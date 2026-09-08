@@ -14,6 +14,10 @@ import sys
 from collections.abc import Sequence
 
 from sonar_analyzer import __version__
+from sonar_analyzer.application.error_handling import (
+    install_exception_handler,
+    qt_notifier,
+)
 
 EXIT_OK = 0
 EXIT_ERROR = 1
@@ -57,6 +61,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     if not isinstance(app, QApplication):  # pragma: no cover - savunma amacli
         print("QApplication olusturulamadi", file=sys.stderr)
         return EXIT_ERROR
+
+    # Islenmemis hatalar sessizce kaybolmasin (F1-008).
+    install_exception_handler(qt_notifier)
 
     window = MainWindow()
 

@@ -4,23 +4,23 @@
 > Bir işi tamamlayınca `plan.md`'deki kutuyu `[x]` yap ve
 > `python tools/sync_todo.py` çalıştır.
 
-**Toplam 492 madde · 24 tamamlandı · 468 kaldı**
+**Toplam 492 madde · 25 tamamlandı · 467 kaldı**
 
-`[#.......................]` %4.9
+`[#.......................]` %5.1
 
 ## Özet
 
 | Grup | Tamam | Kalan | Toplam |
 | --- | --- | --- | --- |
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
-| Faz 1 — Uygulama iskeleti ve domain modeli | 7 | 37 | 44 |
+| Faz 1 — Uygulama iskeleti ve domain modeli | 8 | 36 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 0 | 41 | 41 |
 | Faz 3 — MVP analiz arayüzü | 0 | 80 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **24** | **468** | **492** |
+| **Toplam** | **25** | **467** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -46,7 +46,7 @@
 | [x] | `F0-016` | `0.16.0` | 15 dk | ADR listesini iş ve sürüm hedefleriyle eşleştir |
 | [x] | `F0-017` | `0.17.0` | 15 dk | Format milestone kabul tutanağını hazırla |
 
-### Faz 1 — Uygulama iskeleti ve domain modeli (7/44)
+### Faz 1 — Uygulama iskeleti ve domain modeli (8/44)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -57,7 +57,7 @@
 | [x] | `F1-005` | `0.22.0` | 15 dk | Pytest ve pytest-qt başlangıç düzenini kur |
 | [x] | `F1-006` | `0.23.0` | 20 dk | Windows kalite kontrol iş akışını ekle |
 | [x] | `F1-007` | `0.24.0` | 20 dk | Uygulama girişini ve temiz kapanışı ekle |
-| [ ] | `F1-008` | `0.25.0` | 20 dk | Merkezi exception yakalama yolunu ekle |
+| [x] | `F1-008` | `0.25.0` | 20 dk | Merkezi exception yakalama yolunu ekle |
 | [ ] | `F1-009` | `0.26.0` | 20 dk | Sürümlü temel ayarları yükle ve kaydet |
 | [ ] | `F1-010` | `0.27.0` | 20 dk | Dönen log ve session kimliği ekle |
 | [ ] | `F1-011` | `0.28.0` | 15 dk | ChannelMetadata modelini tanımla |
