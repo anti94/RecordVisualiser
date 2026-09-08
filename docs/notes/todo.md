@@ -4,15 +4,15 @@
 > Bir işi tamamlayınca `plan.md`'deki kutuyu `[x]` yap ve
 > `python tools/sync_todo.py` çalıştır.
 
-**Toplam 492 madde · 14 tamamlandı · 478 kaldı**
+**Toplam 492 madde · 15 tamamlandı · 477 kaldı**
 
-`[#.......................]` %2.8
+`[#.......................]` %3.0
 
 ## Özet
 
 | Grup | Tamam | Kalan | Toplam |
 | --- | --- | --- | --- |
-| Faz 0 — Keşif ve format sözleşmesi | 14 | 3 | 17 |
+| Faz 0 — Keşif ve format sözleşmesi | 15 | 2 | 17 |
 | Faz 1 — Uygulama iskeleti ve domain modeli | 0 | 44 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 0 | 41 | 41 |
 | Faz 3 — MVP analiz arayüzü | 0 | 80 | 80 |
@@ -20,11 +20,11 @@
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **14** | **478** | **492** |
+| **Toplam** | **15** | **477** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
-### Faz 0 — Keşif ve format sözleşmesi (14/17)
+### Faz 0 — Keşif ve format sözleşmesi (15/17)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -42,7 +42,7 @@
 | [x] | `F0-012` | `0.12.0` | 20 dk | Referans mockup'ın dokuz bölgesini yerleşime eşleştir |
 | [x] | `F0-013` | `0.13.0` | 20 dk | Mockup etkileşimleri ve görsel kabul listesini yaz |
 | [x] | `F0-014` | `0.14.0` | 20 dk | Ölçüm bilgisayarı ve performans bütçesini kaydet |
-| [ ] | `F0-015` | `0.15.0` | 20 dk | Açık kararları ve dış bağımlılıkları kaydet |
+| [x] | `F0-015` | `0.15.0` | 20 dk | Açık kararları ve dış bağımlılıkları kaydet |
 | [ ] | `F0-016` | `0.16.0` | 15 dk | ADR listesini iş ve sürüm hedefleriyle eşleştir |
 | [ ] | `F0-017` | `0.17.0` | 15 dk | Format milestone kabul tutanağını hazırla |
 
