@@ -28,8 +28,11 @@ dsp = [
 dev = [
     "pytest>=8.0",
     "pytest-qt>=4.4",
-    "ruff>=0.8",
-    "pyright>=1.1.390",
+    # Lint ve tip denetleyicileri SABIT surumde tutulur: yeni surum yeni kural
+    # getirir ve ayni kod yerelde gecerken CI'da kalir. Surum yukseltmesi
+    # bilincli bir is olarak yapilir.
+    "ruff==0.16.6",
+    "pyright==1.1.411",
 ]
 
 [project.scripts]

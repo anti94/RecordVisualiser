@@ -27,6 +27,11 @@ THEMES = ("dark", "light")
 TIME_DISPLAYS = ("utc", "local", "elapsed")
 
 
+def _empty_str_list() -> list[str]:
+    """`field(default_factory=list)` tip denetiminde list[Unknown] uretir."""
+    return []
+
+
 @dataclass(frozen=True)
 class AppSettings:
     """Uygulamanın kalıcı temel ayarları."""
@@ -36,7 +41,7 @@ class AppSettings:
     time_display: str = "utc"
     last_directory: str = ""
     window_geometry: str = ""
-    recent_files: list[str] = field(default_factory=list)
+    recent_files: list[str] = field(default_factory=_empty_str_list)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -47,7 +52,7 @@ class LoadResult:
     """Yükleme sonucu: ayarlar ve kullanıcıya gösterilecek uyarılar."""
 
     settings: AppSettings
-    warnings: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=_empty_str_list)
     used_defaults: bool = False
 
     @property
