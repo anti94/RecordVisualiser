@@ -4,23 +4,23 @@
 > Bir işi tamamlayınca `plan.md`'deki kutuyu `[x]` yap ve
 > `python tools/sync_todo.py` çalıştır.
 
-**Toplam 492 madde · 32 tamamlandı · 460 kaldı**
+**Toplam 492 madde · 33 tamamlandı · 459 kaldı**
 
-`[##......................]` %6.5
+`[##......................]` %6.7
 
 ## Özet
 
 | Grup | Tamam | Kalan | Toplam |
 | --- | --- | --- | --- |
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
-| Faz 1 — Uygulama iskeleti ve domain modeli | 15 | 29 | 44 |
+| Faz 1 — Uygulama iskeleti ve domain modeli | 16 | 28 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 0 | 41 | 41 |
 | Faz 3 — MVP analiz arayüzü | 0 | 80 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **32** | **460** | **492** |
+| **Toplam** | **33** | **459** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -46,7 +46,7 @@
 | [x] | `F0-016` | `0.16.0` | 15 dk | ADR listesini iş ve sürüm hedefleriyle eşleştir |
 | [x] | `F0-017` | `0.17.0` | 15 dk | Format milestone kabul tutanağını hazırla |
 
-### Faz 1 — Uygulama iskeleti ve domain modeli (15/44)
+### Faz 1 — Uygulama iskeleti ve domain modeli (16/44)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -65,7 +65,7 @@
 | [x] | `F1-013` | `0.30.0` | 15 dk | TimeRange ve RecordingMetadata modellerini ekle |
 | [x] | `F1-014` | `0.31.0` | 15 dk | Event ve BitResult modellerini ekle |
 | [x] | `F1-015` | `0.32.0` | 15 dk | TransmissionInterval modelini ekle |
-| [ ] | `F1-016` | `0.33.0` | 20 dk | RecordingRepository protokolünü tanımla |
+| [x] | `F1-016` | `0.33.0` | 20 dk | RecordingRepository protokolünü tanımla |
 | [ ] | `F1-017` | `0.34.0` | 15 dk | LiveSource protokolünü tanımla |
 | [ ] | `F1-018` | `0.35.0` | 15 dk | Deterministik sinüs üretecini ekle |
 | [ ] | `F1-019` | `0.36.0` | 20 dk | Noise, chirp ve impulse örneklerini ekle |
