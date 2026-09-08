@@ -1,0 +1,78 @@
+name: quality
+
+# Kalite kapisi (F1-006): lint, bicim, tip ve test ayni is akisinda.
+# Plan Bolum 21: basarisiz kalite kapisiyla release uretilmez.
+
+on:
+  push:
+    branches: [main]
+    tags-ignore: ["**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Windows / Python ${{ matrix.python-version }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.9  : su an gelistirme makinesinde kurulu olan surum
+        # 3.12 : plan Bolum 2 hedefi (acik karar D-20)
+        python-version: ["3.9", "3.12"]
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: Python ${{ matrix.python-version }} kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Bagimliliklari kur
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,gui]"
+
+      - name: Surum ve VERSION tutarliligi
+        run: |
+          python -c "import sonar_analyzer; print(sonar_analyzer.__version__)"
+
+      - name: Lint (ruff check)
+        run: python -m ruff check --output-format=github .
+
+      - name: Bicim (ruff format --check)
+        run: python -m ruff format --check .
+
+      - name: Tip kontrolu (pyright, strict)
+        run: python -m pyright
+
+      - name: Testler (Qt gerektirmeyenler)
+        run: python -m pytest -m "not gui" -q
+
+      - name: Testler (GUI, offscreen)
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m pytest -m gui -q
+
+  todo-sync:
+    name: todo.md plan.md ile guncel mi
+    runs-on: windows-latest
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: todo.md guncelligini dogrula
+        run: python tools/sync_todo.py --check

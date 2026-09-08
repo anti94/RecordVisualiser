@@ -77,6 +77,13 @@ pip install -e ".[dsp]"   # SciPy
 | Qt gerektirmeyenler | `python -m pytest -m "not gui"` |
 | Yalnız GUI | `python -m pytest -m gui` |
 
+CI ile birebir aynı kontrolleri yerelde koşmak için:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/check.ps1        # kontrol et
+powershell -ExecutionPolicy Bypass -File tools/check.ps1 -Fix   # düzeltip kontrol et
+```
+
 GUI testleri `QT_QPA_PLATFORM=offscreen` ile görünür pencere açmadan koşar; PySide6 kurulu
 değilse otomatik atlanır. `tests/unit/test_layering.py`, çekirdek katmanların Qt yüklemediğini
 ayrı bir alt süreçte doğrular — katman kuralı belgeyle değil testle korunur.
