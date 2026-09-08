@@ -1,0 +1,26 @@
+# Metin dosyalari depoda LF olarak normalize edilir; calisma kopyasinda
+# platform ayari (core.autocrlf) gecerlidir.
+* text=auto
+
+*.py   text diff=python
+*.md   text
+*.toml text
+*.cfg  text
+*.ini  text
+*.json text
+*.yml  text
+*.yaml text
+VERSION text
+
+# Ikili dosyalar hicbir sekilde satir sonu donusumune girmez.
+# Golden .bin fixture'lari byte-birebir korunmalidir.
+*.bin binary
+*.idx binary
+*.sidx binary
+*.png binary
+*.jpg binary
+*.ico binary
+*.pdf binary
+*.7z  binary
+*.zip binary
+*.qm  binary
