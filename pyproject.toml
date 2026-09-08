@@ -14,7 +14,10 @@ dynamic = ["version"]
 # Plan Bolum 7.1 kurali: GUI, .bin byte duzenini bilmez; cekirdek de GUI'yi bilmez.
 # Bu ayrim burada bagimlilik seviyesinde zorlanir.
 dependencies = [
-    "numpy>=1.24",
+    # numpy ust sinir bilincli: tip taslaklari (stub) surumle degisiyor ve
+    # 3.9 ile 3.12 ayaklarinda farkli numpy secilirse pyright ayni kodda
+    # farkli sonuc veriyor. 2.0.x hem 3.9 hem 3.12 destekliyor.
+    "numpy>=1.26,<2.1",
 ]
 
 [project.optional-dependencies]

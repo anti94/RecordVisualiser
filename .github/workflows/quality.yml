@@ -41,9 +41,12 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev,gui]"
 
-      - name: Surum ve VERSION tutarliligi
+      - name: Surum ve arac bilgileri
         run: |
-          python -c "import sonar_analyzer; print(sonar_analyzer.__version__)"
+          python -c "import sonar_analyzer; print('uygulama', sonar_analyzer.__version__)"
+          python -c "import numpy; print('numpy', numpy.__version__)"
+          python -m ruff --version
+          python -m pyright --version
 
       - name: Lint (ruff check)
         run: python -m ruff check --output-format=github .
