@@ -28,6 +28,7 @@ dsp = [
 dev = [
     "pytest>=8.0",
     "ruff>=0.8",
+    "pyright>=1.1.390",
 ]
 
 [project.scripts]
@@ -75,3 +76,13 @@ known-first-party = ["sonar_analyzer"]
 quote-style = "double"
 indent-style = "space"
 line-ending = "lf"
+
+[tool.pyright]
+include = ["src", "tests", "tools"]
+exclude = [".venv", "**/__pycache__", "**/node_modules"]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.9"          # calisma zamani hedefi 3.12 olunca guncellenecek (D-20)
+pythonPlatform = "Windows"
+typeCheckingMode = "strict"
+reportMissingTypeStubs = false

@@ -44,12 +44,14 @@ powershell -ExecutionPolicy Bypass -File tools/setup-dev.ps1
 ```
 
 Betik sanal ortamı oluşturur, paketi `[dev]` ekstrasıyla kurar ve üç doğrulama yapar
-(paket import, ruff, pytest). Yeniden çalıştırılabilir; mevcut `.venv` varsa kullanır.
+beş doğrulama yapar (paket import, ruff lint, ruff format, pyright, pytest).
+Yeniden çalıştırılabilir; mevcut `.venv` varsa kullanır.
 
 | Seçenek | Etki |
 | --- | --- |
 | `-Recreate` | Mevcut `.venv` silinip sıfırdan kurulur |
 | `-WithGui` | PySide6 + PyQtGraph ekstrası da kurulur |
+| `-Locked` | Bağımlılıklar `requirements-dev.lock` içindeki sabit sürümlerden kurulur |
 
 Elle kurulum (diğer platformlar veya betiği kullanmak istemeyenler için):
 
@@ -76,11 +78,15 @@ pip install -e ".[dsp]"   # SciPy
 .venv/Scripts/python.exe -m ruff check .         # lint (salt kontrol)
 .venv/Scripts/python.exe -m ruff format --check . # bicim (salt kontrol)
 .venv/Scripts/python.exe -m ruff format .        # bicimlendir
+.venv/Scripts/python.exe -m pyright              # tip kontrolu
 ```
 
 Ruff yapılandırması `pyproject.toml` içindedir: satır uzunluğu 100, kural setleri
 `E, F, W, I, UP, B, SIM, RUF`. Markdown dosyaları kapsam dışıdır — belgelerdeki Python
 örnekleri bilerek elle yazılmıştır.
+
+Pyright **strict** modda çalışır (`[tool.pyright]`). Pyright ilk çalıştırmada kendi Node
+çalışma zamanını indirir; ağ erişimi olmayan ortamda bu adım atlanmalıdır.
 
 > **Python sürümü:** plan Python **3.12** hedefliyor; bu makinede yalnız **3.9.13** kurulu olduğu
 > için `requires-python` geçici olarak `>=3.9`'dur. Bkz. açık karar **D-20**.

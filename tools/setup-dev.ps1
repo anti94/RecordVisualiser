@@ -12,6 +12,10 @@
 .PARAMETER WithGui
     PySide6 ve PyQtGraph ekstrasini da kurar.
 
+.PARAMETER Locked
+    Bagimliliklari requirements-dev.lock icindeki sabit surumlerden kurar.
+    Yeniden uretilebilir ortam gerektiginde (CI, hata ayiklama) kullanilir.
+
 .EXAMPLE
     powershell -ExecutionPolicy Bypass -File tools/setup-dev.ps1
 
@@ -21,7 +25,8 @@
 [CmdletBinding()]
 param(
     [switch]$Recreate,
-    [switch]$WithGui
+    [switch]$WithGui,
+    [switch]$Locked
 )
 
 $ErrorActionPreference = 'Stop'
@@ -74,15 +79,29 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'pip guncellenemedi' }
 
     $extras = if ($WithGui) { '.[dev,gui]' } else { '.[dev]' }
-    Write-Step "Paket kuruluyor: pip install -e `"$extras`""
-    & $VenvPython -m pip install --quiet -e $extras
-    if ($LASTEXITCODE -ne 0) { throw 'paket kurulamadi' }
+    if ($Locked) {
+        $lockFile = Join-Path $RepoRoot 'requirements-dev.lock'
+        if (-not (Test-Path $lockFile)) { throw "Kilit dosyasi yok: $lockFile" }
+        Write-Step 'Bagimliliklar kilitten kuruluyor'
+        & $VenvPython -m pip install --quiet -r $lockFile
+        if ($LASTEXITCODE -ne 0) { throw 'kilitli bagimliliklar kurulamadi' }
+        Write-Step 'Paket kuruluyor (bagimliliklar kilitten geldi)'
+        & $VenvPython -m pip install --quiet --no-deps -e .
+        if ($LASTEXITCODE -ne 0) { throw 'paket kurulamadi' }
+    }
+    else {
+        Write-Step "Paket kuruluyor: pip install -e `"$extras`""
+        & $VenvPython -m pip install --quiet -e $extras
+        if ($LASTEXITCODE -ne 0) { throw 'paket kurulamadi' }
+    }
 
     # 4. Dogrulama
     Write-Step 'Kurulum dogrulaniyor'
     $checks = @(
         @{ Name = 'paket import'; Cmd = { & $VenvPython -c 'import sonar_analyzer; print(sonar_analyzer.__version__)' } },
-        @{ Name = 'ruff';         Cmd = { & $VenvPython -m ruff check . } },
+        @{ Name = 'ruff lint';    Cmd = { & $VenvPython -m ruff check . } },
+        @{ Name = 'ruff format';  Cmd = { & $VenvPython -m ruff format --check . } },
+        @{ Name = 'pyright';      Cmd = { & $VenvPython -m pyright } },
         @{ Name = 'pytest';       Cmd = { & $VenvPython -m pytest } }
     )
     foreach ($check in $checks) {
