@@ -1319,7 +1319,7 @@ Kabul: Format taslağı, sentetik/gerçek veri ayrımı, fixture beklentileri ve
 | [x] | `F0-008` | `0.8.0` | 20 dk | CRC destekleyen formatın karar kaydını yaz | Algoritma, parametreler, kapsam, alan konumu, sürüm ve referans vektör bellidir | `F0-007` | `docs(format): F0-008 cRC destekleyen formatın karar kaydını yaz` |
 | [x] | `F0-009` | `0.9.0` | 15 dk | Küçük geçerli fixture için beklenen sonuçları yaz | Sekiz kayıt, 0–875 ms aralığı ve 544 byte örnek boyutu tanımlıdır | `F0-008` | `docs(fixtures): F0-009 küçük geçerli fixture için beklenen sonuçları yaz` |
 | [x] | `F0-010` | `0.10.0` | 15 dk | Bozuk fixture senaryolarının sonuçlarını yaz | Kesik header, kesik kayıt, sıra boşluğu ve CRC hatası ayrı senaryolardır | `F0-009` | `docs(fixtures): F0-010 bozuk fixture senaryolarının sonuçlarını yaz` |
-| [ ] | `F0-011` | `0.11.0` | 20 dk | UTC ve cihaz zamanı dönüşüm kararını yaz | Orijinal zaman, kanonik ns, reset ve drift davranışları tanımlıdır | `F0-010` | `docs(time): F0-011 uTC ve cihaz zamanı dönüşüm kararını yaz` |
+| [x] | `F0-011` | `0.11.0` | 20 dk | UTC ve cihaz zamanı dönüşüm kararını yaz | Orijinal zaman, kanonik ns, reset ve drift davranışları tanımlıdır | `F0-010` | `docs(time): F0-011 uTC ve cihaz zamanı dönüşüm kararını yaz` |
 
 ##### Ekran ve kabul ölçütleri
 
@@ -2005,7 +2005,7 @@ Aşağıdaki kararlar kısa ADR belgeleriyle kaydedilmelidir:
 
 - ADR-001: PySide6 seçimi.
 - ADR-002: PyQtGraph ve plot abstraction sınırı.
-- ADR-003: Kanonik timestamp birimi ve time-base modeli.
+- ADR-003: Kanonik timestamp birimi ve time-base modeli (`docs/adr/ADR-003-time-base.md`, `F0-011`).
 - ADR-004: Decoder versioning ve format detection.
 - ADR-005: Index/cache formatı.
 - ADR-006: Thread/process çalışma modeli.
