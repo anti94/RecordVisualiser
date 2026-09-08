@@ -91,6 +91,98 @@ Kayıt sayısı: `record_count = (dosya_boyutu - header_size) // record_size`.
   daima `header_size` üzerinden hesaplanır.
 - CRC alanı bu sürümde **yoktur**; CRC'li sürüm ayrı karar kaydında tanımlanır (`F0-008`, envanter E-03).
 
-## 5. Kayıt sözleşmesi
+## 5. Kayıt sözleşmesi — `DataNNNNN` (64 byte)
 
-64 byte `DataNNNNN` kaydının alan tablosu `F0-005` ile bu dosyanın 6. bölümüne eklenir.
+Offsetler **kaydın kendi başlangıcına** göredir. Kayıt `n`'in dosya offseti: `header_size + n * record_size`.
+
+| Offset | Alan | Tip | Boyut | Değer / kural |
+| --- | --- | --- | --- | --- |
+| 0 | `name` | `char[12]` | 12 | ASCII `Data00000`; kalan byte `0x00`. Etikettir, yetkili alan `sequence_no`'dur. |
+| 12 | `sequence_no` | `uint32` | 4 | `0`, `1`, `2`, … Monoton artar; atlama zaman boşluğu demektir. |
+| 16 | `elapsed_us` | `uint64` | 8 | Kayıt başından geçen süre: `sequence_no × 125000`. |
+| 24 | `sensor_values` | `float32[8]` | 32 | CH0–CH7 anlık değerleri, sabit kanal sırası. |
+| 56 | `bit_status` | `uint32` | 4 | Bit maskesi; bit *k* = test *k* FAIL. `0` → tümü PASS. |
+| 60 | `tx_status` | `uint32` | 4 | `0 = IDLE`, `1 = ACTIVE`, `2 = FAULT`. |
+
+**Toplam: 64 byte.** `60 + 4 = 64` → `record_size` ile birebir eşleşir.
+
+### 5.1 Makine sözleşmesi
+
+```python
+DATA_RECORD = struct.Struct("<12sIQ8fII")   # 64 byte
+assert DATA_RECORD.size == 64
+
+RECORD_PERIOD_US = 125_000
+TX_STATES = {0: "IDLE", 1: "ACTIVE", 2: "FAULT"}
+
+
+def record_name(sequence_no: int) -> str:
+    return f"Data{sequence_no:05d}"
+
+
+def record_offset(sequence_no: int, header_size: int = 32, record_size: int = 64) -> int:
+    return header_size + sequence_no * record_size
+```
+
+### 5.2 Alan kuralları
+
+- **`name`** — `record_name(sequence_no)` ile üretilir. En az 5 hane sıfır dolgusu; `Data99999`'dan sonra
+  `Data100000` gelir, **sayaç sıfırlanmaz**. `char[12]` en fazla `Data9999999` + sonlandırıcı sıfırı alır;
+  bu sınıra gelmeden yeni dosyaya geçilir. Ad ile `sequence_no` uyuşmazsa tutarsızlık raporlanır.
+- **`sequence_no`** — sıralama, indeksleme ve korelasyonda yetkili alandır. Kayıp periyotta kayıt yazılmaz;
+  numara atlar. Geri giden numara dosya bozulması veya yeniden başlatma sayılır.
+- **`elapsed_us`** — nominal ızgara `sequence_no × 125000`. Mutlak zaman:
+  `start_time_utc_ns + elapsed_us × 1000`. Nominal ızgaradan sapma jitter olarak raporlanır.
+- **`sensor_values`** — birim ve kanal adı bu profilde **taşınmaz**; kanal kataloğundan gelir (envanter E-04).
+  `NaN` değer "ölçüm yok" anlamındadır ve grafikte kesinti olarak gösterilir, `0.0`'a çevrilmez.
+- **`bit_status`** — 32 test kapasitesi. Bit → test eşlemesi bu profilde yoktur; BIT kataloğundan gelir
+  (envanter E-05). Eşleme yokken UI ham bit numarasını gösterir, uydurma test adı üretmez.
+- **`tx_status`** — tanımsız bir kod gelirse değer ham olarak gösterilir ve `bilinmeyen durum` işaretlenir.
+  `TransmissionInterval`, ardışık kayıtlardaki `IDLE → ACTIVE` / `ACTIVE → IDLE` geçişlerinden türetilir;
+  sınırlar 125 ms belirsizlik taşır.
+
+### 5.3 Örnek kayıt — `Data00001` hexdump
+
+`sequence_no = 1`, `elapsed_us = 125000`, CH0–CH7 = `12.5, -3.25, 0.0, 101.75, 7.125, -0.5, 48.0, 1000.0`,
+`bit_status = 0` (tümü PASS), `tx_status = 1` (ACTIVE).
+
+```text
++0x00   44 61 74 61 30 30 30 30 31 00 00 00 01 00 00 00
++0x10   48 E8 01 00 00 00 00 00 00 00 48 41 00 00 50 C0
++0x20   00 00 00 00 00 80 CB 42 00 00 E4 40 00 00 00 BF
++0x30   00 00 40 42 00 00 7A 44 00 00 00 00 01 00 00 00
+```
+
+Alan ayrımı:
+
+```text
++0x00  44 61 74 61 30 30 30 30 31 00 00 00   name        = "Data00001"
++0x0C  01 00 00 00                           sequence_no = 1
++0x10  48 E8 01 00 00 00 00 00               elapsed_us  = 125000
++0x18  00 00 48 41                           CH0         = 12.5
++0x1C  00 00 50 C0                           CH1         = -3.25
++0x20  00 00 00 00                           CH2         = 0.0
++0x24  00 80 CB 42                           CH3         = 101.75
++0x28  00 00 E4 40                           CH4         = 7.125
++0x2C  00 00 00 BF                           CH5         = -0.5
++0x30  00 00 40 42                           CH6         = 48.0
++0x34  00 00 7A 44                           CH7         = 1000.0
++0x38  00 00 00 00                           bit_status  = 0
++0x3C  01 00 00 00                           tx_status   = 1 (ACTIVE)
+```
+
+### 5.4 Dosya düzeyi tutarlılık
+
+| Kontrol | Beklenen |
+| --- | --- |
+| `n` numaralı kaydın offseti | `32 + n × 64` |
+| 8 kayıtlık dosya boyutu | `32 + 8 × 64 = 544` byte |
+| İlk saniye `[0, 1000 ms)` | `Data00000` – `Data00007` |
+| `Data00008` zamanı | `1 000 000 µs` = 1000 ms |
+| Kayıt sayısı | `(dosya_boyutu - 32) // 64` |
+
+## 6. Bu profilin sınırı
+
+Kayıt başına kanal başına **tek anlık değer** taşınır; efektif örnekleme hızı 8 Hz'dir. Bu, trend, durum,
+BIT ve TX izleme için yeterlidir; FFT/PSD/spektrogram gerektiren ham akustik veri için yetersizdir.
+Ham akustik kayıt düzeni `plan.md` Bölüm 8.3'teki Profil B'de tanımlıdır.
