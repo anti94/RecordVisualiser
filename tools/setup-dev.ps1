@@ -85,6 +85,13 @@ try {
         Write-Step 'Bagimliliklar kilitten kuruluyor'
         & $VenvPython -m pip install --quiet -r $lockFile
         if ($LASTEXITCODE -ne 0) { throw 'kilitli bagimliliklar kurulamadi' }
+        if ($WithGui) {
+            $guiLock = Join-Path $RepoRoot 'requirements-gui.lock'
+            if (-not (Test-Path $guiLock)) { throw "GUI kilit dosyasi yok: $guiLock" }
+            Write-Step 'Arayuz bagimliliklari kilitten kuruluyor'
+            & $VenvPython -m pip install --quiet -r $guiLock
+            if ($LASTEXITCODE -ne 0) { throw 'GUI bagimliliklari kurulamadi' }
+        }
         Write-Step 'Paket kuruluyor (bagimliliklar kilitten geldi)'
         & $VenvPython -m pip install --quiet --no-deps -e .
         if ($LASTEXITCODE -ne 0) { throw 'paket kurulamadi' }

@@ -1344,7 +1344,7 @@ Kabul: Uygulama sahte veriyle açılmalı; dock'lar ve temel zaman grafiği çal
 | [x] | `F1-002` | `0.19.0` | 15 dk | Tek komutluk geliştirici kurulumunu yaz | Yeni ortam kurulumu belgelenen komutla tamamlanır | `F1-001` | `docs(dev): F1-002 tek komutluk geliştirici kurulumunu yaz` |
 | [x] | `F1-003` | `0.20.0` | 15 dk | Ruff kontrol yapılandırmasını ekle | Mevcut kaynaklarda salt kontrol komutu geçer | `F1-002` | `chore(quality): F1-003 ruff kontrol yapılandırmasını ekle` |
 | [x] | `F1-004` | `0.21.0` | 15 dk | Pyright tip kontrolünü ekle | Domain ve uygulama iskeleti tip kontrolünden geçer | `F1-003` | `chore(quality): F1-004 pyright tip kontrolünü ekle` |
-| [ ] | `F1-005` | `0.22.0` | 15 dk | Pytest ve pytest-qt başlangıç düzenini kur | Basit bir domain ve pencere yaşam döngüsü kontrolü çalışır | `F1-004` | `test(project): F1-005 pytest ve pytest-qt başlangıç düzenini kur` |
+| [x] | `F1-005` | `0.22.0` | 15 dk | Pytest ve pytest-qt başlangıç düzenini kur | Basit bir domain ve pencere yaşam döngüsü kontrolü çalışır | `F1-004` | `test(project): F1-005 pytest ve pytest-qt başlangıç düzenini kur` |
 | [ ] | `F1-006` | `0.23.0` | 20 dk | Windows kalite kontrol iş akışını ekle | Lint, tip ve test adımları aynı workflow içinde tanımlıdır | `F1-005` | `build(ci): F1-006 windows kalite kontrol iş akışını ekle` |
 | [ ] | `F1-007` | `0.24.0` | 20 dk | Uygulama girişini ve temiz kapanışı ekle | Pencere komutla açılır; kapanışta süreç sonlanır | `F1-006` | `feat(app): F1-007 uygulama girişini ve temiz kapanışı ekle` |
 | [ ] | `F1-008` | `0.25.0` | 20 dk | Merkezi exception yakalama yolunu ekle | Sentetik hata loglanır ve kullanıcıya okunabilir mesaj gösterilir | `F1-007` | `feat(app): F1-008 merkezi exception yakalama yolunu ekle` |

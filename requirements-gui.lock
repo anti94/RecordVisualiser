@@ -1,0 +1,8 @@
+# Arayuz katmani bagimlilik kilidi (F1-005).
+# Kurulum: pip install -r requirements-dev.lock -r requirements-gui.lock
+# Cozumlendigi ortam: Python 3.9.13 / Windows 11 x64.
+# Cekirdek katman bu paketlere bagimli DEGILDIR; yalnizca ui/ ve GUI testleri kullanir.
+PySide6==6.10.3
+PySide6_Addons==6.10.3
+PySide6_Essentials==6.10.3
+shiboken6==6.10.3

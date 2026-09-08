@@ -51,7 +51,8 @@ Yeniden çalıştırılabilir; mevcut `.venv` varsa kullanır.
 | --- | --- |
 | `-Recreate` | Mevcut `.venv` silinip sıfırdan kurulur |
 | `-WithGui` | PySide6 + PyQtGraph ekstrası da kurulur |
-| `-Locked` | Bağımlılıklar `requirements-dev.lock` içindeki sabit sürümlerden kurulur |
+| `-Locked` | Bağımlılıklar `requirements-dev.lock` (ve `-WithGui` ile `requirements-gui.lock`)
+içindeki sabit sürümlerden kurulur |
 
 Elle kurulum (diğer platformlar veya betiği kullanmak istemeyenler için):
 
@@ -67,6 +68,18 @@ Arayüz ve DSP katmanları ayrı kurulur:
 pip install -e ".[gui]"   # PySide6 + PyQtGraph
 pip install -e ".[dsp]"   # SciPy
 ```
+
+### Testler
+
+| Seçim | Komut |
+| --- | --- |
+| Tümü | `python -m pytest` |
+| Qt gerektirmeyenler | `python -m pytest -m "not gui"` |
+| Yalnız GUI | `python -m pytest -m gui` |
+
+GUI testleri `QT_QPA_PLATFORM=offscreen` ile görünür pencere açmadan koşar; PySide6 kurulu
+değilse otomatik atlanır. `tests/unit/test_layering.py`, çekirdek katmanların Qt yüklemediğini
+ayrı bir alt süreçte doğrular — katman kuralı belgeyle değil testle korunur.
 
 Çekirdek katman (domain, io, repository, processing) **Qt'ye bağımlı değildir**; bu ayrım
 `pyproject.toml` içinde bağımlılık seviyesinde zorlanır.
