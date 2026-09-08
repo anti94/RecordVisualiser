@@ -37,6 +37,22 @@ Geliştirme sürümü. Güncel sürüm [`VERSION`](VERSION) dosyasındadır.
 
 ## Geliştirme kurulumu
 
+Tek komut (Windows, PowerShell):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/setup-dev.ps1
+```
+
+Betik sanal ortamı oluşturur, paketi `[dev]` ekstrasıyla kurar ve üç doğrulama yapar
+(paket import, ruff, pytest). Yeniden çalıştırılabilir; mevcut `.venv` varsa kullanır.
+
+| Seçenek | Etki |
+| --- | --- |
+| `-Recreate` | Mevcut `.venv` silinip sıfırdan kurulur |
+| `-WithGui` | PySide6 + PyQtGraph ekstrası da kurulur |
+
+Elle kurulum (diğer platformlar veya betiği kullanmak istemeyenler için):
+
 ```bash
 python -m venv .venv
 .venv/Scripts/python.exe -m pip install -e ".[dev]"     # Windows

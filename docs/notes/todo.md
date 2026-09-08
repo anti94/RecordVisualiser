@@ -4,23 +4,23 @@
 > Bir işi tamamlayınca `plan.md`'deki kutuyu `[x]` yap ve
 > `python tools/sync_todo.py` çalıştır.
 
-**Toplam 492 madde · 18 tamamlandı · 474 kaldı**
+**Toplam 492 madde · 19 tamamlandı · 473 kaldı**
 
-`[#.......................]` %3.7
+`[#.......................]` %3.9
 
 ## Özet
 
 | Grup | Tamam | Kalan | Toplam |
 | --- | --- | --- | --- |
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
-| Faz 1 — Uygulama iskeleti ve domain modeli | 1 | 43 | 44 |
+| Faz 1 — Uygulama iskeleti ve domain modeli | 2 | 42 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 0 | 41 | 41 |
 | Faz 3 — MVP analiz arayüzü | 0 | 80 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **18** | **474** | **492** |
+| **Toplam** | **19** | **473** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -46,12 +46,12 @@
 | [x] | `F0-016` | `0.16.0` | 15 dk | ADR listesini iş ve sürüm hedefleriyle eşleştir |
 | [x] | `F0-017` | `0.17.0` | 15 dk | Format milestone kabul tutanağını hazırla |
 
-### Faz 1 — Uygulama iskeleti ve domain modeli (1/44)
+### Faz 1 — Uygulama iskeleti ve domain modeli (2/44)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
 | [x] | `F1-001` | `0.18.0` | 20 dk | Python paket iskeleti ve bağımlılık kilidini oluştur |
-| [ ] | `F1-002` | `0.19.0` | 15 dk | Tek komutluk geliştirici kurulumunu yaz |
+| [x] | `F1-002` | `0.19.0` | 15 dk | Tek komutluk geliştirici kurulumunu yaz |
 | [ ] | `F1-003` | `0.20.0` | 15 dk | Ruff kontrol yapılandırmasını ekle |
 | [ ] | `F1-004` | `0.21.0` | 15 dk | Pyright tip kontrolünü ekle |
 | [ ] | `F1-005` | `0.22.0` | 15 dk | Pytest ve pytest-qt başlangıç düzenini kur |
