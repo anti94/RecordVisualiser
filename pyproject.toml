@@ -52,6 +52,9 @@ markers = [
 line-length = 100
 src = ["src", "tests", "tools"]
 target-version = "py39"
+# Markdown belgelerindeki Python ornekleri bilerek elle yazilmistir; bicimlendirici
+# plan.md ve docs/ altindaki anlatimi degistirmesin.
+extend-exclude = ["*.md", ".venv"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
@@ -60,3 +63,15 @@ ignore = [
     "RUF002",
     "RUF003",
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# Testlerde assert kullanimi ve uzun aciklayici isimler normaldir.
+"tests/**" = ["B011"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["sonar_analyzer"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"

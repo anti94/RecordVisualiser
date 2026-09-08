@@ -72,9 +72,15 @@ pip install -e ".[dsp]"   # SciPy
 ### Kontroller
 
 ```bash
-.venv/Scripts/python.exe -m pytest        # testler
-.venv/Scripts/python.exe -m ruff check .  # lint
+.venv/Scripts/python.exe -m pytest               # testler
+.venv/Scripts/python.exe -m ruff check .         # lint (salt kontrol)
+.venv/Scripts/python.exe -m ruff format --check . # bicim (salt kontrol)
+.venv/Scripts/python.exe -m ruff format .        # bicimlendir
 ```
+
+Ruff yapılandırması `pyproject.toml` içindedir: satır uzunluğu 100, kural setleri
+`E, F, W, I, UP, B, SIM, RUF`. Markdown dosyaları kapsam dışıdır — belgelerdeki Python
+örnekleri bilerek elle yazılmıştır.
 
 > **Python sürümü:** plan Python **3.12** hedefliyor; bu makinede yalnız **3.9.13** kurulu olduğu
 > için `requires-python` geçici olarak `>=3.9`'dur. Bkz. açık karar **D-20**.
