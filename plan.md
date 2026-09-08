@@ -1310,7 +1310,7 @@ Kabul: Format taslağı, sentetik/gerçek veri ayrımı, fixture beklentileri ve
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F0-001` | `0.1.0` | 15 dk | Git başlangıcını, ignore kurallarını ve VERSION kaynağını hazırla | İlk commit yalnız seçili proje dosyalarını içerir; VERSION hedef sürümü gösterir | — | `chore(repo): F0-001 git başlangıcını, ignore kurallarını ve VERSION kaynağını hazırla` |
-| [ ] | `F0-002` | `0.2.0` | 15 dk | Üç kullanıcı rolü için ilk beş senaryoyu yaz | Her senaryonun girdisi ve gözlenebilir sonucu tanımlıdır | `F0-001` | `docs(product): F0-002 üç kullanıcı rolü için ilk beş senaryoyu yaz` |
+| [x] | `F0-002` | `0.2.0` | 15 dk | Üç kullanıcı rolü için ilk beş senaryoyu yaz | Her senaryonun girdisi ve gözlenebilir sonucu tanımlıdır | `F0-001` | `docs(product): F0-002 üç kullanıcı rolü için ilk beş senaryoyu yaz` |
 | [ ] | `F0-003` | `0.3.0` | 20 dk | Örnek dosya ve format envanterini çıkar | Mevcut dosyalar listelidir; bulunmayan gerçek kayıtlar eksik olarak işaretlidir | `F0-002` | `docs(format): F0-003 örnek dosya ve format envanterini çıkar` |
 | [ ] | `F0-004` | `0.4.0` | 15 dk | 32 byte örnek header sözleşmesini çıkar | Alan offsetleri ve toplam boyut Bölüm 8.2 ile eşleşir | `F0-003` | `docs(format): F0-004 32 byte örnek header sözleşmesini çıkar` |
 | [ ] | `F0-005` | `0.5.0` | 20 dk | 64 byte örnek Data kayıt sözleşmesini çıkar | İsim, sıra, zaman, sensör, BIT ve TX alanları tamdır | `F0-004` | `docs(format): F0-005 64 byte örnek Data kayıt sözleşmesini çıkar` |
