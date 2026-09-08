@@ -51,8 +51,10 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `-` | — | 1 dk 40 sn | `b3b3a74` | pyright/ruff sürümlerini sabitle ve default_factory tipini düzelt |
 | `F1-011` | 15 dk | 1 dk 15 sn | `87b3c64` | ChannelMetadata modelini tanımla |
 | `F1-012` | 15 dk | 1 dk 34 sn | `a01a899` | DataChunk ve kalite alanlarını tanımla |
+| `-` | — | 2 dk 34 sn | `9d1a104` | iş sürelerini git geçmişinden otomatik üret |
+| `-` | — | 1 dk 22 sn | `0d11b80` | numpy sürümünü sabitle, CI'a sürüm raporlama ekle |
 
-**33 commit · olculen toplam 68 dk 47 sn · olculemeyen 1 (ilk commit)**
+**35 commit · olculen toplam 72 dk 43 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
