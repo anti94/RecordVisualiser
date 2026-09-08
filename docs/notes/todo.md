@@ -4,15 +4,15 @@
 > Bir işi tamamlayınca `plan.md`'deki kutuyu `[x]` yap ve
 > `python tools/sync_todo.py` çalıştır.
 
-**Toplam 492 madde · 12 tamamlandı · 480 kaldı**
+**Toplam 492 madde · 13 tamamlandı · 479 kaldı**
 
-`[#.......................]` %2.4
+`[#.......................]` %2.6
 
 ## Özet
 
 | Grup | Tamam | Kalan | Toplam |
 | --- | --- | --- | --- |
-| Faz 0 — Keşif ve format sözleşmesi | 12 | 5 | 17 |
+| Faz 0 — Keşif ve format sözleşmesi | 13 | 4 | 17 |
 | Faz 1 — Uygulama iskeleti ve domain modeli | 0 | 44 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 0 | 41 | 41 |
 | Faz 3 — MVP analiz arayüzü | 0 | 80 | 80 |
@@ -20,11 +20,11 @@
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **12** | **480** | **492** |
+| **Toplam** | **13** | **479** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
-### Faz 0 — Keşif ve format sözleşmesi (12/17)
+### Faz 0 — Keşif ve format sözleşmesi (13/17)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -40,7 +40,7 @@
 | [x] | `F0-010` | `0.10.0` | 15 dk | Bozuk fixture senaryolarının sonuçlarını yaz |
 | [x] | `F0-011` | `0.11.0` | 20 dk | UTC ve cihaz zamanı dönüşüm kararını yaz |
 | [x] | `F0-012` | `0.12.0` | 20 dk | Referans mockup'ın dokuz bölgesini yerleşime eşleştir |
-| [ ] | `F0-013` | `0.13.0` | 20 dk | Mockup etkileşimleri ve görsel kabul listesini yaz |
+| [x] | `F0-013` | `0.13.0` | 20 dk | Mockup etkileşimleri ve görsel kabul listesini yaz |
 | [ ] | `F0-014` | `0.14.0` | 20 dk | Ölçüm bilgisayarı ve performans bütçesini kaydet |
 | [ ] | `F0-015` | `0.15.0` | 20 dk | Açık kararları ve dış bağımlılıkları kaydet |
 | [ ] | `F0-016` | `0.16.0` | 15 dk | ADR listesini iş ve sürüm hedefleriyle eşleştir |
