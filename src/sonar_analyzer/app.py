@@ -10,6 +10,7 @@ gibi komutlar PySide6 kurulu olmasa da çalışır ve hata iletisi anlaşılır 
 from __future__ import annotations
 
 import argparse
+import logging
 import sys
 from collections.abc import Sequence
 
@@ -18,6 +19,8 @@ from sonar_analyzer.application.error_handling import (
     install_exception_handler,
     qt_notifier,
 )
+from sonar_analyzer.logging.setup import setup_logging
+from sonar_analyzer.settings.store import load_settings
 
 EXIT_OK = 0
 EXIT_ERROR = 1
@@ -46,6 +49,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     """Uygulamayı başlatır ve çıkış kodunu döndürür."""
     args = build_parser().parse_args(argv)
 
+    # Log ve ayarlar Qt'den once kurulur: GUI hic acilamasa bile ne oldugu
+    # log'a yazilmis olur (F1-009, F1-010).
+    session = setup_logging()
+    logger = logging.getLogger("sonar_analyzer")
+    settings_result = load_settings()
+    for warning in settings_result.warnings:
+        logger.warning("Ayar uyarisi: %s", warning)
+
     try:
         from PySide6.QtWidgets import QApplication
 
@@ -65,6 +76,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     # Islenmemis hatalar sessizce kaybolmasin (F1-008).
     install_exception_handler(qt_notifier)
 
+    logger.info("Arayuz baslatiliyor (oturum %s)", session.session_id)
     window = MainWindow()
 
     if args.no_window:

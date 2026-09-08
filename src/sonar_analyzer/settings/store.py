@@ -55,8 +55,15 @@ class LoadResult:
         return not self.warnings
 
 
+#: Ayar dosyasini disaridan degistirmeye yarar (test ve CI icin).
+SETTINGS_PATH_ENV = "SONAR_ANALYZER_SETTINGS"
+
+
 def default_settings_path() -> Path:
-    """Windows'ta %APPDATA%, diğerlerinde ~/.config altındaki ayar dosyası."""
+    """Ayar dosyası: önce ortam değişkeni, sonra platform varsayılanı."""
+    override = os.environ.get(SETTINGS_PATH_ENV)
+    if override:
+        return Path(override)
     base = os.environ.get("APPDATA")
     root = Path(base) if base else Path.home() / ".config"
     return root / "SonarAnalyzer" / "settings.json"
