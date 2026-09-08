@@ -1340,7 +1340,7 @@ Kabul: Uygulama sahte veriyle açılmalı; dock'lar ve temel zaman grafiği çal
 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `F1-001` | `0.18.0` | 20 dk | Python paket iskeleti ve bağımlılık kilidini oluştur | Uyumlu Python ortamında paket kurulabilir; metadata VERSION kaynağını kullanır | `F0-017` | `build(project): F1-001 python paket iskeleti ve bağımlılık kilidini oluştur` |
+| [x] | `F1-001` | `0.18.0` | 20 dk | Python paket iskeleti ve bağımlılık kilidini oluştur | Uyumlu Python ortamında paket kurulabilir; metadata VERSION kaynağını kullanır | `F0-017` | `build(project): F1-001 python paket iskeleti ve bağımlılık kilidini oluştur` |
 | [ ] | `F1-002` | `0.19.0` | 15 dk | Tek komutluk geliştirici kurulumunu yaz | Yeni ortam kurulumu belgelenen komutla tamamlanır | `F1-001` | `docs(dev): F1-002 tek komutluk geliştirici kurulumunu yaz` |
 | [ ] | `F1-003` | `0.20.0` | 15 dk | Ruff kontrol yapılandırmasını ekle | Mevcut kaynaklarda salt kontrol komutu geçer | `F1-002` | `chore(quality): F1-003 ruff kontrol yapılandırmasını ekle` |
 | [ ] | `F1-004` | `0.21.0` | 15 dk | Pyright tip kontrolünü ekle | Domain ve uygulama iskeleti tip kontrolünden geçer | `F1-003` | `chore(quality): F1-004 pyright tip kontrolünü ekle` |

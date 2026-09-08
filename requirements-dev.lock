@@ -1,0 +1,17 @@
+# Gelistirme ortami bagimlilik kilidi (F1-001).
+# Uretim: .venv/Scripts/python.exe -m pip freeze --exclude-editable > requirements-dev.lock
+# Cozumlendigi ortam: Python 3.9.13 / Windows 11 x64.
+# UYARI: hedef calisma zamani Python 3.12'dir (plan Bolum 2, acik karar D-20).
+#        3.12 kurulunca bu kilit yeniden uretilmelidir.
+# GUI ve DSP ekstralari (PySide6, pyqtgraph, scipy) bu kilitte YOKTUR;
+# cekirdek katman Qt'ye bagimli olmadigi icin ayri kurulur.
+colorama==0.4.6
+exceptiongroup==1.3.1
+iniconfig==2.1.0
+numpy==1.26.4
+packaging==26.3
+pluggy==1.6.0
+pytest==8.3.4
+ruff==0.8.6
+tomli==2.4.1
+typing_extensions==4.16.0

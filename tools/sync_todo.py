@@ -130,7 +130,9 @@ def render(works: list[Work], items: list[Item]) -> str:
             d = sum(w.done for w in phase)
             out.append(f"| {name} | {d} | {len(phase) - d} | {len(phase)} |")
     d_items = sum(i.done for i in items)
-    out.append(f"| Bölüm içi kontrol listeleri | {d_items} | {len(items) - d_items} | {len(items)} |")
+    out.append(
+        f"| Bölüm içi kontrol listeleri | {d_items} | {len(items) - d_items} | {len(items)} |"
+    )
     out.append(f"| **Toplam** | **{done}** | **{total - done}** | **{total}** |")
     out.append("")
 

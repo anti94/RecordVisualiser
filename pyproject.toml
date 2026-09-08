@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sonar-analyzer"
+description = "SONAR telemetri ve veri analiz arayuzu"
+readme = "README.md"
+license = { text = "Proprietary" }
+requires-python = ">=3.9"
+dynamic = ["version"]
+
+# Cekirdek katman (domain, io, repository, processing) Qt'ye bagimli DEGILDIR.
+# Plan Bolum 7.1 kurali: GUI, .bin byte duzenini bilmez; cekirdek de GUI'yi bilmez.
+# Bu ayrim burada bagimlilik seviyesinde zorlanir.
+dependencies = [
+    "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+gui = [
+    "PySide6>=6.6",
+    "pyqtgraph>=0.13",
+]
+dsp = [
+    "scipy>=1.11",
+]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.8",
+]
+
+[project.scripts]
+sonar-analyzer = "sonar_analyzer.app:main"
+
+[tool.setuptools.dynamic]
+version = { file = "VERSION" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q"
+markers = [
+    "gui: PySide6 gerektiren testler",
+    "slow: uzun suren testler",
+]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests", "tools"]
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
+ignore = [
+    "RUF001",  # belgelerde ve mesajlarda Turkce karakterler bilerek kullaniliyor
+    "RUF002",
+    "RUF003",
+]
