@@ -831,8 +831,8 @@ FileFooter: `magic` `char[8]` = `"SNREOF00"`, `record_count` `uint32`, `index_en
 #### 8.3.8 Zaman ve adlandırma kuralları
 
 - Nominal ızgara: `t_start_utc_ns(k) = t0_utc_ns + k * 125_000_000`, burada `k = record_index - first_record_index`.
-- Kayıt adı yalnızca **etiket**tir: `name = prefix + f"{record_index % 10**digits:05d}"`.
-- 5 hane 100.000 kayıtta dolar → **12.500 s ≈ 3 sa 28 dk 20 sn** sonra ad `Data99999` → `Data00000`'a sarar. Bu nedenle sıralama, indeksleme ve korelasyonda **daima `record_index`** kullanılır; ad yalnız gösterim ve dosya içi arama içindir.
+- Kayıt adı yalnızca **etiket**tir: `name = prefix + f"{record_index:0{digits}d}"`.
+- Ad **sarmaz**: `record_name_digits` asgari hane sayısıdır; `Data99999`'dan sonra `Data100000` gelir ve ad dosya içinde benzersiz kalır. Sıralama, indeksleme ve korelasyonda yine **daima `record_index`** kullanılır; ad gösterim ve dosya içi arama içindir. Ortak kural: `docs/format/timing-and-naming.md` (`F0-006`).
 - Örnek eşleme: `Data00000` → 0 ms, `Data00001` → 125 ms, `Data00008` → 1 s, `Data00480` → 60 s, `Data28800` → 1 saat.
 - Örnek-içi zaman: `t(i) = t_start + t_offset_ns + round(i * 1e9 / sample_rate_hz)`.
 - Gerçek zaman `device_ticks`'ten hesaplanır: `t_dev(k) = (ticks_k - ticks_0) / device_tick_hz`. Nominal ızgaradan sapma jitter/drift olarak raporlanır (bkz. 9. bölüm).
@@ -1314,7 +1314,7 @@ Kabul: Format taslağı, sentetik/gerçek veri ayrımı, fixture beklentileri ve
 | [x] | `F0-003` | `0.3.0` | 20 dk | Örnek dosya ve format envanterini çıkar | Mevcut dosyalar listelidir; bulunmayan gerçek kayıtlar eksik olarak işaretlidir | `F0-002` | `docs(format): F0-003 örnek dosya ve format envanterini çıkar` |
 | [x] | `F0-004` | `0.4.0` | 15 dk | 32 byte örnek header sözleşmesini çıkar | Alan offsetleri ve toplam boyut Bölüm 8.2 ile eşleşir | `F0-003` | `docs(format): F0-004 32 byte örnek header sözleşmesini çıkar` |
 | [x] | `F0-005` | `0.5.0` | 20 dk | 64 byte örnek Data kayıt sözleşmesini çıkar | İsim, sıra, zaman, sensör, BIT ve TX alanları tamdır | `F0-004` | `docs(format): F0-005 64 byte örnek Data kayıt sözleşmesini çıkar` |
-| [ ] | `F0-006` | `0.6.0` | 15 dk | 125 ms periyot ve kayıt adı kurallarını belgeye bağla | Data00000, Data00001 ve sıra boşluğu örnekleri tutarlıdır | `F0-005` | `docs(time): F0-006 125 ms periyot ve kayıt adı kurallarını belgeye bağla` |
+| [x] | `F0-006` | `0.6.0` | 15 dk | 125 ms periyot ve kayıt adı kurallarını belgeye bağla | Data00000, Data00001 ve sıra boşluğu örnekleri tutarlıdır | `F0-005` | `docs(time): F0-006 125 ms periyot ve kayıt adı kurallarını belgeye bağla` |
 | [ ] | `F0-007` | `0.7.0` | 20 dk | Mockup kanal gruplarını örnek veri sözlüğüne eşleştir | Sensors, Acoustic, Navigation, Vehicle/Transmission ve BIT grupları tanımlıdır | `F0-006` | `docs(domain): F0-007 mockup kanal gruplarını örnek veri sözlüğüne eşleştir` |
 | [ ] | `F0-008` | `0.8.0` | 20 dk | CRC destekleyen formatın karar kaydını yaz | Algoritma, parametreler, kapsam, alan konumu, sürüm ve referans vektör bellidir | `F0-007` | `docs(format): F0-008 cRC destekleyen formatın karar kaydını yaz` |
 | [ ] | `F0-009` | `0.9.0` | 15 dk | Küçük geçerli fixture için beklenen sonuçları yaz | Sekiz kayıt, 0–875 ms aralığı ve 544 byte örnek boyutu tanımlıdır | `F0-008` | `docs(fixtures): F0-009 küçük geçerli fixture için beklenen sonuçları yaz` |
