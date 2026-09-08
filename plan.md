@@ -1329,7 +1329,7 @@ Kabul: Format taslağı, sentetik/gerçek veri ayrımı, fixture beklentileri ve
 | [x] | `F0-013` | `0.13.0` | 20 dk | Mockup etkileşimleri ve görsel kabul listesini yaz | Dokuz bölge, varsayılan panel konumları ve grafik akışları kontrol edilebilir | `F0-012` | `docs(ui): F0-013 mockup etkileşimleri ve görsel kabul listesini yaz` |
 | [x] | `F0-014` | `0.14.0` | 20 dk | Ölçüm bilgisayarı ve performans bütçesini kaydet | Bölüm 11.1 hedefleri, veri boyutları ve ölçüm yöntemi belirtilmiştir | `F0-013` | `docs(perf): F0-014 ölçüm bilgisayarı ve performans bütçesini kaydet` |
 | [x] | `F0-015` | `0.15.0` | 20 dk | Açık kararları ve dış bağımlılıkları kaydet | Protokol, donanım verisi, dil, offline ve imzalama ihtiyaçları görünürdür | `F0-014` | `docs(project): F0-015 açık kararları ve dış bağımlılıkları kaydet` |
-| [ ] | `F0-016` | `0.16.0` | 15 dk | ADR listesini iş ve sürüm hedefleriyle eşleştir | ADR-001–010 için karar konusu ve tamamlanma aşaması belirtilmiştir | `F0-015` | `docs(architecture): F0-016 aDR listesini iş ve sürüm hedefleriyle eşleştir` |
+| [x] | `F0-016` | `0.16.0` | 15 dk | ADR listesini iş ve sürüm hedefleriyle eşleştir | ADR-001–010 için karar konusu ve tamamlanma aşaması belirtilmiştir | `F0-015` | `docs(architecture): F0-016 aDR listesini iş ve sürüm hedefleriyle eşleştir` |
 | [ ] | `F0-017` | `0.17.0` | 15 dk | Format milestone kabul tutanağını hazırla | Bu fazın kontrolleri geçer; gerçek veri eksikleri doğrulanmış gibi işaretlenmez | `F0-016` | `docs(release): F0-017 format milestone kabul tutanağını hazırla` |
 
 #### Faz 1 — Uygulama iskeleti ve domain modeli
@@ -2014,6 +2014,9 @@ Aşağıdaki kararlar kısa ADR belgeleriyle kaydedilmelidir:
 - ADR-009: Live-source/backpressure politikası.
 - ADR-010: Native hızlandırmaya geçiş ölçütleri.
 - ADR-011: CRC destekleyen format sürümü (`docs/adr/ADR-011-crc.md`, `F0-008`).
+- ADR-012: Paketleme aracı ve dağıtım biçimi (`F6-001`).
+
+ADR'lerin iş, sürüm ve faz eşlemesi: `docs/adr/README.md` (`F0-016`).
 
 Her ADR; bağlam, karar, alternatifler, olumlu/olumsuz sonuçlar ve karar tarihini içermelidir.
 
