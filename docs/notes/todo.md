@@ -4,15 +4,15 @@
 > Bir işi tamamlayınca `plan.md`'deki kutuyu `[x]` yap ve
 > `python tools/sync_todo.py` çalıştır.
 
-**Toplam 492 madde · 16 tamamlandı · 476 kaldı**
+**Toplam 492 madde · 17 tamamlandı · 475 kaldı**
 
-`[#.......................]` %3.3
+`[#.......................]` %3.5
 
 ## Özet
 
 | Grup | Tamam | Kalan | Toplam |
 | --- | --- | --- | --- |
-| Faz 0 — Keşif ve format sözleşmesi | 16 | 1 | 17 |
+| Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
 | Faz 1 — Uygulama iskeleti ve domain modeli | 0 | 44 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 0 | 41 | 41 |
 | Faz 3 — MVP analiz arayüzü | 0 | 80 | 80 |
@@ -20,11 +20,11 @@
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **16** | **476** | **492** |
+| **Toplam** | **17** | **475** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
-### Faz 0 — Keşif ve format sözleşmesi (16/17)
+### Faz 0 — Keşif ve format sözleşmesi (17/17)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -44,7 +44,7 @@
 | [x] | `F0-014` | `0.14.0` | 20 dk | Ölçüm bilgisayarı ve performans bütçesini kaydet |
 | [x] | `F0-015` | `0.15.0` | 20 dk | Açık kararları ve dış bağımlılıkları kaydet |
 | [x] | `F0-016` | `0.16.0` | 15 dk | ADR listesini iş ve sürüm hedefleriyle eşleştir |
-| [ ] | `F0-017` | `0.17.0` | 15 dk | Format milestone kabul tutanağını hazırla |
+| [x] | `F0-017` | `0.17.0` | 15 dk | Format milestone kabul tutanağını hazırla |
 
 ### Faz 1 — Uygulama iskeleti ve domain modeli (0/44)
 
