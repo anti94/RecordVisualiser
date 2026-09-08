@@ -1358,7 +1358,7 @@ Kabul: Uygulama sahte veriyle açılmalı; dock'lar ve temel zaman grafiği çal
 | [x] | `F1-011` | `0.28.0` | 15 dk | ChannelMetadata modelini tanımla | Kanal kimliği, birim, dtype ve sample rate alanları taşınır | `F1-010` | `feat(domain): F1-011 channelMetadata modelini tanımla` |
 | [x] | `F1-012` | `0.29.0` | 15 dk | DataChunk ve kalite alanlarını tanımla | Zaman/değer uzunluğu tutarsızlığı yakalanır | `F1-011` | `feat(domain): F1-012 dataChunk ve kalite alanlarını tanımla` |
 | [x] | `F1-013` | `0.30.0` | 15 dk | TimeRange ve RecordingMetadata modellerini ekle | Ters zaman aralığı reddedilir; kayıt başlangıç/bitişi taşınır | `F1-012` | `feat(domain): F1-013 timeRange ve RecordingMetadata modellerini ekle` |
-| [ ] | `F1-014` | `0.31.0` | 15 dk | Event ve BitResult modellerini ekle | Kategori, severity ve PASS/FAIL/UNKNOWN kayıpsız taşınır | `F1-013` | `feat(domain): F1-014 event ve BitResult modellerini ekle` |
+| [x] | `F1-014` | `0.31.0` | 15 dk | Event ve BitResult modellerini ekle | Kategori, severity ve PASS/FAIL/UNKNOWN kayıpsız taşınır | `F1-013` | `feat(domain): F1-014 event ve BitResult modellerini ekle` |
 | [ ] | `F1-015` | `0.32.0` | 15 dk | TransmissionInterval modelini ekle | Başlangıç/bitiş ve TX durumu doğrulanır | `F1-014` | `feat(domain): F1-015 transmissionInterval modelini ekle` |
 | [ ] | `F1-016` | `0.33.0` | 20 dk | RecordingRepository protokolünü tanımla | Metadata, channels, query ve events arayüzleri domain tipleri kullanır | `F1-015` | `feat(repository): F1-016 recordingRepository protokolünü tanımla` |
 | [ ] | `F1-017` | `0.34.0` | 15 dk | LiveSource protokolünü tanımla | Connect, disconnect ve packets arayüzü GUI bağımlılığı içermez | `F1-016` | `feat(live): F1-017 liveSource protokolünü tanımla` |
