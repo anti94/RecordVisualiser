@@ -1325,7 +1325,7 @@ Kabul: Format taslağı, sentetik/gerçek veri ayrımı, fixture beklentileri ve
 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `F0-012` | `0.12.0` | 20 dk | Referans mockup'ın dokuz bölgesini yerleşime eşleştir | Sol veri, merkez grafikler, sağ BIT/analiz/export ve alt playback/log eşleşir | `F0-011` | `docs(ui): F0-012 referans mockup'ın dokuz bölgesini yerleşime eşleştir` |
+| [x] | `F0-012` | `0.12.0` | 20 dk | Referans mockup'ın dokuz bölgesini yerleşime eşleştir | Sol veri, merkez grafikler, sağ BIT/analiz/export ve alt playback/log eşleşir | `F0-011` | `docs(ui): F0-012 referans mockup'ın dokuz bölgesini yerleşime eşleştir` |
 | [ ] | `F0-013` | `0.13.0` | 20 dk | Mockup etkileşimleri ve görsel kabul listesini yaz | Dokuz bölge, varsayılan panel konumları ve grafik akışları kontrol edilebilir | `F0-012` | `docs(ui): F0-013 mockup etkileşimleri ve görsel kabul listesini yaz` |
 | [ ] | `F0-014` | `0.14.0` | 20 dk | Ölçüm bilgisayarı ve performans bütçesini kaydet | Bölüm 11.1 hedefleri, veri boyutları ve ölçüm yöntemi belirtilmiştir | `F0-013` | `docs(perf): F0-014 ölçüm bilgisayarı ve performans bütçesini kaydet` |
 | [ ] | `F0-015` | `0.15.0` | 20 dk | Açık kararları ve dış bağımlılıkları kaydet | Protokol, donanım verisi, dil, offline ve imzalama ihtiyaçları görünürdür | `F0-014` | `docs(project): F0-015 açık kararları ve dış bağımlılıkları kaydet` |
