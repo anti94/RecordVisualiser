@@ -1,6 +1,10 @@
-# Metin dosyalari depoda LF olarak normalize edilir; calisma kopyasinda
-# platform ayari (core.autocrlf) gecerlidir.
-* text=auto
+# Metin dosyalari hem depoda hem CALISMA KOPYASINDA LF kullanir.
+#
+# "eol=lf" bilerek eklendi: core.autocrlf=true olan Windows makinelerinde
+# checkout CRLF uretiyordu ve "ruff format --check" (line-ending = "lf")
+# CI'da basarisiz oluyordu. Yerelde dosyalar LF yazildigi icin ayni hata
+# gorunmuyordu; fark yalnizca temiz bir checkout'ta ortaya cikiyordu.
+* text=auto eol=lf
 
 *.py   text diff=python
 *.md   text
