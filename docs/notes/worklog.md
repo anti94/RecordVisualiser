@@ -4,58 +4,138 @@
 > **yapılamayan veya eksik bilgiyle yapılan işleri** kaybetmeden kaydetmektir. Bir iş burada
 > `ATLANDI` ise plan tablosunda `[ ]` olarak kalır ve engeli kalkınca tekrar ele alınır.
 >
-> Güncel madde listesi: `docs/notes/todo.md` (plan.md'den `python tools/sync_todo.py` ile üretilir).
+> Güncel madde listesi: `docs/notes/todo.md` (`python tools/sync_todo.py` ile üretilir).
+
+## 1. Süreler
+
+**Gerçek süre nasıl ölçülüyor:** bir işin commit'i ile bir önceki commit arasındaki zaman farkı.
+Commit, o işin bitişidir; dolayısıyla fark, önceki iş bittikten sonra bu işe harcanan süredir.
+Ölçüm otomatiktir, tahmin değildir.
+
+Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenmez.**
+
+<!-- SURELER:BASLANGIC -->
+
+| İş ID | Hedef | Gerçek | Commit | Konu |
+| --- | --- | --- | --- | --- |
+| `F0-001` | 15 dk | — | `61e4fca` | git başlangıcını, ignore kurallarını ve VERSION kaynağını hazırla |
+| `F0-002` | 15 dk | 1 dk 42 sn | `80c49ac` | üç kullanıcı rolü için ilk beş senaryoyu yaz |
+| `F0-003` | 20 dk | 1 dk 44 sn | `985bceb` | örnek dosya ve format envanterini çıkar |
+| `-` | — | 26 sn | `7be4fae` | gece koşusu için iş günlüğü ve atlama notlarını başlat |
+| `F0-004` | 15 dk | 1 dk 10 sn | `4871335` | 32 byte örnek header sözleşmesini çıkar |
+| `F0-005` | 20 dk | 56 sn | `713f6b7` | 64 byte örnek Data kayıt sözleşmesini çıkar |
+| `F0-006` | 15 dk | 2 dk 3 sn | `141bdd2` | 125 ms periyot ve kayıt adı kurallarını belgeye bağla |
+| `F0-007` | 20 dk | 1 dk 43 sn | `4e3aaa2` | mockup kanal gruplarını örnek veri sözlüğüne eşleştir |
+| `F0-008` | 20 dk | 1 dk 38 sn | `e2b33ed` | CRC destekleyen formatın karar kaydını yaz |
+| `F0-009` | 15 dk | 1 dk 41 sn | `c50bcb0` | küçük geçerli fixture için beklenen sonuçları yaz |
+| `F0-010` | 15 dk | 1 dk 39 sn | `df8cf80` | bozuk fixture senaryolarının sonuçlarını yaz |
+| `F0-011` | 20 dk | 3 dk 44 sn | `250bd0c` | UTC ve cihaz zamanı dönüşüm kararını yaz |
+| `-` | — | 2 dk 27 sn | `b05a64d` | plan.md'den üretilen todo listesi ve süre kaydı ekle |
+| `F0-012` | 20 dk | 2 dk 5 sn | `f144dea` | referans mockup'ın dokuz bölgesini yerleşime eşleştir |
+| `F0-013` | 20 dk | 1 dk 45 sn | `35c00df` | mockup etkileşimleri ve görsel kabul listesini yaz |
+| `F0-014` | 20 dk | 2 dk 27 sn | `71bbb85` | ölçüm bilgisayarı ve performans bütçesini kaydet |
+| `F0-015` | 20 dk | 1 dk 27 sn | `5a833ce` | açık kararları ve dış bağımlılıkları kaydet |
+| `F0-016` | 15 dk | 1 dk 28 sn | `86490c3` | ADR listesini iş ve sürüm hedefleriyle eşleştir |
+| `F0-017` | 15 dk | 1 dk 26 sn | `35d7f68` | format milestone kabul tutanağını hazırla |
+| `F1-001` | 20 dk | 6 dk 50 sn | `6e4a36f` | python paket iskeleti ve bağımlılık kilidini oluştur |
+| `F1-002` | 15 dk | 1 dk 57 sn | `d7f0a90` | tek komutluk geliştirici kurulumunu yaz |
+| `F1-003` | 15 dk | 1 dk 13 sn | `95a3fb3` | ruff kontrol yapılandırmasını ekle |
+| `F1-004` | 15 dk | 2 dk 56 sn | `052a3df` | pyright tip kontrolünü ekle |
+| `F1-005` | 15 dk | 4 dk 9 sn | `3b14a71` | pytest ve pytest-qt başlangıç düzenini kur |
+| `F1-006` | 20 dk | 1 dk 17 sn | `89f8bec` | Windows kalite kontrol iş akışını ekle |
+| `F1-007` | 20 dk | 1 dk 56 sn | `6860120` | uygulama girişini ve temiz kapanışı ekle |
+| `F1-006` | 20 dk | 1 dk 17 sn | `dcfe128` | checkout satır sonlarını LF'e sabitle ( düzeltmesi) |
+| `F1-008` | 20 dk | 4 dk 1 sn | `5a02e57` | merkezi exception yakalama yolunu ekle |
+| `F1-009` | 20 dk | 2 dk 38 sn | `06c4c6b` | sürümlü temel ayarları yükle ve kaydet |
+| `F1-010` | 20 dk | 4 dk 33 sn | `991b9c4` | dönen log ve session kimliği ekle |
+| `-` | — | 1 dk 40 sn | `b3b3a74` | pyright/ruff sürümlerini sabitle ve default_factory tipini düzelt |
+| `F1-011` | 15 dk | 1 dk 15 sn | `87b3c64` | ChannelMetadata modelini tanımla |
+| `F1-012` | 15 dk | 1 dk 34 sn | `a01a899` | DataChunk ve kalite alanlarını tanımla |
+
+**33 commit · olculen toplam 68 dk 47 sn · olculemeyen 1 (ilk commit)**
+
+<!-- SURELER:BITIS -->
+
+## 2. İşlerin durumu
 
 Durum kodları: `TAMAM` · `ATLANDI` (engel var) · `KISMİ` (varsayımla yapıldı, doğrulama bekliyor)
 
-**Gerçek süre nasıl ölçülüyor:** ardışık iki commit'in zaman damgası farkı. Bir işin commit'i, o işin
-bitişidir; dolayısıyla fark, önceki iş bittikten sonra bu işe harcanan süredir. Ölçüm otomatiktir,
-tahmin değildir.
+| İş | Durum | Not |
+| --- | --- | --- |
+| `F0-001` | TAMAM | `.gitattributes` da eklendi: golden `.bin` fixture'larının satır sonu dönüşümüyle bozulmaması için gerekliydi. |
+| `F0-002` | TAMAM | Beş senaryo. |
+| `F0-003` | TAMAM | Depoda gerçek `.bin` yok; E-01..E-10 eksik girdiler işaretlendi. |
+| `F0-004` | **KISMİ** | Header sözleşmesi Bölüm 8.2 **taslağına** göre yazıldı; gerçek format dokümanı (D-02) gelince karşılaştırılmalı. |
+| `F0-005` | **KISMİ** | Aynı gerekçe: 64 byte kayıt sözleşmesi taslak kaynaklı. |
+| `F0-006` | TAMAM | Profiller arası ad sarması çelişkisi bulundu ve giderildi. Süreye, commit mesajı ile içerik uyuşmadığı için yapılan düzeltme (amend) dahil. |
+| `F0-007` | **KISMİ** | Kanal eşlemesi **öneri**dir; gerçek kanal kataloğu (D-06) ve BIT test kataloğu (D-07) yok. Mockup 8 BIT alt sistemi gösteriyor, öneri harita 3 grup — genişletilmeli. |
+| `F0-008` | **KISMİ** | CRC algoritması seçildi (ADR-011) ama donanım onayı yok (D-05). |
+| `F0-009` | TAMAM | Beklenen baytlar üretilip doğrulandı; float32 round-trip kayıpsız. |
+| `F0-010` | TAMAM | Dört zorunlu senaryoya ek olarak K-05 ve K-06 tanımlandı. |
+| `F0-011` | TAMAM | ADR-003. Süre, iki kez başarısız olan kabuk komutunun yeniden yazılmasını içerir. |
+| `F0-012` | TAMAM | Mockup görseli okundu; planda olmayan kanallar ve 8 BIT alt sistemi tespit edildi. |
+| `F0-013` | TAMAM | Etkileşim ve görsel kabul listesi; maddeler MVP/analiz/canlı aşamasına etiketli. |
+| `F0-014` | **KISMİ** | Hedef ölçüm bilgisayarı bilinmiyor (D-15). GUI ölçümleri (P-04/P-05/P-08) iskelet olmadan yapılamadı. |
+| `F0-015` | TAMAM | D-01..D-25 kütüğü. |
+| `F0-016` | TAMAM | ADR-001..012 iş/sürüm eşlemesi. |
+| `F0-017` | TAMAM | Faz 0 kabulü; gerçek veri eksikleri "doğrulanmadı" olarak ayrı bölümde. |
+| `F1-001` | TAMAM | `requires-python` geçici olarak `>=3.9` (D-20). Paket kurulumu ve VERSION eşleşmesi doğrulandı. |
+| `F1-002` | TAMAM | `-Recreate` ile sıfırdan koşuldu. |
+| `F1-003` | TAMAM | Markdown dosyaları biçimlendirici kapsamı dışında tutuldu. |
+| `F1-004` | TAMAM | Pyright **strict** modda 0 hata. Kilit dosyası ilk kez gerçekten kullanılabilir hâle geldi (`-Locked`). |
+| `F1-005` | TAMAM | Katman kuralı artık testle korunuyor (`test_layering.py`). Kilit dev/gui olarak ikiye ayrıldı. |
+| `F1-006` | TAMAM | CI ilk koşuda satır sonu farkı yüzünden düştü; `.gitattributes` `eol=lf` ile düzeltildi. |
+| `F1-007` | TAMAM | Pencere yalnız **offscreen** doğrulandı; kullanıcının ekranında görünür pencere açılmadı. |
+| `F1-008` | TAMAM | KeyboardInterrupt hata sayılmıyor. |
+| `F1-009` | TAMAM | Bozuk ayar dosyası `.bozuk` uzantısıyla saklanıyor, atomik yazma. |
+| `F1-010` | TAMAM | Ham sensör verisi filtreyle engelleniyor. Testlerin gerçek AppData'ya yazması da bu iş sırasında bulunup düzeltildi. |
+| `F1-011` | TAMAM | Doğrulama kurucuda; geçersiz kanal oluşturulamıyor. |
+| `F1-012` | TAMAM | Zaman/değer uzunluk tutarsızlığı kurucuda yakalanıyor. |
 
-## Koşu: 2026-09-08 gecesi (23:31 –)
+## 3. Bu koşuda bulunan ve düzeltilen sorunlar
 
-| İş ID | Durum | Hedef | Gerçek | Commit | Not |
-| --- | --- | --- | --- | --- | --- |
-| `F0-001` | TAMAM | 15 dk | — | `61e4fca` | İlk commit; önceki referans olmadığı için ölçülemedi. `.gitattributes` da eklendi: golden `.bin` fixture'larının satır sonu dönüşümüyle bozulmaması için gerekliydi. |
-| `F0-002` | TAMAM | 15 dk | 1 dk 42 sn | `80c49ac` | `docs/scenarios.md`, beş senaryo. |
-| `F0-003` | TAMAM | 20 dk | 1 dk 44 sn | `985bceb` | `docs/format/inventory.md`. Depoda gerçek `.bin` yok; E-01..E-10 eksik girdiler işaretlendi. |
-| — | TAMAM | — | 26 sn | `7be4fae` | Bu günlüğün başlatılması (plan işi değil). |
-| `F0-004` | KISMİ | 15 dk | 1 dk 10 sn | `4871335` | Header sözleşmesi Bölüm 8.2 **taslağına** göre yazıldı; gerçek format dokümanı (E-02) gelince karşılaştırılmalı. |
-| `F0-005` | KISMİ | 20 dk | 56 sn | `713f6b7` | Aynı gerekçe: 64 byte kayıt sözleşmesi taslak kaynaklı. |
-| `F0-006` | TAMAM | 15 dk | 2 dk 3 sn | `141bdd2` | Profiller arası çelişki bulundu ve giderildi (ad sarması). Süreye, commit mesajı ile içerik uyuşmadığı için yapılan düzeltme (amend) dahildir. |
-| `F0-007` | KISMİ | 20 dk | 1 dk 43 sn | `4e3aaa2` | Kanal eşlemesi **öneri**dir; gerçek kanal kataloğu (E-04) ve BIT test kataloğu (E-05) yok. |
-| `F0-008` | KISMİ | 20 dk | 1 dk 38 sn | `e2b33ed` | CRC algoritması seçildi (ADR-011) ama donanım onayı yok (E-03). Cihaz farklı CRC kullanıyorsa ADR değişir. |
-| `F0-009` | TAMAM | 15 dk | 1 dk 41 sn | `c50bcb0` | Beklenen baytlar üretilip doğrulandı; float32 round-trip kayıpsız. |
-| `F0-010` | TAMAM | 15 dk | 1 dk 39 sn | `df8cf80` | Dört zorunlu senaryoya ek olarak K-05 ve K-06 tanımlandı. |
-| `F0-011` | TAMAM | 20 dk | 3 dk 44 sn | `250bd0c` | ADR-003. Süre, iki kez başarısız olan kabuk komutunun yeniden yazılmasını içerir. |
+Hiçbiri plan işi değildi; çalışırken ortaya çıktı.
 
-**Ara toplam:** 11 iş · hedef 3 sa 10 dk · gerçek yaklaşık 18 dk (ilk iş hariç).
+| Sorun | Nerede bulundu | Çözüm |
+| --- | --- | --- |
+| İki profil arasında kayıt adı sarma çelişkisi | `F0-006` | Sarma kaldırıldı, tek kural `timing-and-naming.md` |
+| Boşluklu dosyada `32 + n*64` offset formülü yanlış kayda gidiyor | `F0-006` analiz | Uyarı yazıldı; K-03 fixture'ı bunu yakalıyor |
+| İndeks olmadan 2,6 GiB dosyada 5 s açılış hedefi tutmuyor | `F0-014` ölçüm | `RecordIndex` ön koşul ilan edildi |
+| Mockup'ta planda olmayan kanallar ve 8 BIT alt sistemi | `F0-012` | `layout-map.md` §9'a kaydedildi, D-06/D-07'ye bağlandı |
+| Bağımlılık kilidi hiçbir akış tarafından kullanılmıyordu | `F1-004` | `setup-dev.ps1 -Locked` eklendi |
+| CI'da `ruff format` düşüyor, yerelde geçiyordu (satır sonu) | `F1-006` CI | `.gitattributes` `eol=lf` |
+| CI'da `pyright` düşüyor, yerelde geçiyordu (sürüm kayması) | `F1-009` CI | ruff ve pyright sabit sürüme çekildi |
+| Testler kullanıcının gerçek `%LOCALAPPDATA%` ve `%APPDATA%` yollarına yazıyordu | `F1-010` | Ortam değişkeni yönlendirmesi + conftest; oluşan klasör silindi |
+| Bir GUI testinden sonra `caplog` testleri sessizce bozuluyordu | `F1-010` | conftest her testten sonra logger durumunu geri koyuyor |
 
-## Açık engeller
+## 4. Açık engeller
 
-Ayrıntı ve hangi işleri engelledikleri: `docs/format/inventory.md` Bölüm 2.
+Ayrıntı: `docs/notes/open-decisions.md` (D-01..D-25) ve `docs/format/inventory.md` §2.
 
-- **E-01/E-02 — gerçek `.bin` kaydı ve resmî format dokümanı yok.** Faz 0'ın format işleri
-  (`F0-004`, `F0-005`, `F0-007`, `F0-008`) yalnız Bölüm 8.2/8.3 **taslağına** göre yazılabildi ve
-  `KISMİ` sayıldı. Sentetik doğrulama gerçek donanım kanıtı olarak sunulmaz.
-- **E-03 — CRC tanımı yok.** ADR-011 bir öneri sunar; algoritma donanım ekibi onayı olmadan kesinleşmez.
-- **E-04/E-05 — kanal ve BIT test katalogları yok.** `channel-map.md` slot atamaları önerilmiştir.
-- **E-07 — cihaz zaman kaynağı bilinmiyor.** ADR-003 sarma/reset/drift davranışını tanımlar ama
-  gerçek `tick_hz` ve drift değeri ölçülemedi.
-- **E-10 — hedef ölçüm bilgisayarı bilinmiyor.** `F0-014` performans bütçesi yalnız hedef olarak yazılabilir.
+- **D-01/D-02 — gerçek `.bin` kaydı ve resmî format dokümanı yok.** Faz 0'ın format işleri
+  taslağa göre yazıldı ve `KISMİ` sayıldı. Sentetik doğrulama gerçek donanım kanıtı sayılmaz.
+- **D-05 — CRC tanımı yok.** ADR-011 öneri; donanım onayı bekliyor.
+- **D-06/D-07 — kanal ve BIT test katalogları yok.**
+- **D-09 — cihaz zaman kaynağı bilinmiyor.**
+- **D-15 — hedef ölçüm bilgisayarı bilinmiyor.**
+- **D-20 — Python 3.12 bu makinede kurulu değil** (yalnız 3.9.13 var). Kurulum sistem
+  değişikliği olduğu için yapılmadı. **Kod 3.12'de doğrulanıyor:** CI matrisi hem 3.9 hem
+  3.12 ile koşuyor ve geçiyor. Eksik olan yalnız yerel geliştirme ortamı.
 
-## Ortam notları
+## 5. Ortam notları
 
-- **Python sürümü:** bu makinede `python` → **3.9.13**. Plan Bölüm 2 ve `F1-001` Python **3.12**
-  öngörüyor. Faz 1'e geçmeden önce 3.12+ kurulmalı; aksi halde paket iskeleti ve tip
-  ipuçları hedef sürümde doğrulanamaz. `tools/sync_todo.py` 3.9 ile de çalışacak şekilde yazıldı.
-- **Satır sonu:** Git `core.autocrlf` nedeniyle çalışma kopyasında CRLF uyarısı veriyor; depoda LF
-  normalize ediliyor (`.gitattributes`). Beklenen davranıştır.
+- **Python:** yerel `python` → 3.9.13. `requires-python` geçici olarak `>=3.9`; CI 3.12'yi de
+  doğruluyor.
+- **Sanal ortam:** `.venv` (3.9.13). PySide6 6.10.3 + Qt 6.10.3 kurulu; GUI testleri
+  `QT_QPA_PLATFORM=offscreen` ile koşuyor.
+- **Uzak depo:** `origin` → `https://github.com/anti94/RecordVisualiser`. Her iş commit'i ve
+  sürüm etiketi push ediliyor.
 
-## Kullanıcıya sorulacaklar
+## 6. Kullanıcıya sorulacaklar
 
-- `.claude/settings.local.json` depoda izlenmiyor ve `.gitignore` içinde de yok. Yerel izin
-  ayarlarının yanlışlıkla commit edilmemesi için ignore kuralına eklenmesi öneriliyor.
-- `SONAR Veri Analiz Panosu Mockup’ı.7z` arşivi izlenmiyor; kaynak PNG depoda olduğu için
-  gerekli görülmedi. Silinsin mi, kalsın mı?
-- Python 3.12 kurulumu ne zaman yapılabilir? Faz 1 buna bağlı.
+- `.claude/settings.local.json` izlenmiyor ve `.gitignore` içinde de yok. Yerel izin ayarlarının
+  yanlışlıkla commit edilmemesi için ignore kuralına eklenmesi öneriliyor.
+- `SONAR Veri Analiz Panosu Mockup’ı.7z` arşivi izlenmiyor; kaynak PNG depoda olduğu için gerekli
+  görülmedi. Silinsin mi, kalsın mı?
+- Python 3.12 yerel kuruluma ne zaman eklenebilir? (D-20)
+- Faz 1'in kalan işleri plan sırasıyla mı ilerlesin, yoksa parser/fixture (Faz 2) öne mi alınsın?
