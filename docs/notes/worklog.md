@@ -53,8 +53,14 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F1-012` | 15 dk | 1 dk 34 sn | `a01a899` | DataChunk ve kalite alanlarını tanımla |
 | `-` | — | 2 dk 34 sn | `9d1a104` | iş sürelerini git geçmişinden otomatik üret |
 | `-` | — | 1 dk 22 sn | `0d11b80` | numpy sürümünü sabitle, CI'a sürüm raporlama ekle |
+| `F1-013` | 15 dk | 1 dk 30 sn | `074f936` | TimeRange ve RecordingMetadata modellerini ekle |
+| `F1-014` | 15 dk | 1 dk 27 sn | `0e21f97` | Event ve BitResult modellerini ekle |
+| `F1-015` | 15 dk | 1 dk 27 sn | `3afe5f3` | TransmissionInterval modelini ekle |
+| `F1-016` | 20 dk | 3 dk 19 sn | `04534ec` | RecordingRepository protokolünü tanımla |
+| `F1-017` | 15 dk | 1 dk 40 sn | `020f243` | LiveSource protokolünü tanımla |
+| `F1-018` | 15 dk | 430 dk 17 sn | `36b9809` | deterministik sinüs üretecini ekle |
 
-**35 commit · olculen toplam 72 dk 43 sn · olculemeyen 1 (ilk commit)**
+**41 commit · olculen toplam 512 dk 23 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
