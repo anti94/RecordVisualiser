@@ -122,8 +122,16 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F2-027` | 20 dk | 2 dk 0 sn | `c088986` | tanımlı drift düzeltmesini uygula |
 | `F2-028` | 20 dk | 2 dk 26 sn | `e23f038` | kayıt offseti ve zaman indeksini oluştur |
 | `F2-029` | 20 dk | 2 dk 0 sn | `210fc91` | kanal ve olay indekslerini oluştur |
+| `F2-030` | 20 dk | 1 dk 54 sn | `adf20e6` | kaynak fingerprint ve parser sürümünü kaydet |
+| `F2-031` | 20 dk | 83 dk 18 sn | `a45ae98` | indeks dosyasını atomik kaydet |
+| `F2-032` | 20 dk | 3 dk 22 sn | `4516fc7` | geçerli indeksi yeniden kullan |
+| `F2-033` | 20 dk | 3 dk 30 sn | `b8799af` | dosya metadata ve kanal listesini sun |
+| `F2-034` | 20 dk | 4 dk 0 sn | `2f30c9b` | indeksli zaman aralığı sorgusunu ekle |
+| `F2-035` | 20 dk | 5 dk 42 sn | `7cb05e6` | zaman ve kategoriye göre olay sorgula |
+| `F2-036` | 20 dk | 3 dk 39 sn | `90652ed` | birden fazla kaydı ayrı kimlikle yönet |
+| `F2-037` | 15 dk | 34 sn | `ae0ee1e` | decoded öğeden ham offsete erişim ekle |
 
-**104 commit · olculen toplam 1322 dk 23 sn · olculemeyen 1 (ilk commit)**
+**112 commit · olculen toplam 1428 dk 22 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

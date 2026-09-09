@@ -13,6 +13,7 @@ import math
 from bisect import bisect_left
 from dataclasses import replace
 from pathlib import Path
+from types import TracebackType
 
 import numpy as np
 
@@ -282,6 +283,17 @@ class FileRecordingRepository:
         self._times = ()
         self._event_data = None
         self._event_times = ()
+
+    def __enter__(self) -> FileRecordingRepository:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
+        self.close()
 
 
 def _bounded_indices(values: list[float], max_points: int | None) -> list[int]:
