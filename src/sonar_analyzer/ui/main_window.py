@@ -36,6 +36,7 @@ from sonar_analyzer.ui.actions import (
 )
 from sonar_analyzer.ui.docks.bottom_panel import BottomPanelDock
 from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock
+from sonar_analyzer.ui.docks.playback import PlaybackDock
 from sonar_analyzer.ui.docks.right_column import RightColumnDock
 
 # docs/ui/layout-map.md §1 ve §7
@@ -46,6 +47,8 @@ LEFT_COLUMN_MIN_WIDTH = 160
 RIGHT_COLUMN_MIN_WIDTH = 260
 BOTTOM_PANEL_HEIGHT = 152
 BOTTOM_PANEL_MIN_HEIGHT = 96
+PLAYBACK_HEIGHT = 56
+PLAYBACK_MIN_HEIGHT = 44
 
 WINDOW_TITLE = "SONAR Data Analyzer"
 RIGHT_DOCK_TITLE = "BIT / Analysis / Export"
@@ -74,14 +77,16 @@ class MainWindow(QMainWindow):
         self.right_dock = self._build_right_dock()
         self.center = self._build_center()
 
+        self.playback_dock = self._build_playback_dock()
         self.bottom_dock = self._build_bottom_dock()
 
         self.setCentralWidget(self.center)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.left_dock)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.right_dock)
-        # Alt panel merkezin ALTINDA durur; sol/sag sutunlar tepeden tabana
-        # devam eder (docs/ui/layout-map.md §1).
-        self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.bottom_dock)
+        # Alt bolge merkezin ALTINDA durur; sol/sag sutunlar tepeden tabana
+        # devam eder (docs/ui/layout-map.md §1). Sira: playback ustte, log altta.
+        self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.playback_dock)
+        self.splitDockWidget(self.playback_dock, self.bottom_dock, Qt.Orientation.Vertical)
         self.apply_default_layout()
 
         self._connect_layout_actions()
@@ -160,6 +165,11 @@ class MainWindow(QMainWindow):
         dock.setMinimumWidth(RIGHT_COLUMN_MIN_WIDTH)
         return dock
 
+    def _build_playback_dock(self) -> PlaybackDock:
+        dock = PlaybackDock(self)
+        dock.setMinimumHeight(PLAYBACK_MIN_HEIGHT)
+        return dock
+
     def _build_bottom_dock(self) -> BottomPanelDock:
         dock = BottomPanelDock(self)
         dock.setMinimumHeight(BOTTOM_PANEL_MIN_HEIGHT)
@@ -200,6 +210,7 @@ class MainWindow(QMainWindow):
         self._channels = tuple(channels)
         self.left_dock.set_recording(metadata, channels)
         self.right_dock.close_inspector()
+        self.playback_dock.set_recording_range(metadata.time_range)
         self.bottom_dock.append_log(f"Kayit acildi: {metadata.source_path}")
         self.bottom_dock.append_log(f"{len(channels)} kanal bulundu.")
         self.action("action_close").setEnabled(True)

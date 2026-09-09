@@ -73,8 +73,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `-` | — | 344 dk 17 sn | `5f0d20b` | pyright bulgularını GitHub annotation'a çevir |
 | `-` | — | 3 dk 9 sn | `702ec61` | pyright çıkış kodunu yutup annotation adımına ulaş |
 | `-` | — | 3 dk 55 sn | `8c930f3` | PySide6 sürümünü sabitle, Qt None kontrollerini geri koy |
+| `-` | — | 3 dk 53 sn | `814476a` | CI 3.12 pyright sorununu çözüldü olarak kapat |
 
-**55 commit · olculen toplam 896 dk 22 sn · olculemeyen 1 (ilk commit)**
+**56 commit · olculen toplam 900 dk 15 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
