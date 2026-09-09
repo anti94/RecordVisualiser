@@ -16,6 +16,16 @@
   2. A genuine blocker requires user input.
 - Before stopping, re-read this TODO file and verify that no actionable unchecked task remains.
 
+## Autonomous Execution Rule
+
+Work in fully autonomous mode.
+
+- Do not stop to ask the user questions, request confirmation, or present choices when a reasonable recommended/default option exists.
+- If multiple implementation options are available, choose the recommended / best-practice option and continue automatically.
+- Make reasonable assumptions when information is missing and proceed with the safest, most maintainable choice.
+- Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
+- After completing a task, immediately continue with the next unfinished item in todo.md.
+
 **Toplam 492 madde · 113 tamamlandı · 379 kaldı**
 
 `[######..................]` %23.0
