@@ -170,6 +170,22 @@ def build_valid_v2_fixture(record_count: int = 8) -> bytes:
     return bytes(body)
 
 
+def build_unknown_packet_fixture() -> bytes:
+    """`F2-015`: fiziksel index 3'ün tüm 64 baytı tanınmayan çöp veriyle
+    değiştirilir (yalnız adın sayısal kısmı değil, `b"Data"` öneki dahi
+    yok) — `K-06`'daki (`F2-010`) sayısal `sequence_no` uyumsuzluğundan
+    farklı bir bozulma sınıfı.
+
+    Dosya yine 8 kayıt / 544 bayttır; diğer 7 kayıt sağlamdır.
+    """
+    buffer = bytearray(build_valid_fixture())
+    record_offset = 32 + 3 * 64
+    garbage = bytes((i * 7 + 13) % 256 for i in range(64))
+    assert garbage[:4] != b"Data"
+    buffer[record_offset : record_offset + 64] = garbage
+    return bytes(buffer)
+
+
 def build_name_mismatch_fixture() -> bytes:
     """docs/format/fixture-corrupt.md K-06: sequence_no=2'nin name alani
     Data00099 yapilir, diger alanlar dokunulmaz.
