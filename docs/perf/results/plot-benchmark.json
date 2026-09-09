@@ -1,0 +1,22 @@
+{
+  "environment": "offscreen (yazilim rasterlayici; ekran performansini TEMSIL ETMEZ)",
+  "sample_rate_hz": 100000.0,
+  "pan_zoom_iterations": 30,
+  "cursor_iterations": 200,
+  "results": [
+    {
+      "sample_count": 1000000,
+      "query_seconds": 0.011894,
+      "query_ms": 11.894,
+      "pan_zoom_fps": 7.44,
+      "cursor_latency_ms": 0.0105
+    },
+    {
+      "sample_count": 10000000,
+      "query_seconds": 0.100355,
+      "query_ms": 100.355,
+      "pan_zoom_fps": 0.82,
+      "cursor_latency_ms": 0.0076
+    }
+  ]
+}
