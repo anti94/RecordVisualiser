@@ -87,6 +87,9 @@ class Event:
     state: str | None = None
     value: float | str | None = None
     unit: str | None = None
+    #: Parser teşhislerinde ham `.bin` dosyasındaki bayt offseti (`F2-024`);
+    #: kaynağı dosya değilse (canlı bağlantı, kullanıcı eylemi) `None` kalır.
+    source_offset: int | None = None
 
     def __post_init__(self) -> None:
         if not self.source.strip():
@@ -95,6 +98,8 @@ class Event:
             raise ValueError(f"{self.source}: olay kategorisi bos olamaz")
         if not self.message.strip():
             raise ValueError(f"{self.source}: olay mesaji bos olamaz")
+        if self.source_offset is not None and self.source_offset < 0:
+            raise ValueError(f"{self.source}: source_offset negatif olamaz: {self.source_offset}")
 
     @property
     def is_alarm(self) -> bool:
