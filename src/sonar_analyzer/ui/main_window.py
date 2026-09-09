@@ -34,6 +34,7 @@ from sonar_analyzer.ui.actions import (
     TOOLBAR_ACTION_NAMES,
     build_action,
 )
+from sonar_analyzer.ui.docks.bottom_panel import BottomPanelDock
 from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock
 from sonar_analyzer.ui.docks.right_column import RightColumnDock
 
@@ -43,6 +44,8 @@ LEFT_COLUMN_WIDTH = 200
 RIGHT_COLUMN_WIDTH = 300
 LEFT_COLUMN_MIN_WIDTH = 160
 RIGHT_COLUMN_MIN_WIDTH = 260
+BOTTOM_PANEL_HEIGHT = 152
+BOTTOM_PANEL_MIN_HEIGHT = 96
 
 WINDOW_TITLE = "SONAR Data Analyzer"
 RIGHT_DOCK_TITLE = "BIT / Analysis / Export"
@@ -71,9 +74,14 @@ class MainWindow(QMainWindow):
         self.right_dock = self._build_right_dock()
         self.center = self._build_center()
 
+        self.bottom_dock = self._build_bottom_dock()
+
         self.setCentralWidget(self.center)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.left_dock)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.right_dock)
+        # Alt panel merkezin ALTINDA durur; sol/sag sutunlar tepeden tabana
+        # devam eder (docs/ui/layout-map.md §1).
+        self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.bottom_dock)
         self.apply_default_layout()
 
         self._connect_layout_actions()
@@ -152,6 +160,11 @@ class MainWindow(QMainWindow):
         dock.setMinimumWidth(RIGHT_COLUMN_MIN_WIDTH)
         return dock
 
+    def _build_bottom_dock(self) -> BottomPanelDock:
+        dock = BottomPanelDock(self)
+        dock.setMinimumHeight(BOTTOM_PANEL_MIN_HEIGHT)
+        return dock
+
     def _build_center(self) -> QWidget:
         container = QFrame(self)
         container.setObjectName("center_area")
@@ -187,6 +200,8 @@ class MainWindow(QMainWindow):
         self._channels = tuple(channels)
         self.left_dock.set_recording(metadata, channels)
         self.right_dock.close_inspector()
+        self.bottom_dock.append_log(f"Kayit acildi: {metadata.source_path}")
+        self.bottom_dock.append_log(f"{len(channels)} kanal bulundu.")
         self.action("action_close").setEnabled(True)
         self.action("action_export").setEnabled(True)
 
@@ -200,6 +215,7 @@ class MainWindow(QMainWindow):
             [LEFT_COLUMN_WIDTH, RIGHT_COLUMN_WIDTH],
             Qt.Orientation.Horizontal,
         )
+        self.resizeDocks([self.bottom_dock], [BOTTOM_PANEL_HEIGHT], Qt.Orientation.Vertical)
 
     def column_widths(self) -> tuple[int, int, int]:
         """(sol, merkez, sağ) genişlikleri — görsel kabul kontrolü için."""
