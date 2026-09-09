@@ -81,8 +81,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F1-031` | 20 dk | 2 dk 45 sn | `50da59f` | tek kanallı PlotPanel iskeletini ekle |
 | `F1-032` | 20 dk | 2 dk 4 sn | `a9eb0be` | mock repository seçimini grafiğe bağla |
 | `-` | — | 2 dk 47 sn | `dc3dc18` | ekran görüntüsü aracı ekle, offscreen yazı tipi sorununu çöz |
+| `F1-033` | 15 dk | 46 dk 34 sn | `c627589` | boş workspace yönlendirmesini ekle |
 
-**63 commit · olculen toplam 1158 dk 35 sn · olculemeyen 1 (ilk commit)**
+**64 commit · olculen toplam 1205 dk 9 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

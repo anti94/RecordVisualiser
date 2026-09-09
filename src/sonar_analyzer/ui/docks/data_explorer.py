@@ -14,11 +14,13 @@ kanal listesi üretilmez; bunun yerine boş durum metni görünür (plan Bölüm
 from __future__ import annotations
 
 from collections.abc import Sequence
+from datetime import datetime, timezone
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QDockWidget,
     QFormLayout,
+    QGroupBox,
     QHeaderView,
     QLabel,
     QLineEdit,
@@ -60,6 +62,18 @@ def _format_size(size_bytes: int) -> str:
             return f"{value:.1f} {unit}" if unit != "B" else f"{int(value)} B"
         value /= 1024
     return EMPTY_VALUE
+
+
+def _format_start(timestamp_ns: int) -> str:
+    """Başlangıç zamanını okunabilir UTC olarak gösterir.
+
+    Ham nanosaniye kullanıcıya bir şey anlatmıyor; kayıt ankoru
+    `docs/adr/ADR-003-time-base.md` gereği UTC epoch nanosaniyedir.
+    """
+    if timestamp_ns <= 0:
+        return EMPTY_VALUE
+    moment = datetime.fromtimestamp(timestamp_ns / 1_000_000_000, tz=timezone.utc)
+    return moment.strftime("%Y-%m-%d %H:%M:%S UTC")
 
 
 def _format_duration(seconds: float) -> str:
@@ -118,9 +132,10 @@ class DataExplorerDock(QDockWidget):
         return body
 
     def _build_summary(self, parent: QWidget) -> QWidget:
-        container = QWidget(parent)
+        container = QGroupBox("Recording", parent)
+        container.setObjectName("card_file_summary")
         form = QFormLayout(container)
-        form.setContentsMargins(0, 0, 0, 0)
+        form.setContentsMargins(6, 4, 6, 4)
         form.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
 
         for field in SUMMARY_FIELDS:
@@ -196,7 +211,7 @@ class DataExplorerDock(QDockWidget):
         """Dosya özetini ve kanal ağacını açılan kayıttan doldurur."""
         self._summary_labels["File"].setText(metadata.source_path or EMPTY_VALUE)
         self._summary_labels["Size"].setText(_format_size(metadata.file_size_bytes))
-        self._summary_labels["Start"].setText(str(metadata.start_ns))
+        self._summary_labels["Start"].setText(_format_start(metadata.start_ns))
         self._summary_labels["Duration"].setText(_format_duration(metadata.duration_seconds))
         self._summary_labels["Platform"].setText(metadata.device_id or EMPTY_VALUE)
 
