@@ -106,6 +106,20 @@ Durum kodları: `TAMAM` · `ATLANDI` (engel var) · `KISMİ` (varsayımla yapıl
 | `F1-010` | TAMAM | Ham sensör verisi filtreyle engelleniyor. Testlerin gerçek AppData'ya yazması da bu iş sırasında bulunup düzeltildi. |
 | `F1-011` | TAMAM | Doğrulama kurucuda; geçersiz kanal oluşturulamıyor. |
 | `F1-012` | TAMAM | Zaman/değer uzunluk tutarsızlığı kurucuda yakalanıyor. |
+| `F1-013` | TAMAM | Ters aralık kurucuda reddediliyor. |
+| `F1-014` | TAMAM | Tanınmayan BIT kodu UNKNOWN; PASS varsayılmıyor. |
+| `F1-015` | TAMAM | Türetme, fixture beklentisiyle birebir aynı sonucu veriyor (250–750 ms). |
+| `F1-016` | TAMAM | Sözleşmeyi karşılayan FakeRepository yazıldı; gerçek repository'ler aynı testlere tabi olacak. |
+| `F1-017` | TAMAM | Modülün Qt yüklemediği ayrı süreçte doğrulanıyor. |
+| `F1-018` | TAMAM | Nyquist üstü frekans reddediliyor; zaman ekseni tamsayı aritmetiğiyle. |
+| `F1-019` | TAMAM | Seed sabit; chirp fazı frekansın integrali olarak hesaplanıyor. |
+| `F1-020` | TAMAM | Sorgu sınırları yarı açık; aralık dışı sorgu boş parça döndürüyor. |
+| `F1-021` | TAMAM | Olay zamanları sabit ve bilinir; rastgele olay üretilmiyor. |
+| `F1-022` | TAMAM | Ölçülen sütunlar 1520 px pencerede tam 200 / 1008 / 300 px. |
+| `F1-023` | **KISMİ** | Beş menü kuruldu ama **mockup dört menü gösteriyor** (Analysis yok). Karar bekliyor; `layout-map.md` §9'da kayıtlı. |
+| `F1-024` | TAMAM | Ağaç hiyerarşik; arama derin ağaçta çalışıyor. |
+| `F1-025` | TAMAM | Qt "tabified dock" yerine gerçek QTabWidget seçildi; gerekçe commit'te. |
+| `F1-026` | TAMAM | Log ile Events ayrı; olaylar log'a yazılmıyor. |
 
 ## 3. Bu koşuda bulunan ve düzeltilen sorunlar
 
@@ -122,6 +136,11 @@ Hiçbiri plan işi değildi; çalışırken ortaya çıktı.
 | CI'da `pyright` düşüyor, yerelde geçiyordu (sürüm kayması) | `F1-009` CI | ruff ve pyright sabit sürüme çekildi |
 | Testler kullanıcının gerçek `%LOCALAPPDATA%` ve `%APPDATA%` yollarına yazıyordu | `F1-010` | Ortam değişkeni yönlendirmesi + conftest; oluşan klasör silindi |
 | Bir GUI testinden sonra `caplog` testleri sessizce bozuluyordu | `F1-010` | conftest her testten sonra logger durumunu geri koyuyor |
+| CI'da `pyright` 3.12 ayağında düşüyor, 3.9'da geçiyordu (numpy sürümü) | `F1-012` CI | numpy `>=1.26,<2.1`'e sabitlendi; CI'a sürüm raporlama adımı eklendi |
+| Sarmalanmayan `QLabel` panelin asgari genişliğini şişiriyordu (sağ sütun 300 yerine 424 px) | `F1-022` | Yer tutucu etiketler word-wrap edildi |
+| Menülere Python referansı tutulmayınca PySide nesneyi serbest bırakıyordu ("C++ object already deleted") | `F1-023` | Menüler pencerede saklanıyor |
+| Kanal yolunda `/` hem ayraç hem ad parçasıydı; ağaçta `"Vehicle "` diye bozuk grup çıkıyordu | `F1-024` | Yol `Vehicle/Voltage` yapıldı, gösterim etiketi `GROUP_LABELS` ile eşlendi |
+| Qt tabified dock'ta aynı anda tek dock görünür sayıldığı için "kartlar duruyor mu" doğrulanamıyordu | `F1-025` | Sağ sütunda gerçek `QTabWidget` kullanıldı |
 
 ## 4. Açık engeller
 
