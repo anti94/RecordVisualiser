@@ -4,23 +4,23 @@
 > Bir işi tamamlayınca `plan.md`'deki kutuyu `[x]` yap ve
 > `python tools/sync_todo.py` çalıştır.
 
-**Toplam 492 madde · 52 tamamlandı · 440 kaldı**
+**Toplam 492 madde · 53 tamamlandı · 439 kaldı**
 
-`[###.....................]` %10.6
+`[###.....................]` %10.8
 
 ## Özet
 
 | Grup | Tamam | Kalan | Toplam |
 | --- | --- | --- | --- |
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
-| Faz 1 — Uygulama iskeleti ve domain modeli | 35 | 9 | 44 |
+| Faz 1 — Uygulama iskeleti ve domain modeli | 36 | 8 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 0 | 41 | 41 |
 | Faz 3 — MVP analiz arayüzü | 0 | 80 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **52** | **440** | **492** |
+| **Toplam** | **53** | **439** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -46,7 +46,7 @@
 | [x] | `F0-016` | `0.16.0` | 15 dk | ADR listesini iş ve sürüm hedefleriyle eşleştir |
 | [x] | `F0-017` | `0.17.0` | 15 dk | Format milestone kabul tutanağını hazırla |
 
-### Faz 1 — Uygulama iskeleti ve domain modeli (35/44)
+### Faz 1 — Uygulama iskeleti ve domain modeli (36/44)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -85,7 +85,7 @@
 | [x] | `F1-033` | `0.50.0` | 15 dk | Boş workspace yönlendirmesini ekle |
 | [x] | `F1-034` | `0.51.0` | 15 dk | Open .bin File düğmesi ve dosya özet kartını ekle |
 | [x] | `F1-035` | `0.52.0` | 15 dk | Sağ üst BIT/System Status kartını yerleştir |
-| [ ] | `F1-036` | `0.53.0` | 15 dk | Analysis Tools kartının sekmelerini yerleştir |
+| [x] | `F1-036` | `0.53.0` | 15 dk | Analysis Tools kartının sekmelerini yerleştir |
 | [ ] | `F1-037` | `0.54.0` | 15 dk | Sağ alt Data Export kartını yerleştir |
 | [ ] | `F1-038` | `0.55.0` | 15 dk | Mockup ana analiz sekmelerini yerleştir |
 | [ ] | `F1-039` | `0.56.0` | 20 dk | Merkez dashboard grafik hücrelerini oluştur |
