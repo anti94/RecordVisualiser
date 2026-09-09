@@ -4,23 +4,23 @@
 > Bir işi tamamlayınca `plan.md`'deki kutuyu `[x]` yap ve
 > `python tools/sync_todo.py` çalıştır.
 
-**Toplam 492 madde · 40 tamamlandı · 452 kaldı**
+**Toplam 492 madde · 41 tamamlandı · 451 kaldı**
 
-`[##......................]` %8.1
+`[##......................]` %8.3
 
 ## Özet
 
 | Grup | Tamam | Kalan | Toplam |
 | --- | --- | --- | --- |
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
-| Faz 1 — Uygulama iskeleti ve domain modeli | 23 | 21 | 44 |
+| Faz 1 — Uygulama iskeleti ve domain modeli | 24 | 20 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 0 | 41 | 41 |
 | Faz 3 — MVP analiz arayüzü | 0 | 80 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **40** | **452** | **492** |
+| **Toplam** | **41** | **451** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -46,7 +46,7 @@
 | [x] | `F0-016` | `0.16.0` | 15 dk | ADR listesini iş ve sürüm hedefleriyle eşleştir |
 | [x] | `F0-017` | `0.17.0` | 15 dk | Format milestone kabul tutanağını hazırla |
 
-### Faz 1 — Uygulama iskeleti ve domain modeli (23/44)
+### Faz 1 — Uygulama iskeleti ve domain modeli (24/44)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -73,7 +73,7 @@
 | [x] | `F1-021` | `0.38.0` | 15 dk | Sahte BIT, TX ve sistem olaylarını ekle |
 | [x] | `F1-022` | `0.39.0` | 20 dk | Mockup'ın üç sütunlu ana pencere düzenini oluştur |
 | [x] | `F1-023` | `0.40.0` | 15 dk | Menü ve toolbar eylem iskeletini ekle |
-| [ ] | `F1-024` | `0.41.0` | 15 dk | Data Explorer dock'unu ekle |
+| [x] | `F1-024` | `0.41.0` | 15 dk | Data Explorer dock'unu ekle |
 | [ ] | `F1-025` | `0.42.0` | 15 dk | Inspector'ı bağlamsal araç sekmesi olarak ekle |
 | [ ] | `F1-026` | `0.43.0` | 15 dk | Alt Log/Messages alanı ve Events sekmesini ekle |
 | [ ] | `F1-027` | `0.44.0` | 15 dk | Playback/Time Control şeridini yerleştir |

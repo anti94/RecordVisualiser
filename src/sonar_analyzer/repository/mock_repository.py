@@ -80,7 +80,7 @@ DEFAULT_CHANNELS: tuple[MockChannelSpec, ...] = (
     ),
     MockChannelSpec(
         "ch7",
-        "Vehicle / Transmission/Voltage",
+        "Vehicle/Voltage",
         "Voltage",
         "V",
         ChannelSource.TRANSMISSION,

@@ -80,8 +80,18 @@ def test_columns_are_in_correct_areas(window: MainWindow) -> None:
 
 
 def test_minimum_widths_protect_readability(window: MainWindow) -> None:
-    assert window.left_dock.minimumWidth() == LEFT_COLUMN_MIN_WIDTH
-    assert window.right_dock.minimumWidth() == RIGHT_COLUMN_MIN_WIDTH
+    """Asgari genişlik tabanın altına inmemeli ve öntanımlı genişliği aşmamalı.
+
+    Panel içeriği (düğme, form etiketleri) kendi asgari genişliğini dayatabilir;
+    önemli olan sütunun okunur kalması ve yine de mockup ölçüsüne oturabilmesi.
+    """
+    left_min = window.left_dock.minimumWidth()
+    right_min = window.right_dock.minimumWidth()
+
+    assert left_min >= LEFT_COLUMN_MIN_WIDTH, f"sol sutun tabani {left_min} px"
+    assert left_min <= LEFT_COLUMN_WIDTH, "asgari genislik ontanimliyi asarsa sutun bozulur"
+    assert right_min >= RIGHT_COLUMN_MIN_WIDTH, f"sag sutun tabani {right_min} px"
+    assert right_min <= RIGHT_COLUMN_WIDTH
 
 
 def test_docks_have_stable_object_names(window: MainWindow) -> None:

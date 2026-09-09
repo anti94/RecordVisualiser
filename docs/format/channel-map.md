@@ -39,7 +39,7 @@ Decoder `record_size`'ı **header'dan okur**; 64 değerini sabitlemez. `record_s
 | CH4 | `Sensors/Accelerometer/Z` | Sensors | g | -4 – 4 | |
 | CH5 | `Acoustic/Hydrophone 1` | Acoustic | Pa | -10 – 10 | **8 Hz temsilî değer**, bkz. 5. bölüm |
 | CH6 | `Navigation/Depth` | Navigation | m | 0 – 500 | |
-| CH7 | `Vehicle / Transmission/Voltage` | Vehicle / Transmission | V | 0 – 60 | Besleme gerilimi |
+| CH7 | `Vehicle/Voltage` | Vehicle / Transmission | V | 0 – 60 | Besleme gerilimi |
 
 ## 3. Genişletilmiş sözlük — `channel_count = 12` (mockup demosu)
 
@@ -58,9 +58,14 @@ Mockup'taki beş grubun tamamının dolu görünmesi için kullanılır; `record
 | CH8 | `Navigation/Position (GPS)/Longitude` | Navigation | ° | Aynı uyarı |
 | CH9 | `Navigation/Heading` | Navigation | ° | 0 – 360 |
 | CH10 | `Navigation/Depth` | Navigation | m | |
-| CH11 | `Vehicle / Transmission/RPM` | Vehicle / Transmission | rpm | |
+| CH11 | `Vehicle/RPM` | Vehicle / Transmission | rpm | |
 
-`Vehicle / Transmission/Voltage` bu sözlükte yer almaz; 16 kanallı sürümde CH12 olur.
+`Vehicle/Voltage` bu sözlükte yer almaz; 16 kanallı sürümde CH12 olur.
+
+> **Yol ayracı kuralı:** kanal yolunda `/` yalnız **ayraç**tır; bir yol parçası `/` içeremez.
+> Mockup'ta grup etiketi `Vehicle / Transmission` yazar, yolda ise `Vehicle` tutulur ve
+> gösterim etiketi arayüzde eşlenir (`ui/docks/data_explorer.py` `GROUP_LABELS`).
+> Aksi hâlde ağaç `Vehicle` ve `Transmission` diye ikiye bölünürdü.
 
 ## 4. `sensor_values` dışından gelen ağaç düğümleri
 
@@ -68,7 +73,7 @@ Mockup ağacındaki her düğüm bir `float32` slotu değildir:
 
 | Ağaç düğümü | Kaynak alan | Dönüşüm |
 | --- | --- | --- |
-| `Vehicle / Transmission/TX State` | `tx_status` (`uint32`) | `0 = IDLE`, `1 = ACTIVE`, `2 = FAULT`; durum kanalı olarak çizilir (basamak grafiği) |
+| `Vehicle/TX State` | `tx_status` (`uint32`) | `0 = IDLE`, `1 = ACTIVE`, `2 = FAULT`; durum kanalı olarak çizilir (basamak grafiği) |
 | `BIT/Power Supply` | `bit_status` bit 0–3 | Herhangi biri 1 → grup `FAIL` |
 | `BIT/Communication` | `bit_status` bit 4–7 | Aynı kural |
 | `BIT/Thermal` | `bit_status` bit 8–11 | Aynı kural |

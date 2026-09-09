@@ -31,6 +31,7 @@ from sonar_analyzer.ui.actions import (
     TOOLBAR_ACTION_NAMES,
     build_action,
 )
+from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock
 
 # docs/ui/layout-map.md §1 ve §7
 DEFAULT_WINDOW_SIZE = (1520, 840)
@@ -40,7 +41,6 @@ LEFT_COLUMN_MIN_WIDTH = 160
 RIGHT_COLUMN_MIN_WIDTH = 260
 
 WINDOW_TITLE = "SONAR Data Analyzer"
-LEFT_DOCK_TITLE = "Data Explorer"
 RIGHT_DOCK_TITLE = "BIT / Analysis / Export"
 
 
@@ -77,6 +77,16 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(WINDOW_TITLE)
         self.resize(*DEFAULT_WINDOW_SIZE)
 
+        self.actions_by_name: dict[str, QAction] = {}
+        # Menulere Python tarafinda referans tutulmazsa PySide nesneyi serbest
+        # birakiyor ve sonraki erisimde "C++ object already deleted" hatasi
+        # aliniyor.
+        self.menus_by_name: dict[str, QMenu] = {}
+        self._build_menus()
+        self.toolbar = self._build_toolbar()
+
+        # Paneller eylemlerden SONRA kurulur: sol panelin "Open .bin File"
+        # dugmesi action_open eylemine baglaniyor.
         self.left_dock = self._build_left_dock()
         self.right_dock = self._build_right_dock()
         self.center = self._build_center()
@@ -86,13 +96,6 @@ class MainWindow(QMainWindow):
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.right_dock)
         self.apply_default_layout()
 
-        self.actions_by_name: dict[str, QAction] = {}
-        # Menulere Python tarafinda referans tutulmazsa PySide nesneyi serbest
-        # birakiyor ve sonraki erisimde "C++ object already deleted" hatasi
-        # aliniyor.
-        self.menus_by_name: dict[str, QMenu] = {}
-        self._build_menus()
-        self.toolbar = self._build_toolbar()
         self._connect_layout_actions()
 
         self.statusBar().showMessage("Ready")
@@ -150,16 +153,10 @@ class MainWindow(QMainWindow):
 
     # -- kurulum ---------------------------------------------------------
 
-    def _build_left_dock(self) -> QDockWidget:
-        dock = QDockWidget(LEFT_DOCK_TITLE, self)
-        dock.setObjectName("dock_data_explorer")
-        dock.setWidget(
-            _placeholder(
-                "Dosya ve Veri Yonetimi",
-                "Open .bin File, dosya ozeti, Channels / Data Tree (docs/ui/layout-map.md bolge 1)",
-            )
-        )
+    def _build_left_dock(self) -> DataExplorerDock:
+        dock = DataExplorerDock(self)
         dock.setMinimumWidth(LEFT_COLUMN_MIN_WIDTH)
+        dock.open_requested.connect(self.action("action_open").trigger)
         return dock
 
     def _build_right_dock(self) -> QDockWidget:

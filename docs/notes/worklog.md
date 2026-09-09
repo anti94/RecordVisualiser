@@ -59,8 +59,13 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F1-016` | 20 dk | 3 dk 19 sn | `04534ec` | RecordingRepository protokolünü tanımla |
 | `F1-017` | 15 dk | 1 dk 40 sn | `020f243` | LiveSource protokolünü tanımla |
 | `F1-018` | 15 dk | 430 dk 17 sn | `36b9809` | deterministik sinüs üretecini ekle |
+| `F1-019` | 20 dk | 1 dk 40 sn | `72145e4` | noise, chirp ve impulse örneklerini ekle |
+| `F1-020` | 20 dk | 1 dk 55 sn | `48f95dc` | sahte kanal repository uygulamasını ekle |
+| `F1-021` | 15 dk | 2 dk 18 sn | `a11d9f3` | sahte BIT, TX ve sistem olaylarını ekle |
+| `F1-022` | 20 dk | 2 dk 38 sn | `59ce1b7` | mockup'ın üç sütunlu ana pencere düzenini oluştur |
+| `F1-023` | 15 dk | 3 dk 30 sn | `5a20b3e` | menü ve toolbar eylem iskeletini ekle |
 
-**41 commit · olculen toplam 512 dk 23 sn · olculemeyen 1 (ilk commit)**
+**46 commit · olculen toplam 524 dk 24 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

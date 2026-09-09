@@ -1,0 +1,1 @@
+"""Ana pencere panelleri (dock)."""
