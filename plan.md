@@ -1429,7 +1429,7 @@ Kabul: Örnek dosya güvenilir çözümlenmeli; kanal, olay ve zaman sorguları 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F2-016` | `0.77.0` | 20 dk | 32/64 byte örnek fixture yazıcısını ekle | Sekiz kayıt tam 544 byte üretir; ad ve zamanlar sözleşmeye uyar | `F2-015` | `feat(fixtures): F2-016 32/64 byte örnek fixture yazıcısını ekle` |
-| [ ] | `F2-017` | `0.78.0` | 20 dk | Kesik, bozuk ve sıra boşluklu fixture'ları ekle | Her fixture önceden belirlenen hata sonucunu üretir | `F2-016` | `test(parser): F2-017 kesik, bozuk ve sıra boşluklu fixture'ları ekle` |
+| [x] | `F2-017` | `0.78.0` | 20 dk | Kesik, bozuk ve sıra boşluklu fixture'ları ekle | Her fixture önceden belirlenen hata sonucunu üretir | `F2-016` | `test(parser): F2-017 kesik, bozuk ve sıra boşluklu fixture'ları ekle` |
 | [ ] | `F2-018` | `0.79.0` | 20 dk | CRC destekli format fixture'ını ekle | Geçerli ve tek byte bozulmuş dosya farklı doğrulama sonucu verir | `F2-017` | `test(parser): F2-018 cRC destekli format fixture'ını ekle` |
 | [ ] | `F2-019` | `0.80.0` | 20 dk | Sensör alanlarını kanal metadata'sına eşleştir | CH0–CH7 sırası, dtype ve birimler sözlükle eşleşir | `F2-018` | `feat(parser): F2-019 sensör alanlarını kanal metadata'sına eşleştir` |
 | [ ] | `F2-020` | `0.81.0` | 20 dk | Scale ve offset dönüşümünü ekle | Bilinen ham değer beklenen mühendislik değerine dönüşür | `F2-019` | `feat(parser): F2-020 scale ve offset dönüşümünü ekle` |
