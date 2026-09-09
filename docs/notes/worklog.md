@@ -86,8 +86,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F1-035` | 15 dk | 2 dk 27 sn | `d0fd7c1` | sağ üst BIT/System Status kartını yerleştir |
 | `F1-036` | 15 dk | 2 dk 4 sn | `d27c290` | Analysis Tools kartının sekmelerini yerleştir |
 | `F1-037` | 15 dk | 1 dk 26 sn | `9482d61` | sağ alt Data Export kartını yerleştir |
+| `F1-038` | 15 dk | 2 dk 10 sn | `ac43dce` | mockup ana analiz sekmelerini yerleştir |
 
-**68 commit · olculen toplam 1212 dk 41 sn · olculemeyen 1 (ilk commit)**
+**69 commit · olculen toplam 1214 dk 51 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

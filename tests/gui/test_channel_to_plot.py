@@ -41,9 +41,10 @@ def loaded(window: MainWindow) -> MainWindow:
 
 
 def test_plot_is_in_the_center(window: MainWindow) -> None:
-    """Grafik merkez alanın yığınında; kayıt açılınca öne gelir (F1-033)."""
+    """Grafik dashboard içinde; kayıt açılınca öne gelir (F1-033, F1-039)."""
     assert window.plot_panel is not None
-    assert window.center_stack.indexOf(window.plot_panel) >= 0
+    assert window.plot_panel is window.dashboard.time_series
+    assert window.center_stack.indexOf(window.dashboard) >= 0
     assert window.center_stack.parent() is window.center
 
 

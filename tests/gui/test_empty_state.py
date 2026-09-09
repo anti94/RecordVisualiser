@@ -76,7 +76,7 @@ def test_selecting_a_channel_switches_to_the_plot(window: MainWindow) -> None:
     window.left_dock.channel_activated.emit("ch0")
 
     assert window.center_shows_plot
-    assert window.center_stack.currentWidget() is window.plot_panel
+    assert window.center_stack.currentWidget() is window.dashboard
 
 
 def test_new_recording_returns_to_guidance(window: MainWindow) -> None:

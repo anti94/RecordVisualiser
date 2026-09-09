@@ -40,7 +40,7 @@ from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock
 from sonar_analyzer.ui.docks.playback import PlaybackDock
 from sonar_analyzer.ui.docks.right_column import RightColumnDock
 from sonar_analyzer.ui.empty_state import EmptyStatePanel
-from sonar_analyzer.ui.plots.plot_panel import PlotPanel
+from sonar_analyzer.ui.plots.dashboard import DashboardPanel
 from sonar_analyzer.ui.status_bar import AppStatusBar
 from sonar_analyzer.ui.theme import apply_theme
 from sonar_analyzer.ui.view_tab_bar import ViewTabBar
@@ -168,6 +168,7 @@ class MainWindow(QMainWindow):
 
         chunk = self._repository.query(channel_id, self._repository.metadata().time_range)
         self.plot_panel.set_channel(channel, chunk)
+        self.dashboard.statistics.set_channel_data(channel, chunk.values)
         self.show_plot()
         self.right_dock.show_channel(channel)
         self.bottom_dock.append_log(f"{channel.display_label} cizildi ({len(chunk)} ornek).")
@@ -240,12 +241,13 @@ class MainWindow(QMainWindow):
         self.empty_state.open_requested.connect(self.action("action_open").trigger)
         self.empty_state.simulation_requested.connect(self.action("action_load_simulation").trigger)
 
-        self.plot_panel = PlotPanel(container)
+        self.dashboard = DashboardPanel(container)
+        self.plot_panel = self.dashboard.time_series
 
         self.center_stack = QStackedWidget(container)
         self.center_stack.setObjectName("center_stack")
         self.center_stack.addWidget(self.empty_state)
-        self.center_stack.addWidget(self.plot_panel)
+        self.center_stack.addWidget(self.dashboard)
         self.center_stack.setCurrentWidget(self.empty_state)
 
         layout.addWidget(self.center_stack, 1)
@@ -256,11 +258,11 @@ class MainWindow(QMainWindow):
         self.center_stack.setCurrentWidget(self.empty_state)
 
     def show_plot(self) -> None:
-        self.center_stack.setCurrentWidget(self.plot_panel)
+        self.center_stack.setCurrentWidget(self.dashboard)
 
     @property
     def center_shows_plot(self) -> bool:
-        return self.center_stack.currentWidget() is self.plot_panel
+        return self.center_stack.currentWidget() is self.dashboard
 
     # -- duzen -----------------------------------------------------------
 
@@ -275,6 +277,7 @@ class MainWindow(QMainWindow):
         self.right_dock.close_inspector()
         self.right_dock.bit_status.clear()
         self.plot_panel.clear()
+        self.dashboard.statistics.clear()
         self.show_empty_state()
         self.playback_dock.set_recording_range(metadata.time_range)
         self.status.set_field("file", metadata.source_path)
