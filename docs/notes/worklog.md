@@ -121,8 +121,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F2-026` | 20 dk | 2 dk 22 sn | `0bd93b5` | wraparound ve saat resetini ayırt et |
 | `F2-027` | 20 dk | 2 dk 0 sn | `c088986` | tanımlı drift düzeltmesini uygula |
 | `F2-028` | 20 dk | 2 dk 26 sn | `e23f038` | kayıt offseti ve zaman indeksini oluştur |
+| `F2-029` | 20 dk | 2 dk 0 sn | `210fc91` | kanal ve olay indekslerini oluştur |
 
-**103 commit · olculen toplam 1320 dk 23 sn · olculemeyen 1 (ilk commit)**
+**104 commit · olculen toplam 1322 dk 23 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
