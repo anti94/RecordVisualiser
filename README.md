@@ -43,8 +43,8 @@ Tek komut (Windows, PowerShell):
 powershell -ExecutionPolicy Bypass -File tools/setup-dev.ps1
 ```
 
-Betik sanal ortamı oluşturur, paketi `[dev]` ekstrasıyla kurar ve üç doğrulama yapar
-beş doğrulama yapar (paket import, ruff lint, ruff format, pyright, pytest).
+Betik sanal ortamı oluşturur, paketi `[dev]` ekstrasıyla kurar ve beş doğrulama yapar
+(paket import, ruff lint, ruff format, pyright, pytest).
 Yeniden çalıştırılabilir; mevcut `.venv` varsa kullanır.
 
 | Seçenek | Etki |
@@ -68,6 +68,36 @@ Arayüz ve DSP katmanları ayrı kurulur:
 pip install -e ".[gui]"   # PySide6 + PyQtGraph
 pip install -e ".[dsp]"   # SciPy
 ```
+
+### Uygulamayı çalıştırma
+
+Proje kökünde PowerShell ile:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/run.ps1
+```
+
+Betik projenin `.venv` ortamını kullanır; ortamı etkinleştirmek gerekmez. Başka bir
+klasörden çağırırken `run.ps1` için tam yol verilebilir. Pencere kapandığında uygulamanın
+çıkış kodunu döndürür.
+
+İlk kurulumda GUI bağımlılıklarını da yükleyin:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/setup-dev.ps1 -WithGui -Locked
+```
+
+| Seçenek | Komut |
+| --- | --- |
+| Sürümü göster | `powershell -NoProfile -ExecutionPolicy Bypass -File tools/run.ps1 -Version` |
+| Pencere göstermeden başlangıcı doğrula | `powershell -NoProfile -ExecutionPolicy Bypass -File tools/run.ps1 -NoWindow` |
+
+Doğrudan giriş noktası: `.venv\Scripts\python.exe -m sonar_analyzer`.
+
+Mevcut geliştirme sürümünde **Tools → Load Simulation Data** (`Ctrl+Shift+S`) ile
+örnek kanalları yükleyip bir kanala çift tıklayarak grafiği açabilirsiniz. `.bin`
+okuyucu geliştirmesi sürüyor; **Open .bin File** düğmesinin okuyucuya bağlantısı
+henüz tamamlanmadı.
 
 ### Testler
 
