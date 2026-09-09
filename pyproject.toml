@@ -89,7 +89,10 @@ include = ["src", "tests", "tools"]
 exclude = [".venv", "**/__pycache__", "**/node_modules"]
 venvPath = "."
 venv = ".venv"
-pythonVersion = "3.9"          # calisma zamani hedefi 3.12 olunca guncellenecek (D-20)
+# pythonVersion BILEREK sabitlenmedi: pyright ortamdaki yorumlayici surumunu
+# kullanir. Sabit "3.9" verildiginde CI'nin 3.12 ayagi, 3.12 stdlib ile 3.9 dil
+# surumunu birlestirip yalnizca o ayakta hata uretiyordu. Matris zaten her iki
+# surumu ayri ayri denetliyor.
 pythonPlatform = "Windows"
 typeCheckingMode = "strict"
 reportMissingTypeStubs = false
