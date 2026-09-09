@@ -103,8 +103,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F2-008` | 20 dk | 2 dk 13 sn | `799b5b7` | sıra ve zaman boşluklarını raporla |
 | `F2-009` | 15 dk | 1 dk 42 sn | `c5a0609` | kesik son kaydı raporlayarak okumayı bitir |
 | `F2-010` | 15 dk | 3 dk 35 sn | `36dead5` | kayıt adı ve sıra numarası tutarlılığını denetle |
+| `F2-011` | 20 dk | 8 dk 6 sn | `9b992de` | tekrarlı ve sıra dışı kayıtları raporla |
 
-**85 commit · olculen toplam 1264 dk 5 sn · olculemeyen 1 (ilk commit)**
+**86 commit · olculen toplam 1272 dk 11 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

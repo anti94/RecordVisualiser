@@ -15,9 +15,11 @@ from typing import Union
 
 from sonar_analyzer.io.profile_a_format import (
     DATA_RECORD_V1,
+    DATA_RECORD_V2,
     FILE_HEADER_V1,
     FILE_HEADER_V2,
     DataRecordV1,
+    DataRecordV2,
     FileHeaderV1,
     FileHeaderV2,
 )
@@ -83,4 +85,21 @@ def read_data_record_v1(buffer: ReadableBuffer, offset: int) -> DataRecordV1:
         sensor_values=sensor_values,  # type: ignore[arg-type]
         bit_status=bit_status,
         tx_status=tx_status,
+    )
+
+
+def read_data_record_v2(buffer: ReadableBuffer, offset: int) -> DataRecordV2:
+    """68 baytlık ham veriyi `DataRecordV2`'ye çözer (v1 gövdesi + `record_crc32`)."""
+    unpacked = DATA_RECORD_V2.unpack_from(buffer, offset)
+    name, sequence_no, elapsed_us = unpacked[0], unpacked[1], unpacked[2]
+    sensor_values = unpacked[3:11]
+    bit_status, tx_status, record_crc32 = unpacked[11], unpacked[12], unpacked[13]
+    return DataRecordV2(
+        name=name,
+        sequence_no=sequence_no,
+        elapsed_us=elapsed_us,
+        sensor_values=sensor_values,  # type: ignore[arg-type]
+        bit_status=bit_status,
+        tx_status=tx_status,
+        record_crc32=record_crc32,
     )

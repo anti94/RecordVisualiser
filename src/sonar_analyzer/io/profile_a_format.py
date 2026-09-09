@@ -107,6 +107,19 @@ class DataRecordV1:
     tx_status: int
 
 
+@dataclass(frozen=True)
+class DataRecordV2:
+    """68 baytlık `DataNNNNN` kaydının çözülmüş hâli (CRC destekli)."""
+
+    name: bytes
+    sequence_no: int
+    elapsed_us: int
+    sensor_values: tuple[float, float, float, float, float, float, float, float]
+    bit_status: int
+    tx_status: int
+    record_crc32: int
+
+
 def record_name(sequence_no: int, digits: int = 5) -> str:
     """`docs/format/timing-and-naming.md` §2: ad sarmaz, en az `digits` hane."""
     return f"Data{sequence_no:0{digits}d}"
