@@ -1413,7 +1413,7 @@ Kabul: Örnek dosya güvenilir çözümlenmeli; kanal, olay ve zaman sorguları 
 | [x] | `F2-003` | `0.64.0` | 15 dk | Magic ve sürüm doğrulamasını ekle | Geçersiz magic ve bilinmeyen sürüm konum bilgili hata verir | `F2-002` | `feat(parser): F2-003 magic ve sürüm doğrulamasını ekle` |
 | [x] | `F2-004` | `0.65.0` | 20 dk | Eksik header ve boyut sınırlarını denetle | Kesik ve tutarsız girdiler aşırı allocation veya sınır dışı okumaya yol açmaz | `F2-003` | `fix(parser): F2-004 eksik header ve boyut sınırlarını denetle` |
 | [x] | `F2-005` | `0.66.0` | 20 dk | Tek Data kaydını çözümle | İsim, sıra, zaman, sekiz sensör, BIT ve TX referansla eşleşir | `F2-004` | `feat(parser): F2-005 tek Data kaydını çözümle` |
-| [ ] | `F2-006` | `0.67.0` | 20 dk | Ardışık kayıt iterator'unu ekle | Sekiz kayıt sırayla okunur; offsetler 32 + n × 64 olur | `F2-005` | `feat(parser): F2-006 ardışık kayıt iterator'unu ekle` |
+| [x] | `F2-006` | `0.67.0` | 20 dk | Ardışık kayıt iterator'unu ekle | Sekiz kayıt sırayla okunur; offsetler 32 + n × 64 olur | `F2-005` | `feat(parser): F2-006 ardışık kayıt iterator'unu ekle` |
 | [ ] | `F2-007` | `0.68.0` | 15 dk | 125 ms kayıt zamanını kanonik ns'ye dönüştür | İlk üç kayıt 0, 125 ve 250 ms üretir; UTC başlangıcı doğru eklenir | `F2-006` | `feat(time): F2-007 125 ms kayıt zamanını kanonik ns'ye dönüştür` |
 | [ ] | `F2-008` | `0.69.0` | 20 dk | Sıra ve zaman boşluklarını raporla | Atlanan sıra boşluk olarak gösterilir; sonraki kaydın zamanı kaydırılmaz | `F2-007` | `feat(parser): F2-008 sıra ve zaman boşluklarını raporla` |
 | [ ] | `F2-009` | `0.70.0` | 15 dk | Kesik son kaydı raporlayarak okumayı bitir | Önceki tam kayıtlar erişilebilir kalır | `F2-008` | `fix(parser): F2-009 kesik son kaydı raporlayarak okumayı bitir` |

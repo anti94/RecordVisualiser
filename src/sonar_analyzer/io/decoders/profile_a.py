@@ -6,6 +6,8 @@ sürüm. Boyut/sınır denetimleri (`F2-004`) ayrı fonksiyondadır.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
+
 from sonar_analyzer.io.decoders.errors import InvalidMagicError, UnsupportedVersionError
 from sonar_analyzer.io.profile_a_format import (
     EXPECTED_HEADER_SIZE_V1,
@@ -47,3 +49,34 @@ def decode_record_at_index(
         raise ValueError(f"Kayit indeksi negatif olamaz: {index}")
     offset = header_size + index * record_size
     return read_data_record_v1(buffer, offset)
+
+
+def record_count_in_buffer(
+    buffer_length: int,
+    header_size: int = EXPECTED_HEADER_SIZE_V1,
+    record_size: int = EXPECTED_RECORD_SIZE_V1,
+) -> int:
+    """Buffer'a sığan **tam** kayıt sayısı; artık bayt varsa yok sayılır.
+
+    Kesik son kayıt burada raporlanmaz (bkz. `F2-009`); yalnız kaçta tam
+    kayıt olduğunu söyler.
+    """
+    if buffer_length < header_size:
+        return 0
+    return (buffer_length - header_size) // record_size
+
+
+def iter_records(
+    buffer: ReadableBuffer,
+    header_size: int = EXPECTED_HEADER_SIZE_V1,
+    record_size: int = EXPECTED_RECORD_SIZE_V1,
+) -> Iterator[DataRecordV1]:
+    """Buffer'daki tüm tam kayıtları sırayla çözer — `F2-006`.
+
+    Her kaydın offseti `header_size + n * record_size` formülüyle üretilir;
+    `docs/format/timing-and-naming.md` §2'deki nominal (kayıpsız) offset
+    formülüyle aynıdır.
+    """
+    count = record_count_in_buffer(len(buffer), header_size, record_size)
+    for index in range(count):
+        yield decode_record_at_index(buffer, index, header_size, record_size)
