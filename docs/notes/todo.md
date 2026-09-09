@@ -4,9 +4,9 @@
 > Bir işi tamamlayınca `plan.md`'deki kutuyu `[x]` yap ve
 > `python tools/sync_todo.py` çalıştır.
 
-**Toplam 492 madde · 65 tamamlandı · 427 kaldı**
+**Toplam 492 madde · 66 tamamlandı · 426 kaldı**
 
-`[###.....................]` %13.2
+`[###.....................]` %13.4
 
 ## Özet
 
@@ -14,13 +14,13 @@
 | --- | --- | --- | --- |
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
-| Faz 2 — Parser, indeks ve kayıtlı veri | 4 | 37 | 41 |
+| Faz 2 — Parser, indeks ve kayıtlı veri | 5 | 36 | 41 |
 | Faz 3 — MVP analiz arayüzü | 0 | 80 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **65** | **427** | **492** |
+| **Toplam** | **66** | **426** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -95,7 +95,7 @@
 | [x] | `F1-043` | `0.60.0` | 20 dk | İlk spike sonuçlarını ve darboğazı kaydet |
 | [x] | `F1-044` | `0.61.0` | 15 dk | Uygulama iskeleti milestone kontrolünü yap |
 
-### Faz 2 — Parser, indeks ve kayıtlı veri (4/41)
+### Faz 2 — Parser, indeks ve kayıtlı veri (5/41)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -103,7 +103,7 @@
 | [x] | `F2-002` | `0.63.0` | 20 dk | Little-endian header okuyucusunu ekle |
 | [x] | `F2-003` | `0.64.0` | 15 dk | Magic ve sürüm doğrulamasını ekle |
 | [x] | `F2-004` | `0.65.0` | 20 dk | Eksik header ve boyut sınırlarını denetle |
-| [ ] | `F2-005` | `0.66.0` | 20 dk | Tek Data kaydını çözümle |
+| [x] | `F2-005` | `0.66.0` | 20 dk | Tek Data kaydını çözümle |
 | [ ] | `F2-006` | `0.67.0` | 20 dk | Ardışık kayıt iterator'unu ekle |
 | [ ] | `F2-007` | `0.68.0` | 15 dk | 125 ms kayıt zamanını kanonik ns'ye dönüştür |
 | [ ] | `F2-008` | `0.69.0` | 20 dk | Sıra ve zaman boşluklarını raporla |

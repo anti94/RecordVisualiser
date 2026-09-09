@@ -13,49 +13,16 @@ import hashlib
 import struct
 
 import pytest
+from tests.golden_bytes import (
+    START_TIME_UTC_NS,
+    VALID_8RECORDS_SHA256,
+    build_valid_fixture,
+)
 
-from sonar_analyzer.io.profile_a_format import DATA_RECORD_V1, FILE_HEADER_V1
 from sonar_analyzer.io.readers.binary_reader import (
     read_data_record_v1,
     read_file_header_v1,
 )
-
-START_TIME_UTC_NS = 1_788_901_200_000_000_000
-CHANNEL_COUNT = 8
-
-#: docs/format/fixture-valid-8records.md §6.
-EXPECTED_SHA256 = "5094b9b0bc585518cf7fa9dc372d3e997f32b59caeb156cb4c0f9ab9d039fce9"
-
-
-def _sensor_values(n: int) -> tuple[float, float, float, float, float, float, float, float]:
-    return (
-        100.0 + 0.5 * n,
-        25.0,
-        0.125 * n,
-        0.0 - 0.125 * n,  # negatif sifir uretmeyen bicim (belgedeki uyari)
-        1.0,
-        2.5 if n % 2 == 0 else -2.5,
-        10.0 + 0.25 * n,
-        48.0,
-    )
-
-
-def build_valid_fixture() -> bytes:
-    """`docs/format/fixture-valid-8records.md` §1'deki formüllerden dosyayı üretir."""
-    header = FILE_HEADER_V1.pack(b"SONARBIN", 1, 32, 64, 125_000, CHANNEL_COUNT, START_TIME_UTC_NS)
-    body = bytearray(header)
-    for n in range(8):
-        bit_status = 0x00000100 if n == 4 else 0
-        tx_status = 1 if 2 <= n <= 5 else 0
-        body += DATA_RECORD_V1.pack(
-            f"Data{n:05d}".encode("ascii"),
-            n,
-            n * 125_000,
-            *_sensor_values(n),
-            bit_status,
-            tx_status,
-        )
-    return bytes(body)
 
 
 @pytest.fixture(scope="module")
@@ -66,7 +33,7 @@ def fixture_bytes() -> bytes:
 def test_fixture_matches_documented_hash(fixture_bytes: bytes) -> None:
     """Formül belgeyle senkron değilse bu test en önce kırılır."""
     assert len(fixture_bytes) == 544
-    assert hashlib.sha256(fixture_bytes).hexdigest() == EXPECTED_SHA256
+    assert hashlib.sha256(fixture_bytes).hexdigest() == VALID_8RECORDS_SHA256
 
 
 # -- header ------------------------------------------------------------
