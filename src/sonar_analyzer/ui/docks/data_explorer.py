@@ -46,6 +46,9 @@ DOCK_TITLE = "Data Explorer"
 EMPTY_VALUE = "—"
 EMPTY_TREE_HINT = "Kanal yok. Bir .bin dosyasi acin."
 
+#: "Data Tree" sekmesinde henuz genisletilmemis sensor grubunun tek cocugu — F3-010 lazy yukleme.
+_LAZY_PLACEHOLDER_TEXT = "Yukleniyor..."
+
 #: Dosya ozetinde gosterilen alanlar (mockup bolge 1).
 SUMMARY_FIELDS = ("File", "Size", "Start", "Duration", "Platform")
 
@@ -55,6 +58,16 @@ SUMMARY_FIELDS = ("File", "Size", "Start", "Duration", "Platform")
 #: grup "Vehicle / Transmission" yaziyor; yolda "Vehicle" tutulur ve gosterim
 #: etiketi burada eslenir.
 GROUP_LABELS = {"Vehicle": "Vehicle / Transmission"}
+
+
+def _all_children_are_leaves(node: RecordingTreeNode) -> bool:
+    """Bir düğümün tüm çocukları kanal yaprağı mı — `F3-010` lazy sınırı.
+
+    Yalnız bu düğümler (sensör grupları) yer tutucuyla kurulur ve
+    genişletilene kadar açılmaz; `Kayıt`/`Cihaz` gibi ara düzeyler her
+    zaman gerçek çocuklarıyla ve açık başlar (sayıları zaten az).
+    """
+    return bool(node.children) and all(child.is_leaf for child in node.children)
 
 
 def _format_size(size_bytes: int) -> str:
@@ -110,6 +123,8 @@ class DataExplorerDock(QDockWidget):
         self._summary_labels: dict[str, QLabel] = {}
         self._channels: tuple[ChannelMetadata, ...] = ()
         self._recording_tree: tuple[RecordingTreeNode, ...] = ()
+        #: Genisletilmemis sensor grubu -> henuz eklenmemis kanal dugumleri (F3-010).
+        self._pending_children: dict[int, tuple[RecordingTreeNode, ...]] = {}
 
         self.setWidget(self._build_body())
         self.clear()
@@ -202,6 +217,7 @@ class DataExplorerDock(QDockWidget):
         header = self.data_tree.header()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.data_tree.itemDoubleClicked.connect(self._on_data_tree_item_double_clicked)
+        self.data_tree.itemExpanded.connect(self._on_data_tree_item_expanded)
         layout.addWidget(self.data_tree, 1)
 
         self.data_tree_empty_hint = QLabel(EMPTY_TREE_HINT, page)
@@ -251,25 +267,62 @@ class DataExplorerDock(QDockWidget):
 
         Kabul kriteri: kayıt, cihaz, sensör ve kanal hiyerarşisi doğru
         görünür. Boş liste (hiç kayıt açık değil) ağacı temizler.
+
+        Kanal yaprakları **lazy** yüklenir (`F3-010`): sensör grubu düğümü
+        gerçek kanal öğeleri yerine tek bir yer tutucuyla kurulur, gerçek
+        öğeler yalnız grup ilk genişletildiğinde eklenir. Kayıt/cihaz/grup
+        sayısı her zaman azdır (birkaç dosya, birkaç grup) — asıl maliyet
+        binlerce kanal olabilecek yaprak düzeyindedir; `QTreeWidgetItem`
+        kurulumu orada ertelenir.
         """
         self._recording_tree = build_recording_tree(recordings)
         self.data_tree.clear()
+        self._pending_children.clear()
         for recording_node in self._recording_tree:
-            self._add_tree_node(None, recording_node)
-        self.data_tree.expandAll()
+            item = self._add_lazy_node(None, recording_node)
+            item.setExpanded(True)
         self.data_tree_empty_hint.setVisible(not recordings)
 
-    def _add_tree_node(
+    def _add_lazy_node(
         self, parent: QTreeWidgetItem | None, node: RecordingTreeNode
     ) -> QTreeWidgetItem:
+        """Bir düğümü kurar; kanal yapraklarının **doğrudan** atasında durur.
+
+        O düğüme tek bir yer tutucu çocuk eklenir (genişletme oku
+        görünsün diye) ve gerçek kanallar `_pending_children`'da saklanır;
+        `_on_data_tree_item_expanded` ilk genişletmede materyalize eder.
+        """
         item = self._new_data_tree_item(parent, node.label)
         if node.is_leaf:
             item.setData(0, Qt.ItemDataRole.UserRole, node.channel_id)
-        else:
-            item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsSelectable)
+            return item
+
+        item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsSelectable)
+        if _all_children_are_leaves(node):
+            placeholder = self._new_data_tree_item(item, _LAZY_PLACEHOLDER_TEXT)
+            placeholder.setFlags(Qt.ItemFlag.NoItemFlags)
+            self._pending_children[id(item)] = node.children
+            return item
+
         for child in node.children:
-            self._add_tree_node(item, child)
+            child_item = self._add_lazy_node(item, child)
+            if not child.is_leaf and not _all_children_are_leaves(child):
+                # Cocuk kendisi Kayit/Cihaz gibi bir ara duzeyse acik
+                # baslar. Sensor grubu gibi cocuklari TAMAMEN yapraksa
+                # genisletilmez -- bu tam olarak lazy sinirdir; onu burada
+                # da acarsak setExpanded() itemExpanded'i hemen tetikler
+                # ve yer tutucu aninda gercek binlerce yaprakla degisir.
+                child_item.setExpanded(True)
         return item
+
+    def _on_data_tree_item_expanded(self, item: QTreeWidgetItem) -> None:
+        """Sensör grubu ilk genişletildiğinde yer tutucuyu gerçek kanallarla değiştirir."""
+        pending = self._pending_children.pop(id(item), None)
+        if pending is None:
+            return
+        item.takeChildren()
+        for channel_node in pending:
+            self._add_lazy_node(item, channel_node)
 
     def _new_data_tree_item(self, parent: QTreeWidgetItem | None, label: str) -> QTreeWidgetItem:
         if parent is None:
@@ -277,7 +330,11 @@ class DataExplorerDock(QDockWidget):
         return QTreeWidgetItem(parent, [label])
 
     def data_tree_channel_ids(self) -> list[str]:
-        """ "Data Tree" sekmesindeki tüm kanal kimlikleri (testler için)."""
+        """ "Data Tree" sekmesindeki tüm kanal kimlikleri (testler için).
+
+        Modelden okunur — lazy yükleme, ağaçta o an materyalize edilmiş
+        `QTreeWidgetItem` sayısından bağımsızdır.
+        """
         return flatten_channel_ids(self._recording_tree)
 
     def summary_value(self, field: str) -> str:

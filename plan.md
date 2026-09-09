@@ -1482,7 +1482,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F3-009` | `0.111.0` | 20 dk | Dosya ve kanal ağaç modelini ekle | Kayıt, cihaz, sensör ve kanal hiyerarşisi doğru görünür | `F3-008` | `feat(ui): F3-009 dosya ve kanal ağaç modelini ekle` |
-| [ ] | `F3-010` | `0.112.0` | 20 dk | Kanal ağacında lazy yüklemeyi ekle | Açılmamış dallar gerektiğinde yüklenir; binlerce kanal gezilebilir | `F3-009` | `perf(ui): F3-010 kanal ağacında lazy yüklemeyi ekle` |
+| [x] | `F3-010` | `0.112.0` | 20 dk | Kanal ağacında lazy yüklemeyi ekle | Açılmamış dallar gerektiğinde yüklenir; binlerce kanal gezilebilir | `F3-009` | `perf(ui): F3-010 kanal ağacında lazy yüklemeyi ekle` |
 | [ ] | `F3-011` | `0.113.0` | 20 dk | Ad, ID, birim ve kaynak aramasını ekle | Her alan için bilinen eşleşme bulunur; temizleme tüm kanalları getirir | `F3-010` | `feat(ui): F3-011 ad, ID, birim ve kaynak aramasını ekle` |
 | [ ] | `F3-012` | `0.114.0` | 15 dk | Channels/Data Tree sekmeleri ve kategori filtrelerini bağla | Sensors, Acoustic, Navigation, Vehicle/Transmission ve BIT seçimleri doğru çalışır | `F3-011` | `feat(ui): F3-012 channels/Data Tree sekmeleri ve kategori filtrelerini bağla` |
 | [ ] | `F3-013` | `0.115.0` | 20 dk | Çift tıkla kanalı grafiğe ekle | Gerçek dosyadan seçilen kanal doğru zaman ekseninde görünür | `F3-012` | `feat(plot): F3-013 çift tıkla kanalı grafiğe ekle` |

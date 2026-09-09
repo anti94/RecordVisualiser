@@ -110,6 +110,7 @@ def test_double_clicking_a_data_tree_leaf_activates_the_channel(
     assert device_item is not None
     group_item = device_item.child(0)
     assert group_item is not None
+    dock.data_tree.expandItem(group_item)  # F3-010: yapraklar lazy, once genislet
     leaf = group_item.child(0)
     assert leaf is not None
 
