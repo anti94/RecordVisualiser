@@ -91,6 +91,7 @@ MENU_SPECS: tuple[MenuSpec, ...] = (
         "menu_tools",
         "&Tools",
         (
+            ActionSpec("action_load_simulation", "Load Simulation Data", "Ctrl+Shift+S"),
             ActionSpec("action_settings", "Settings...", "Ctrl+,"),
             ActionSpec("action_diagnostics", "Diagnostics", enabled=False),
         ),

@@ -33,8 +33,8 @@ def window(qtbot: QtBot) -> MainWindow:
     qtbot.addWidget(win)
     win.show()
     qtbot.waitExposed(win)
-    repo = MockRecordingRepository(duration_s=10.0)
-    win.set_recording(repo.metadata(), repo.channels())
+    # set_repository kullaniliyor: kanal cizimi repository'den veri cekiyor.
+    win.set_repository(MockRecordingRepository(duration_s=10.0))
     return win
 
 

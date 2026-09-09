@@ -18,7 +18,6 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
     QFrame,
-    QLabel,
     QMainWindow,
     QMenu,
     QToolBar,
@@ -26,9 +25,10 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from sonar_analyzer import __version__
 from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.recording import RecordingMetadata
+from sonar_analyzer.repository.mock_repository import SIMULATION_LABEL, MockRecordingRepository
+from sonar_analyzer.repository.protocol import RecordingRepository
 from sonar_analyzer.ui.actions import (
     MENU_SPECS,
     TOOLBAR_ACTION_NAMES,
@@ -38,6 +38,7 @@ from sonar_analyzer.ui.docks.bottom_panel import BottomPanelDock
 from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock
 from sonar_analyzer.ui.docks.playback import PlaybackDock
 from sonar_analyzer.ui.docks.right_column import RightColumnDock
+from sonar_analyzer.ui.plots.plot_panel import PlotPanel
 from sonar_analyzer.ui.status_bar import AppStatusBar
 from sonar_analyzer.ui.theme import apply_theme
 
@@ -67,6 +68,7 @@ class MainWindow(QMainWindow):
         apply_theme(self)
 
         self._channels: tuple[ChannelMetadata, ...] = ()
+        self._repository: RecordingRepository | None = None
         self.actions_by_name: dict[str, QAction] = {}
         # Menulere Python tarafinda referans tutulmazsa PySide nesneyi serbest
         # birakiyor ve sonraki erisimde "C++ object already deleted" hatasi
@@ -94,7 +96,8 @@ class MainWindow(QMainWindow):
         self.apply_default_layout()
 
         self._connect_layout_actions()
-        self.left_dock.channel_activated.connect(self.show_channel_in_inspector)
+        self.left_dock.channel_activated.connect(self.open_channel)
+        self.action("action_load_simulation").triggered.connect(self.load_simulation)
 
         self.status = AppStatusBar(self)
         self.setStatusBar(self.status)
@@ -153,6 +156,32 @@ class MainWindow(QMainWindow):
             return
         self.right_dock.show_channel(channel)
 
+    def open_channel(self, channel_id: str) -> None:
+        """Seçilen kanalı çizer ve ayrıntısını gösterir."""
+        channel = next((c for c in self._channels if c.id == channel_id), None)
+        if channel is None or self._repository is None:
+            return
+
+        chunk = self._repository.query(channel_id, self._repository.metadata().time_range)
+        self.plot_panel.set_channel(channel, chunk)
+        self.right_dock.show_channel(channel)
+        self.bottom_dock.append_log(f"{channel.display_label} cizildi ({len(chunk)} ornek).")
+
+    def load_simulation(self) -> None:
+        """Sahte kaydı açar; veri kaynağı `Simülasyon` olarak görünür."""
+        repository = MockRecordingRepository()
+        self.set_repository(repository)
+
+    def set_repository(self, repository: RecordingRepository) -> None:
+        """Bir veri kaynağını açar ve panellere dağıtır."""
+        self._repository = repository
+        metadata = repository.metadata()
+        channels = repository.channels()
+        self.set_recording(metadata, channels)
+
+        span = metadata.time_range
+        self.bottom_dock.set_events(repository.events(span))
+
     def action(self, name: str) -> QAction:
         """Adına göre eylemi döndürür; bulunamazsa hata verir."""
         try:
@@ -184,27 +213,14 @@ class MainWindow(QMainWindow):
         return dock
 
     def _build_center(self) -> QWidget:
+        """Merkez alan: sekme çubuğu ve araçlar sonraki işlerde eklenecek."""
         container = QFrame(self)
         container.setObjectName("center_area")
         layout = QVBoxLayout(container)
-        layout.setContentsMargins(8, 8, 8, 8)
+        layout.setContentsMargins(4, 4, 4, 4)
 
-        heading = QLabel(WINDOW_TITLE, container)
-        heading.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        detail = QLabel(
-            f"surum {__version__}\n\n"
-            "Merkez alan: sekme cubugu, hizli araclar ve grafikler "
-            "(bolge 2, 3, 6) sonraki islerde eklenecek.",
-            container,
-        )
-        detail.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        detail.setWordWrap(True)
-
-        layout.addStretch(1)
-        layout.addWidget(heading)
-        layout.addWidget(detail)
-        layout.addStretch(1)
+        self.plot_panel = PlotPanel(container)
+        layout.addWidget(self.plot_panel, 1)
         return container
 
     # -- duzen -----------------------------------------------------------
@@ -218,8 +234,13 @@ class MainWindow(QMainWindow):
         self._channels = tuple(channels)
         self.left_dock.set_recording(metadata, channels)
         self.right_dock.close_inspector()
+        self.plot_panel.clear()
         self.playback_dock.set_recording_range(metadata.time_range)
         self.status.set_field("file", metadata.source_path)
+        self.status.set_field(
+            "connection",
+            SIMULATION_LABEL if metadata.source_path == SIMULATION_LABEL else "Dosya",
+        )
         self.status.set_status("Ready")
         self.status.update_memory()
         self.bottom_dock.append_log(f"Kayit acildi: {metadata.source_path}")

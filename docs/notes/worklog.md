@@ -78,8 +78,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F1-028` | 15 dk | 3 dk 21 sn | `18eddb8` | durum çubuğu alanlarını ekle |
 | `F1-029` | 20 dk | 242 dk 21 sn | `6a735d1` | mockup koyu temasını ve mavi vurgularını uygula |
 | `F1-030` | 20 dk | 2 dk 8 sn | `2bc3f14` | durum ikonları ve kanal paletini ekle |
+| `F1-031` | 20 dk | 2 dk 45 sn | `50da59f` | tek kanallı PlotPanel iskeletini ekle |
 
-**60 commit · olculen toplam 1150 dk 59 sn · olculemeyen 1 (ilk commit)**
+**61 commit · olculen toplam 1153 dk 44 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

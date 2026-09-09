@@ -4,23 +4,23 @@
 > Bir işi tamamlayınca `plan.md`'deki kutuyu `[x]` yap ve
 > `python tools/sync_todo.py` çalıştır.
 
-**Toplam 492 madde · 48 tamamlandı · 444 kaldı**
+**Toplam 492 madde · 49 tamamlandı · 443 kaldı**
 
-`[##......................]` %9.8
+`[##......................]` %10.0
 
 ## Özet
 
 | Grup | Tamam | Kalan | Toplam |
 | --- | --- | --- | --- |
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
-| Faz 1 — Uygulama iskeleti ve domain modeli | 31 | 13 | 44 |
+| Faz 1 — Uygulama iskeleti ve domain modeli | 32 | 12 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 0 | 41 | 41 |
 | Faz 3 — MVP analiz arayüzü | 0 | 80 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **48** | **444** | **492** |
+| **Toplam** | **49** | **443** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -46,7 +46,7 @@
 | [x] | `F0-016` | `0.16.0` | 15 dk | ADR listesini iş ve sürüm hedefleriyle eşleştir |
 | [x] | `F0-017` | `0.17.0` | 15 dk | Format milestone kabul tutanağını hazırla |
 
-### Faz 1 — Uygulama iskeleti ve domain modeli (31/44)
+### Faz 1 — Uygulama iskeleti ve domain modeli (32/44)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -81,7 +81,7 @@
 | [x] | `F1-029` | `0.46.0` | 20 dk | Mockup koyu temasını ve mavi vurgularını uygula |
 | [x] | `F1-030` | `0.47.0` | 20 dk | Durum ikonları ve kanal paletini ekle |
 | [x] | `F1-031` | `0.48.0` | 20 dk | Tek kanallı PlotPanel iskeletini ekle |
-| [ ] | `F1-032` | `0.49.0` | 20 dk | Mock repository seçimini grafiğe bağla |
+| [x] | `F1-032` | `0.49.0` | 20 dk | Mock repository seçimini grafiğe bağla |
 | [ ] | `F1-033` | `0.50.0` | 15 dk | Boş workspace yönlendirmesini ekle |
 | [ ] | `F1-034` | `0.51.0` | 15 dk | Open .bin File düğmesi ve dosya özet kartını ekle |
 | [ ] | `F1-035` | `0.52.0` | 15 dk | Sağ üst BIT/System Status kartını yerleştir |
