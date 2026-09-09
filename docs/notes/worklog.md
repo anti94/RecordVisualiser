@@ -76,8 +76,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `-` | — | 3 dk 53 sn | `814476a` | CI 3.12 pyright sorununu çözüldü olarak kapat |
 | `F1-027` | 15 dk | 2 dk 54 sn | `5f679d9` | Playback/Time Control şeridini yerleştir |
 | `F1-028` | 15 dk | 3 dk 21 sn | `18eddb8` | durum çubuğu alanlarını ekle |
+| `F1-029` | 20 dk | 242 dk 21 sn | `6a735d1` | mockup koyu temasını ve mavi vurgularını uygula |
 
-**58 commit · olculen toplam 906 dk 30 sn · olculemeyen 1 (ilk commit)**
+**59 commit · olculen toplam 1148 dk 51 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

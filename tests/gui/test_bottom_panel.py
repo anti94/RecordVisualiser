@@ -14,10 +14,10 @@ pytest.importorskip("PySide6", reason="PySide6 kurulu degil")
 from PySide6.QtCore import Qt
 from pytestqt.qtbot import QtBot
 
-from sonar_analyzer.domain.event import Severity
 from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.repository.mock_repository import MockRecordingRepository
 from sonar_analyzer.ui.docks.bottom_panel import (
+    EVENT_COLUMNS,
     EVENTS_TAB_TITLE,
     LOG_TAB_TITLE,
     MAX_LOG_LINES,
@@ -144,13 +144,26 @@ def test_known_failure_appears_in_events(panel: BottomPanelDock) -> None:
     rows = [
         row
         for row in range(panel.event_row_count())
-        if panel.event_cell(row, "Severity") == Severity.ERROR.value
+        if panel.event_cell(row, "Severity") == "Error"
     ]
     assert len(rows) == 1
     row = rows[0]
     assert panel.event_cell(row, "Category") == "Thermal Management"
     assert panel.event_cell(row, "Time") == "00:00:04.000"
     assert "basarisiz" in panel.event_cell(row, "Message")
+
+
+def test_severity_cell_has_icon_and_text(panel: BottomPanelDock) -> None:
+    """Durum yalnız renkle anlatılmıyor: ikon ve metin birlikte."""
+    repo = MockRecordingRepository(duration_s=10.0)
+    panel.set_events(repo.events(TimeRange(0, 10 * SECOND)))
+
+    column = EVENT_COLUMNS.index("Severity")
+    item = panel.events.item(0, column)
+    assert item is not None
+    assert item.text() != "", "metin bos olmamali"
+    assert not item.icon().isNull(), "ikon bulunmali"
+    assert item.text() in item.toolTip()
 
 
 def test_events_are_separate_from_log(panel: BottomPanelDock) -> None:

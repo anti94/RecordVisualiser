@@ -28,6 +28,7 @@ from PySide6.QtWidgets import (
 )
 
 from sonar_analyzer.domain.event import Event, Severity
+from sonar_analyzer.ui.status_icons import make_status_icon, severity_style
 
 DOCK_OBJECT_NAME = "dock_bottom_panel"
 DOCK_TITLE = "Log / Events"
@@ -105,19 +106,29 @@ class BottomPanelDock(QDockWidget):
     # -- olaylar ---------------------------------------------------------
 
     def set_events(self, events: Sequence[Event]) -> None:
-        """Olay tablosunu doldurur; mevcut satırları değiştirir."""
+        """Olay tablosunu doldurur; mevcut satırları değiştirir.
+
+        Şiddet sütununda hem ikon hem metin bulunur: durum yalnız renkle
+        anlatılmaz (plan Bölüm 6.4).
+        """
+        severity_column = EVENT_COLUMNS.index("Severity")
         self.events.setRowCount(len(events))
+
         for row, event in enumerate(events):
+            style = severity_style(event.severity)
             values = (
                 format_timestamp(event.timestamp_ns),
                 event.source,
                 event.category,
-                event.severity.value,
+                style.label,
                 event.message,
             )
             for column, text in enumerate(values):
                 item = QTableWidgetItem(text)
                 item.setData(Qt.ItemDataRole.UserRole, event.timestamp_ns)
+                if column == severity_column:
+                    item.setIcon(make_status_icon(style))
+                    item.setToolTip(style.describe())
                 if event.severity.rank >= Severity.ERROR.rank:
                     font = item.font()
                     font.setBold(True)
