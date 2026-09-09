@@ -1438,7 +1438,7 @@ Kabul: Örnek dosya güvenilir çözümlenmeli; kanal, olay ve zaman sorguları 
 | [x] | `F2-023` | `0.84.0` | 20 dk | TX durumunu başlangıç/bitiş aralıklarına çevir | START/STOP ve açık kalan son aralık doğru temsil edilir | `F2-022` | `feat(parser): F2-023 tX durumunu başlangıç/bitiş aralıklarına çevir` |
 | [x] | `F2-024` | `0.85.0` | 15 dk | Parser teşhislerini sistem olaylarına çevir | Hata zamanı, kaynak offseti, kategori ve severity korunur | `F2-023` | `feat(parser): F2-024 parser teşhislerini sistem olaylarına çevir` |
 | [x] | `F2-025` | `0.86.0` | 20 dk | Cihaz tick dönüşüm adaptörünü ekle | Referans tick değerleri doğru ns üretir; ham tick saklanır | `F2-024` | `feat(time): F2-025 cihaz tick dönüşüm adaptörünü ekle` |
-| [ ] | `F2-026` | `0.87.0` | 20 dk | Wraparound ve saat resetini ayırt et | İki sentetik senaryo farklı teşhis ve zaman kalitesi üretir | `F2-025` | `feat(time): F2-026 wraparound ve saat resetini ayırt et` |
+| [x] | `F2-026` | `0.87.0` | 20 dk | Wraparound ve saat resetini ayırt et | İki sentetik senaryo farklı teşhis ve zaman kalitesi üretir | `F2-025` | `feat(time): F2-026 wraparound ve saat resetini ayırt et` |
 | [ ] | `F2-027` | `0.88.0` | 20 dk | Tanımlı drift düzeltmesini uygula | Bilinen katsayı referans zamanı üretir; düzeltme metadata'da görünür | `F2-026` | `feat(time): F2-027 tanımlı drift düzeltmesini uygula` |
 
 ##### İndeks ve repository
