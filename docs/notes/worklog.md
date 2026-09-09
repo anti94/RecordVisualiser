@@ -64,8 +64,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F1-021` | 15 dk | 2 dk 18 sn | `a11d9f3` | sahte BIT, TX ve sistem olaylarını ekle |
 | `F1-022` | 20 dk | 2 dk 38 sn | `59ce1b7` | mockup'ın üç sütunlu ana pencere düzenini oluştur |
 | `F1-023` | 15 dk | 3 dk 30 sn | `5a20b3e` | menü ve toolbar eylem iskeletini ekle |
+| `F1-024` | 15 dk | 7 dk 22 sn | `ea51cac` | Data Explorer dock'unu ekle |
 
-**46 commit · olculen toplam 524 dk 24 sn · olculemeyen 1 (ilk commit)**
+**47 commit · olculen toplam 531 dk 46 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

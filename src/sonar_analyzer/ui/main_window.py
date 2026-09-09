@@ -12,10 +12,11 @@ hâle gelmez.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
-    QDockWidget,
     QFrame,
     QLabel,
     QMainWindow,
@@ -26,12 +27,15 @@ from PySide6.QtWidgets import (
 )
 
 from sonar_analyzer import __version__
+from sonar_analyzer.domain.channel import ChannelMetadata
+from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.ui.actions import (
     MENU_SPECS,
     TOOLBAR_ACTION_NAMES,
     build_action,
 )
 from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock
+from sonar_analyzer.ui.docks.right_column import RightColumnDock
 
 # docs/ui/layout-map.md §1 ve §7
 DEFAULT_WINDOW_SIZE = (1520, 840)
@@ -44,31 +48,6 @@ WINDOW_TITLE = "SONAR Data Analyzer"
 RIGHT_DOCK_TITLE = "BIT / Analysis / Export"
 
 
-def _placeholder(text: str, detail: str = "") -> QWidget:
-    """İçeriği sonraki işlerde gelecek geçici panel gövdesi."""
-    container = QWidget()
-    layout = QVBoxLayout(container)
-    layout.setContentsMargins(8, 8, 8, 8)
-
-    heading = QLabel(text, container)
-    heading.setAlignment(Qt.AlignmentFlag.AlignCenter)
-    # Sarmalama olmadan etiketin sizeHint'i panelin asgari genisligini
-    # belirler ve sutun mockup oranindan tasar.
-    heading.setWordWrap(True)
-    heading.setMinimumWidth(1)
-    layout.addWidget(heading)
-
-    if detail:
-        note = QLabel(detail, container)
-        note.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        note.setWordWrap(True)
-        note.setMinimumWidth(1)
-        layout.addWidget(note)
-
-    layout.addStretch(1)
-    return container
-
-
 class MainWindow(QMainWindow):
     """Uygulamanın ana penceresi: üç sütunlu mockup düzeni."""
 
@@ -77,6 +56,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(WINDOW_TITLE)
         self.resize(*DEFAULT_WINDOW_SIZE)
 
+        self._channels: tuple[ChannelMetadata, ...] = ()
         self.actions_by_name: dict[str, QAction] = {}
         # Menulere Python tarafinda referans tutulmazsa PySide nesneyi serbest
         # birakiyor ve sonraki erisimde "C++ object already deleted" hatasi
@@ -97,6 +77,7 @@ class MainWindow(QMainWindow):
         self.apply_default_layout()
 
         self._connect_layout_actions()
+        self.left_dock.channel_activated.connect(self.show_channel_in_inspector)
 
         self.statusBar().showMessage("Ready")
 
@@ -144,6 +125,13 @@ class MainWindow(QMainWindow):
         except KeyError as exc:
             raise KeyError(f"Tanimsiz menu: {name}") from exc
 
+    def show_channel_in_inspector(self, channel_id: str) -> None:
+        """Seçilen kanalın ayrıntısını Inspector sekmesinde öne getirir."""
+        channel = next((c for c in self._channels if c.id == channel_id), None)
+        if channel is None:
+            return
+        self.right_dock.show_channel(channel)
+
     def action(self, name: str) -> QAction:
         """Adına göre eylemi döndürür; bulunamazsa hata verir."""
         try:
@@ -159,15 +147,8 @@ class MainWindow(QMainWindow):
         dock.open_requested.connect(self.action("action_open").trigger)
         return dock
 
-    def _build_right_dock(self) -> QDockWidget:
-        dock = QDockWidget(RIGHT_DOCK_TITLE, self)
-        dock.setObjectName("dock_right_column")
-        dock.setWidget(
-            _placeholder(
-                "BIT / Analysis Tools / Data Export",
-                "Bolge 4, 5 ve 9 bu sutunda alt alta yer alir",
-            )
-        )
+    def _build_right_dock(self) -> RightColumnDock:
+        dock = RightColumnDock(self)
         dock.setMinimumWidth(RIGHT_COLUMN_MIN_WIDTH)
         return dock
 
@@ -196,6 +177,18 @@ class MainWindow(QMainWindow):
         return container
 
     # -- duzen -----------------------------------------------------------
+
+    def set_recording(
+        self,
+        metadata: RecordingMetadata,
+        channels: Sequence[ChannelMetadata],
+    ) -> None:
+        """Açılan kaydı panellere dağıtır."""
+        self._channels = tuple(channels)
+        self.left_dock.set_recording(metadata, channels)
+        self.right_dock.close_inspector()
+        self.action("action_close").setEnabled(True)
+        self.action("action_export").setEnabled(True)
 
     def apply_default_layout(self) -> None:
         """Sütun genişliklerini mockup öntanımlarına döndürür.
