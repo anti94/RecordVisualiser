@@ -227,12 +227,28 @@ class MainWindow(QMainWindow):
         Çağrı hemen döner: dosyalar arka plan thread'inde açılır, pencere
         bu sırada etkileşimlere yanıt vermeye devam eder.
         """
+        self._supersede_active_load()
         self.pending_load_paths = tuple(Path(path) for path in paths)
         count = len(self.pending_load_paths)
         names = ", ".join(path.name for path in self.pending_load_paths)
         self.bottom_dock.append_log(f"Yukleme talebi: {count} dosya ({names}).")
         self.status.start_load_progress(count)
         self.active_load_request_id = self.file_loader.submit(self.pending_load_paths)
+
+    def _supersede_active_load(self) -> None:
+        """Yeni bir açma isteği geldiğinde öncekini geçersiz kılar — `F3-004`.
+
+        Önceki istek iptal edilir (worker boşuna dosya açmasın) ve o isteğe
+        ait sonuçlar geri alınır. Böylece iki hızlı açma isteğinde ekrana
+        **yalnız güncel** olan uygulanır; geriden gelen eski sonuç görünümü
+        ezemez.
+        """
+        previous_id = self.active_load_request_id
+        if not previous_id:
+            return
+        self.file_loader.cancel(previous_id)
+        self._discard_results_of(previous_id)
+        self.bottom_dock.append_log(f"Onceki yukleme istegi birakildi (#{previous_id}).")
 
     def cancel_active_load(self) -> None:
         """Süren yüklemeyi iptal eder — `F3-003`.
@@ -255,6 +271,12 @@ class MainWindow(QMainWindow):
         self._discard_results_of(request_id)
         self.bottom_dock.append_log(f"Yukleme iptal edildi (#{request_id}).")
         self.status.cancel_button.setEnabled(False)
+
+    @staticmethod
+    def _release(result: FileLoadResult) -> None:
+        """Uygulanmayan bir sonucun snapshot'ını bırakır (kaynak sızmasın)."""
+        if result.repository is not None:
+            result.repository.close()
 
     def _discard_results_of(self, request_id: int) -> None:
         """İptal edilen isteğin tamamlanmış sonuçlarını geri alır."""
@@ -283,11 +305,19 @@ class MainWindow(QMainWindow):
         """
         if self.file_loader.is_cancelled(result.request_id):
             # Iptal edilen istegin YARIM kalan sonucu acik dosya listesine
-            # girmez (kabul kriteri). Worker o dosyayi zaten acmis olabilir;
+            # girmez (F3-003). Worker o dosyayi zaten acmis olabilir;
             # snapshot'i birakiyoruz ki acik kaynak sizmasin.
-            if result.repository is not None:
-                result.repository.close()
+            self._release(result)
             self.bottom_dock.append_log(f"Iptal edildi, alinmadi: {result.path.name}")
+            return
+        if result.request_id != self.active_load_request_id:
+            # ESKIMIS sonuc (F3-004): kullanici bu istegi baslattiktan sonra
+            # yeni bir acma istedi. Geriden gelen sonuc guncel gorunumu
+            # ezmemeli; sessizce dusurulur ama log'da izi kalir.
+            self._release(result)
+            self.bottom_dock.append_log(
+                f"Eskimis sonuc yok sayildi: {result.path.name} (#{result.request_id})"
+            )
             return
         if result.succeeded:
             self.loaded_results = (*self.loaded_results, result)
@@ -299,11 +329,15 @@ class MainWindow(QMainWindow):
         )
 
     def _on_load_finished(self, request_id: int) -> None:
+        self.bottom_dock.append_log(f"Yukleme istegi bitti (#{request_id}).")
+        if self.active_load_request_id not in (0, request_id):
+            # Eskimis istek bitti ama guncel olan hala suruyor: onun
+            # ilerleme gostergesini kapatmayiz (F3-004).
+            return
         cancelled = self.file_loader.is_cancelled(request_id)
         self.status.finish_load_progress(CANCELLED_TEXT if cancelled else READY_TEXT)
         if request_id == self.active_load_request_id:
             self.active_load_request_id = 0
-        self.bottom_dock.append_log(f"Yukleme istegi bitti (#{request_id}).")
 
     def closeEvent(self, event: QCloseEvent) -> None:
         """Pencere kapanırken worker thread'i düzgün durdurulur."""
