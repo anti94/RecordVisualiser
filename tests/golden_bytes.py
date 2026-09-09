@@ -58,3 +58,24 @@ def build_valid_fixture(record_count: int = 8) -> bytes:
             tx_status_for(n),
         )
     return bytes(body)
+
+
+def build_gap_fixture() -> bytes:
+    """`docs/format/timing-and-naming.md` §4 örneği: `sequence_no = 5` kayıp.
+
+    Fiziksel sıra 0..7 yazılır ama sequence_no'lar 0,1,2,3,4,6,7,8'dir.
+    Dosya yine 8 kayıt / 544 bayttır.
+    """
+    header = FILE_HEADER_V1.pack(b"SONARBIN", 1, 32, 64, 125_000, CHANNEL_COUNT, START_TIME_UTC_NS)
+    written_sequences = (0, 1, 2, 3, 4, 6, 7, 8)
+    body = bytearray(header)
+    for n in written_sequences:
+        body += DATA_RECORD_V1.pack(
+            f"Data{n:05d}".encode("ascii"),
+            n,
+            n * 125_000,
+            *sensor_values(n),
+            bit_status_for(n),
+            tx_status_for(n),
+        )
+    return bytes(body)
