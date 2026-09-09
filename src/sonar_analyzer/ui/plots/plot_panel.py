@@ -23,11 +23,14 @@ from __future__ import annotations
 import numpy as np
 import pyqtgraph as pg
 from numpy.typing import NDArray
+from PySide6.QtCore import QEvent, QObject, Signal
+from PySide6.QtGui import QDragEnterEvent, QDropEvent
 from PySide6.QtWidgets import QVBoxLayout, QWidget
 
 from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.data_chunk import DataChunk
 from sonar_analyzer.domain.time_range import NS_PER_SECOND
+from sonar_analyzer.ui.drag_drop import CHANNEL_MIME_TYPE, decode_channel_id
 from sonar_analyzer.ui.status_icons import channel_color
 from sonar_analyzer.ui.theme import DARK
 
@@ -46,6 +49,11 @@ def to_seconds(timestamps_ns: NDArray[np.int64], t0_ns: int) -> NDArray[np.float
 
 class PlotPanel(QWidget):
     """Bir veya daha fazla kanalı aynı zaman ekseninde çizen panel."""
+
+    #: F3-015: Data Explorer'dan sürüklenip bırakılan kanalın kimliği.
+    #: `MainWindow` bunu dinleyip gerçek veriyi `add_channel()`'a iletir —
+    #: panel kendisi repository'ye erişmez (ADR-002 soyutlama sınırı).
+    channel_dropped = Signal(str)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -68,9 +76,35 @@ class PlotPanel(QWidget):
         # plot(..., name=...) legend'e otomatik eklenir (pyqtgraph davranisi).
         self._legend = self.plot.addLegend()
 
+        # F3-015: grafik kanal-ağacından sürükle-bırak hedefidir.
+        self.plot.setAcceptDrops(True)
+        self.plot.installEventFilter(self)
+
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.plot)
+
+    def eventFilter(self, watched: QObject, event: QEvent) -> bool:
+        """`self.plot` üzerindeki sürükle-bırak olaylarını yakalar — `F3-015`.
+
+        Yalnız geçerli `CHANNEL_MIME_TYPE` taşıyan sürüklemeler kabul edilir;
+        diğerleri (örn. dosya sürükleme) dokunulmadan üst sınıfa bırakılır.
+        """
+        if watched is self.plot:
+            if event.type() == QEvent.Type.DragEnter:
+                assert isinstance(event, QDragEnterEvent)
+                if event.mimeData().hasFormat(CHANNEL_MIME_TYPE):
+                    event.acceptProposedAction()
+                    return True
+            elif event.type() == QEvent.Type.Drop:
+                assert isinstance(event, QDropEvent)
+                mime = event.mimeData()
+                if mime.hasFormat(CHANNEL_MIME_TYPE):
+                    channel_id = decode_channel_id(bytes(mime.data(CHANNEL_MIME_TYPE).data()))
+                    event.acceptProposedAction()
+                    self.channel_dropped.emit(channel_id)
+                    return True
+        return super().eventFilter(watched, event)
 
     # -- veri ------------------------------------------------------------
 

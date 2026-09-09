@@ -238,6 +238,27 @@ class MainWindow(QMainWindow):
         self.right_dock.show_channel(channel)
         self.bottom_dock.append_log(f"{channel.display_label} cizildi ({len(chunk)} ornek).")
 
+    def _on_channel_dropped(self, channel_id: str) -> None:
+        """Data Explorer'dan grafiğe sürüklenen kanalı ekler — `F3-015`.
+
+        `open_channel` (çift tık) aksine grafiği SIFIRLAMAZ: `add_channel`
+        var olan diğer serileri korur, boş grafiğe bırakılırsa tek seri
+        olarak başlatır. Kayıt kapalıysa (`_repository is None`) sessizce
+        döner — `open_channel` ile aynı kural.
+        """
+        channel = next((c for c in self._channels if c.id == channel_id), None)
+        if channel is None or self._repository is None:
+            return
+
+        chunk = self._repository.query(channel_id, self._repository.metadata().time_range)
+        self.plot_panel.add_channel(channel, chunk)
+        self.plot_tool_bar.set_current_channel(channel_id)
+        self.show_plot()
+        self.right_dock.show_channel(channel)
+        self.bottom_dock.append_log(
+            f"{channel.display_label} suruklenerek eklendi ({len(chunk)} ornek)."
+        )
+
     def refresh_bit_analysis(self) -> None:
         """Kayıtlı BIT verisini yeniden özetler; donanıma komut göndermez."""
         if self._repository is None:
@@ -550,6 +571,7 @@ class MainWindow(QMainWindow):
 
         self.dashboard = DashboardPanel(container)
         self.plot_panel = self.dashboard.time_series
+        self.plot_panel.channel_dropped.connect(self._on_channel_dropped)
 
         self.center_stack = QStackedWidget(container)
         self.center_stack.setObjectName("center_stack")

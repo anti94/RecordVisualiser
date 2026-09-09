@@ -16,7 +16,7 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 from datetime import datetime, timezone
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import QMimeData, Qt, Signal
 from PySide6.QtWidgets import (
     QDockWidget,
     QFormLayout,
@@ -40,6 +40,7 @@ from sonar_analyzer.ui.docks.recording_tree import (
     build_recording_tree,
     flatten_channel_ids,
 )
+from sonar_analyzer.ui.drag_drop import CHANNEL_MIME_TYPE, encode_channel_id
 
 DOCK_OBJECT_NAME = "dock_data_explorer"
 DOCK_TITLE = "Data Explorer"
@@ -154,6 +155,31 @@ def _format_duration(seconds: float) -> str:
     hours, remainder = divmod(total, 3600)
     minutes, secs = divmod(remainder, 60)
     return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+
+
+class _DraggableChannelTree(QTreeWidget):
+    """Kanal yapraklarını sürüklenebilir yapan `QTreeWidget` — `F3-015`.
+
+    Qt'nin widget-tabanlı görünümleri (`QTreeWidget`/`QListWidget`) için
+    belgelenen genişletme noktası `mimeData()`'dır: `setDragEnabled(True)`
+    ile birlikte üzerine yazıldığında, temel sınıf sürüklemeyi otomatik
+    başlatır — ayrıca bir `QDrag`/`startDrag()` kurmaya gerek yoktur.
+
+    Yalnız kanal yaprakları (`UserRole` verisi dolu) geçerli MIME verisi
+    üretir; grup/kayıt/cihaz düğümleri **boş** `QMimeData` döner — hedef
+    (`PlotPanel`) `CHANNEL_MIME_TYPE` formatını bulamayınca bırakmayı
+    reddeder (kabul kriterinin "geçerli kanal" şartı).
+    """
+
+    def mimeTypes(self) -> list[str]:
+        return [CHANNEL_MIME_TYPE]
+
+    def mimeData(self, items: list[QTreeWidgetItem]) -> QMimeData:  # type: ignore[override]
+        mime = QMimeData()
+        channel_id = items[0].data(0, Qt.ItemDataRole.UserRole) if items else None
+        if channel_id:
+            mime.setData(CHANNEL_MIME_TYPE, encode_channel_id(str(channel_id)))
+        return mime
 
 
 class DataExplorerDock(QDockWidget):
@@ -282,13 +308,17 @@ class DataExplorerDock(QDockWidget):
         self.search.textChanged.connect(self._apply_filter)
         layout.addWidget(self.search)
 
-        self.tree = QTreeWidget(page)
+        self.tree = _DraggableChannelTree(page)
         self.tree.setObjectName("tree_channels")
         self.tree.setHeaderHidden(True)
         self.tree.setColumnCount(1)
         header = self.tree.header()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.tree.itemDoubleClicked.connect(self._on_item_double_clicked)
+        # F3-015: kanal yapraklari PlotPanel'e suruklenebilir; agac disari
+        # bir seyi kabul ETMEZ (yalniz kaynak).
+        self.tree.setDragEnabled(True)
+        self.tree.setDragDropMode(QTreeWidget.DragDropMode.DragOnly)
         layout.addWidget(self.tree, 1)
 
         self.empty_hint = QLabel(EMPTY_TREE_HINT, page)
@@ -311,7 +341,7 @@ class DataExplorerDock(QDockWidget):
         layout = QVBoxLayout(page)
         layout.setContentsMargins(0, 6, 0, 0)
 
-        self.data_tree = QTreeWidget(page)
+        self.data_tree = _DraggableChannelTree(page)
         self.data_tree.setObjectName("tree_data_tree")
         self.data_tree.setHeaderHidden(True)
         self.data_tree.setColumnCount(1)
@@ -319,6 +349,8 @@ class DataExplorerDock(QDockWidget):
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.data_tree.itemDoubleClicked.connect(self._on_data_tree_item_double_clicked)
         self.data_tree.itemExpanded.connect(self._on_data_tree_item_expanded)
+        self.data_tree.setDragEnabled(True)
+        self.data_tree.setDragDropMode(QTreeWidget.DragDropMode.DragOnly)
         layout.addWidget(self.data_tree, 1)
 
         self.data_tree_empty_hint = QLabel(EMPTY_TREE_HINT, page)
