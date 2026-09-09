@@ -34,6 +34,11 @@ from PySide6.QtWidgets import (
 
 from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.recording import RecordingMetadata
+from sonar_analyzer.ui.docks.recording_tree import (
+    RecordingTreeNode,
+    build_recording_tree,
+    flatten_channel_ids,
+)
 
 DOCK_OBJECT_NAME = "dock_data_explorer"
 DOCK_TITLE = "Data Explorer"
@@ -104,6 +109,7 @@ class DataExplorerDock(QDockWidget):
 
         self._summary_labels: dict[str, QLabel] = {}
         self._channels: tuple[ChannelMetadata, ...] = ()
+        self._recording_tree: tuple[RecordingTreeNode, ...] = ()
 
         self.setWidget(self._build_body())
         self.clear()
@@ -179,17 +185,32 @@ class DataExplorerDock(QDockWidget):
         return page
 
     def _build_tree_tab(self, parent: QWidget) -> QWidget:
+        """Kayıt › Cihaz › Sensör grubu › Kanal ağacı — `F3-009`.
+
+        "Channels" sekmesi kanal **yolundan** ağaç kurar; bu sekme **hangi
+        kayıttan/cihazdan** geldiğini gösterir. Birden fazla dosya açıkken
+        (`F2-036`) bu ayrım Channels sekmesinde görünmez.
+        """
         page = QWidget(parent)
         layout = QVBoxLayout(page)
-        note = QLabel(
-            "Data Tree, Channels ile ayni kanal modelini kullanir; "
-            "ayri agac gorunumu sonraki iste eklenecek.",
-            page,
-        )
-        note.setWordWrap(True)
-        note.setMinimumWidth(1)
-        layout.addWidget(note)
-        layout.addStretch(1)
+        layout.setContentsMargins(0, 6, 0, 0)
+
+        self.data_tree = QTreeWidget(page)
+        self.data_tree.setObjectName("tree_data_tree")
+        self.data_tree.setHeaderHidden(True)
+        self.data_tree.setColumnCount(1)
+        header = self.data_tree.header()
+        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.data_tree.itemDoubleClicked.connect(self._on_data_tree_item_double_clicked)
+        layout.addWidget(self.data_tree, 1)
+
+        self.data_tree_empty_hint = QLabel(EMPTY_TREE_HINT, page)
+        self.data_tree_empty_hint.setObjectName("label_empty_data_tree")
+        self.data_tree_empty_hint.setWordWrap(True)
+        self.data_tree_empty_hint.setMinimumWidth(1)
+        self.data_tree_empty_hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.data_tree_empty_hint)
+
         return page
 
     # -- veri ------------------------------------------------------------
@@ -202,13 +223,18 @@ class DataExplorerDock(QDockWidget):
         self.tree.clear()
         self.empty_hint.setText(EMPTY_TREE_HINT)
         self.empty_hint.setVisible(True)
+        self.set_recordings([])
 
     def set_recording(
         self,
         metadata: RecordingMetadata,
         channels: Sequence[ChannelMetadata],
     ) -> None:
-        """Dosya özetini ve kanal ağacını açılan kayıttan doldurur."""
+        """Dosya özetini ve **etkin** kaydın kanal ağacını (Channels sekmesi) doldurur.
+
+        "Data Tree" sekmesi ayrıdır — açık tüm kayıtları gösterir, bkz.
+        `set_recordings()`.
+        """
         self._summary_labels["File"].setText(metadata.source_path or EMPTY_VALUE)
         self._summary_labels["Size"].setText(_format_size(metadata.file_size_bytes))
         self._summary_labels["Start"].setText(_format_start(metadata.start_ns))
@@ -217,6 +243,42 @@ class DataExplorerDock(QDockWidget):
 
         self._channels = tuple(channels)
         self._rebuild_tree()
+
+    def set_recordings(
+        self, recordings: Sequence[tuple[RecordingMetadata, Sequence[ChannelMetadata]]]
+    ) -> None:
+        """ "Data Tree" sekmesini **açık tüm kayıtlardan** kurar — `F3-009`.
+
+        Kabul kriteri: kayıt, cihaz, sensör ve kanal hiyerarşisi doğru
+        görünür. Boş liste (hiç kayıt açık değil) ağacı temizler.
+        """
+        self._recording_tree = build_recording_tree(recordings)
+        self.data_tree.clear()
+        for recording_node in self._recording_tree:
+            self._add_tree_node(None, recording_node)
+        self.data_tree.expandAll()
+        self.data_tree_empty_hint.setVisible(not recordings)
+
+    def _add_tree_node(
+        self, parent: QTreeWidgetItem | None, node: RecordingTreeNode
+    ) -> QTreeWidgetItem:
+        item = self._new_data_tree_item(parent, node.label)
+        if node.is_leaf:
+            item.setData(0, Qt.ItemDataRole.UserRole, node.channel_id)
+        else:
+            item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsSelectable)
+        for child in node.children:
+            self._add_tree_node(item, child)
+        return item
+
+    def _new_data_tree_item(self, parent: QTreeWidgetItem | None, label: str) -> QTreeWidgetItem:
+        if parent is None:
+            return QTreeWidgetItem(self.data_tree, [label])
+        return QTreeWidgetItem(parent, [label])
+
+    def data_tree_channel_ids(self) -> list[str]:
+        """ "Data Tree" sekmesindeki tüm kanal kimlikleri (testler için)."""
+        return flatten_channel_ids(self._recording_tree)
 
     def summary_value(self, field: str) -> str:
         """Özet alanının gösterilen değeri — testler ve kabul için."""
@@ -359,6 +421,12 @@ class DataExplorerDock(QDockWidget):
             self.empty_hint.setVisible(nothing_found)
 
     def _on_item_double_clicked(self, item: QTreeWidgetItem, column: int) -> None:
+        del column
+        channel_id = item.data(0, Qt.ItemDataRole.UserRole)
+        if channel_id:
+            self.channel_activated.emit(str(channel_id))
+
+    def _on_data_tree_item_double_clicked(self, item: QTreeWidgetItem, column: int) -> None:
         del column
         channel_id = item.data(0, Qt.ItemDataRole.UserRole)
         if channel_id:

@@ -479,6 +479,26 @@ class MainWindow(QMainWindow):
         span = metadata.time_range
         self.bottom_dock.set_events(repository.events(span))
         self.right_dock.bit_status.set_results(repository.bit_results(span))
+        self._refresh_recording_tree()
+
+    def _refresh_recording_tree(self) -> None:
+        """ "Data Tree" sekmesini (`F3-009`) açık kayıtlarla senkronlar.
+
+        Pencerenin sahibi olduğu kayıtlar varsa (`F3-001`den açılmış
+        dosyalar) hepsi gösterilir — bir dosyayı kapatmak diğerlerini
+        etkilemez (`F3-007`). Yalnız dışarıdan verilmiş tek bir kaynak
+        (örn. simülasyon) açıksa o tek başına gösterilir.
+        """
+        if self._owned_repositories:
+            recordings = [
+                (repository.metadata(), repository.channels())
+                for repository in self._owned_repositories
+            ]
+        elif self._repository is not None:
+            recordings = [(self._repository.metadata(), self._repository.channels())]
+        else:
+            recordings = []
+        self.left_dock.set_recordings(recordings)
 
     def action(self, name: str) -> QAction:
         """Adına göre eylemi döndürür; bulunamazsa hata verir."""

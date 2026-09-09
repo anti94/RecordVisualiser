@@ -142,8 +142,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-005` | 20 dk | 3 dk 39 sn | `c1ad33a` | dosya yükleme sonucunu repository ve ekrana bağla |
 | `F3-006` | 15 dk | 4 dk 16 sn | `a883737` | format ve dosya erişim hatalarını göster |
 | `F3-007` | 20 dk | 6 dk 47 sn | `7bd5001` | dosya kapatma ve bağlı panel temizliğini ekle |
+| `F3-008` | 15 dk | 4 dk 17 sn | `f409f35` | son dosyalar ve varsayılan klasörü kaydet |
 
-**124 commit · olculen toplam 1508 dk 58 sn · olculemeyen 1 (ilk commit)**
+**125 commit · olculen toplam 1513 dk 15 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
