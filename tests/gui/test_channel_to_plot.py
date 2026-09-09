@@ -41,13 +41,16 @@ def loaded(window: MainWindow) -> MainWindow:
 
 
 def test_plot_is_in_the_center(window: MainWindow) -> None:
+    """Grafik merkez alanın yığınında; kayıt açılınca öne gelir (F1-033)."""
     assert window.plot_panel is not None
-    assert window.plot_panel.parent() is window.center
+    assert window.center_stack.indexOf(window.plot_panel) >= 0
+    assert window.center_stack.parent() is window.center
 
 
 def test_plot_is_empty_before_loading(window: MainWindow) -> None:
     assert window.plot_panel.channel is None
     assert EMPTY_TITLE in window.plot_panel.title_text()
+    assert not window.center_shows_plot, "kayit yokken yonlendirme gorunmeli"
 
 
 # -- simulasyon yuklenmesi -------------------------------------------------

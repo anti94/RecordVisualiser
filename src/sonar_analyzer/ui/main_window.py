@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (
     QFrame,
     QMainWindow,
     QMenu,
+    QStackedWidget,
     QToolBar,
     QVBoxLayout,
     QWidget,
@@ -38,6 +39,7 @@ from sonar_analyzer.ui.docks.bottom_panel import BottomPanelDock
 from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock
 from sonar_analyzer.ui.docks.playback import PlaybackDock
 from sonar_analyzer.ui.docks.right_column import RightColumnDock
+from sonar_analyzer.ui.empty_state import EmptyStatePanel
 from sonar_analyzer.ui.plots.plot_panel import PlotPanel
 from sonar_analyzer.ui.status_bar import AppStatusBar
 from sonar_analyzer.ui.theme import apply_theme
@@ -164,6 +166,7 @@ class MainWindow(QMainWindow):
 
         chunk = self._repository.query(channel_id, self._repository.metadata().time_range)
         self.plot_panel.set_channel(channel, chunk)
+        self.show_plot()
         self.right_dock.show_channel(channel)
         self.bottom_dock.append_log(f"{channel.display_label} cizildi ({len(chunk)} ornek).")
 
@@ -213,15 +216,37 @@ class MainWindow(QMainWindow):
         return dock
 
     def _build_center(self) -> QWidget:
-        """Merkez alan: sekme çubuğu ve araçlar sonraki işlerde eklenecek."""
+        """Merkez alan: kayıt yokken yönlendirme, varken grafik."""
         container = QFrame(self)
         container.setObjectName("center_area")
         layout = QVBoxLayout(container)
         layout.setContentsMargins(4, 4, 4, 4)
 
+        self.empty_state = EmptyStatePanel(container)
+        self.empty_state.open_requested.connect(self.action("action_open").trigger)
+        self.empty_state.simulation_requested.connect(self.action("action_load_simulation").trigger)
+
         self.plot_panel = PlotPanel(container)
-        layout.addWidget(self.plot_panel, 1)
+
+        self.center_stack = QStackedWidget(container)
+        self.center_stack.setObjectName("center_stack")
+        self.center_stack.addWidget(self.empty_state)
+        self.center_stack.addWidget(self.plot_panel)
+        self.center_stack.setCurrentWidget(self.empty_state)
+
+        layout.addWidget(self.center_stack, 1)
         return container
+
+    def show_empty_state(self) -> None:
+        """Merkez alanı yönlendirme ekranına döndürür."""
+        self.center_stack.setCurrentWidget(self.empty_state)
+
+    def show_plot(self) -> None:
+        self.center_stack.setCurrentWidget(self.plot_panel)
+
+    @property
+    def center_shows_plot(self) -> bool:
+        return self.center_stack.currentWidget() is self.plot_panel
 
     # -- duzen -----------------------------------------------------------
 
@@ -235,6 +260,7 @@ class MainWindow(QMainWindow):
         self.left_dock.set_recording(metadata, channels)
         self.right_dock.close_inspector()
         self.plot_panel.clear()
+        self.show_empty_state()
         self.playback_dock.set_recording_range(metadata.time_range)
         self.status.set_field("file", metadata.source_path)
         self.status.set_field(
