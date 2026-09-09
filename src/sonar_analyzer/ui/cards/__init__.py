@@ -1,0 +1,1 @@
+"""Sag sutun kartlari."""

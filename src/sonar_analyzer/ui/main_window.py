@@ -99,6 +99,7 @@ class MainWindow(QMainWindow):
 
         self._connect_layout_actions()
         self.left_dock.channel_activated.connect(self.open_channel)
+        self.right_dock.bit_status.analysis_requested.connect(self.refresh_bit_analysis)
         self.action("action_load_simulation").triggered.connect(self.load_simulation)
 
         self.status = AppStatusBar(self)
@@ -170,6 +171,14 @@ class MainWindow(QMainWindow):
         self.right_dock.show_channel(channel)
         self.bottom_dock.append_log(f"{channel.display_label} cizildi ({len(chunk)} ornek).")
 
+    def refresh_bit_analysis(self) -> None:
+        """Kayıtlı BIT verisini yeniden özetler; donanıma komut göndermez."""
+        if self._repository is None:
+            return
+        span = self._repository.metadata().time_range
+        self.right_dock.bit_status.set_results(self._repository.bit_results(span))
+        self.bottom_dock.append_log("BIT ozeti yenilendi.")
+
     def load_simulation(self) -> None:
         """Sahte kaydı açar; veri kaynağı `Simülasyon` olarak görünür."""
         repository = MockRecordingRepository()
@@ -184,6 +193,7 @@ class MainWindow(QMainWindow):
 
         span = metadata.time_range
         self.bottom_dock.set_events(repository.events(span))
+        self.right_dock.bit_status.set_results(repository.bit_results(span))
 
     def action(self, name: str) -> QAction:
         """Adına göre eylemi döndürür; bulunamazsa hata verir."""
@@ -259,6 +269,7 @@ class MainWindow(QMainWindow):
         self._channels = tuple(channels)
         self.left_dock.set_recording(metadata, channels)
         self.right_dock.close_inspector()
+        self.right_dock.bit_status.clear()
         self.plot_panel.clear()
         self.show_empty_state()
         self.playback_dock.set_recording_range(metadata.time_range)

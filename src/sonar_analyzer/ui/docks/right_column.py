@@ -30,6 +30,7 @@ from PySide6.QtWidgets import (
 )
 
 from sonar_analyzer.domain.channel import ChannelMetadata
+from sonar_analyzer.ui.cards.bit_status import BitStatusCard
 from sonar_analyzer.ui.docks.inspector import InspectorPanel
 
 DOCK_OBJECT_NAME = "dock_right_column"
@@ -71,6 +72,7 @@ class RightColumnDock(QDockWidget):
         )
 
         self.cards: dict[str, QGroupBox] = {}
+        self.bit_status = BitStatusCard()
         self.inspector = InspectorPanel()
 
         self.tabs = QTabWidget(self)
@@ -89,6 +91,13 @@ class RightColumnDock(QDockWidget):
         layout.setSpacing(8)
 
         for name, title, detail in CARD_SPECS:
+            if name == "card_bit_status":
+                # Gercek kart; yer tutucu yerine kullanilir (F1-035).
+                self.bit_status.setParent(page)
+                self.cards[name] = self.bit_status
+                layout.addWidget(self.bit_status)
+                continue
+
             card = QGroupBox(title, page)
             card.setObjectName(name)
 
