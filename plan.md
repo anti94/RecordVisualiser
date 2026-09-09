@@ -1446,7 +1446,7 @@ Kabul: Örnek dosya güvenilir çözümlenmeli; kanal, olay ve zaman sorguları 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F2-028` | `0.89.0` | 20 dk | Kayıt offseti ve zaman indeksini oluştur | İndeks konumları tam kayıt sınırlarına işaret eder | `F2-027` | `feat(index): F2-028 kayıt offseti ve zaman indeksini oluştur` |
-| [ ] | `F2-029` | `0.90.0` | 20 dk | Kanal ve olay indekslerini oluştur | Kanal sorgusu ve severity özeti referans sayıları verir | `F2-028` | `feat(index): F2-029 kanal ve olay indekslerini oluştur` |
+| [x] | `F2-029` | `0.90.0` | 20 dk | Kanal ve olay indekslerini oluştur | Kanal sorgusu ve severity özeti referans sayıları verir | `F2-028` | `feat(index): F2-029 kanal ve olay indekslerini oluştur` |
 | [ ] | `F2-030` | `0.91.0` | 20 dk | Kaynak fingerprint ve parser sürümünü kaydet | Kaynak değişikliği veya decoder değişikliği indeksi geçersiz kılar | `F2-029` | `feat(index): F2-030 kaynak fingerprint ve parser sürümünü kaydet` |
 | [ ] | `F2-031` | `0.92.0` | 20 dk | İndeks dosyasını atomik kaydet | Yarım geçici dosya geçerli indeksin üzerine alınmaz | `F2-030` | `feat(index): F2-031 indeks dosyasını atomik kaydet` |
 | [ ] | `F2-032` | `0.93.0` | 20 dk | Geçerli indeksi yeniden kullan | İkinci açılış mevcut indeksi kullanır; bozuk indeks yeniden üretilir | `F2-031` | `feat(index): F2-032 geçerli indeksi yeniden kullan` |
