@@ -1458,7 +1458,7 @@ Kabul: Örnek dosya güvenilir çözümlenmeli; kanal, olay ve zaman sorguları 
 | [x] | `F2-038` | `0.99.0` | 15 dk | Okuyucu kaynaklarını güvenli kapat | Dosya aç/kapat sonrası dosya kilidi ve handle kalmaz | `F2-037` | `fix(parser): F2-038 okuyucu kaynaklarını güvenli kapat` |
 | [x] | `F2-039` | `0.100.0` | 20 dk | Bağımsız golden sonuçlarını parser ile karşılaştır | Kanal, örnek, olay, zaman ve CRC sonuçları referansla eşleşir | `F2-038` | `test(parser): F2-039 bağımsız golden sonuçlarını parser ile karşılaştır` |
 | [x] | `F2-040` | `0.101.0` | 20 dk | Kaynak dosyanın değişmediğini doğrula | Geçerli ve bozuk dosya aç/kapat öncesi ve sonrası hash aynıdır | `F2-039` | `test(parser): F2-040 kaynak dosyanın değişmediğini doğrula` |
-| [ ] | `F2-041` | `0.102.0` | 15 dk | Parser milestone kabulünü kaydet | Geçerli, bozuk, CRC'li, çoklu dosya ve sorgu kontrolleri geçer | `F2-040` | `test(release): F2-041 parser milestone kabulünü kaydet` |
+| [x] | `F2-041` | `0.102.0` | 15 dk | Parser milestone kabulünü kaydet | Geçerli, bozuk, CRC'li, çoklu dosya ve sorgu kontrolleri geçer | `F2-040` | `test(release): F2-041 parser milestone kabulünü kaydet` |
 
 #### Faz 3 — MVP analiz arayüzü
 

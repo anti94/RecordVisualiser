@@ -133,8 +133,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F2-038` | 15 dk | 15 dk 32 sn | `e072e74` | okuyucu kaynaklarını güvenli kapat |
 | `-` | — | 33 sn | `d300caf` | uygulama başlatma betiği ve çalıştırma bölümü ekle |
 | `F2-039` | 20 dk | 3 dk 31 sn | `03d0460` | bağımsız golden sonuçlarını parser ile karşılaştır |
+| `F2-040` | 20 dk | 2 dk 43 sn | `80823d0` | kaynak dosyanın değişmediğini doğrula |
 
-**115 commit · olculen toplam 1447 dk 58 sn · olculemeyen 1 (ilk commit)**
+**116 commit · olculen toplam 1450 dk 41 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
@@ -187,6 +188,11 @@ Durum kodları: `TAMAM` · `ATLANDI` (engel var) · `KISMİ` (varsayımla yapıl
 | `F1-024` | TAMAM | Ağaç hiyerarşik; arama derin ağaçta çalışıyor. |
 | `F1-025` | TAMAM | Qt "tabified dock" yerine gerçek QTabWidget seçildi; gerekçe commit'te. |
 | `F1-026` | TAMAM | Log ile Events ayrı; olaylar log'a yazılmıyor. |
+| `F1-027`–`F1-044` | TAMAM | Faz 1'in kalan işleri; iş bazında not ve kanıtlar `docs/release/ms-02-app-shell.md` §2–§4'te. `F1-043` P-04 sapmasını ölçtü (1M noktada 7,4 FPS) — hâlâ açık, `F4-056`/`F4-057`'ye bağlı. |
+| `F2-001`–`F2-041` | TAMAM | Faz 2'nin tamamı; iş bazında çıktı/commit tablosu ve kabul kanıtları `docs/release/ms-03-bin-reader.md` §2–§4'te. Bu tablo orada tutuluyor, burada tekrarlanmıyor (iki kopya kaçınılmaz olarak birbirinden ayrışır). |
+| `F2-013`/`F2-014` | **KISMİ** | CRC hesaplaması ve doğrulaması çalışıyor ama algoritma **bizim kararımız** (ADR-011 durumu "Önerildi", D-05). Gerçek cihaz farklı CRC kullanıyorsa yeniden yazılır. |
+| `F2-019` | **KISMİ** | Kanal kataloğu `channel-map.md` §2'deki **öneriyi** kodluyor (D-06). Gerçek katalog gelince slot sırası ve birimler değişecek. |
+| `F2-025`–`F2-027` | **KISMİ** | Tick/wraparound/drift yalnız sentetik değerlerle ve ADR-003'ün kendi referans örnekleriyle doğrulandı. Profil A ham sayaç taşımadığı için (`tick_hz = 0`) bu yollar hiçbir gerçek dosyayla çalıştırılmadı; gerçek `tick_hz` bilinmiyor (D-09). |
 
 ## 3. Bu koşuda bulunan ve düzeltilen sorunlar
 
@@ -210,6 +216,12 @@ Hiçbiri plan işi değildi; çalışırken ortaya çıktı.
 | Qt tabified dock'ta aynı anda tek dock görünür sayıldığı için "kartlar duruyor mu" doğrulanamıyordu | `F1-025` | Sağ sütunda gerçek `QTabWidget` kullanıldı |
 | CI'da `pyright` yalnız 3.12 ayağında düşüyordu (PySide6 taslak farkı) | CI #26–#30 | PySide6 sabitlendi, `None` kontrolleri geri kondu; teşhis için pyright annotation adımı eklendi |
 | Offscreen Qt'de hiç yazı tipi yok; ekran görüntüsünde **tüm metinler kutu** çıkıyordu | `F1-032` görsel doğrulama | `QT_QPA_FONTDIR` conftest'te ve `tools/screenshot.py` içinde ayarlanıyor. Metin genişliği asgari widget boyutunu belirlediği için bu yerleşim testlerini de etkiliyordu. |
+| Kabuk aracı heredoc içindeki `\xNN` kaçış dizilerini kendisi yorumlayıp kaynak dosyaya gerçek NUL bayt yazıyordu | `F2-010` fixture üreticisi | `\x00` yerine `bytes(3)`; dosya içeriği Write/Edit araçlarıyla yazılıyor |
+| `X \| Y` tip birleşimi Python 3.9'da çalışma anında kurulamıyor (takma ad gövdede değerlendiriliyor) | `F2-011` | `typing.Union` kullanıldı; `from __future__ import annotations` yalnız açıklamaları erteliyor |
+| Geçerli fixture formülü test yardımcısı ile araçta iki kez yazılmıştı | `F2-016`, `F2-018` | Formül `tools/make_fixture.py`'ye taşındı; `tests/golden_bytes.py` oradan içe aktarıyor |
+| `Event` modeli parser teşhislerinin bayt offsetini taşıyamıyordu | `F2-024` | `Event.source_offset` eklendi (geriye dönük uyumlu, negatif değer reddediliyor) |
+| Belge BIT grubunu `Thermal` yazıyor, kataloğun adı `Thermal Management` | `F2-039` | Test bit numarası ve durumu tam eşleştiriyor, ad için önek kontrolü yapıyor; fark tutanakta |
+| Milestone testinde son kaydın offseti `dosya_boyutu - 64` varsayılmıştı; v2 (68 byte) ve kesik kuyruklu dosyada yanlış | `F2-041` | İlk kaydın offseti (= header boyutu) kullanılıyor |
 
 ## 3b. ÇÖZÜLDÜ: CI'nin Python 3.12 ayağında pyright hatası
 
