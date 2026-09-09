@@ -79,3 +79,20 @@ def build_gap_fixture() -> bytes:
             tx_status_for(n),
         )
     return bytes(body)
+
+
+def build_name_mismatch_fixture() -> bytes:
+    """docs/format/fixture-corrupt.md K-06: sequence_no=2'nin name alani
+    Data00099 yapilir, diger alanlar dokunulmaz.
+
+    "Data00099" 9 karakterdir; alan char[12] oldugu icin sonuna 3 sifir
+    bayt eklenir (b"Data00099" + bytes(3) = 12 bayt) — literal \\x00
+    kacis dizisi yerine bytes(3) kullanildi, cunku bu ortamdaki kabuk
+    araci bazi \\xNN dizilerini kaynak dosyaya yazmadan once kendi
+    yorumluyor ve gercek NUL bayt sizdiriyordu (once bu yuzden bozuk bir
+    dosya uretilmisti).
+    """
+    buffer = bytearray(build_valid_fixture())
+    record_offset = 32 + 2 * 64  # sequence_no = 2
+    buffer[record_offset : record_offset + 12] = b"Data00099" + bytes(3)
+    return bytes(buffer)

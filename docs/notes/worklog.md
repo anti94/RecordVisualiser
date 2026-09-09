@@ -101,8 +101,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F2-006` | 20 dk | 1 dk 15 sn | `6821a9d` | ardışık kayıt iterator'unu ekle |
 | `F2-007` | 15 dk | 1 dk 13 sn | `643f92d` | 125 ms kayıt zamanını kanonik ns'ye dönüştür |
 | `F2-008` | 20 dk | 2 dk 13 sn | `799b5b7` | sıra ve zaman boşluklarını raporla |
+| `F2-009` | 15 dk | 1 dk 42 sn | `c5a0609` | kesik son kaydı raporlayarak okumayı bitir |
 
-**83 commit · olculen toplam 1258 dk 48 sn · olculemeyen 1 (ilk commit)**
+**84 commit · olculen toplam 1260 dk 30 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
