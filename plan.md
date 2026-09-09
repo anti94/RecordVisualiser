@@ -1452,7 +1452,7 @@ Kabul: Örnek dosya güvenilir çözümlenmeli; kanal, olay ve zaman sorguları 
 | [x] | `F2-032` | `0.93.0` | 20 dk | Geçerli indeksi yeniden kullan | İkinci açılış mevcut indeksi kullanır; bozuk indeks yeniden üretilir | `F2-031` | `feat(index): F2-032 geçerli indeksi yeniden kullan` |
 | [x] | `F2-033` | `0.94.0` | 20 dk | Dosya metadata ve kanal listesini sun | Dosya açılmadan sorgu reddedilir; açık dosya doğru kanal sayısı verir | `F2-032` | `feat(repository): F2-033 dosya metadata ve kanal listesini sun` |
 | [x] | `F2-034` | `0.95.0` | 20 dk | İndeksli zaman aralığı sorgusunu ekle | Başlangıç/bitiş sınırları ve boş aralık beklenen örnekleri döndürür | `F2-033` | `feat(repository): F2-034 indeksli zaman aralığı sorgusunu ekle` |
-| [ ] | `F2-035` | `0.96.0` | 20 dk | Zaman ve kategoriye göre olay sorgula | Filtreler yalnız eşleşen olayları döndürür | `F2-034` | `feat(repository): F2-035 zaman ve kategoriye göre olay sorgula` |
+| [x] | `F2-035` | `0.96.0` | 20 dk | Zaman ve kategoriye göre olay sorgula | Filtreler yalnız eşleşen olayları döndürür | `F2-034` | `feat(repository): F2-035 zaman ve kategoriye göre olay sorgula` |
 | [ ] | `F2-036` | `0.97.0` | 20 dk | Birden fazla kaydı ayrı kimlikle yönet | İki dosyanın kanal ve olay kimlikleri çakışmaz | `F2-035` | `feat(repository): F2-036 birden fazla kaydı ayrı kimlikle yönet` |
 | [ ] | `F2-037` | `0.98.0` | 15 dk | Decoded öğeden ham offsete erişim ekle | Seçilen öğe kaynak byte konumuyla eşleşir | `F2-036` | `feat(parser): F2-037 decoded öğeden ham offsete erişim ekle` |
 | [ ] | `F2-038` | `0.99.0` | 15 dk | Okuyucu kaynaklarını güvenli kapat | Dosya aç/kapat sonrası dosya kilidi ve handle kalmaz | `F2-037` | `fix(parser): F2-038 okuyucu kaynaklarını güvenli kapat` |

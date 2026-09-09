@@ -18,15 +18,19 @@ import numpy as np
 
 from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.data_chunk import DataChunk, Quality
+from sonar_analyzer.domain.event import BitResult, Event
 from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import TimeRange
+from sonar_analyzer.domain.transmission import TransmissionInterval
 from sonar_analyzer.io.decoders.channel_catalog import CHANNELS_8
 from sonar_analyzer.io.decoders.crc_validation import check_record_crc
+from sonar_analyzer.io.decoders.recording_events import RecordingEvents, scan_recording_events
 from sonar_analyzer.io.index.cache import load_or_build_record_index
 from sonar_analyzer.io.index.record_index import RecordIndexEntry, build_record_index
 from sonar_analyzer.io.profile_a_format import EXPECTED_PERIOD_US, FileHeaderV1
 from sonar_analyzer.io.readers.binary_reader import read_data_record_v1, read_data_record_v2
 from sonar_analyzer.io.readers.recording_reader import MAX_TIMESTAMP_NS, read_validated_header
+from sonar_analyzer.repository.protocol import EventFilter
 
 
 class FileRecordingRepository:
@@ -41,6 +45,8 @@ class FileRecordingRepository:
         self._cache_reused = False
         self._time_index: tuple[RecordIndexEntry, ...] = ()
         self._times: tuple[int, ...] = ()
+        self._event_data: RecordingEvents | None = None
+        self._event_times: tuple[int, ...] = ()
 
     def open(self, path: Path, *, cache_path: Path | None = None) -> None:
         source = path.resolve(strict=True)
@@ -100,6 +106,8 @@ class FileRecordingRepository:
         self._index, self._cache_reused = entries, reused
         self._time_index = tuple(sorted(valid_entries, key=lambda item: item.timestamp_ns))
         self._times = tuple(entry.timestamp_ns for entry in self._time_index)
+        self._event_data = None
+        self._event_times = ()
 
     def _require_open(self) -> tuple[bytes, FileHeaderV1]:
         if self._data is None or self._header is None:
@@ -182,6 +190,40 @@ class FileRecordingRepository:
             quality=np.array([flags[i] for i in keep], dtype=np.uint8),
         )
 
+    def _scan_events(self) -> RecordingEvents:
+        data, header = self._require_open()
+        if self._event_data is None:
+            self._event_data = scan_recording_events(data, header)
+            self._event_times = tuple(item.timestamp_ns for item in self._event_data.events)
+        return self._event_data
+
+    def events(
+        self, time_range: TimeRange, filters: EventFilter | None = None
+    ) -> tuple[Event, ...]:
+        collection = self._scan_events()
+        left = bisect_left(self._event_times, time_range.start_ns)
+        right = bisect_left(self._event_times, time_range.end_ns)
+        return tuple(
+            event
+            for event in collection.events[left:right]
+            if filters is None or filters.matches(event)
+        )
+
+    def bit_results(self, time_range: TimeRange) -> tuple[BitResult, ...]:
+        return tuple(
+            item
+            for item in self._scan_events().bit_results
+            if time_range.contains(item.timestamp_ns)
+        )
+
+    def transmissions(self, time_range: TimeRange) -> tuple[TransmissionInterval, ...]:
+        collection = self._scan_events()
+        if time_range.is_empty:
+            return ()
+        return tuple(
+            item for item in collection.transmissions if item.time_range.overlaps(time_range)
+        )
+
     @property
     def cache_reused(self) -> bool:
         self._require_open()
@@ -196,6 +238,8 @@ class FileRecordingRepository:
         self._cache_reused = False
         self._time_index = ()
         self._times = ()
+        self._event_data = None
+        self._event_times = ()
 
 
 def _bounded_indices(values: list[float], max_points: int | None) -> list[int]:
