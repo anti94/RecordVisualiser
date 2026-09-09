@@ -1456,7 +1456,7 @@ Kabul: Örnek dosya güvenilir çözümlenmeli; kanal, olay ve zaman sorguları 
 | [x] | `F2-036` | `0.97.0` | 20 dk | Birden fazla kaydı ayrı kimlikle yönet | İki dosyanın kanal ve olay kimlikleri çakışmaz | `F2-035` | `feat(repository): F2-036 birden fazla kaydı ayrı kimlikle yönet` |
 | [x] | `F2-037` | `0.98.0` | 15 dk | Decoded öğeden ham offsete erişim ekle | Seçilen öğe kaynak byte konumuyla eşleşir | `F2-036` | `feat(parser): F2-037 decoded öğeden ham offsete erişim ekle` |
 | [x] | `F2-038` | `0.99.0` | 15 dk | Okuyucu kaynaklarını güvenli kapat | Dosya aç/kapat sonrası dosya kilidi ve handle kalmaz | `F2-037` | `fix(parser): F2-038 okuyucu kaynaklarını güvenli kapat` |
-| [ ] | `F2-039` | `0.100.0` | 20 dk | Bağımsız golden sonuçlarını parser ile karşılaştır | Kanal, örnek, olay, zaman ve CRC sonuçları referansla eşleşir | `F2-038` | `test(parser): F2-039 bağımsız golden sonuçlarını parser ile karşılaştır` |
+| [x] | `F2-039` | `0.100.0` | 20 dk | Bağımsız golden sonuçlarını parser ile karşılaştır | Kanal, örnek, olay, zaman ve CRC sonuçları referansla eşleşir | `F2-038` | `test(parser): F2-039 bağımsız golden sonuçlarını parser ile karşılaştır` |
 | [ ] | `F2-040` | `0.101.0` | 20 dk | Kaynak dosyanın değişmediğini doğrula | Geçerli ve bozuk dosya aç/kapat öncesi ve sonrası hash aynıdır | `F2-039` | `test(parser): F2-040 kaynak dosyanın değişmediğini doğrula` |
 | [ ] | `F2-041` | `0.102.0` | 15 dk | Parser milestone kabulünü kaydet | Geçerli, bozuk, CRC'li, çoklu dosya ve sorgu kontrolleri geçer | `F2-040` | `test(release): F2-041 parser milestone kabulünü kaydet` |
 

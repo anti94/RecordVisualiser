@@ -130,8 +130,10 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F2-035` | 20 dk | 5 dk 42 sn | `7cb05e6` | zaman ve kategoriye göre olay sorgula |
 | `F2-036` | 20 dk | 3 dk 39 sn | `90652ed` | birden fazla kaydı ayrı kimlikle yönet |
 | `F2-037` | 15 dk | 34 sn | `ae0ee1e` | decoded öğeden ham offsete erişim ekle |
+| `F2-038` | 15 dk | 15 dk 32 sn | `e072e74` | okuyucu kaynaklarını güvenli kapat |
+| `-` | — | 33 sn | `d300caf` | uygulama başlatma betiği ve çalıştırma bölümü ekle |
 
-**112 commit · olculen toplam 1428 dk 22 sn · olculemeyen 1 (ilk commit)**
+**114 commit · olculen toplam 1444 dk 27 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
