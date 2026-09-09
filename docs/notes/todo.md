@@ -16,9 +16,9 @@
   2. A genuine blocker requires user input.
 - Before stopping, re-read this TODO file and verify that no actionable unchecked task remains.
 
-**Toplam 492 madde · 109 tamamlandı · 383 kaldı**
+**Toplam 492 madde · 110 tamamlandı · 382 kaldı**
 
-`[#####...................]` %22.2
+`[#####...................]` %22.4
 
 ## Özet
 
@@ -27,12 +27,12 @@
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
-| Faz 3 — MVP analiz arayüzü | 7 | 73 | 80 |
+| Faz 3 — MVP analiz arayüzü | 8 | 72 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **109** | **383** | **492** |
+| **Toplam** | **110** | **382** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -153,7 +153,7 @@
 | [x] | `F2-040` | `0.101.0` | 20 dk | Kaynak dosyanın değişmediğini doğrula |
 | [x] | `F2-041` | `0.102.0` | 15 dk | Parser milestone kabulünü kaydet |
 
-### Faz 3 — MVP analiz arayüzü (7/80)
+### Faz 3 — MVP analiz arayüzü (8/80)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -164,7 +164,7 @@
 | [x] | `F3-005` | `0.107.0` | 20 dk | Dosya yükleme sonucunu repository ve ekrana bağla |
 | [x] | `F3-006` | `0.108.0` | 15 dk | Format ve dosya erişim hatalarını göster |
 | [x] | `F3-007` | `0.109.0` | 20 dk | Dosya kapatma ve bağlı panel temizliğini ekle |
-| [ ] | `F3-008` | `0.110.0` | 15 dk | Son dosyalar ve varsayılan klasörü kaydet |
+| [x] | `F3-008` | `0.110.0` | 15 dk | Son dosyalar ve varsayılan klasörü kaydet |
 | [ ] | `F3-009` | `0.111.0` | 20 dk | Dosya ve kanal ağaç modelini ekle |
 | [ ] | `F3-010` | `0.112.0` | 20 dk | Kanal ağacında lazy yüklemeyi ekle |
 | [ ] | `F3-011` | `0.113.0` | 20 dk | Ad, ID, birim ve kaynak aramasını ekle |

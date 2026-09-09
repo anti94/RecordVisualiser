@@ -13,7 +13,8 @@ hâle gelmez.
 from __future__ import annotations
 
 import logging
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
+from dataclasses import replace
 from pathlib import Path
 
 from PySide6.QtCore import Qt
@@ -28,6 +29,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from sonar_analyzer.application import recent_files
 from sonar_analyzer.application.file_loader import (
     FileLoadResult,
     FileLoadService,
@@ -39,6 +41,7 @@ from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.repository.file_repository import FileRecordingRepository
 from sonar_analyzer.repository.mock_repository import SIMULATION_LABEL, MockRecordingRepository
 from sonar_analyzer.repository.protocol import RecordingRepository
+from sonar_analyzer.settings.store import AppSettings, SettingsWriter, save_settings
 from sonar_analyzer.ui import error_dialogs
 from sonar_analyzer.ui.actions import (
     MENU_SPECS,
@@ -83,11 +86,15 @@ class MainWindow(QMainWindow):
         *,
         loader: LoaderCallable | None = None,
         error_notifier: LoadErrorNotifier | None = None,
+        settings: AppSettings | None = None,
+        settings_writer: SettingsWriter | None = None,
     ) -> None:
         """`loader`: dosya açma çağrısını değiştirir (testler ve ileride
         farklı kaynak türleri için); verilmezse gerçek `.bin` okuyucu.
         `error_notifier`: yükleme hatasının kullanıcıya gösterimi;
-        verilmezse Qt uyarı kutusu."""
+        verilmezse Qt uyarı kutusu. `settings`: açılışta okunan kalıcı
+        ayarlar (`F3-008` son dosyalar); `settings_writer`: kaydetme
+        çağrısı — verilmezse gerçek ayar dosyasına yazılır."""
         super().__init__()
         self.setWindowTitle(WINDOW_TITLE)
         self.resize(*DEFAULT_WINDOW_SIZE)
@@ -108,6 +115,8 @@ class MainWindow(QMainWindow):
         # modulu yamalayan test agi (tests/conftest.py) pencere kurulduktan
         # sonra da etkili olur (ayni tuzak: F3-001 dosya diyalogu).
         self._error_notifier: LoadErrorNotifier | None = error_notifier
+        self._settings = settings if settings is not None else AppSettings()
+        self._settings_writer: SettingsWriter = settings_writer or save_settings
         self.actions_by_name: dict[str, QAction] = {}
         # Menulere Python tarafinda referans tutulmazsa PySide nesneyi serbest
         # birakiyor ve sonraki erisimde "C++ object already deleted" hatasi
@@ -141,6 +150,10 @@ class MainWindow(QMainWindow):
 
         # Dosya secici yalniz talep uretir; okuma worker thread'inde yapilir.
         self.file_open = FileOpenController(self)
+        self.file_open.set_last_directory(
+            self._settings.last_directory
+            or recent_files.default_directory(self._settings.recent_files)
+        )
         self.file_loader = FileLoadService(self, loader=loader)
         self.action("action_open").triggered.connect(self.request_open_files)
         self.file_open.load_requested.connect(self._on_load_requested)
@@ -349,6 +362,10 @@ class MainWindow(QMainWindow):
             self.bottom_dock.append_log(f"Yuklendi: {result.path.name}")
             return
         self.failed_results = (*self.failed_results, result)
+        if result.error_type == "FileNotFoundError":
+            # Dosya kalici olarak yok: son dosyalar listesinde tutmak
+            # kullaniciyi tekrar tekrar ayni hataya goturur.
+            self._forget_recent(result.path)
         self._report_load_error(result)
 
     def _report_load_error(self, result: FileLoadResult) -> None:
@@ -395,6 +412,7 @@ class MainWindow(QMainWindow):
 
         primary = applied[0]
         assert primary.repository is not None
+        self._remember_recent(result.path for result in applied)
         self._close_owned_repositories()
         self._owned_repositories = tuple(
             result.repository for result in applied if result.repository is not None
@@ -404,6 +422,41 @@ class MainWindow(QMainWindow):
         if len(applied) > 1:
             others = ", ".join(result.path.name for result in applied[1:])
             self.bottom_dock.append_log(f"Ayrica acik: {others}")
+
+    def _remember_recent(self, paths: Iterable[Path]) -> None:
+        """Açılan dosyaları son dosyalar listesine ve klasör hafızasına yazar."""
+        ordered = list(paths)
+        if not ordered:
+            return
+        updated = recent_files.add_all(self._settings.recent_files, ordered)
+        directory = str(ordered[0].parent)
+        self._settings = replace(self._settings, recent_files=updated, last_directory=directory)
+        self.file_open.set_last_directory(directory)
+        self._persist_settings()
+
+    def _forget_recent(self, path: Path) -> None:
+        remaining = recent_files.drop(self._settings.recent_files, path)
+        if remaining == self._settings.recent_files:
+            return
+        self._settings = replace(self._settings, recent_files=remaining)
+        self._persist_settings()
+
+    def _persist_settings(self) -> None:
+        """Ayarları kalıcı hâle getirir; yazamamak uygulamayı durdurmaz."""
+        try:
+            self._settings_writer(self._settings)
+        except OSError as exc:
+            logger.warning("Ayarlar kaydedilemedi: %s", exc)
+            self.bottom_dock.append_log("Ayarlar kaydedilemedi; liste bu oturumda tutuluyor.")
+
+    @property
+    def recent_files(self) -> tuple[str, ...]:
+        """Son açılan dosyalar, en yeniden eskiye."""
+        return tuple(self._settings.recent_files)
+
+    def open_recent(self, path: Path) -> None:
+        """Son dosyalar listesinden bir kaydı açar — seçiciyle aynı yolu izler."""
+        self._on_load_requested([str(path)])
 
     def _close_owned_repositories(self) -> None:
         for repository in self._owned_repositories:

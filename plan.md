@@ -1475,7 +1475,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 | [x] | `F3-005` | `0.107.0` | 20 dk | Dosya yükleme sonucunu repository ve ekrana bağla | Açılan dosyanın metadata ve kanalları görünür | `F3-004` | `feat(ui): F3-005 dosya yükleme sonucunu repository ve ekrana bağla` |
 | [x] | `F3-006` | `0.108.0` | 15 dk | Format ve dosya erişim hatalarını göster | Kullanıcı mesajı anlaşılır; teknik ayrıntı logda bulunur | `F3-005` | `feat(ui): F3-006 format ve dosya erişim hatalarını göster` |
 | [x] | `F3-007` | `0.109.0` | 20 dk | Dosya kapatma ve bağlı panel temizliğini ekle | Kapatılan dosyanın sorguları iptal olur; diğer kayıtlar çalışır | `F3-006` | `feat(ui): F3-007 dosya kapatma ve bağlı panel temizliğini ekle` |
-| [ ] | `F3-008` | `0.110.0` | 15 dk | Son dosyalar ve varsayılan klasörü kaydet | Yeniden açılışta liste korunur; eksik dosya anlaşılır hata verir | `F3-007` | `feat(settings): F3-008 son dosyalar ve varsayılan klasörü kaydet` |
+| [x] | `F3-008` | `0.110.0` | 15 dk | Son dosyalar ve varsayılan klasörü kaydet | Yeniden açılışta liste korunur; eksik dosya anlaşılır hata verir | `F3-007` | `feat(settings): F3-008 son dosyalar ve varsayılan klasörü kaydet` |
 
 ##### Data Explorer
 

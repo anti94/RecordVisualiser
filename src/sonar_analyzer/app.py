@@ -77,7 +77,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     install_exception_handler(qt_notifier)
 
     logger.info("Arayuz baslatiliyor (oturum %s)", session.session_id)
-    window = MainWindow()
+    window = MainWindow(settings=settings_result.settings)
 
     if args.no_window:
         # Pencere hic gosterilmeden yasam dongusu tamamlanir: giris yolunun

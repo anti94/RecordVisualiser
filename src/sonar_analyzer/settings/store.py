@@ -16,12 +16,17 @@ from __future__ import annotations
 import json
 import os
 import tempfile
+from collections.abc import Callable
 from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from typing import Any, cast
 
 #: Ayar semasinin surumu. Alan eklendiginde/anlamı degistiginde artar.
 SCHEMA_VERSION = 1
+
+#: `save_settings`'in imzasi — kalici hale getirmeyi enjekte etmek icin
+#: (testler gercek ayar dosyasina yazmasin diye, bkz. `F3-008`).
+SettingsWriter = Callable[["AppSettings"], Path]
 
 THEMES = ("dark", "light")
 TIME_DISPLAYS = ("utc", "local", "elapsed")
