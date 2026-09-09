@@ -1362,7 +1362,7 @@ Kabul: Uygulama sahte veriyle açılmalı; dock'lar ve temel zaman grafiği çal
 | [x] | `F1-015` | `0.32.0` | 15 dk | TransmissionInterval modelini ekle | Başlangıç/bitiş ve TX durumu doğrulanır | `F1-014` | `feat(domain): F1-015 transmissionInterval modelini ekle` |
 | [x] | `F1-016` | `0.33.0` | 20 dk | RecordingRepository protokolünü tanımla | Metadata, channels, query ve events arayüzleri domain tipleri kullanır | `F1-015` | `feat(repository): F1-016 recordingRepository protokolünü tanımla` |
 | [x] | `F1-017` | `0.34.0` | 15 dk | LiveSource protokolünü tanımla | Connect, disconnect ve packets arayüzü GUI bağımlılığı içermez | `F1-016` | `feat(live): F1-017 liveSource protokolünü tanımla` |
-| [ ] | `F1-018` | `0.35.0` | 15 dk | Deterministik sinüs üretecini ekle | Sabit parametreler aynı zaman ve örnek dizisini üretir | `F1-017` | `feat(fixtures): F1-018 deterministik sinüs üretecini ekle` |
+| [x] | `F1-018` | `0.35.0` | 15 dk | Deterministik sinüs üretecini ekle | Sabit parametreler aynı zaman ve örnek dizisini üretir | `F1-017` | `feat(fixtures): F1-018 deterministik sinüs üretecini ekle` |
 | [ ] | `F1-019` | `0.36.0` | 20 dk | Noise, chirp ve impulse örneklerini ekle | Seed sabitlenir; her sinyalin süre ve örnek sayısı doğrudur | `F1-018` | `feat(fixtures): F1-019 noise, chirp ve impulse örneklerini ekle` |
 | [ ] | `F1-020` | `0.37.0` | 20 dk | Sahte kanal repository uygulamasını ekle | Zaman aralığı sorgusu beklenen örnekleri döndürür | `F1-019` | `feat(repository): F1-020 sahte kanal repository uygulamasını ekle` |
 | [ ] | `F1-021` | `0.38.0` | 15 dk | Sahte BIT, TX ve sistem olaylarını ekle | Bilinen zamanlarda PASS/FAIL ve TX geçişleri oluşur | `F1-020` | `feat(fixtures): F1-021 sahte BIT, TX ve sistem olaylarını ekle` |
