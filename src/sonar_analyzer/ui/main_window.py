@@ -43,6 +43,7 @@ from sonar_analyzer.ui.empty_state import EmptyStatePanel
 from sonar_analyzer.ui.plots.plot_panel import PlotPanel
 from sonar_analyzer.ui.status_bar import AppStatusBar
 from sonar_analyzer.ui.theme import apply_theme
+from sonar_analyzer.ui.view_tab_bar import ViewTabBar
 
 # docs/ui/layout-map.md §1 ve §7
 DEFAULT_WINDOW_SIZE = (1520, 840)
@@ -231,6 +232,9 @@ class MainWindow(QMainWindow):
         container.setObjectName("center_area")
         layout = QVBoxLayout(container)
         layout.setContentsMargins(4, 4, 4, 4)
+
+        self.view_tabs = ViewTabBar(container)
+        layout.addWidget(self.view_tabs)
 
         self.empty_state = EmptyStatePanel(container)
         self.empty_state.open_requested.connect(self.action("action_open").trigger)
