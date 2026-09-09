@@ -4,9 +4,21 @@
 > Bir işi tamamlayınca `plan.md`'deki kutuyu `[x]` yap ve
 > `python tools/sync_todo.py` çalıştır.
 
-**Toplam 492 madde · 108 tamamlandı · 384 kaldı**
+## Agent Instructions
 
-`[#####...................]` %22.0
+- Work through ALL unchecked tasks sequentially.
+- After completing a task, mark it as completed.
+- Immediately continue with the next unchecked task.
+- Do NOT stop after completing a single task.
+- Do NOT ask for confirmation between tasks.
+- Stop only when:
+  1. All tasks are complete, or
+  2. A genuine blocker requires user input.
+- Before stopping, re-read this TODO file and verify that no actionable unchecked task remains.
+
+**Toplam 492 madde · 109 tamamlandı · 383 kaldı**
+
+`[#####...................]` %22.2
 
 ## Özet
 
@@ -15,12 +27,12 @@
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
-| Faz 3 — MVP analiz arayüzü | 6 | 74 | 80 |
+| Faz 3 — MVP analiz arayüzü | 7 | 73 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **108** | **384** | **492** |
+| **Toplam** | **109** | **383** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -141,7 +153,7 @@
 | [x] | `F2-040` | `0.101.0` | 20 dk | Kaynak dosyanın değişmediğini doğrula |
 | [x] | `F2-041` | `0.102.0` | 15 dk | Parser milestone kabulünü kaydet |
 
-### Faz 3 — MVP analiz arayüzü (6/80)
+### Faz 3 — MVP analiz arayüzü (7/80)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -151,7 +163,7 @@
 | [x] | `F3-004` | `0.106.0` | 20 dk | Eski istek sonucunun görünümü ezmesini önle |
 | [x] | `F3-005` | `0.107.0` | 20 dk | Dosya yükleme sonucunu repository ve ekrana bağla |
 | [x] | `F3-006` | `0.108.0` | 15 dk | Format ve dosya erişim hatalarını göster |
-| [ ] | `F3-007` | `0.109.0` | 20 dk | Dosya kapatma ve bağlı panel temizliğini ekle |
+| [x] | `F3-007` | `0.109.0` | 20 dk | Dosya kapatma ve bağlı panel temizliğini ekle |
 | [ ] | `F3-008` | `0.110.0` | 15 dk | Son dosyalar ve varsayılan klasörü kaydet |
 | [ ] | `F3-009` | `0.111.0` | 20 dk | Dosya ve kanal ağaç modelini ekle |
 | [ ] | `F3-010` | `0.112.0` | 20 dk | Kanal ağacında lazy yüklemeyi ekle |

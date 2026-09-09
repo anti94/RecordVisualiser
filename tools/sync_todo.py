@@ -104,6 +104,25 @@ def bar(done: int, total: int, width: int = 24) -> str:
     return "#" * filled + "." * (width - filled)
 
 
+#: Bu bolum uretilen todo.md'nin basina konur. Dosya her regenerate
+#: edildiginde silinmesin diye metin BURADA tutulur; todo.md'ye elle
+#: yazilsaydi bir sonraki `python tools/sync_todo.py` cagrisinda giderdi.
+AGENT_INSTRUCTIONS: tuple[str, ...] = (
+    "## Agent Instructions",
+    "",
+    "- Work through ALL unchecked tasks sequentially.",
+    "- After completing a task, mark it as completed.",
+    "- Immediately continue with the next unchecked task.",
+    "- Do NOT stop after completing a single task.",
+    "- Do NOT ask for confirmation between tasks.",
+    "- Stop only when:",
+    "  1. All tasks are complete, or",
+    "  2. A genuine blocker requires user input.",
+    "- Before stopping, re-read this TODO file and verify that no actionable "
+    "unchecked task remains.",
+)
+
+
 def render(works: list[Work], items: list[Item]) -> str:
     total = len(works) + len(items)
     done = sum(w.done for w in works) + sum(i.done for i in items)
@@ -114,6 +133,8 @@ def render(works: list[Work], items: list[Item]) -> str:
     out.append("> **Bu dosya elle düzenlenmez.** Kaynak `plan.md`'dir.")
     out.append("> Bir işi tamamlayınca `plan.md`'deki kutuyu `[x]` yap ve")
     out.append("> `python tools/sync_todo.py` çalıştır.")
+    out.append("")
+    out.extend(AGENT_INSTRUCTIONS)
     out.append("")
     out.append(f"**Toplam {total} madde · {done} tamamlandı · {total - done} kaldı**")
     out.append("")

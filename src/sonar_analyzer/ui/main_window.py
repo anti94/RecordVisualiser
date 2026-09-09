@@ -181,6 +181,7 @@ class MainWindow(QMainWindow):
     def _connect_layout_actions(self) -> None:
         """Görünüm eylemlerini panellere bağlar."""
         self.action("action_exit").triggered.connect(self.close)
+        self.action("action_close").triggered.connect(self.close_active_recording)
         self.action("action_reset_layout").triggered.connect(self.apply_default_layout)
 
         pairs = (
@@ -207,7 +208,11 @@ class MainWindow(QMainWindow):
         self.right_dock.show_channel(channel)
 
     def open_channel(self, channel_id: str) -> None:
-        """Seçilen kanalı çizer ve ayrıntısını gösterir."""
+        """Seçilen kanalı çizer ve ayrıntısını gösterir.
+
+        Kayıt kapatılmışsa (`F3-007`) sessizce döner: kapatılmış bir
+        snapshot'a sorgu gönderilmez.
+        """
         channel = next((c for c in self._channels if c.id == channel_id), None)
         if channel is None or self._repository is None:
             return
@@ -521,6 +526,78 @@ class MainWindow(QMainWindow):
         self.bottom_dock.append_log(f"{len(channels)} kanal bulundu.")
         self.action("action_close").setEnabled(True)
         self.action("action_export").setEnabled(True)
+
+    def close_active_recording(self) -> None:
+        """Etkin kaydı kapatır ve bağlı panelleri temizler — `F3-007`.
+
+        Kapatılan kaydın snapshot'ı bırakılır; ondan sonra o kayda **sorgu
+        yapılmaz** (`_repository` bırakılır, `open_channel` sessizce döner).
+        Açık başka kayıt varsa sıradaki etkin görünüm olur — bir dosyayı
+        kapatmak diğerlerini bozmaz (kabul kriteri).
+        """
+        if self._repository is None:
+            return
+
+        closed_path = self._active_source_label()
+        # Suren yukleme varsa iptal edilir: kapatilan kayda ait sonuc geri
+        # gelip gorunumu tazelemeye kalkmasin.
+        if self.active_load_request_id:
+            self.cancel_active_load()
+
+        remaining = self._detach_active_repository()
+        self.bottom_dock.append_log(f"Kayit kapatildi: {closed_path}")
+
+        if remaining is None:
+            self._clear_recording_panels()
+            return
+
+        self.set_repository(remaining)
+        promoted_path = remaining.metadata().source_path
+        self.bottom_dock.append_log(f"Goruntulenen kayit: {Path(promoted_path).name}")
+
+    def _active_source_label(self) -> str:
+        assert self._repository is not None
+        return self._repository.metadata().source_path
+
+    def _detach_active_repository(self) -> FileRecordingRepository | None:
+        """Etkin kaydı kapatıp listelerden çıkarır; varsa sıradakini döner."""
+        active = self._repository
+        self._repository = None
+
+        promoted: FileRecordingRepository | None = None
+        kept_owned: list[FileRecordingRepository] = []
+        for repository in self._owned_repositories:
+            if repository is active:
+                repository.close()
+                continue
+            kept_owned.append(repository)
+            if promoted is None:
+                promoted = repository
+        self._owned_repositories = tuple(kept_owned)
+
+        # Pencerenin sahibi olmadigi bir kaynak (ornegin simulasyon) ise
+        # kapatma sorumlulugu cagirana ait; yalnizca birakilir.
+        self.loaded_results = tuple(
+            result for result in self.loaded_results if result.repository is not active
+        )
+        return promoted
+
+    def _clear_recording_panels(self) -> None:
+        """Hiç açık kayıt kalmadığında panelleri boş duruma döndürür."""
+        self._channels = ()
+        self.left_dock.clear()
+        self.plot_tool_bar.set_channels([])
+        self.right_dock.close_inspector()
+        self.right_dock.bit_status.clear()
+        self.plot_panel.clear()
+        self.dashboard.statistics.clear()
+        self.bottom_dock.clear_events()
+        self.show_empty_state()
+        self.status.set_field("file", "")
+        self.status.set_field("connection", "")
+        self.status.set_status(READY_TEXT)
+        self.action("action_close").setEnabled(False)
+        self.action("action_export").setEnabled(False)
 
     def apply_default_layout(self) -> None:
         """Sütun genişliklerini mockup öntanımlarına döndürür.
