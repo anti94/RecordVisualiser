@@ -13,16 +13,24 @@ hâle gelmez.
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
     QDockWidget,
     QFrame,
     QLabel,
     QMainWindow,
+    QMenu,
+    QToolBar,
     QVBoxLayout,
     QWidget,
 )
 
 from sonar_analyzer import __version__
+from sonar_analyzer.ui.actions import (
+    MENU_SPECS,
+    TOOLBAR_ACTION_NAMES,
+    build_action,
+)
 
 # docs/ui/layout-map.md §1 ve §7
 DEFAULT_WINDOW_SIZE = (1520, 840)
@@ -78,7 +86,67 @@ class MainWindow(QMainWindow):
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.right_dock)
         self.apply_default_layout()
 
+        self.actions_by_name: dict[str, QAction] = {}
+        # Menulere Python tarafinda referans tutulmazsa PySide nesneyi serbest
+        # birakiyor ve sonraki erisimde "C++ object already deleted" hatasi
+        # aliniyor.
+        self.menus_by_name: dict[str, QMenu] = {}
+        self._build_menus()
+        self.toolbar = self._build_toolbar()
+        self._connect_layout_actions()
+
         self.statusBar().showMessage("Ready")
+
+    # -- eylemler --------------------------------------------------------
+
+    def _build_menus(self) -> None:
+        menubar = self.menuBar()
+        for menu_spec in MENU_SPECS:
+            menu = menubar.addMenu(menu_spec.title)
+            menu.setObjectName(menu_spec.name)
+            self.menus_by_name[menu_spec.name] = menu
+            for action_spec in menu_spec.actions:
+                action = build_action(self, action_spec)
+                self.actions_by_name[action_spec.name] = action
+                menu.addAction(action)
+
+    def _build_toolbar(self) -> QToolBar:
+        toolbar = QToolBar("Quick Tools", self)
+        toolbar.setObjectName("toolbar_quick_tools")
+        for name in TOOLBAR_ACTION_NAMES:
+            action = self.actions_by_name.get(name)
+            if action is not None:
+                toolbar.addAction(action)
+        self.addToolBar(Qt.ToolBarArea.TopToolBarArea, toolbar)
+        return toolbar
+
+    def _connect_layout_actions(self) -> None:
+        """Görünüm eylemlerini panellere bağlar."""
+        self.action("action_exit").triggered.connect(self.close)
+        self.action("action_reset_layout").triggered.connect(self.apply_default_layout)
+
+        pairs = (
+            ("action_toggle_data_explorer", self.left_dock),
+            ("action_toggle_right_column", self.right_dock),
+        )
+        for name, dock in pairs:
+            action = self.action(name)
+            action.toggled.connect(dock.setVisible)
+            dock.visibilityChanged.connect(action.setChecked)
+
+    def menu(self, name: str) -> QMenu:
+        """Adına göre menüyü döndürür; bulunamazsa hata verir."""
+        try:
+            return self.menus_by_name[name]
+        except KeyError as exc:
+            raise KeyError(f"Tanimsiz menu: {name}") from exc
+
+    def action(self, name: str) -> QAction:
+        """Adına göre eylemi döndürür; bulunamazsa hata verir."""
+        try:
+            return self.actions_by_name[name]
+        except KeyError as exc:
+            raise KeyError(f"Tanimsiz eylem: {name}") from exc
 
     # -- kurulum ---------------------------------------------------------
 

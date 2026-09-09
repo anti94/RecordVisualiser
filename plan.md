@@ -1372,7 +1372,7 @@ Kabul: Uygulama sahte veriyle açılmalı; dock'lar ve temel zaman grafiği çal
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F1-022` | `0.39.0` | 20 dk | Mockup'ın üç sütunlu ana pencere düzenini oluştur | Solda yaklaşık 200 px, sağda 300 px panel; merkez esnek alan bulunur | `F1-021` | `feat(ui): F1-022 mockup'ın üç sütunlu ana pencere düzenini oluştur` |
-| [ ] | `F1-023` | `0.40.0` | 15 dk | Menü ve toolbar eylem iskeletini ekle | File, View, Analysis, Tools ve Help eylemleri erişilebilirdir | `F1-022` | `feat(ui): F1-023 menü ve toolbar eylem iskeletini ekle` |
+| [x] | `F1-023` | `0.40.0` | 15 dk | Menü ve toolbar eylem iskeletini ekle | File, View, Analysis, Tools ve Help eylemleri erişilebilirdir | `F1-022` | `feat(ui): F1-023 menü ve toolbar eylem iskeletini ekle` |
 | [ ] | `F1-024` | `0.41.0` | 15 dk | Data Explorer dock'unu ekle | Panel açılır, kapanır ve taşınır | `F1-023` | `feat(ui): F1-024 data Explorer dock'unu ekle` |
 | [ ] | `F1-025` | `0.42.0` | 15 dk | Inspector'ı bağlamsal araç sekmesi olarak ekle | Kanal ayrıntısı sağdaki BIT, Analysis Tools ve Export düzenini bozmadan açılır | `F1-024` | `feat(ui): F1-025 ınspector'ı bağlamsal araç sekmesi olarak ekle` |
 | [ ] | `F1-026` | `0.43.0` | 15 dk | Alt Log/Messages alanı ve Events sekmesini ekle | Log merkezin altında; olay tablosu aynı alanda ayrı sekmededir | `F1-025` | `feat(ui): F1-026 alt Log/Messages alanı ve Events sekmesini ekle` |

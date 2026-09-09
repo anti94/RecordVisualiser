@@ -150,3 +150,4 @@ Bu farklar `F0-013` ve `F0-007` takibine girer; kaynak olarak **mockup esas alı
 | `Vehicle / Transmission` | RPM, Voltage, TX State | + **Current**, **Gear Status** | Kanal sözlüğü eksik |
 | `BIT` | Power Supply, Communication, Thermal (3) | **8 alt sistem** (+ Navigation (INS/GPS), Sonar Transceiver, Hydrophones, Thrusters / Transmission, Storage) | `channel-map.md` BIT bit haritası 3 gruba göre yazıldı; 8 gruba genişletilmeli |
 | Kanal sayısı | Örnek sözlükte 8/12 | Görselde log `48 channels found` diyor | Örnek sözlük ölçeği küçük; gerçek katalog gelince (E-04) güncellenecek |
+| Menü çubuğu | `F1-023` kabulü beş menü ister: File, View, **Analysis**, Tools, Help | Mockup dört menü gösteriyor: File, View, Tools, Help | Uygulamada beş menü var. `Analysis` menüsü mockup'ta yok; görsel kabulde bu fark bilinerek kabul edilir veya menü Tools altına taşınır. Karar bekliyor. |
