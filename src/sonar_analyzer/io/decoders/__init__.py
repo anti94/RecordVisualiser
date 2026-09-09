@@ -1,0 +1,1 @@
+"""Profil kararlaştırma ve doğrulama."""

@@ -1410,7 +1410,7 @@ Kabul: Örnek dosya güvenilir çözümlenmeli; kanal, olay ve zaman sorguları 
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F2-001` | `0.62.0` | 15 dk | Header alan sabitlerini ve veri modelini ekle | Örnek alan offsetleri toplam 32 byte ile eşleşir | `F1-044` | `feat(parser): F2-001 header alan sabitlerini ve veri modelini ekle` |
 | [x] | `F2-002` | `0.63.0` | 20 dk | Little-endian header okuyucusunu ekle | Bilinen header tüm beklenen sayısal değerleri üretir | `F2-001` | `feat(parser): F2-002 little-endian header okuyucusunu ekle` |
-| [ ] | `F2-003` | `0.64.0` | 15 dk | Magic ve sürüm doğrulamasını ekle | Geçersiz magic ve bilinmeyen sürüm konum bilgili hata verir | `F2-002` | `feat(parser): F2-003 magic ve sürüm doğrulamasını ekle` |
+| [x] | `F2-003` | `0.64.0` | 15 dk | Magic ve sürüm doğrulamasını ekle | Geçersiz magic ve bilinmeyen sürüm konum bilgili hata verir | `F2-002` | `feat(parser): F2-003 magic ve sürüm doğrulamasını ekle` |
 | [ ] | `F2-004` | `0.65.0` | 20 dk | Eksik header ve boyut sınırlarını denetle | Kesik ve tutarsız girdiler aşırı allocation veya sınır dışı okumaya yol açmaz | `F2-003` | `fix(parser): F2-004 eksik header ve boyut sınırlarını denetle` |
 | [ ] | `F2-005` | `0.66.0` | 20 dk | Tek Data kaydını çözümle | İsim, sıra, zaman, sekiz sensör, BIT ve TX referansla eşleşir | `F2-004` | `feat(parser): F2-005 tek Data kaydını çözümle` |
 | [ ] | `F2-006` | `0.67.0` | 20 dk | Ardışık kayıt iterator'unu ekle | Sekiz kayıt sırayla okunur; offsetler 32 + n × 64 olur | `F2-005` | `feat(parser): F2-006 ardışık kayıt iterator'unu ekle` |
