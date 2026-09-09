@@ -3,6 +3,7 @@
 # Cozumlendigi ortam: Python 3.9.13 / Windows 11 x64.
 # Cekirdek katman bu paketlere bagimli DEGILDIR; yalnizca ui/ ve GUI testleri kullanir.
 # PySide6 sabit surumde tutulur: tip taslaklari surumler arasinda degisiyor.
+pyqtgraph==0.13.7
 PySide6==6.10.3
 PySide6_Addons==6.10.3
 PySide6_Essentials==6.10.3

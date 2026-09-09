@@ -104,3 +104,19 @@ reportMissingTypeStubs = false
 # nullptr donebiliyor. "is not None" kontrollerini korumak icin bu STIL kurali
 # kapali. Guvenlik kurallari (reportOptionalMemberAccess vb.) acik kaliyor.
 reportUnnecessaryComparison = false
+
+# PyQtGraph tip taslagi (stub) tasimiyor; strict modda her cagri "bilinmeyen tip"
+# sayiliyor. Gevsetme YALNIZ grafik adaptor katmaniyla sinirli: ADR-002'ye gore
+# PyQtGraph'in gorundugu tek yer burasi ve disariya DataChunk/ChannelMetadata
+# ciktigi icin bilinmeyen tipler bu klasorun disina sizmiyor.
+[[tool.pyright.executionEnvironments]]
+root = "src/sonar_analyzer/ui/plots"
+reportUnknownMemberType = "none"
+reportUnknownArgumentType = "none"
+reportUnknownVariableType = "none"
+reportUnknownParameterType = "none"
+reportMissingParameterType = "none"
+reportOptionalMemberAccess = "none"
+
+[[tool.pyright.executionEnvironments]]
+root = "."
