@@ -92,3 +92,6 @@ $RECYCLE.BIN/
 .env
 .env.local
 *.local.json
+
+# Pyright JSON ciktisi (CI adimi uretir)
+pyright.json

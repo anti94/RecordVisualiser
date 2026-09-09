@@ -55,7 +55,10 @@ jobs:
         run: python -m ruff format --check .
 
       - name: Tip kontrolu (pyright, strict)
-        run: python -m pyright
+        run: |
+          python -m pyright --outputjson > pyright.json
+          python tools/pyright_annotations.py pyright.json
+        shell: bash
 
       - name: Testler (Qt gerektirmeyenler)
         run: python -m pytest -m "not gui" -q
