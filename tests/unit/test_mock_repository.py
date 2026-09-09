@@ -130,14 +130,14 @@ def test_query_after_close_raises(repo: MockRecordingRepository) -> None:
         repo.query("ch0", TimeRange(0, SECOND))
 
 
-def test_events_bit_and_transmissions_are_empty_for_now(
+def test_events_bit_and_transmissions_are_produced(
     repo: MockRecordingRepository,
 ) -> None:
-    """F1-021'e kadar olay üretilmiyor; boş liste dönüyor, hata değil."""
+    """F1-021 sonrası bu üç kaynak da dolu döner; ayrıntı ayrı test dosyasında."""
     span = TimeRange(0, 10 * SECOND)
-    assert repo.events(span) == []
-    assert repo.bit_results(span) == []
-    assert repo.transmissions(span) == []
+    assert len(repo.events(span)) > 0
+    assert len(repo.bit_results(span)) > 0
+    assert len(repo.transmissions(span)) > 0
 
 
 def test_rejects_non_positive_duration() -> None:

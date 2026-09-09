@@ -18,10 +18,10 @@ import numpy as np
 
 from sonar_analyzer.domain.channel import ChannelMetadata, ChannelSource
 from sonar_analyzer.domain.data_chunk import DataChunk
-from sonar_analyzer.domain.event import BitResult, Event
+from sonar_analyzer.domain.event import BitResult, BitState, Event, Severity
 from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import RECORD_PERIOD_NS, TimeRange
-from sonar_analyzer.domain.transmission import TransmissionInterval
+from sonar_analyzer.domain.transmission import TransmissionInterval, TxState
 from sonar_analyzer.processing.signals import NS_PER_SECOND, noise, sine
 from sonar_analyzer.repository.protocol import EventFilter
 
@@ -91,6 +91,41 @@ DEFAULT_CHANNELS: tuple[MockChannelSpec, ...] = (
 )
 
 
+@dataclass(frozen=True)
+class MockEventSchedule:
+    """Sahte olayların **bilinen** zamanları.
+
+    Değerler sabittir; testler ve arayüz denemeleri bu zamanlara göre
+    beklenti kurabilir. Rastgele olay üretilmez.
+    """
+
+    bit_period_s: float = 1.0
+    #: (saniye, bilesen) -> bu anda FAIL uretilir, digerlerinde PASS.
+    bit_failures: tuple[tuple[float, str], ...] = ((4.0, "Thermal Management"),)
+    #: (baslangic, bitis) saniye -> TX ACTIVE araliklari.
+    tx_intervals_s: tuple[tuple[float, float], ...] = ((2.0, 3.5), (6.0, 7.0))
+    #: (saniye, mesaj) -> sistem olaylari (Log/Messages seridi).
+    system_events: tuple[tuple[float, str], ...] = (
+        (0.0, "Simulasyon kaynagi baslatildi"),
+        (0.5, "Kanal listesi hazir"),
+    )
+
+
+DEFAULT_SCHEDULE = MockEventSchedule()
+
+#: BIT alt sistemleri (docs/ui/layout-map.md §4'teki mockup tablosu).
+BIT_COMPONENTS: tuple[str, ...] = (
+    "Power Supply",
+    "Communication",
+    "Navigation (INS/GPS)",
+    "Sonar Transceiver",
+    "Hydrophones",
+    "Thrusters / Transmission",
+    "Thermal Management",
+    "Storage",
+)
+
+
 class MockRecordingRepository:
     """`RecordingRepository` sözleşmesini sahte veriyle karşılar."""
 
@@ -101,6 +136,7 @@ class MockRecordingRepository:
         sample_rate_hz: float = DEFAULT_SAMPLE_RATE_HZ,
         specs: Sequence[MockChannelSpec] = DEFAULT_CHANNELS,
         seed: int = 0,
+        schedule: MockEventSchedule = DEFAULT_SCHEDULE,
     ) -> None:
         if duration_s <= 0:
             raise ValueError(f"Sure pozitif olmali: {duration_s}")
@@ -110,6 +146,7 @@ class MockRecordingRepository:
         self._sample_rate_hz = sample_rate_hz
         self._specs = tuple(specs)
         self._seed = seed
+        self._schedule = schedule
         self._closed = False
         self._cache: dict[str, DataChunk] = {}
 
@@ -180,20 +217,98 @@ class MockRecordingRepository:
         time_range: TimeRange,
         filters: EventFilter | None = None,
     ) -> Sequence[Event]:
-        del time_range, filters
-        return []
+        collected = [result.to_event() for result in self._all_bit_results()]
+        collected.extend(self._system_events())
+        selected = [event for event in collected if time_range.contains(event.timestamp_ns)]
+        if filters is not None:
+            selected = [event for event in selected if filters.matches(event)]
+        return sorted(selected, key=lambda event: (event.timestamp_ns, event.source))
 
     def bit_results(self, time_range: TimeRange) -> Sequence[BitResult]:
-        del time_range
-        return []
+        return [
+            result for result in self._all_bit_results() if time_range.contains(result.timestamp_ns)
+        ]
 
     def transmissions(self, time_range: TimeRange) -> Sequence[TransmissionInterval]:
-        del time_range
-        return []
+        return [
+            interval
+            for interval in self._all_transmissions()
+            if interval.time_range.overlaps(time_range)
+        ]
 
     def close(self) -> None:
         self._closed = True
         self._cache.clear()
+
+    # -- sahte olaylar ---------------------------------------------------
+
+    def _to_ns(self, seconds: float) -> int:
+        return self._start_ns + round(seconds * NS_PER_SECOND)
+
+    def _all_bit_results(self) -> list[BitResult]:
+        results: list[BitResult] = []
+        failures = {
+            (round(second, 6), component) for second, component in self._schedule.bit_failures
+        }
+        failure_times = {second for second, _ in failures}
+
+        step = self._schedule.bit_period_s
+        count = int(self._duration_s // step)
+        for index in range(count):
+            second = round(index * step, 6)
+            for test_id, component in enumerate(BIT_COMPONENTS):
+                failed = second in failure_times and (second, component) in failures
+                results.append(
+                    BitResult(
+                        timestamp_ns=self._to_ns(second),
+                        test_id=test_id,
+                        component=component,
+                        state=BitState.FAIL if failed else BitState.PASS,
+                        severity=Severity.ERROR if failed else Severity.INFO,
+                        code=0x0412 if failed else 0,
+                        detail=(
+                            f"{component} testi basarisiz" if failed else f"{component} normal"
+                        ),
+                    )
+                )
+        return results
+
+    def _all_transmissions(self) -> list[TransmissionInterval]:
+        intervals: list[TransmissionInterval] = []
+        for start_s, end_s in self._schedule.tx_intervals_s:
+            if end_s <= start_s:
+                raise ValueError(f"Gecersiz TX araligi: {start_s} -> {end_s}")
+            intervals.append(
+                TransmissionInterval(
+                    time_range=TimeRange(self._to_ns(start_s), self._to_ns(end_s)),
+                    state=TxState.ACTIVE,
+                    frequency_hz=12_000.0,
+                    bandwidth_hz=2_000.0,
+                    power_w=250.0,
+                    mode="LFM",
+                )
+            )
+        return intervals
+
+    def tx_state_at(self, timestamp_ns: int) -> TxState:
+        """Verilen andaki transmisyon durumu — geçişleri sınamak için."""
+        for interval in self._all_transmissions():
+            if interval.time_range.contains(timestamp_ns):
+                return interval.state
+        return TxState.IDLE
+
+    def _system_events(self) -> list[Event]:
+        return [
+            Event(
+                timestamp_ns=self._to_ns(second),
+                source="System",
+                category="Simulasyon",
+                severity=Severity.INFO,
+                code="0",
+                message=message,
+            )
+            for second, message in self._schedule.system_events
+        ]
 
     # -- ic yardimcilar --------------------------------------------------
 
