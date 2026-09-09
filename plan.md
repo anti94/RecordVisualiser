@@ -1398,7 +1398,7 @@ Kabul: Uygulama sahte veriyle açılmalı; dock'lar ve temel zaman grafiği çal
 | [x] | `F1-041` | `0.58.0` | 20 dk | Bir ve on milyon noktalık spike girdilerini hazırla | Dizilerin örnek sayısı ve bellek boyutu raporlanır | `F1-040` | `perf(fixtures): F1-041 bir ve on milyon noktalık spike girdilerini hazırla` |
 | [x] | `F1-042` | `0.59.0` | 20 dk | Pan/zoom ve cursor ölçüm koşucusunu ekle | FPS, sorgu süresi ve cursor gecikmesi dosyaya yazılır | `F1-041` | `perf(plot): F1-042 pan/zoom ve cursor ölçüm koşucusunu ekle` |
 | [x] | `F1-043` | `0.60.0` | 20 dk | İlk spike sonuçlarını ve darboğazı kaydet | Ölçüm koşullarıyla sonuçlar raporlanır; bütçe sapmaları açıkça listelenir | `F1-042` | `docs(perf): F1-043 ilk spike sonuçlarını ve darboğazı kaydet` |
-| [ ] | `F1-044` | `0.61.0` | 15 dk | Uygulama iskeleti milestone kontrolünü yap | Açılış, dock yaşam döngüsü, sahte grafik ve başlangıç CI kontrolleri geçer | `F1-043` | `test(release): F1-044 uygulama iskeleti milestone kontrolünü yap` |
+| [x] | `F1-044` | `0.61.0` | 15 dk | Uygulama iskeleti milestone kontrolünü yap | Açılış, dock yaşam döngüsü, sahte grafik ve başlangıç CI kontrolleri geçer | `F1-043` | `test(release): F1-044 uygulama iskeleti milestone kontrolünü yap` |
 
 #### Faz 2 — Parser, indeks ve kayıtlı veri
 
