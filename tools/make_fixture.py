@@ -20,7 +20,13 @@ import hashlib
 import sys
 from pathlib import Path
 
-from sonar_analyzer.io.profile_a_format import DATA_RECORD_V1, FILE_HEADER_V1
+from sonar_analyzer.io.decoders.crc import crc32
+from sonar_analyzer.io.profile_a_format import (
+    DATA_RECORD_V1,
+    DATA_RECORD_V2,
+    FILE_HEADER_V1,
+    FILE_HEADER_V2,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_OUT = ROOT / "tests" / "fixtures" / "valid_8records.bin"
@@ -29,6 +35,8 @@ DEFAULT_OUT = ROOT / "tests" / "fixtures" / "valid_8records.bin"
 START_TIME_UTC_NS = 1_788_901_200_000_000_000
 CHANNEL_COUNT = 8
 PERIOD_US = 125_000
+HEADER_SIZE_V2 = 36
+RECORD_SIZE_V2 = 68
 
 #: docs/format/fixture-valid-8records.md §6 — yalnız 8 kayıtlık öntanımlı dosya için geçerli.
 VALID_8RECORDS_SHA256 = "5094b9b0bc585518cf7fa9dc372d3e997f32b59caeb156cb4c0f9ab9d039fce9"
@@ -74,6 +82,49 @@ def build_valid_fixture(record_count: int = 8) -> bytes:
             *sensor_values(n),
             bit_status_for(n),
             tx_status_for(n),
+        )
+    return bytes(body)
+
+
+def build_valid_v2_fixture(record_count: int = 8) -> bytes:
+    """`ADR-011-crc.md` §2.3: v1 ile aynı formüller, CRC destekli 36B header / 68B kayıt.
+
+    Her kaydın `record_crc32`'si, CRC alanı hariç 64 baytın (`F2-013`'teki
+    `crc32()` ile hesaplanan) CRC-32'sidir; header'ın `header_crc32`'si de
+    aynı yöntemle CRC hariç ilk 32 bayttan hesaplanır (ADR-011 §2.2 kapsam
+    kuralı).
+    """
+    header_body = FILE_HEADER_V1.pack(
+        b"SONARBIN", 2, HEADER_SIZE_V2, RECORD_SIZE_V2, PERIOD_US, CHANNEL_COUNT, START_TIME_UTC_NS
+    )
+    header = FILE_HEADER_V2.pack(
+        b"SONARBIN",
+        2,
+        HEADER_SIZE_V2,
+        RECORD_SIZE_V2,
+        PERIOD_US,
+        CHANNEL_COUNT,
+        START_TIME_UTC_NS,
+        crc32(header_body),
+    )
+    body = bytearray(header)
+    for n in range(record_count):
+        record_body = DATA_RECORD_V1.pack(
+            f"Data{n:05d}".encode("ascii"),
+            n,
+            n * PERIOD_US,
+            *sensor_values(n),
+            bit_status_for(n),
+            tx_status_for(n),
+        )
+        body += DATA_RECORD_V2.pack(
+            f"Data{n:05d}".encode("ascii"),
+            n,
+            n * PERIOD_US,
+            *sensor_values(n),
+            bit_status_for(n),
+            tx_status_for(n),
+            crc32(record_body),
         )
     return bytes(body)
 

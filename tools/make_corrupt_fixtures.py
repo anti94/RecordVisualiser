@@ -1,12 +1,15 @@
-"""Kesik, bozuk ve sıra boşluklu fixture yazıcısı — `F2-017`.
+"""Kesik, bozuk, sıra boşluklu ve CRC hatalı fixture yazıcısı — `F2-017`, `F2-018`.
 
-`docs/format/fixture-corrupt.md`'deki beş senaryoyu (K-01, K-02, K-03,
-K-05, K-06) üretir. Taban dosya `tools/make_fixture.py::build_valid_fixture()`
-çıktısıdır; her senaryo o dosyadan **tek bir kusurla** türetilir (F0-010
-ilkesi) — böylece gözlenen fark tek bir nedene bağlanabilir.
+`docs/format/fixture-corrupt.md`'deki altı senaryoyu (K-01, K-02, K-03,
+K-04, K-05, K-06) üretir. Taban dosya `tools/make_fixture.py`'deki
+`build_valid_fixture()`/`build_valid_v2_fixture()` çıktısıdır; her senaryo
+o dosyadan **tek bir kusurla** türetilir (F0-010 ilkesi) — böylece gözlenen
+fark tek bir nedene bağlanabilir.
 
-`K-04` (CRC hatası) burada **yok**: Profil A sürüm 2 (CRC destekli) gerektirir,
-`F2-018`'in kapsamındadır.
+`K-04` (CRC hatası, `F2-018`) Profil A sürüm 2 (CRC destekli) gerektirir;
+ayrıca kabul kriterinin ("geçerli ve tek byte bozulmuş dosya farklı
+doğrulama sonucu verir") karşılaştırma tarafı için bozulmamış
+`valid_8records_v2.bin` da yazılır.
 
 Kullanım:
     python tools/make_corrupt_fixtures.py
@@ -27,10 +30,13 @@ if str(ROOT) not in sys.path:
 
 from tools.make_fixture import (  # noqa: E402 -- sys.path kurulumundan sonra
     CHANNEL_COUNT,
+    HEADER_SIZE_V2,
     PERIOD_US,
+    RECORD_SIZE_V2,
     START_TIME_UTC_NS,
     bit_status_for,
     build_valid_fixture,
+    build_valid_v2_fixture,
     sensor_values,
     tx_status_for,
 )
@@ -41,6 +47,9 @@ DEFAULT_OUT_DIR = ROOT / "tests" / "fixtures"
 
 #: docs/format/fixture-corrupt.md — (dosya adı, üretici, beklenen SHA-256).
 _VERSION_FIELD_OFFSET = 8
+#: K-04: Data00003'un CH0 alaninin ilk bayti.
+#: offset = 12 (name) + 4 (sequence_no) + 8 (elapsed_us).
+_CH0_FIRST_BYTE_OFFSET_IN_RECORD = 24
 
 
 def build_k01_truncated_header() -> bytes:
@@ -87,6 +96,20 @@ def build_k06_name_index_mismatch() -> bytes:
     return bytes(buffer)
 
 
+def build_valid_v2_8records() -> bytes:
+    """K-04'ün bozulmamış tabanı: geçerli CRC'li 8 kayıt (580 bayt)."""
+    return build_valid_v2_fixture()
+
+
+def build_k04_crc_error() -> bytes:
+    """K-04: `Data00003`'ün CH0 alanının ilk baytı `0x00 → 0x01`; CRC alanı değiştirilmez."""
+    buffer = bytearray(build_valid_v2_fixture())
+    record_offset = HEADER_SIZE_V2 + 3 * RECORD_SIZE_V2
+    corrupt_at = record_offset + _CH0_FIRST_BYTE_OFFSET_IN_RECORD
+    buffer[corrupt_at] ^= 0x01
+    return bytes(buffer)
+
+
 #: (dosya adı, üretici fonksiyon, beklenen SHA-256) — docs/format/fixture-corrupt.md.
 SCENARIOS: tuple[tuple[str, Callable[[], bytes], str], ...] = (
     (
@@ -114,12 +137,22 @@ SCENARIOS: tuple[tuple[str, Callable[[], bytes], str], ...] = (
         build_k06_name_index_mismatch,
         "b1f807cf1bbea070273ce48d9d2b45d06a402a46241cd1bd576b290e0cb14a84",
     ),
+    (
+        "valid_8records_v2.bin",
+        build_valid_v2_8records,
+        "57681d96de5eedf22b86f3ca2ce1e359a721bb0680cc01f69d6c74a658c7bf4f",
+    ),
+    (
+        "crc_error.bin",
+        build_k04_crc_error,
+        "d23348d74ce425532c534713fa83fa875d91d185b335f2298f067f08051f8aaf",
+    ),
 )
 
 
 def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="K-01/K-02/K-03/K-05/K-06 bozuk fixture'larini yazar."
+        description="K-01/K-02/K-03/K-04/K-05/K-06 bozuk fixture'larini yazar."
     )
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
     return parser.parse_args(argv)

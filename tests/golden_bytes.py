@@ -9,7 +9,6 @@ o formülün üzerine kurulan **bozuk/anormal** senaryo üreticileri kalır.
 from __future__ import annotations
 
 import sys
-import zlib
 from pathlib import Path
 
 # tools/ paket değildir; kök dizin sys.path'te olsa da "tools.make_fixture"
@@ -25,15 +24,14 @@ from tools.make_fixture import (  # noqa: E402 -- sys.path kurulumundan sonra
     VALID_8RECORDS_SHA256,
     bit_status_for,
     build_valid_fixture,
+    build_valid_v2_fixture,
     sensor_values,
     tx_status_for,
 )
 
 from sonar_analyzer.io.profile_a_format import (  # noqa: E402
     DATA_RECORD_V1,
-    DATA_RECORD_V2,
     FILE_HEADER_V1,
-    FILE_HEADER_V2,
 )
 
 __all__ = [
@@ -113,45 +111,6 @@ def build_out_of_order_fixture() -> bytes:
             *sensor_values(n),
             bit_status_for(n),
             tx_status_for(n),
-        )
-    return bytes(body)
-
-
-def build_valid_v2_fixture(record_count: int = 8) -> bytes:
-    """`F2-012`/`ADR-011-crc.md` §2.3: v1 ile aynı formüller, CRC'li 68B kayıt.
-
-    Her kaydın `record_crc32` alanı, CRC hariç 64 baytın CRC-32'sidir
-    (`F2-013`'ün kapsamı tam algoritmayı sabitler; burada yalnız decoder
-    seçiminin CRC alanını doğru şekilde çözdüğünü göstermek için makul bir
-    değer yazılır). Header'ın `header_crc32` alanı da aynı yöntemle,
-    CRC hariç ilk 32 baytın CRC-32'sidir.
-    """
-    header_body = FILE_HEADER_V1.pack(
-        b"SONARBIN", 2, 36, 68, 125_000, CHANNEL_COUNT, START_TIME_UTC_NS
-    )
-    header_crc32 = zlib.crc32(header_body)
-    header = FILE_HEADER_V2.pack(
-        b"SONARBIN", 2, 36, 68, 125_000, CHANNEL_COUNT, START_TIME_UTC_NS, header_crc32
-    )
-    body = bytearray(header)
-    for n in range(record_count):
-        record_body = DATA_RECORD_V1.pack(
-            f"Data{n:05d}".encode("ascii"),
-            n,
-            n * 125_000,
-            *sensor_values(n),
-            bit_status_for(n),
-            tx_status_for(n),
-        )
-        record_crc32 = zlib.crc32(record_body)
-        body += DATA_RECORD_V2.pack(
-            f"Data{n:05d}".encode("ascii"),
-            n,
-            n * 125_000,
-            *sensor_values(n),
-            bit_status_for(n),
-            tx_status_for(n),
-            record_crc32,
         )
     return bytes(body)
 

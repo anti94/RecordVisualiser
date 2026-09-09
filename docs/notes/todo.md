@@ -4,9 +4,9 @@
 > Bir işi tamamlayınca `plan.md`'deki kutuyu `[x]` yap ve
 > `python tools/sync_todo.py` çalıştır.
 
-**Toplam 492 madde · 78 tamamlandı · 414 kaldı**
+**Toplam 492 madde · 79 tamamlandı · 413 kaldı**
 
-`[####....................]` %15.9
+`[####....................]` %16.1
 
 ## Özet
 
@@ -14,13 +14,13 @@
 | --- | --- | --- | --- |
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
-| Faz 2 — Parser, indeks ve kayıtlı veri | 17 | 24 | 41 |
+| Faz 2 — Parser, indeks ve kayıtlı veri | 18 | 23 | 41 |
 | Faz 3 — MVP analiz arayüzü | 0 | 80 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **78** | **414** | **492** |
+| **Toplam** | **79** | **413** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -95,7 +95,7 @@
 | [x] | `F1-043` | `0.60.0` | 20 dk | İlk spike sonuçlarını ve darboğazı kaydet |
 | [x] | `F1-044` | `0.61.0` | 15 dk | Uygulama iskeleti milestone kontrolünü yap |
 
-### Faz 2 — Parser, indeks ve kayıtlı veri (17/41)
+### Faz 2 — Parser, indeks ve kayıtlı veri (18/41)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -116,7 +116,7 @@
 | [x] | `F2-015` | `0.76.0` | 20 dk | Bilinmeyen paket teşhisini ekle |
 | [x] | `F2-016` | `0.77.0` | 20 dk | 32/64 byte örnek fixture yazıcısını ekle |
 | [x] | `F2-017` | `0.78.0` | 20 dk | Kesik, bozuk ve sıra boşluklu fixture'ları ekle |
-| [ ] | `F2-018` | `0.79.0` | 20 dk | CRC destekli format fixture'ını ekle |
+| [x] | `F2-018` | `0.79.0` | 20 dk | CRC destekli format fixture'ını ekle |
 | [ ] | `F2-019` | `0.80.0` | 20 dk | Sensör alanlarını kanal metadata'sına eşleştir |
 | [ ] | `F2-020` | `0.81.0` | 20 dk | Scale ve offset dönüşümünü ekle |
 | [ ] | `F2-021` | `0.82.0` | 20 dk | Calibration seçimini ve kalite eşlemesini ekle |
