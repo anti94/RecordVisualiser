@@ -116,8 +116,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F2-021` | 20 dk | 1 dk 52 sn | `33ad0ba` | calibration seçimini ve kalite eşlemesini ekle |
 | `F2-022` | 20 dk | 2 dk 37 sn | `b61ab4c` | BIT maskesini durum ve değişim olaylarına çevir |
 | `F2-023` | 20 dk | 2 dk 2 sn | `7be2eae` | TX durumunu başlangıç/bitiş aralıklarına çevir |
+| `F2-024` | 15 dk | 3 dk 16 sn | `42a3abb` | parser teşhislerini sistem olaylarına çevir |
 
-**98 commit · olculen toplam 1307 dk 53 sn · olculemeyen 1 (ilk commit)**
+**99 commit · olculen toplam 1311 dk 9 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
