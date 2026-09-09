@@ -81,6 +81,49 @@ def build_gap_fixture() -> bytes:
     return bytes(body)
 
 
+def build_duplicate_sequence_fixture() -> bytes:
+    """`F2-011`: fiziksel sıradaki 3. kayıt (index 3), önceki kayıtla aynı
+    `sequence_no = 2`'yi tekrarlar. Diğer alanlar index 3'ün kendi
+    formülüyle yazılır — yalnız `sequence_no` ve `elapsed_us` sabitlenir.
+
+    Fiziksel sequence_no dizisi: 0, 1, 2, 2, 4, 5, 6, 7.
+    """
+    header = FILE_HEADER_V1.pack(b"SONARBIN", 1, 32, 64, 125_000, CHANNEL_COUNT, START_TIME_UTC_NS)
+    body = bytearray(header)
+    physical_sequences = (0, 1, 2, 2, 4, 5, 6, 7)
+    for n in physical_sequences:
+        body += DATA_RECORD_V1.pack(
+            f"Data{n:05d}".encode("ascii"),
+            n,
+            n * 125_000,
+            *sensor_values(n),
+            bit_status_for(n),
+            tx_status_for(n),
+        )
+    return bytes(body)
+
+
+def build_out_of_order_fixture() -> bytes:
+    """`F2-011`: fiziksel sırada `sequence_no` geri gider (reset/bozulma).
+
+    Fiziksel sequence_no dizisi: 0, 1, 2, 3, 1, 5, 6, 7 — index 4'te (fiziksel
+    5. kayıt) sequence_no önceki kayıttan (3) küçüktür (1).
+    """
+    header = FILE_HEADER_V1.pack(b"SONARBIN", 1, 32, 64, 125_000, CHANNEL_COUNT, START_TIME_UTC_NS)
+    body = bytearray(header)
+    physical_sequences = (0, 1, 2, 3, 1, 5, 6, 7)
+    for n in physical_sequences:
+        body += DATA_RECORD_V1.pack(
+            f"Data{n:05d}".encode("ascii"),
+            n,
+            n * 125_000,
+            *sensor_values(n),
+            bit_status_for(n),
+            tx_status_for(n),
+        )
+    return bytes(body)
+
+
 def build_name_mismatch_fixture() -> bytes:
     """docs/format/fixture-corrupt.md K-06: sequence_no=2'nin name alani
     Data00099 yapilir, diger alanlar dokunulmaz.
