@@ -16,7 +16,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QAction
+from PySide6.QtGui import QAction, QCloseEvent
 from PySide6.QtWidgets import (
     QFrame,
     QMainWindow,
@@ -27,6 +27,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from sonar_analyzer.application.file_loader import FileLoadResult, FileLoadService
 from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.repository.mock_repository import SIMULATION_LABEL, MockRecordingRepository
@@ -75,8 +76,12 @@ class MainWindow(QMainWindow):
 
         self._channels: tuple[ChannelMetadata, ...] = ()
         self._repository: RecordingRepository | None = None
-        #: `F3-001` seçiminin sonucu; `F3-002`'nin worker'ı buradan okuyacak.
+        #: `F3-001` seçiminin sonucu; worker bu yolları açar.
         self.pending_load_paths: tuple[Path, ...] = ()
+        #: Worker'dan dönen sonuçlar; ekrana bağlanması `F3-005`'in işi.
+        self.loaded_results: tuple[FileLoadResult, ...] = ()
+        self.failed_results: tuple[FileLoadResult, ...] = ()
+        self.active_load_request_id = 0
         self.actions_by_name: dict[str, QAction] = {}
         # Menulere Python tarafinda referans tutulmazsa PySide nesneyi serbest
         # birakiyor ve sonraki erisimde "C++ object already deleted" hatasi
@@ -108,10 +113,13 @@ class MainWindow(QMainWindow):
         self.right_dock.bit_status.analysis_requested.connect(self.refresh_bit_analysis)
         self.action("action_load_simulation").triggered.connect(self.load_simulation)
 
-        # Dosya secici yalniz talep uretir; okuma F3-002'nin worker'ina baglanacak.
+        # Dosya secici yalniz talep uretir; okuma worker thread'inde yapilir.
         self.file_open = FileOpenController(self)
+        self.file_loader = FileLoadService(self)
         self.action("action_open").triggered.connect(self.request_open_files)
         self.file_open.load_requested.connect(self._on_load_requested)
+        self.file_loader.file_loaded.connect(self._on_file_loaded)
+        self.file_loader.request_finished.connect(self._on_load_finished)
 
         self.status = AppStatusBar(self)
         self.setStatusBar(self.status)
@@ -206,16 +214,39 @@ class MainWindow(QMainWindow):
         return self.file_open.request_open(self)
 
     def _on_load_requested(self, paths: Sequence[str]) -> None:
-        """Seçim talebini kaydeder ve log'a yazar.
+        """Seçim talebini worker'a verir — `F3-001`, `F3-002`.
 
-        Gerçek yükleme `F3-002`'nin worker'ına bağlanacak; bu iş yalnız
-        seçicinin talebi doğru ürettiğini garanti eder. Talep burada
-        biriktirilir ki worker geldiğinde ekran akışı değişmesin.
+        Çağrı hemen döner: dosyalar arka plan thread'inde açılır, pencere
+        bu sırada etkileşimlere yanıt vermeye devam eder.
         """
         self.pending_load_paths = tuple(Path(path) for path in paths)
         count = len(self.pending_load_paths)
         names = ", ".join(path.name for path in self.pending_load_paths)
         self.bottom_dock.append_log(f"Yukleme talebi: {count} dosya ({names}).")
+        self.active_load_request_id = self.file_loader.submit(self.pending_load_paths)
+
+    def _on_file_loaded(self, result: FileLoadResult) -> None:
+        """Worker'dan gelen tek dosya sonucunu kaydeder ve log'a yazar.
+
+        Sonucun repository'ye ve ekrana bağlanması `F3-005`'in işi; burada
+        yalnız sonucun GUI thread'ine ulaştığı garanti edilir.
+        """
+        if result.succeeded:
+            self.loaded_results = (*self.loaded_results, result)
+            self.bottom_dock.append_log(f"Yuklendi: {result.path.name}")
+            return
+        self.failed_results = (*self.failed_results, result)
+        self.bottom_dock.append_log(
+            f"Yuklenemedi: {result.path.name} ({result.error_type}: {result.error})"
+        )
+
+    def _on_load_finished(self, request_id: int) -> None:
+        self.bottom_dock.append_log(f"Yukleme istegi bitti (#{request_id}).")
+
+    def closeEvent(self, event: QCloseEvent) -> None:
+        """Pencere kapanırken worker thread'i düzgün durdurulur."""
+        self.file_loader.shutdown()
+        super().closeEvent(event)
 
     def set_repository(self, repository: RecordingRepository) -> None:
         """Bir veri kaynağını açar ve panellere dağıtır."""

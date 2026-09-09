@@ -135,8 +135,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F2-039` | 20 dk | 3 dk 31 sn | `03d0460` | bağımsız golden sonuçlarını parser ile karşılaştır |
 | `F2-040` | 20 dk | 2 dk 43 sn | `80823d0` | kaynak dosyanın değişmediğini doğrula |
 | `F2-041` | 15 dk | 8 dk 41 sn | `51aea02` | parser milestone kabulünü kaydet |
+| `F3-001` | 15 dk | 14 dk 30 sn | `017bb27` | tekli ve çoklu dosya açma seçicisini bağla |
 
-**117 commit · olculen toplam 1459 dk 22 sn · olculemeyen 1 (ilk commit)**
+**118 commit · olculen toplam 1473 dk 52 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
