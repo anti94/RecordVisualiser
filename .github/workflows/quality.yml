@@ -56,7 +56,9 @@ jobs:
 
       - name: Tip kontrolu (pyright, strict)
         run: |
-          python -m pyright --outputjson > pyright.json
+          # pyright hata bulunca 1 ile cikar; "bash -e" burada durmasin diye
+          # cikis kodu yutulur, karar donusturucu adimda verilir.
+          python -m pyright --outputjson > pyright.json || true
           python tools/pyright_annotations.py pyright.json
         shell: bash
 
