@@ -4,23 +4,23 @@
 > Bir işi tamamlayınca `plan.md`'deki kutuyu `[x]` yap ve
 > `python tools/sync_todo.py` çalıştır.
 
-**Toplam 492 madde · 57 tamamlandı · 435 kaldı**
+**Toplam 492 madde · 58 tamamlandı · 434 kaldı**
 
-`[###.....................]` %11.6
+`[###.....................]` %11.8
 
 ## Özet
 
 | Grup | Tamam | Kalan | Toplam |
 | --- | --- | --- | --- |
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
-| Faz 1 — Uygulama iskeleti ve domain modeli | 40 | 4 | 44 |
+| Faz 1 — Uygulama iskeleti ve domain modeli | 41 | 3 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 0 | 41 | 41 |
 | Faz 3 — MVP analiz arayüzü | 0 | 80 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **57** | **435** | **492** |
+| **Toplam** | **58** | **434** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -46,7 +46,7 @@
 | [x] | `F0-016` | `0.16.0` | 15 dk | ADR listesini iş ve sürüm hedefleriyle eşleştir |
 | [x] | `F0-017` | `0.17.0` | 15 dk | Format milestone kabul tutanağını hazırla |
 
-### Faz 1 — Uygulama iskeleti ve domain modeli (40/44)
+### Faz 1 — Uygulama iskeleti ve domain modeli (41/44)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -90,7 +90,7 @@
 | [x] | `F1-038` | `0.55.0` | 15 dk | Mockup ana analiz sekmelerini yerleştir |
 | [x] | `F1-039` | `0.56.0` | 20 dk | Merkez dashboard grafik hücrelerini oluştur |
 | [x] | `F1-040` | `0.57.0` | 15 dk | Grafik hızlı araç şeridini yerleştir |
-| [ ] | `F1-041` | `0.58.0` | 20 dk | Bir ve on milyon noktalık spike girdilerini hazırla |
+| [x] | `F1-041` | `0.58.0` | 20 dk | Bir ve on milyon noktalık spike girdilerini hazırla |
 | [ ] | `F1-042` | `0.59.0` | 20 dk | Pan/zoom ve cursor ölçüm koşucusunu ekle |
 | [ ] | `F1-043` | `0.60.0` | 20 dk | İlk spike sonuçlarını ve darboğazı kaydet |
 | [ ] | `F1-044` | `0.61.0` | 15 dk | Uygulama iskeleti milestone kontrolünü yap |

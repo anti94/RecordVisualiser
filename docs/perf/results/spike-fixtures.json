@@ -1,0 +1,27 @@
+{
+  "sample_rate_hz": 100000.0,
+  "sizes": [
+    {
+      "sample_count": 1000000,
+      "timestamps_dtype": "int64",
+      "values_dtype": "float32",
+      "timestamps_bytes": 8000000,
+      "values_bytes": 4000000,
+      "total_bytes": 12000000,
+      "total_mib": 11.444,
+      "build_seconds": 0.031287,
+      "is_monotonic": true
+    },
+    {
+      "sample_count": 10000000,
+      "timestamps_dtype": "int64",
+      "values_dtype": "float32",
+      "timestamps_bytes": 80000000,
+      "values_bytes": 40000000,
+      "total_bytes": 120000000,
+      "total_mib": 114.441,
+      "build_seconds": 0.290976,
+      "is_monotonic": true
+    }
+  ]
+}
