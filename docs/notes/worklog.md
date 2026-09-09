@@ -74,8 +74,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `-` | — | 3 dk 9 sn | `702ec61` | pyright çıkış kodunu yutup annotation adımına ulaş |
 | `-` | — | 3 dk 55 sn | `8c930f3` | PySide6 sürümünü sabitle, Qt None kontrollerini geri koy |
 | `-` | — | 3 dk 53 sn | `814476a` | CI 3.12 pyright sorununu çözüldü olarak kapat |
+| `F1-027` | 15 dk | 2 dk 54 sn | `5f679d9` | Playback/Time Control şeridini yerleştir |
 
-**56 commit · olculen toplam 900 dk 15 sn · olculemeyen 1 (ilk commit)**
+**57 commit · olculen toplam 903 dk 9 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

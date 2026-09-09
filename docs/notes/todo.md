@@ -4,23 +4,23 @@
 > Bir işi tamamlayınca `plan.md`'deki kutuyu `[x]` yap ve
 > `python tools/sync_todo.py` çalıştır.
 
-**Toplam 492 madde · 44 tamamlandı · 448 kaldı**
+**Toplam 492 madde · 45 tamamlandı · 447 kaldı**
 
-`[##......................]` %8.9
+`[##......................]` %9.1
 
 ## Özet
 
 | Grup | Tamam | Kalan | Toplam |
 | --- | --- | --- | --- |
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
-| Faz 1 — Uygulama iskeleti ve domain modeli | 27 | 17 | 44 |
+| Faz 1 — Uygulama iskeleti ve domain modeli | 28 | 16 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 0 | 41 | 41 |
 | Faz 3 — MVP analiz arayüzü | 0 | 80 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **44** | **448** | **492** |
+| **Toplam** | **45** | **447** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -46,7 +46,7 @@
 | [x] | `F0-016` | `0.16.0` | 15 dk | ADR listesini iş ve sürüm hedefleriyle eşleştir |
 | [x] | `F0-017` | `0.17.0` | 15 dk | Format milestone kabul tutanağını hazırla |
 
-### Faz 1 — Uygulama iskeleti ve domain modeli (27/44)
+### Faz 1 — Uygulama iskeleti ve domain modeli (28/44)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -77,7 +77,7 @@
 | [x] | `F1-025` | `0.42.0` | 15 dk | Inspector'ı bağlamsal araç sekmesi olarak ekle |
 | [x] | `F1-026` | `0.43.0` | 15 dk | Alt Log/Messages alanı ve Events sekmesini ekle |
 | [x] | `F1-027` | `0.44.0` | 15 dk | Playback/Time Control şeridini yerleştir |
-| [ ] | `F1-028` | `0.45.0` | 15 dk | Durum çubuğu alanlarını ekle |
+| [x] | `F1-028` | `0.45.0` | 15 dk | Durum çubuğu alanlarını ekle |
 | [ ] | `F1-029` | `0.46.0` | 20 dk | Mockup koyu temasını ve mavi vurgularını uygula |
 | [ ] | `F1-030` | `0.47.0` | 20 dk | Durum ikonları ve kanal paletini ekle |
 | [ ] | `F1-031` | `0.48.0` | 20 dk | Tek kanallı PlotPanel iskeletini ekle |

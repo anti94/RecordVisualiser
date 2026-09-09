@@ -53,7 +53,8 @@ def test_main_window_opens_and_closes(qtbot: QtBot) -> None:
     qtbot.waitExposed(window)
     assert window.isVisible()
     assert window.windowTitle() == WINDOW_TITLE
-    assert window.statusBar().currentMessage() == "Ready"
+    # Durum artik gecici mesaj degil, kalici alanda (F1-028).
+    assert window.status.field_value("status") == "Ready"
 
     assert window.close()
     assert not window.isVisible()

@@ -38,6 +38,7 @@ from sonar_analyzer.ui.docks.bottom_panel import BottomPanelDock
 from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock
 from sonar_analyzer.ui.docks.playback import PlaybackDock
 from sonar_analyzer.ui.docks.right_column import RightColumnDock
+from sonar_analyzer.ui.status_bar import AppStatusBar
 
 # docs/ui/layout-map.md §1 ve §7
 DEFAULT_WINDOW_SIZE = (1520, 840)
@@ -92,7 +93,11 @@ class MainWindow(QMainWindow):
         self._connect_layout_actions()
         self.left_dock.channel_activated.connect(self.show_channel_in_inspector)
 
-        self.statusBar().showMessage("Ready")
+        self.status = AppStatusBar(self)
+        self.setStatusBar(self.status)
+        self.status.update_memory()
+
+        self.playback_dock.position_changed.connect(self.status.set_cursor_time)
 
     # -- eylemler --------------------------------------------------------
 
@@ -211,6 +216,9 @@ class MainWindow(QMainWindow):
         self.left_dock.set_recording(metadata, channels)
         self.right_dock.close_inspector()
         self.playback_dock.set_recording_range(metadata.time_range)
+        self.status.set_field("file", metadata.source_path)
+        self.status.set_status("Ready")
+        self.status.update_memory()
         self.bottom_dock.append_log(f"Kayit acildi: {metadata.source_path}")
         self.bottom_dock.append_log(f"{len(channels)} kanal bulundu.")
         self.action("action_close").setEnabled(True)
