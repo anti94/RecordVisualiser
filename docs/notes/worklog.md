@@ -66,8 +66,11 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F1-023` | 15 dk | 3 dk 30 sn | `5a20b3e` | menü ve toolbar eylem iskeletini ekle |
 | `F1-024` | 15 dk | 7 dk 22 sn | `ea51cac` | Data Explorer dock'unu ekle |
 | `F1-025` | 15 dk | 4 dk 43 sn | `b59e723` | Inspector'ı bağlamsal araç sekmesi olarak ekle |
+| `F1-026` | 15 dk | 1 dk 59 sn | `d34620a` | alt Log/Messages alanı ve Events sekmesini ekle |
+| `F1-013` | 15 dk | 34 sn | `e6832b4` | worklog'a ..F1-026 durumları ve bulunan sorunları ekle |
+| `-` | — | 3 dk 25 sn | `720d5de` | pyright pythonVersion sabitini kaldır |
 
-**48 commit · olculen toplam 536 dk 29 sn · olculemeyen 1 (ilk commit)**
+**51 commit · olculen toplam 542 dk 27 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
@@ -141,6 +144,28 @@ Hiçbiri plan işi değildi; çalışırken ortaya çıktı.
 | Menülere Python referansı tutulmayınca PySide nesneyi serbest bırakıyordu ("C++ object already deleted") | `F1-023` | Menüler pencerede saklanıyor |
 | Kanal yolunda `/` hem ayraç hem ad parçasıydı; ağaçta `"Vehicle "` diye bozuk grup çıkıyordu | `F1-024` | Yol `Vehicle/Voltage` yapıldı, gösterim etiketi `GROUP_LABELS` ile eşlendi |
 | Qt tabified dock'ta aynı anda tek dock görünür sayıldığı için "kartlar duruyor mu" doğrulanamıyordu | `F1-025` | Sağ sütunda gerçek `QTabWidget` kullanıldı |
+
+## 3b. ÇÖZÜLMEMİŞ: CI'nin Python 3.12 ayağında pyright hatası
+
+**Durum: AÇIK.** `main` üzerinde CI kırmızı.
+
+- Python **3.9** ayağı ve `todo-sync` işi **geçiyor**; yalnız **3.12** ayağı
+  `Tip kontrolu (pyright, strict)` adımında düşüyor.
+- Yerelde (Python 3.9 + pyright 1.1.411) pyright **0 hata** veriyor; ruff ve
+  284 testin tamamı geçiyor.
+- İki deneme yapıldı ve ikisi de yetmedi:
+  1. numpy `>=1.26,<2.1`'e sabitlendi (iki ayak aynı numpy'yi alsın diye) — `0d11b80`.
+  2. pyright'ın sabit `pythonVersion = "3.9"` ayarı kaldırıldı — `720d5de`.
+- **Neden teşhis edilemedi:** GitHub Actions job log'ları kimlik doğrulaması
+  istiyor; bu ortamdan hatanın tam metni okunamıyor. Teşhis yalnız "hangi ayak
+  düşüyor" bilgisiyle yapıldı.
+
+**Önerilen sonraki adım:** Python 3.12 yerel makineye kurulup (D-20) o ortamda
+`pyright` bir kez çalıştırılmalı; hata büyük olasılıkla anında görünecek.
+Alternatif olarak depoya erişimi olan biri koşu log'unu açıp hatayı iletebilir.
+
+Bu sorun, kalite kapısını zayıflatmamak için **gizlenmedi**: 3.12 adımı
+devre dışı bırakılmadı, pyright gevşetilmedi.
 
 ## 4. Açık engeller
 
