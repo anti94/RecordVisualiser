@@ -12,6 +12,7 @@ hâle gelmez.
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -32,11 +33,13 @@ from sonar_analyzer.application.file_loader import (
     FileLoadService,
     LoaderCallable,
 )
+from sonar_analyzer.application.load_errors import describe_load_error
 from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.repository.file_repository import FileRecordingRepository
 from sonar_analyzer.repository.mock_repository import SIMULATION_LABEL, MockRecordingRepository
 from sonar_analyzer.repository.protocol import RecordingRepository
+from sonar_analyzer.ui import error_dialogs
 from sonar_analyzer.ui.actions import (
     MENU_SPECS,
     TOOLBAR_ACTION_NAMES,
@@ -47,12 +50,15 @@ from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock
 from sonar_analyzer.ui.docks.playback import PlaybackDock
 from sonar_analyzer.ui.docks.right_column import RightColumnDock
 from sonar_analyzer.ui.empty_state import EmptyStatePanel
+from sonar_analyzer.ui.error_dialogs import LoadErrorNotifier
 from sonar_analyzer.ui.file_open import FileOpenController
 from sonar_analyzer.ui.plot_tool_bar import PlotToolBar
 from sonar_analyzer.ui.plots.dashboard import DashboardPanel
 from sonar_analyzer.ui.status_bar import CANCELLED_TEXT, READY_TEXT, AppStatusBar
 from sonar_analyzer.ui.theme import apply_theme
 from sonar_analyzer.ui.view_tab_bar import ViewTabBar
+
+logger = logging.getLogger("sonar_analyzer")
 
 # docs/ui/layout-map.md §1 ve §7
 DEFAULT_WINDOW_SIZE = (1520, 840)
@@ -72,9 +78,16 @@ RIGHT_DOCK_TITLE = "BIT / Analysis / Export"
 class MainWindow(QMainWindow):
     """Uygulamanın ana penceresi: üç sütunlu mockup düzeni."""
 
-    def __init__(self, *, loader: LoaderCallable | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        loader: LoaderCallable | None = None,
+        error_notifier: LoadErrorNotifier | None = None,
+    ) -> None:
         """`loader`: dosya açma çağrısını değiştirir (testler ve ileride
-        farklı kaynak türleri için); verilmezse gerçek `.bin` okuyucu."""
+        farklı kaynak türleri için); verilmezse gerçek `.bin` okuyucu.
+        `error_notifier`: yükleme hatasının kullanıcıya gösterimi;
+        verilmezse Qt uyarı kutusu."""
         super().__init__()
         self.setWindowTitle(WINDOW_TITLE)
         self.resize(*DEFAULT_WINDOW_SIZE)
@@ -91,6 +104,10 @@ class MainWindow(QMainWindow):
         self.active_load_request_id = 0
         #: Ekrana uygulanmış, MainWindow'un sahibi olduğu snapshot'lar.
         self._owned_repositories: tuple[FileRecordingRepository, ...] = ()
+        # None saklanir; ontanimli bildirim CAGRI aninda cozulur, boylece
+        # modulu yamalayan test agi (tests/conftest.py) pencere kurulduktan
+        # sonra da etkili olur (ayni tuzak: F3-001 dosya diyalogu).
+        self._error_notifier: LoadErrorNotifier | None = error_notifier
         self.actions_by_name: dict[str, QAction] = {}
         # Menulere Python tarafinda referans tutulmazsa PySide nesneyi serbest
         # birakiyor ve sonraki erisimde "C++ object already deleted" hatasi
@@ -327,9 +344,18 @@ class MainWindow(QMainWindow):
             self.bottom_dock.append_log(f"Yuklendi: {result.path.name}")
             return
         self.failed_results = (*self.failed_results, result)
-        self.bottom_dock.append_log(
-            f"Yuklenemedi: {result.path.name} ({result.error_type}: {result.error})"
-        )
+        self._report_load_error(result)
+
+    def _report_load_error(self, result: FileLoadResult) -> None:
+        """Hatayı kullanıcı diline çevirip gösterir; teknik ayrıntıyı log'a yazar — `F3-006`."""
+        message = describe_load_error(result.path, result.error_type, result.error)
+        # Teknik ayrinti UYGULAMA LOG'una gider (kabul kriteri): tur, ham
+        # ileti ve tam yol teshis icin kaybolmaz.
+        logger.error("Dosya yuklenemedi - %s", message.technical_text)
+        # Alt seritteki operator gunlugu kullanici dilinde kalir.
+        self.bottom_dock.append_log(f"Yuklenemedi: {result.path.name} - {message.user_text}")
+        notifier = self._error_notifier or error_dialogs.message_box_notifier
+        notifier(self, message)
 
     def _on_load_finished(self, request_id: int) -> None:
         self.bottom_dock.append_log(f"Yukleme istegi bitti (#{request_id}).")

@@ -52,6 +52,25 @@ def block_native_file_dialog(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(file_open, "_default_dialog", refuse)
 
 
+@pytest.fixture(autouse=True)
+def block_modal_error_box(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Yükleme hatası kutusunun testte modal açılmasını engeller — `F3-006`.
+
+    `block_native_file_dialog` ile aynı gerekçe: modal kutu kullanıcı girdisi
+    bekler ve paketi kilitler. Yamalı sürüm hiçbir şey göstermez; kutuyu
+    doğrulayan testler kendi kaydedicisini enjekte eder.
+    """
+    if importlib.util.find_spec("PySide6") is None:
+        return
+
+    from sonar_analyzer.ui import error_dialogs
+
+    def silent(_parent: object, _message: object) -> None:
+        return None
+
+    monkeypatch.setattr(error_dialogs, "message_box_notifier", silent)
+
+
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
     """PySide6 yoksa `gui` işaretli testleri atlar."""
     del config
