@@ -95,8 +95,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F1-044` | 15 dk | 8 dk 39 sn | `228f6dd` | uygulama iskeleti milestone kontrolünü yap |
 | `F2-001` | 15 dk | 6 dk 21 sn | `7011f27` | header alan sabitlerini ve veri modelini ekle |
 | `F2-002` | 20 dk | 1 dk 41 sn | `572b0f1` | little-endian header okuyucusunu ekle |
+| `F2-003` | 15 dk | 1 dk 34 sn | `b8a049e` | magic ve sürüm doğrulamasını ekle |
 
-**77 commit · olculen toplam 1247 dk 43 sn · olculemeyen 1 (ilk commit)**
+**78 commit · olculen toplam 1249 dk 17 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

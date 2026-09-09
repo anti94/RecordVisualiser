@@ -38,3 +38,19 @@ class UnsupportedVersionError(FormatError):
         )
         self.found = found
         self.supported = supported
+
+
+class TruncatedHeaderError(FormatError):
+    """Dosya, header'in tamamini tasimayacak kadar kisa (docs/format/profile-a.md §3 adim 1)."""
+
+    def __init__(self, available_bytes: int, required_bytes: int) -> None:
+        super().__init__(
+            f"kesik header: {required_bytes} bayt gerekli, {available_bytes} bayt bulundu",
+            byte_offset=0,
+        )
+        self.available_bytes = available_bytes
+        self.required_bytes = required_bytes
+
+
+class HeaderContractError(FormatError):
+    """header_size/record_size/channel_count beklenenle uyusmuyor (adim 4, 6)."""
