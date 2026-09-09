@@ -40,6 +40,7 @@ from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock
 from sonar_analyzer.ui.docks.playback import PlaybackDock
 from sonar_analyzer.ui.docks.right_column import RightColumnDock
 from sonar_analyzer.ui.empty_state import EmptyStatePanel
+from sonar_analyzer.ui.plot_tool_bar import PlotToolBar
 from sonar_analyzer.ui.plots.dashboard import DashboardPanel
 from sonar_analyzer.ui.status_bar import AppStatusBar
 from sonar_analyzer.ui.theme import apply_theme
@@ -169,6 +170,7 @@ class MainWindow(QMainWindow):
         chunk = self._repository.query(channel_id, self._repository.metadata().time_range)
         self.plot_panel.set_channel(channel, chunk)
         self.dashboard.statistics.set_channel_data(channel, chunk.values)
+        self.plot_tool_bar.set_current_channel(channel_id)
         self.show_plot()
         self.right_dock.show_channel(channel)
         self.bottom_dock.append_log(f"{channel.display_label} cizildi ({len(chunk)} ornek).")
@@ -237,6 +239,10 @@ class MainWindow(QMainWindow):
         self.view_tabs = ViewTabBar(container)
         layout.addWidget(self.view_tabs)
 
+        self.plot_tool_bar = PlotToolBar(container)
+        self.plot_tool_bar.channel_selected.connect(self.open_channel)
+        layout.addWidget(self.plot_tool_bar)
+
         self.empty_state = EmptyStatePanel(container)
         self.empty_state.open_requested.connect(self.action("action_open").trigger)
         self.empty_state.simulation_requested.connect(self.action("action_load_simulation").trigger)
@@ -274,6 +280,7 @@ class MainWindow(QMainWindow):
         """Açılan kaydı panellere dağıtır."""
         self._channels = tuple(channels)
         self.left_dock.set_recording(metadata, channels)
+        self.plot_tool_bar.set_channels(list(channels))
         self.right_dock.close_inspector()
         self.right_dock.bit_status.clear()
         self.plot_panel.clear()

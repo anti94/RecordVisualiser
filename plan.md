@@ -1389,7 +1389,7 @@ Kabul: Uygulama sahte veriyle açılmalı; dock'lar ve temel zaman grafiği çal
 | [x] | `F1-037` | `0.54.0` | 15 dk | Sağ alt Data Export kartını yerleştir | Format, zaman aralığı, metadata ve export kontrolleri görünürdür | `F1-036` | `feat(ui): F1-037 sağ alt Data Export kartını yerleştir` |
 | [x] | `F1-038` | `0.55.0` | 15 dk | Mockup ana analiz sekmelerini yerleştir | Sekiz sekme aynı sıradadır; henüz desteklenmeyen sekmeler açıkça pasiftir | `F1-037` | `feat(ui): F1-038 mockup ana analiz sekmelerini yerleştir` |
 | [x] | `F1-039` | `0.56.0` | 20 dk | Merkez dashboard grafik hücrelerini oluştur | Üst zaman serisi, orta spektrogram, alt FFT ve istatistik hücreleri vardır | `F1-038` | `feat(ui): F1-039 merkez dashboard grafik hücrelerini oluştur` |
-| [ ] | `F1-040` | `0.57.0` | 15 dk | Grafik hızlı araç şeridini yerleştir | Zaman penceresi, kanal seçimi ve Sync kontrolü aynı şerittedir | `F1-039` | `feat(ui): F1-040 grafik hızlı araç şeridini yerleştir` |
+| [x] | `F1-040` | `0.57.0` | 15 dk | Grafik hızlı araç şeridini yerleştir | Zaman penceresi, kanal seçimi ve Sync kontrolü aynı şerittedir | `F1-039` | `feat(ui): F1-040 grafik hızlı araç şeridini yerleştir` |
 
 ##### İlk grafik ölçümü
 
