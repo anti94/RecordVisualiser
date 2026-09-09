@@ -9,16 +9,23 @@ Faz 4 işidir; uygulama burada dosya tanıtıcısını açık tutmaz.
 from __future__ import annotations
 
 import hashlib
+import math
+from bisect import bisect_left
 from dataclasses import replace
 from pathlib import Path
 
+import numpy as np
+
 from sonar_analyzer.domain.channel import ChannelMetadata
+from sonar_analyzer.domain.data_chunk import DataChunk, Quality
 from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.io.decoders.channel_catalog import CHANNELS_8
+from sonar_analyzer.io.decoders.crc_validation import check_record_crc
 from sonar_analyzer.io.index.cache import load_or_build_record_index
 from sonar_analyzer.io.index.record_index import RecordIndexEntry, build_record_index
 from sonar_analyzer.io.profile_a_format import EXPECTED_PERIOD_US, FileHeaderV1
+from sonar_analyzer.io.readers.binary_reader import read_data_record_v1, read_data_record_v2
 from sonar_analyzer.io.readers.recording_reader import MAX_TIMESTAMP_NS, read_validated_header
 
 
@@ -32,6 +39,8 @@ class FileRecordingRepository:
         self._channels: tuple[ChannelMetadata, ...] = ()
         self._index: tuple[RecordIndexEntry, ...] = ()
         self._cache_reused = False
+        self._time_index: tuple[RecordIndexEntry, ...] = ()
+        self._times: tuple[int, ...] = ()
 
     def open(self, path: Path, *, cache_path: Path | None = None) -> None:
         source = path.resolve(strict=True)
@@ -60,14 +69,15 @@ class FileRecordingRepository:
             reused = False
             messages.append(f"Indeks cache kullanilamadi: {exc}")
         period_ns = header.period_us * 1000
-        valid_times = [
-            entry.timestamp_ns
+        valid_entries = [
+            entry
             for entry in entries
             if header.start_time_utc_ns <= entry.timestamp_ns <= MAX_TIMESTAMP_NS - period_ns
             and data[entry.byte_offset : entry.byte_offset + 4] == b"Data"
         ]
-        if len(valid_times) != len(entries):
+        if len(valid_entries) != len(entries):
             messages.append("Taninmayan veya int64 zaman sinirini asan kayitlar var.")
+        valid_times = [entry.timestamp_ns for entry in valid_entries]
         end_ns = max(valid_times) + period_ns if valid_times else header.start_time_utc_ns
         recording_id = hashlib.sha256(str(source).encode("utf-8")).hexdigest()[:24]
         metadata = RecordingMetadata(
@@ -88,6 +98,8 @@ class FileRecordingRepository:
         self._data, self._header = data, header
         self._metadata, self._channels = metadata, channels
         self._index, self._cache_reused = entries, reused
+        self._time_index = tuple(sorted(valid_entries, key=lambda item: item.timestamp_ns))
+        self._times = tuple(entry.timestamp_ns for entry in self._time_index)
 
     def _require_open(self) -> tuple[bytes, FileHeaderV1]:
         if self._data is None or self._header is None:
@@ -104,6 +116,72 @@ class FileRecordingRepository:
         self._require_open()
         return self._channels
 
+    def query(
+        self,
+        channel_id: str,
+        time_range: TimeRange,
+        max_points: int | None = None,
+    ) -> DataChunk:
+        """İkili aramayla [başlangıç, bitiş) içindeki kayıtları çözer — F2-034.
+
+        Fiziksel indeks değişmez; zaman indeksi sırasız/tekrarlı zamanları sorgu
+        için kararlı sıralar. Bozuk CRC örneği NaN ve kalite bayrağıyla korunur.
+        """
+        data, header = self._require_open()
+        slot = next(
+            (i for i, channel in enumerate(self._channels) if channel.id == channel_id), None
+        )
+        if slot is None:
+            raise KeyError(f"Bilinmeyen kanal: {channel_id}")
+        if max_points is not None and max_points <= 0:
+            raise ValueError("max_points pozitif olmali")
+        left = bisect_left(self._times, time_range.start_ns)
+        right = bisect_left(self._times, time_range.end_ns)
+        selected = self._time_index[left:right]
+        if not selected:
+            return DataChunk.empty(channel_id)
+        channel = self._channels[slot]
+        values: list[float] = []
+        flags: list[int] = []
+        for entry in selected:
+            record = read_data_record_v1(data, entry.byte_offset)
+            quality = Quality.OK
+            if header.version == 2:
+                crc_record = read_data_record_v2(data, entry.byte_offset)
+                if (
+                    check_record_crc(
+                        crc_record,
+                        data[entry.byte_offset : entry.byte_offset + 64],
+                        entry.byte_offset,
+                    )
+                    is not None
+                ):
+                    quality |= Quality.CRC_ERROR
+            physical_index = (entry.byte_offset - header.header_size) // header.record_size
+            if physical_index:
+                previous = self._index[physical_index - 1]
+                if entry.sequence_no > previous.sequence_no + 1:
+                    quality |= Quality.GAP_BEFORE
+                elif entry.sequence_no <= previous.sequence_no:
+                    quality |= Quality.SUSPECT
+            if record.elapsed_us != record.sequence_no * header.period_us:
+                quality |= Quality.JITTER
+            value = channel.to_physical(record.sensor_values[slot])
+            if not math.isfinite(value):
+                quality |= Quality.SUSPECT
+                value = math.nan
+            if quality & Quality.CRC_ERROR:
+                value = math.nan
+            values.append(value)
+            flags.append(int(quality))
+        keep = _bounded_indices(values, max_points)
+        return DataChunk(
+            channel_id=channel_id,
+            timestamps_ns=np.array([selected[i].timestamp_ns for i in keep], dtype=np.int64),
+            values=np.array([values[i] for i in keep], dtype=np.float32),
+            quality=np.array([flags[i] for i in keep], dtype=np.uint8),
+        )
+
     @property
     def cache_reused(self) -> bool:
         self._require_open()
@@ -116,3 +194,33 @@ class FileRecordingRepository:
         self._channels = ()
         self._index = ()
         self._cache_reused = False
+        self._time_index = ()
+        self._times = ()
+
+
+def _bounded_indices(values: list[float], max_points: int | None) -> list[int]:
+    """Sorgu bütçesi için küçük min/max özeti; kalıcı piramit Faz 4 işidir."""
+    if max_points is None or len(values) <= max_points:
+        return list(range(len(values)))
+    if max_points == 1:
+        return [
+            max(
+                range(len(values)),
+                key=lambda i: abs(values[i]) if math.isfinite(values[i]) else math.inf,
+            )
+        ]
+    buckets = max_points // 2
+    keep: list[int] = []
+    for bucket in range(buckets):
+        start = bucket * len(values) // buckets
+        stop = (bucket + 1) * len(values) // buckets
+        finite = [i for i in range(start, stop) if math.isfinite(values[i])]
+        missing = [i for i in range(start, stop) if not math.isfinite(values[i])]
+        if missing:
+            chosen = [missing[0]]
+            if finite:
+                chosen.append(max(finite, key=lambda i: abs(values[i])))
+        else:
+            chosen = [min(finite, key=lambda i: values[i]), max(finite, key=lambda i: values[i])]
+        keep.extend(sorted(set(chosen)))
+    return keep
