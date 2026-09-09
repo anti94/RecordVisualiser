@@ -99,7 +99,7 @@ class DataExplorerDock(QDockWidget):
     def _build_body(self) -> QWidget:
         body = QWidget(self)
         layout = QVBoxLayout(body)
-        layout.setContentsMargins(6, 6, 6, 6)
+        layout.setContentsMargins(4, 4, 4, 4)
         layout.setSpacing(6)
 
         self.open_button = QPushButton("Open .bin File", body)

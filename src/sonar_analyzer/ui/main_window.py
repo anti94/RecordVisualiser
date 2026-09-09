@@ -39,6 +39,7 @@ from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock
 from sonar_analyzer.ui.docks.playback import PlaybackDock
 from sonar_analyzer.ui.docks.right_column import RightColumnDock
 from sonar_analyzer.ui.status_bar import AppStatusBar
+from sonar_analyzer.ui.theme import apply_theme
 
 # docs/ui/layout-map.md §1 ve §7
 DEFAULT_WINDOW_SIZE = (1520, 840)
@@ -62,6 +63,8 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle(WINDOW_TITLE)
         self.resize(*DEFAULT_WINDOW_SIZE)
+        # Tema pencere geneline uygulanir; tek renk bile widget icine yazilmaz.
+        apply_theme(self)
 
         self._channels: tuple[ChannelMetadata, ...] = ()
         self.actions_by_name: dict[str, QAction] = {}
