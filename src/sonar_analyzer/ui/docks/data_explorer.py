@@ -288,7 +288,9 @@ class DataExplorerDock(QDockWidget):
             if channel_id:
                 found.append((item, str(channel_id)))
             for index in range(item.childCount()):
-                walk(item.child(index))
+                child = item.child(index)
+                if child is not None:
+                    walk(child)
 
         for index in range(self.tree.topLevelItemCount()):
             top = self.tree.topLevelItem(index)
@@ -296,20 +298,19 @@ class DataExplorerDock(QDockWidget):
                 walk(top)
         return found
 
-    def _is_visible(self, item: QTreeWidgetItem) -> bool:
+    @staticmethod
+    def _is_visible(item: QTreeWidgetItem) -> bool:
         """Öğe ve tüm ataları görünür mü?
 
-        Üst düzeye ulaşıldığı `indexOfTopLevelItem` ile anlaşılır. PySide
-        taslakları `parent()` dönüşünü opsiyonel saymadığı için `is None`
-        kontrolü tip denetiminden geçmiyor.
+        Üst düzey öğede `parent()` gerçekten `None` döner; PySide taslakları
+        bunu bazı sürümlerde opsiyonel saymasa da kontrol korunur.
         """
-        node = item
-        while True:
+        node: QTreeWidgetItem | None = item
+        while node is not None:
             if node.isHidden():
                 return False
-            if self.tree.indexOfTopLevelItem(node) >= 0:
-                return True
             node = node.parent()
+        return True
 
     def _apply_filter(self, text: str) -> None:
         """Yaprakları süzer; altında görünen yaprak kalmayan grubu gizler."""
@@ -324,7 +325,8 @@ class DataExplorerDock(QDockWidget):
 
             any_visible = False
             for index in range(item.childCount()):
-                if prune(item.child(index)):
+                child = item.child(index)
+                if child is not None and prune(child):
                     any_visible = True
             item.setHidden(not any_visible)
             return any_visible

@@ -22,7 +22,11 @@ dependencies = [
 
 [project.optional-dependencies]
 gui = [
-    "PySide6>=6.6",
+    # PySide6 SABIT surumde: tip taslaklari surumler arasinda degisiyor.
+    # Ornegin QTreeWidgetItem.child() bir surumde "QTreeWidgetItem", digerinde
+    # "QTreeWidgetItem | None" donuyor ve ayni kod bir Python ayaginda gecip
+    # digerinde kaliyordu.
+    "PySide6==6.10.3",
     "pyqtgraph>=0.13",
 ]
 dsp = [
@@ -96,3 +100,7 @@ venv = ".venv"
 pythonPlatform = "Windows"
 typeCheckingMode = "strict"
 reportMissingTypeStubs = false
+# Qt taslaklari bazi surumlerde donusu opsiyonel saymiyor; oysa Qt gercekten
+# nullptr donebiliyor. "is not None" kontrollerini korumak icin bu STIL kurali
+# kapali. Guvenlik kurallari (reportOptionalMemberAccess vb.) acik kaliyor.
+reportUnnecessaryComparison = false
