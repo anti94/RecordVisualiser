@@ -60,6 +60,21 @@ SUMMARY_FIELDS = ("File", "Size", "Start", "Duration", "Platform")
 GROUP_LABELS = {"Vehicle": "Vehicle / Transmission"}
 
 
+def _channel_search_haystack(channel: ChannelMetadata) -> str:
+    """Ad, ID, birim, yol ve kaynağı tek küçük-harf metinde birleştirir — `F3-011`.
+
+    Kabul kriteri: "her alan için bilinen eşleşme bulunur" — kullanıcı
+    kanal adını, kimliğini (`ch0`), birimini (`bar`) ya da kaynağını
+    (`sensors`) yazdığında da kanal bulunmalı; yalnız görünen etiket
+    (ad + birim) ve yol yetmez, `channel.id` ve `channel.source` de dahil
+    edilir.
+    """
+    parts = [channel.name, channel.id, channel.path, channel.source.value]
+    if channel.unit:
+        parts.append(channel.unit)
+    return " ".join(parts).casefold()
+
+
 def _all_children_are_leaves(node: RecordingTreeNode) -> bool:
     """Bir düğümün tüm çocukları kanal yaprağı mı — `F3-010` lazy sınırı.
 
@@ -447,12 +462,24 @@ class DataExplorerDock(QDockWidget):
         return True
 
     def _apply_filter(self, text: str) -> None:
-        """Yaprakları süzer; altında görünen yaprak kalmayan grubu gizler."""
+        """Yaprakları ad, ID, birim ve kaynağa göre süzer — `F3-011`.
+
+        Kabul: her alan için bilinen eşleşme bulunur; temizleme (`text`
+        boş) tüm kanalları getirir — `needle` boşsa her yaprak eşleşir,
+        bu davranış aşağıda zaten korunur.
+        """
         needle = text.strip().casefold()
+        channel_by_id = {channel.id: channel for channel in self._channels}
 
         def prune(item: QTreeWidgetItem) -> bool:
             if item.childCount() == 0:
-                haystack = f"{item.text(0)} {item.toolTip(0)}".casefold()
+                channel_id = item.data(0, Qt.ItemDataRole.UserRole)
+                channel = channel_by_id.get(str(channel_id)) if channel_id else None
+                haystack = (
+                    _channel_search_haystack(channel)
+                    if channel is not None
+                    else f"{item.text(0)} {item.toolTip(0)}".casefold()
+                )
                 matches = not needle or needle in haystack
                 item.setHidden(not matches)
                 return matches

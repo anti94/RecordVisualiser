@@ -144,8 +144,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-007` | 20 dk | 6 dk 47 sn | `7bd5001` | dosya kapatma ve bağlı panel temizliğini ekle |
 | `F3-008` | 15 dk | 4 dk 17 sn | `f409f35` | son dosyalar ve varsayılan klasörü kaydet |
 | `F3-009` | 20 dk | 6 dk 11 sn | `a33d142` | dosya ve kanal ağaç modelini ekle |
+| `F3-010` | 20 dk | 6 dk 3 sn | `c3f9162` | kanal ağacında lazy yüklemeyi ekle |
 
-**126 commit · olculen toplam 1519 dk 26 sn · olculemeyen 1 (ilk commit)**
+**127 commit · olculen toplam 1525 dk 29 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
