@@ -28,6 +28,30 @@ if "QT_QPA_FONTDIR" not in os.environ and Path("C:/Windows/Fonts").is_dir():
     os.environ["QT_QPA_FONTDIR"] = "C:/Windows/Fonts"
 
 
+@pytest.fixture(autouse=True)
+def block_native_file_dialog(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Hiçbir testin **yerel dosya diyaloğu** açmasına izin vermez — `F3-001`.
+
+    `action_open` artık gerçek bir `QFileDialog` açıyor. Diyalog modal ve
+    kullanıcı girdisi beklediği için, onu tetikleyen bir test (örneğin
+    yalnız sinyalin yayıldığını doğrulayan `test_empty_state`) tüm paketi
+    süresiz kilitler. Bu bir kez yaşandı; ağ kalıcı olarak buraya kondu.
+
+    Yama "kullanıcı iptal etti" davranışı üretir: seçici hiçbir talep
+    yaymaz ve oturum korunur. Kendi diyaloğunu veren testler
+    (`tests/gui/test_file_open.py`) bundan etkilenmez.
+    """
+    if importlib.util.find_spec("PySide6") is None:
+        return
+
+    from sonar_analyzer.ui import file_open
+
+    def refuse(_parent: object, _start_directory: str) -> tuple[str, ...]:
+        return ()
+
+    monkeypatch.setattr(file_open, "_default_dialog", refuse)
+
+
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
     """PySide6 yoksa `gui` işaretli testleri atlar."""
     del config

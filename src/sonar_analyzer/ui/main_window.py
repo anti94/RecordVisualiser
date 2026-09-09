@@ -13,6 +13,7 @@ hâle gelmez.
 from __future__ import annotations
 
 from collections.abc import Sequence
+from pathlib import Path
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction
@@ -40,6 +41,7 @@ from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock
 from sonar_analyzer.ui.docks.playback import PlaybackDock
 from sonar_analyzer.ui.docks.right_column import RightColumnDock
 from sonar_analyzer.ui.empty_state import EmptyStatePanel
+from sonar_analyzer.ui.file_open import FileOpenController
 from sonar_analyzer.ui.plot_tool_bar import PlotToolBar
 from sonar_analyzer.ui.plots.dashboard import DashboardPanel
 from sonar_analyzer.ui.status_bar import AppStatusBar
@@ -73,6 +75,8 @@ class MainWindow(QMainWindow):
 
         self._channels: tuple[ChannelMetadata, ...] = ()
         self._repository: RecordingRepository | None = None
+        #: `F3-001` seçiminin sonucu; `F3-002`'nin worker'ı buradan okuyacak.
+        self.pending_load_paths: tuple[Path, ...] = ()
         self.actions_by_name: dict[str, QAction] = {}
         # Menulere Python tarafinda referans tutulmazsa PySide nesneyi serbest
         # birakiyor ve sonraki erisimde "C++ object already deleted" hatasi
@@ -103,6 +107,11 @@ class MainWindow(QMainWindow):
         self.left_dock.channel_activated.connect(self.open_channel)
         self.right_dock.bit_status.analysis_requested.connect(self.refresh_bit_analysis)
         self.action("action_load_simulation").triggered.connect(self.load_simulation)
+
+        # Dosya secici yalniz talep uretir; okuma F3-002'nin worker'ina baglanacak.
+        self.file_open = FileOpenController(self)
+        self.action("action_open").triggered.connect(self.request_open_files)
+        self.file_open.load_requested.connect(self._on_load_requested)
 
         self.status = AppStatusBar(self)
         self.setStatusBar(self.status)
@@ -187,6 +196,26 @@ class MainWindow(QMainWindow):
         """Sahte kaydı açar; veri kaynağı `Simülasyon` olarak görünür."""
         repository = MockRecordingRepository()
         self.set_repository(repository)
+
+    def request_open_files(self) -> tuple[Path, ...]:
+        """Dosya seçicisini açar — `F3-001`.
+
+        İptal edilirse hiçbir şey değişmez: açık kayıt, paneller ve merkezdeki
+        görünüm olduğu gibi kalır (kabul kriteri).
+        """
+        return self.file_open.request_open(self)
+
+    def _on_load_requested(self, paths: Sequence[str]) -> None:
+        """Seçim talebini kaydeder ve log'a yazar.
+
+        Gerçek yükleme `F3-002`'nin worker'ına bağlanacak; bu iş yalnız
+        seçicinin talebi doğru ürettiğini garanti eder. Talep burada
+        biriktirilir ki worker geldiğinde ekran akışı değişmesin.
+        """
+        self.pending_load_paths = tuple(Path(path) for path in paths)
+        count = len(self.pending_load_paths)
+        names = ", ".join(path.name for path in self.pending_load_paths)
+        self.bottom_dock.append_log(f"Yukleme talebi: {count} dosya ({names}).")
 
     def set_repository(self, repository: RecordingRepository) -> None:
         """Bir veri kaynağını açar ve panellere dağıtır."""

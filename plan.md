@@ -1468,7 +1468,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `F3-001` | `0.103.0` | 15 dk | Tekli ve çoklu dosya açma seçicisini bağla | İptal mevcut oturumu korur; seçim dosya yükleme talebi üretir | `F2-041` | `feat(ui): F3-001 tekli ve çoklu dosya açma seçicisini bağla` |
+| [x] | `F3-001` | `0.103.0` | 15 dk | Tekli ve çoklu dosya açma seçicisini bağla | İptal mevcut oturumu korur; seçim dosya yükleme talebi üretir | `F2-041` | `feat(ui): F3-001 tekli ve çoklu dosya açma seçicisini bağla` |
 | [ ] | `F3-002` | `0.104.0` | 20 dk | Dosya yükleme worker'ını ekle | Yükleme sırasında pencere etkileşimlere yanıt verir | `F3-001` | `feat(app): F3-002 dosya yükleme worker'ını ekle` |
 | [ ] | `F3-003` | `0.105.0` | 20 dk | Yükleme ilerlemesi ve iptal eylemini ekle | İptal worker'a ulaşır; yarım kayıt açık dosya listesine girmez | `F3-002` | `feat(ui): F3-003 yükleme ilerlemesi ve iptal eylemini ekle` |
 | [ ] | `F3-004` | `0.106.0` | 20 dk | Eski istek sonucunun görünümü ezmesini önle | Hızlı iki açma isteğinde yalnız güncel sonuç uygulanır | `F3-003` | `fix(app): F3-004 eski istek sonucunun görünümü ezmesini önle` |
