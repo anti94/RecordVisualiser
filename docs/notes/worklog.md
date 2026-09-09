@@ -110,8 +110,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F2-015` | 20 dk | 3 dk 10 sn | `cadcb56` | bilinmeyen paket teşhisini ekle |
 | `F2-016` | 20 dk | 4 dk 30 sn | `01ffa02` | 32/64 byte örnek fixture yazıcısını ekle |
 | `F2-017` | 20 dk | 4 dk 18 sn | `be5e96c` | kesik, bozuk ve sıra boşluklu fixture'ları ekle |
+| `F2-018` | 20 dk | 4 dk 18 sn | `2ec1560` | CRC destekli format fixture'ını ekle |
 
-**92 commit · olculen toplam 1292 dk 49 sn · olculemeyen 1 (ilk commit)**
+**93 commit · olculen toplam 1297 dk 7 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
