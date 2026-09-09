@@ -19,6 +19,7 @@ import numpy as np
 from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.data_chunk import DataChunk, Quality
 from sonar_analyzer.domain.event import BitResult, Event
+from sonar_analyzer.domain.raw_record import RawRecordInspection
 from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.domain.transmission import TransmissionInterval
@@ -196,6 +197,47 @@ class FileRecordingRepository:
             self._event_data = scan_recording_events(data, header)
             self._event_times = tuple(item.timestamp_ns for item in self._event_data.events)
         return self._event_data
+
+    def inspect_record(self, byte_offset: int) -> RawRecordInspection:
+        """Kaynak offsetteki tam kaydı ham byte ve alanlarla döndürür — F2-037."""
+        data, header = self._require_open()
+        if (
+            byte_offset < header.header_size
+            or (byte_offset - header.header_size) % header.record_size
+            or byte_offset + header.record_size > len(data)
+        ):
+            raise ValueError(f"Tam kayit siniri olmayan offset: {byte_offset}")
+        record = read_data_record_v1(data, byte_offset)
+        raw = data[byte_offset : byte_offset + header.record_size]
+        quality = Quality.OK if record.name.startswith(b"Data") else Quality.SUSPECT
+        timestamp = header.start_time_utc_ns + record.elapsed_us * 1000
+        if timestamp > MAX_TIMESTAMP_NS - header.period_us * 1000:
+            quality |= Quality.SUSPECT
+        fields = [
+            ("name", record.name.rstrip(bytes(1)).decode("ascii", errors="replace")),
+            ("sequence_no", str(record.sequence_no)),
+            ("elapsed_us", str(record.elapsed_us)),
+            ("bit_status", str(record.bit_status)),
+            ("tx_status", str(record.tx_status)),
+        ]
+        fields.extend(
+            (f"CH{index}", str(value)) for index, value in enumerate(record.sensor_values)
+        )
+        if header.version == 2:
+            crc_record = read_data_record_v2(data, byte_offset)
+            fields.append(("record_crc32", f"0x{crc_record.record_crc32:08X}"))
+            if check_record_crc(crc_record, raw[:64], byte_offset) is not None:
+                quality |= Quality.CRC_ERROR
+        metadata = self.metadata()
+        return RawRecordInspection(
+            metadata.recording_id,
+            metadata.source_path,
+            byte_offset,
+            raw,
+            timestamp if timestamp <= MAX_TIMESTAMP_NS - header.period_us * 1000 else None,
+            tuple(fields),
+            quality,
+        )
 
     def events(
         self, time_range: TimeRange, filters: EventFilter | None = None
