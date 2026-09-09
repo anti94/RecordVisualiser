@@ -94,10 +94,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/setup-dev.ps1 -WithGui
 
 Doğrudan giriş noktası: `.venv\Scripts\python.exe -m sonar_analyzer`.
 
-Mevcut geliştirme sürümünde **Tools → Load Simulation Data** (`Ctrl+Shift+S`) ile
-örnek kanalları yükleyip bir kanala çift tıklayarak grafiği açabilirsiniz. `.bin`
-okuyucu geliştirmesi sürüyor; **Open .bin File** düğmesinin okuyucuya bağlantısı
-henüz tamamlanmadı.
+**Open .bin File** (`Ctrl+O`) ile gerçek bir kayıt açabilirsiniz; birden fazla
+dosya seçilebilir. Yükleme arka planda çalışır, alt şeritte ilerleme ve iptal
+görünür. Denemek için depodaki `tests/fixtures/valid_8records.bin` kullanılabilir.
+**Tools → Load Simulation Data** (`Ctrl+Shift+S`) ise dosyasız sahte veri yükler.
+Her iki durumda da bir kanala çift tıklayarak grafiği açabilirsiniz.
 
 ### Testler
 

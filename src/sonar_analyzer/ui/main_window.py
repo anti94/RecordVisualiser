@@ -34,6 +34,7 @@ from sonar_analyzer.application.file_loader import (
 )
 from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.recording import RecordingMetadata
+from sonar_analyzer.repository.file_repository import FileRecordingRepository
 from sonar_analyzer.repository.mock_repository import SIMULATION_LABEL, MockRecordingRepository
 from sonar_analyzer.repository.protocol import RecordingRepository
 from sonar_analyzer.ui.actions import (
@@ -88,6 +89,8 @@ class MainWindow(QMainWindow):
         self.loaded_results: tuple[FileLoadResult, ...] = ()
         self.failed_results: tuple[FileLoadResult, ...] = ()
         self.active_load_request_id = 0
+        #: Ekrana uygulanmış, MainWindow'un sahibi olduğu snapshot'lar.
+        self._owned_repositories: tuple[FileRecordingRepository, ...] = ()
         self.actions_by_name: dict[str, QAction] = {}
         # Menulere Python tarafinda referans tutulmazsa PySide nesneyi serbest
         # birakiyor ve sonraki erisimde "C++ object already deleted" hatasi
@@ -338,10 +341,48 @@ class MainWindow(QMainWindow):
         self.status.finish_load_progress(CANCELLED_TEXT if cancelled else READY_TEXT)
         if request_id == self.active_load_request_id:
             self.active_load_request_id = 0
+            if not cancelled:
+                self._apply_loaded_results(request_id)
+
+    def _apply_loaded_results(self, request_id: int) -> None:
+        """Yüklenen kaydı repository'ye ve ekrana bağlar — `F3-005`.
+
+        Çok dosyalı seçimde **ilk** başarılı kayıt etkin görünüm olur
+        (seçim sırası `F3-001`'de korunuyor); diğerleri açık kalır ve
+        log'da bildirilir. Önceki açma isteğinden kalan snapshot'lar
+        kapatılır — pencere yalnız gösterdiği kaydın sahibidir.
+        """
+        applied = [
+            result
+            for result in self.loaded_results
+            if result.request_id == request_id and result.repository is not None
+        ]
+        if not applied:
+            if self.failed_results:
+                self.bottom_dock.append_log("Acilabilen dosya yok; gorunum degismedi.")
+            return
+
+        primary = applied[0]
+        assert primary.repository is not None
+        self._close_owned_repositories()
+        self._owned_repositories = tuple(
+            result.repository for result in applied if result.repository is not None
+        )
+        self.set_repository(primary.repository)
+        self.bottom_dock.append_log(f"Goruntulenen kayit: {primary.path.name}")
+        if len(applied) > 1:
+            others = ", ".join(result.path.name for result in applied[1:])
+            self.bottom_dock.append_log(f"Ayrica acik: {others}")
+
+    def _close_owned_repositories(self) -> None:
+        for repository in self._owned_repositories:
+            repository.close()
+        self._owned_repositories = ()
 
     def closeEvent(self, event: QCloseEvent) -> None:
-        """Pencere kapanırken worker thread'i düzgün durdurulur."""
+        """Pencere kapanırken worker thread'i ve açık snapshot'lar bırakılır."""
         self.file_loader.shutdown()
+        self._close_owned_repositories()
         super().closeEvent(event)
 
     def set_repository(self, repository: RecordingRepository) -> None:
