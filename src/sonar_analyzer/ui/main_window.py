@@ -27,7 +27,11 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from sonar_analyzer.application.file_loader import FileLoadResult, FileLoadService
+from sonar_analyzer.application.file_loader import (
+    FileLoadResult,
+    FileLoadService,
+    LoaderCallable,
+)
 from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.repository.mock_repository import SIMULATION_LABEL, MockRecordingRepository
@@ -45,7 +49,7 @@ from sonar_analyzer.ui.empty_state import EmptyStatePanel
 from sonar_analyzer.ui.file_open import FileOpenController
 from sonar_analyzer.ui.plot_tool_bar import PlotToolBar
 from sonar_analyzer.ui.plots.dashboard import DashboardPanel
-from sonar_analyzer.ui.status_bar import AppStatusBar
+from sonar_analyzer.ui.status_bar import CANCELLED_TEXT, READY_TEXT, AppStatusBar
 from sonar_analyzer.ui.theme import apply_theme
 from sonar_analyzer.ui.view_tab_bar import ViewTabBar
 
@@ -67,7 +71,9 @@ RIGHT_DOCK_TITLE = "BIT / Analysis / Export"
 class MainWindow(QMainWindow):
     """Uygulamanın ana penceresi: üç sütunlu mockup düzeni."""
 
-    def __init__(self) -> None:
+    def __init__(self, *, loader: LoaderCallable | None = None) -> None:
+        """`loader`: dosya açma çağrısını değiştirir (testler ve ileride
+        farklı kaynak türleri için); verilmezse gerçek `.bin` okuyucu."""
         super().__init__()
         self.setWindowTitle(WINDOW_TITLE)
         self.resize(*DEFAULT_WINDOW_SIZE)
@@ -115,15 +121,17 @@ class MainWindow(QMainWindow):
 
         # Dosya secici yalniz talep uretir; okuma worker thread'inde yapilir.
         self.file_open = FileOpenController(self)
-        self.file_loader = FileLoadService(self)
+        self.file_loader = FileLoadService(self, loader=loader)
         self.action("action_open").triggered.connect(self.request_open_files)
         self.file_open.load_requested.connect(self._on_load_requested)
         self.file_loader.file_loaded.connect(self._on_file_loaded)
         self.file_loader.request_finished.connect(self._on_load_finished)
+        self.file_loader.progress.connect(self._on_load_progress)
 
         self.status = AppStatusBar(self)
         self.setStatusBar(self.status)
         self.status.update_memory()
+        self.status.cancel_requested.connect(self.cancel_active_load)
 
         self.playback_dock.position_changed.connect(self.status.set_cursor_time)
 
@@ -223,7 +231,49 @@ class MainWindow(QMainWindow):
         count = len(self.pending_load_paths)
         names = ", ".join(path.name for path in self.pending_load_paths)
         self.bottom_dock.append_log(f"Yukleme talebi: {count} dosya ({names}).")
+        self.status.start_load_progress(count)
         self.active_load_request_id = self.file_loader.submit(self.pending_load_paths)
+
+    def cancel_active_load(self) -> None:
+        """Süren yüklemeyi iptal eder — `F3-003`.
+
+        **İptal tüm isteği bırakır.** İptal bayrağı worker'ın paylaşılan
+        durumuna yazılır (worker sıradaki dosyaya geçmeden görür) ve o isteğe
+        ait **zaten tamamlanmış** sonuçlar da geri alınır: açık dosya
+        listesinden çıkarılır, snapshot'ları kapatılır.
+
+        Neden yarısını tutmuyoruz: kullanıcı çok dosyalı bir açmayı iptal
+        ettiğinde "5 dosyadan 2'si açık kaldı" durumu, tamamlanmamış bir
+        işlemi tamamlanmış gibi gösterir. Kabul kriteri de bunu yasaklıyor
+        ("yarım kayıt açık dosya listesine girmez"). İptal ya hepsi ya
+        hiçbiri demektir; kullanıcı isterse yeniden açar.
+        """
+        request_id = self.active_load_request_id
+        if not request_id:
+            return
+        self.file_loader.cancel(request_id)
+        self._discard_results_of(request_id)
+        self.bottom_dock.append_log(f"Yukleme iptal edildi (#{request_id}).")
+        self.status.cancel_button.setEnabled(False)
+
+    def _discard_results_of(self, request_id: int) -> None:
+        """İptal edilen isteğin tamamlanmış sonuçlarını geri alır."""
+        kept: list[FileLoadResult] = []
+        for result in self.loaded_results:
+            if result.request_id == request_id:
+                if result.repository is not None:
+                    result.repository.close()
+                continue
+            kept.append(result)
+        self.loaded_results = tuple(kept)
+        self.failed_results = tuple(
+            result for result in self.failed_results if result.request_id != request_id
+        )
+
+    def _on_load_progress(self, request_id: int, completed: int, total: int) -> None:
+        if request_id != self.active_load_request_id:
+            return
+        self.status.set_load_progress(completed, total)
 
     def _on_file_loaded(self, result: FileLoadResult) -> None:
         """Worker'dan gelen tek dosya sonucunu kaydeder ve log'a yazar.
@@ -231,6 +281,14 @@ class MainWindow(QMainWindow):
         Sonucun repository'ye ve ekrana bağlanması `F3-005`'in işi; burada
         yalnız sonucun GUI thread'ine ulaştığı garanti edilir.
         """
+        if self.file_loader.is_cancelled(result.request_id):
+            # Iptal edilen istegin YARIM kalan sonucu acik dosya listesine
+            # girmez (kabul kriteri). Worker o dosyayi zaten acmis olabilir;
+            # snapshot'i birakiyoruz ki acik kaynak sizmasin.
+            if result.repository is not None:
+                result.repository.close()
+            self.bottom_dock.append_log(f"Iptal edildi, alinmadi: {result.path.name}")
+            return
         if result.succeeded:
             self.loaded_results = (*self.loaded_results, result)
             self.bottom_dock.append_log(f"Yuklendi: {result.path.name}")
@@ -241,6 +299,10 @@ class MainWindow(QMainWindow):
         )
 
     def _on_load_finished(self, request_id: int) -> None:
+        cancelled = self.file_loader.is_cancelled(request_id)
+        self.status.finish_load_progress(CANCELLED_TEXT if cancelled else READY_TEXT)
+        if request_id == self.active_load_request_id:
+            self.active_load_request_id = 0
         self.bottom_dock.append_log(f"Yukleme istegi bitti (#{request_id}).")
 
     def closeEvent(self, event: QCloseEvent) -> None:

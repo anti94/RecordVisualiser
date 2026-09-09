@@ -16,10 +16,19 @@ import ctypes
 import sys
 from dataclasses import dataclass
 
-from PySide6.QtWidgets import QLabel, QProgressBar, QStatusBar, QWidget
+from PySide6.QtCore import Signal
+from PySide6.QtWidgets import (
+    QLabel,
+    QProgressBar,
+    QPushButton,
+    QStatusBar,
+    QWidget,
+)
 
 EMPTY_VALUE = "—"
 READY_TEXT = "Ready"
+LOADING_TEXT = "Loading..."
+CANCELLED_TEXT = "Yukleme iptal edildi"
 
 #: (alan adi, ontanimli metin) — soldan saga.
 FIELD_SPECS: tuple[tuple[str, str], ...] = (
@@ -120,6 +129,9 @@ def read_memory_usage() -> MemoryUsage | None:
 class AppStatusBar(QStatusBar):
     """Mockup alt şeridi."""
 
+    #: Kullanıcı yükleme iptalini istedi (`F3-003`).
+    cancel_requested = Signal()
+
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.setObjectName("status_bar")
@@ -142,6 +154,22 @@ class AppStatusBar(QStatusBar):
         self.memory_bar.setTextVisible(False)
         self.memory_bar.setFixedWidth(80)
         self.addPermanentWidget(self.memory_bar)
+
+        # Yukleme ilerlemesi ve iptali (F3-003). Bosta gizlidir; yalniz bir
+        # istek surerken gorunur, boylece alt serit normalde kalabalasmaz.
+        self.load_bar = QProgressBar(self)
+        self.load_bar.setObjectName("status_load_bar")
+        self.load_bar.setRange(0, 100)
+        self.load_bar.setValue(0)
+        self.load_bar.setFixedWidth(120)
+        self.load_bar.hide()
+        self.addPermanentWidget(self.load_bar)
+
+        self.cancel_button = QPushButton("Iptal", self)
+        self.cancel_button.setObjectName("button_cancel_load")
+        self.cancel_button.hide()
+        self.cancel_button.clicked.connect(self.cancel_requested)
+        self.addPermanentWidget(self.cancel_button)
 
     # -- alanlar ---------------------------------------------------------
 
@@ -171,6 +199,33 @@ class AppStatusBar(QStatusBar):
     def set_cursor_time(self, seconds: float | None) -> None:
         """İmlecin bulunduğu an; `None` ise alan boşalır."""
         self.set_field("cursor", EMPTY_VALUE if seconds is None else f"t = {seconds:.3f} s")
+
+    # -- yukleme ilerlemesi (F3-003) --------------------------------------
+
+    def start_load_progress(self, total: int) -> None:
+        """İlerleme çubuğunu ve iptal düğmesini görünür yapar."""
+        self.load_bar.setRange(0, max(1, total))
+        self.load_bar.setValue(0)
+        self.load_bar.setFormat(f"0/{total}")
+        self.load_bar.show()
+        self.cancel_button.setEnabled(True)
+        self.cancel_button.show()
+        self.set_status(LOADING_TEXT)
+
+    def set_load_progress(self, completed: int, total: int) -> None:
+        self.load_bar.setRange(0, max(1, total))
+        self.load_bar.setValue(completed)
+        self.load_bar.setFormat(f"{completed}/{total}")
+
+    def finish_load_progress(self, status_text: str = READY_TEXT) -> None:
+        """Yükleme bitti ya da iptal edildi: gösterge gizlenir."""
+        self.load_bar.hide()
+        self.cancel_button.hide()
+        self.set_status(status_text)
+
+    @property
+    def load_in_progress(self) -> bool:
+        return self.load_bar.isVisible()
 
     def update_memory(self, usage: MemoryUsage | None = None) -> None:
         """Bellek göstergesini tazeler."""

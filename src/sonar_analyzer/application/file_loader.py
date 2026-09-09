@@ -92,6 +92,8 @@ class FileLoadWorker(QObject):
 
     file_loaded = Signal(object)
     request_finished = Signal(int)
+    #: (request_id, tamamlanan, toplam) — ilerleme gostergesi icin (`F3-003`).
+    progress = Signal(int, int, int)
 
     def __init__(self, loader: LoaderCallable, state: _WorkerState) -> None:
         super().__init__()
@@ -105,7 +107,9 @@ class FileLoadWorker(QObject):
         §0 fail-soft ilkesinin GUI karşılığı): hatalı dosya `error` ile
         raporlanır, kalanlar yüklenmeye devam eder.
         """
-        for path in request.paths:
+        total = len(request.paths)
+        self.progress.emit(request.request_id, 0, total)
+        for index, path in enumerate(request.paths):
             if request.request_id in self._state.cancelled_requests:
                 break
             try:
@@ -119,10 +123,12 @@ class FileLoadWorker(QObject):
                         error_type=type(exc).__name__,
                     )
                 )
+                self.progress.emit(request.request_id, index + 1, total)
                 continue
             self.file_loaded.emit(
                 FileLoadResult(request_id=request.request_id, path=path, repository=repository)
             )
+            self.progress.emit(request.request_id, index + 1, total)
         self.request_finished.emit(request.request_id)
 
 
@@ -135,6 +141,10 @@ class FileLoadService(QObject):
     request_finished = Signal(int)
     #: Yeni bir istek başlatıldı (`request_id`) — ilerleme göstergesi için.
     request_started = Signal(int)
+    #: (request_id, tamamlanan, toplam) ilerleme (`F3-003`).
+    progress = Signal(int, int, int)
+    #: İstek iptal edildi (`request_id`).
+    request_cancelled = Signal(int)
 
     _submit_requested = Signal(object)
 
@@ -159,6 +169,7 @@ class FileLoadService(QObject):
         self._submit_requested.connect(self._worker.load)
         self._worker.file_loaded.connect(self.file_loaded)
         self._worker.request_finished.connect(self._on_worker_finished)
+        self._worker.progress.connect(self.progress)
         # Thread BURADA baslatilmaz; bkz. `submit()` ve sinif docstring'i.
 
     @property
@@ -194,8 +205,18 @@ class FileLoadService(QObject):
             self.shutdown()
 
     def cancel(self, request_id: int) -> None:
-        """İsteği iptal eder; worker sıradaki dosyaya geçmeden durur (`F3-003`)."""
+        """İsteği iptal eder; worker sıradaki dosyaya geçmeden durur (`F3-003`).
+
+        İptal bayrağı worker ile **paylaşılan** durumda tutulur, kuyruğa
+        alınmış bir sinyalle değil: worker o sırada bir dosyayı okuyor olsa
+        bile, sıradaki dosyaya geçmeden önce bayrağı görür. Sinyalle
+        gönderilseydi worker meşgulken kuyrukta bekler ve iptal ancak tüm
+        istek bittikten sonra işlenirdi — yani hiç işlenmezdi.
+        """
+        if request_id <= 0:
+            return
         self._state.cancelled_requests.add(request_id)
+        self.request_cancelled.emit(request_id)
 
     def is_cancelled(self, request_id: int) -> bool:
         return request_id in self._state.cancelled_requests

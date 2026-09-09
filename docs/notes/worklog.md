@@ -136,8 +136,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F2-040` | 20 dk | 2 dk 43 sn | `80823d0` | kaynak dosyanın değişmediğini doğrula |
 | `F2-041` | 15 dk | 8 dk 41 sn | `51aea02` | parser milestone kabulünü kaydet |
 | `F3-001` | 15 dk | 14 dk 30 sn | `017bb27` | tekli ve çoklu dosya açma seçicisini bağla |
+| `F3-002` | 20 dk | 11 dk 52 sn | `b20fdcb` | dosya yükleme worker'ını ekle |
 
-**118 commit · olculen toplam 1473 dk 52 sn · olculemeyen 1 (ilk commit)**
+**119 commit · olculen toplam 1485 dk 44 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
