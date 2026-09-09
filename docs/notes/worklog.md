@@ -111,8 +111,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F2-016` | 20 dk | 4 dk 30 sn | `01ffa02` | 32/64 byte örnek fixture yazıcısını ekle |
 | `F2-017` | 20 dk | 4 dk 18 sn | `be5e96c` | kesik, bozuk ve sıra boşluklu fixture'ları ekle |
 | `F2-018` | 20 dk | 4 dk 18 sn | `2ec1560` | CRC destekli format fixture'ını ekle |
+| `F2-019` | 20 dk | 2 dk 22 sn | `8be2bbe` | sensör alanlarını kanal metadata'sına eşleştir |
 
-**93 commit · olculen toplam 1297 dk 7 sn · olculemeyen 1 (ilk commit)**
+**94 commit · olculen toplam 1299 dk 29 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
