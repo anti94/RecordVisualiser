@@ -13,7 +13,7 @@ kanal listesi üretilmez; bunun yerine boş durum metni görünür (plan Bölüm
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from datetime import datetime, timezone
 
 from PySide6.QtCore import Qt, Signal
@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
     QDockWidget,
     QFormLayout,
     QGroupBox,
+    QHBoxLayout,
     QHeaderView,
     QLabel,
     QLineEdit,
@@ -58,6 +59,43 @@ SUMMARY_FIELDS = ("File", "Size", "Start", "Duration", "Platform")
 #: grup "Vehicle / Transmission" yaziyor; yolda "Vehicle" tutulur ve gosterim
 #: etiketi burada eslenir.
 GROUP_LABELS = {"Vehicle": "Vehicle / Transmission"}
+
+#: `F3-012` kategori filtresi düğmeleri — mockup'taki beş grup (plan Bölüm 5.2).
+CATEGORIES: tuple[str, ...] = (
+    "Sensors",
+    "Acoustic",
+    "Navigation",
+    "Vehicle/Transmission",
+    "BIT",
+)
+
+#: Düğme etiketinden ağaçtaki GERÇEK üst düzey etikete (`GROUP_LABELS` çevirisi
+#: sonrası). `BIT` hiçbir gerçek düğüme karşılık gelmez — bkz. `_build_category_filter`.
+_CATEGORY_TO_GROUP_LABEL = {
+    "Sensors": "Sensors",
+    "Acoustic": "Acoustic",
+    "Navigation": "Navigation",
+    "Vehicle/Transmission": "Vehicle / Transmission",
+    "BIT": "BIT",
+}
+
+#: Düğme üzerinde gösterilen KISA metin; tam ad `toolTip`'tedir. Dar sol
+#: sütuna (200 px) beş tam kelimeli düğme sığmıyordu — bkz. `_build_category_filter`.
+_CATEGORY_BUTTON_TEXT = {
+    "Sensors": "Sens",
+    "Acoustic": "Aco",
+    "Navigation": "Nav",
+    "Vehicle/Transmission": "V/T",
+    "BIT": "BIT",
+}
+
+#: Her kategori düğmesinin sabit genişliği (piksel); üç düğme bir satırda
+#: (3 × 46 + boşluklar) 200 px sütuna sığar.
+_CATEGORY_BUTTON_WIDTH = 46
+
+
+def _category_slug(category: str) -> str:
+    return category.lower().replace("/", "_")
 
 
 def _channel_search_haystack(channel: ChannelMetadata) -> str:
@@ -140,6 +178,10 @@ class DataExplorerDock(QDockWidget):
         self._recording_tree: tuple[RecordingTreeNode, ...] = ()
         #: Genisletilmemis sensor grubu -> henuz eklenmemis kanal dugumleri (F3-010).
         self._pending_children: dict[int, tuple[RecordingTreeNode, ...]] = {}
+        #: Kapali kategoriler — agactaki GERCEK ust duzey etiket (F3-012).
+        #: Bos = hicbiri kapali degil, hepsi gorunur.
+        self._disabled_group_labels: set[str] = set()
+        self.category_buttons: dict[str, QPushButton] = {}
 
         self.setWidget(self._build_body())
         self.clear()
@@ -158,6 +200,7 @@ class DataExplorerDock(QDockWidget):
         layout.addWidget(self.open_button)
 
         layout.addWidget(self._build_summary(body))
+        layout.addWidget(self._build_category_filter(body))
 
         self.tabs = QTabWidget(body)
         self.tabs.setObjectName("tabs_data_explorer")
@@ -166,6 +209,49 @@ class DataExplorerDock(QDockWidget):
         layout.addWidget(self.tabs, 1)
 
         return body
+
+    def _build_category_filter(self, parent: QWidget) -> QWidget:
+        """Kategori seçim düğmeleri — `F3-012`.
+
+        Her iki sekmeyi de (Channels ve Data Tree) birlikte süzer: bir
+        kategori kapatılınca o kategorinin üst düzey düğümü **her iki**
+        ağaçta da gizlenir. `BIT` düğmesi şimdilik ağaçta karşılığı
+        olmayan tek kategoridir (BIT, `ChannelMetadata` tabanlı bir kanal
+        değildir — sağ paneldeki ayrı BIT Status kartından gelir, plan
+        Bölüm 5.2/`F1-035`); yine de **etkin bir kontrol** olarak
+        sunulur ve tıklanabilir — yalnızca eşleşen bir düğüm olmadığı
+        için görünür bir etkisi yoktur, uydurma bir BIT düğümü icat
+        edilmez.
+
+        Düğmeler **kısaltılmış** metinle (tam ad `toolTip`'te) ve **sabit
+        dar genişlikle** iki satıra bölünmüş kurulur: sol sütun 200 px
+        (`LEFT_COLUMN_WIDTH`), beş tam kelimeli düğme tek satırda bu
+        sınırı büyük farkla aşardı (`button_open_bin`'in `F1-034`'teki
+        aynı sorunuyla aynı neden — bkz. `theme.py` yorumu).
+        """
+        container = QWidget(parent)
+        outer = QVBoxLayout(container)
+        outer.setContentsMargins(0, 0, 0, 0)
+        outer.setSpacing(2)
+
+        rows = (CATEGORIES[:3], CATEGORIES[3:])
+        for row_categories in rows:
+            row = QHBoxLayout()
+            row.setSpacing(2)
+            for category in row_categories:
+                button = QPushButton(_CATEGORY_BUTTON_TEXT[category], container)
+                button.setObjectName(f"button_category_{_category_slug(category)}")
+                button.setToolTip(category)
+                button.setCheckable(True)
+                button.setChecked(True)
+                button.setFixedWidth(_CATEGORY_BUTTON_WIDTH)
+                button.toggled.connect(self._make_category_toggle_handler(category))
+                self.category_buttons[category] = button
+                row.addWidget(button)
+            row.addStretch(1)
+            outer.addLayout(row)
+
+        return container
 
     def _build_summary(self, parent: QWidget) -> QWidget:
         container = QGroupBox("Recording", parent)
@@ -297,6 +383,7 @@ class DataExplorerDock(QDockWidget):
             item = self._add_lazy_node(None, recording_node)
             item.setExpanded(True)
         self.data_tree_empty_hint.setVisible(not recordings)
+        self._apply_category_filter_to_data_tree()
 
     def _add_lazy_node(
         self, parent: QTreeWidgetItem | None, node: RecordingTreeNode
@@ -494,8 +581,14 @@ class DataExplorerDock(QDockWidget):
 
         for index in range(self.tree.topLevelItemCount()):
             top = self.tree.topLevelItem(index)
-            if top is not None:
-                prune(top)
+            if top is None:
+                continue
+            if top.text(0) in self._disabled_group_labels:
+                # F3-012: kapali kategori tum alt agaciyla gizlenir, metin
+                # eslesmesi hic hesaplanmaz.
+                top.setHidden(True)
+                continue
+            prune(top)
 
         if self._channels:
             nothing_found = not self.visible_channel_ids()
@@ -515,3 +608,59 @@ class DataExplorerDock(QDockWidget):
         channel_id = item.data(0, Qt.ItemDataRole.UserRole)
         if channel_id:
             self.channel_activated.emit(str(channel_id))
+
+    # -- kategori filtreleri (F3-012) -------------------------------------
+
+    def _make_category_toggle_handler(self, category: str) -> Callable[[bool], None]:
+        """`category` değerini kapatan tam tipli bir geri çağrı üretir.
+
+        `lambda checked, name=category: ...` yerine — pyright, PySide
+        sinyalinin taslağında parametre tipini çıkaramadığı için lambda'yı
+        `Unknown` sayardı; bu fabrika `bool -> None` imzasını açıkça verir.
+        """
+
+        def handler(checked: bool) -> None:
+            self._on_category_toggled(category, checked=checked)
+
+        return handler
+
+    def _on_category_toggled(self, category: str, checked: bool) -> None:
+        """Bir kategori düğmesi değiştiğinde her iki ağacı da yeniden süzer.
+
+        `BIT` için `_CATEGORY_TO_GROUP_LABEL` hiçbir gerçek düğüme karşılık
+        gelmez; bu yüzden bu kategori değiştiğinde ağaçlarda gözle görülür
+        bir değişiklik olmaz — düğme yine de doğru şekilde işaretlenir/
+        işareti kaldırılır (kabul: "BIT seçimleri doğru çalışır").
+        """
+        group_label = _CATEGORY_TO_GROUP_LABEL[category]
+        if checked:
+            self._disabled_group_labels.discard(group_label)
+        else:
+            self._disabled_group_labels.add(group_label)
+        self._apply_filter(self.search.text())
+        self._apply_category_filter_to_data_tree()
+
+    def _apply_category_filter_to_data_tree(self) -> None:
+        """ "Data Tree" sekmesinde kapalı kategorilerin düğümlerini gizler.
+
+        Kayıt/cihaz düğümleri gerçek bir kategori adıyla asla eşleşmediği
+        için (dosya adı, cihaz kimliği) yalnızca sensör grubu düzeyi
+        etkilenir; lazy yükleme (`F3-010`) bundan bağımsızdır — gizlemek
+        henüz materyalize edilmemiş bir grubu genişletmez.
+        """
+
+        def walk(item: QTreeWidgetItem) -> None:
+            item.setHidden(item.text(0) in self._disabled_group_labels)
+            for index in range(item.childCount()):
+                child = item.child(index)
+                if child is not None:
+                    walk(child)
+
+        for index in range(self.data_tree.topLevelItemCount()):
+            top = self.data_tree.topLevelItem(index)
+            if top is not None:
+                walk(top)
+
+    def enabled_categories(self) -> set[str]:
+        """Şu anda seçili (görünür) kategori adları — testler için."""
+        return {category for category in CATEGORIES if self.category_buttons[category].isChecked()}
