@@ -132,8 +132,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F2-037` | 15 dk | 34 sn | `ae0ee1e` | decoded öğeden ham offsete erişim ekle |
 | `F2-038` | 15 dk | 15 dk 32 sn | `e072e74` | okuyucu kaynaklarını güvenli kapat |
 | `-` | — | 33 sn | `d300caf` | uygulama başlatma betiği ve çalıştırma bölümü ekle |
+| `F2-039` | 20 dk | 3 dk 31 sn | `03d0460` | bağımsız golden sonuçlarını parser ile karşılaştır |
 
-**114 commit · olculen toplam 1444 dk 27 sn · olculemeyen 1 (ilk commit)**
+**115 commit · olculen toplam 1447 dk 58 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
