@@ -107,8 +107,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F2-012` | 20 dk | 3 dk 44 sn | `74088ab` | sürüme göre decoder seçimini ekle |
 | `F2-013` | 20 dk | 2 dk 25 sn | `a172271` | kararlaştırılmış CRC hesaplamasını ekle |
 | `F2-014` | 20 dk | 2 dk 31 sn | `ded1933` | CRC alanlı format doğrulamasını bağla |
+| `F2-015` | 20 dk | 3 dk 10 sn | `cadcb56` | bilinmeyen paket teşhisini ekle |
 
-**89 commit · olculen toplam 1280 dk 51 sn · olculemeyen 1 (ilk commit)**
+**90 commit · olculen toplam 1284 dk 1 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
