@@ -4,9 +4,9 @@
 > Bir işi tamamlayınca `plan.md`'deki kutuyu `[x]` yap ve
 > `python tools/sync_todo.py` çalıştır.
 
-**Toplam 492 madde · 87 tamamlandı · 405 kaldı**
+**Toplam 492 madde · 88 tamamlandı · 404 kaldı**
 
-`[####....................]` %17.7
+`[####....................]` %17.9
 
 ## Özet
 
@@ -14,13 +14,13 @@
 | --- | --- | --- | --- |
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
-| Faz 2 — Parser, indeks ve kayıtlı veri | 26 | 15 | 41 |
+| Faz 2 — Parser, indeks ve kayıtlı veri | 27 | 14 | 41 |
 | Faz 3 — MVP analiz arayüzü | 0 | 80 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **87** | **405** | **492** |
+| **Toplam** | **88** | **404** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -95,7 +95,7 @@
 | [x] | `F1-043` | `0.60.0` | 20 dk | İlk spike sonuçlarını ve darboğazı kaydet |
 | [x] | `F1-044` | `0.61.0` | 15 dk | Uygulama iskeleti milestone kontrolünü yap |
 
-### Faz 2 — Parser, indeks ve kayıtlı veri (26/41)
+### Faz 2 — Parser, indeks ve kayıtlı veri (27/41)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -125,7 +125,7 @@
 | [x] | `F2-024` | `0.85.0` | 15 dk | Parser teşhislerini sistem olaylarına çevir |
 | [x] | `F2-025` | `0.86.0` | 20 dk | Cihaz tick dönüşüm adaptörünü ekle |
 | [x] | `F2-026` | `0.87.0` | 20 dk | Wraparound ve saat resetini ayırt et |
-| [ ] | `F2-027` | `0.88.0` | 20 dk | Tanımlı drift düzeltmesini uygula |
+| [x] | `F2-027` | `0.88.0` | 20 dk | Tanımlı drift düzeltmesini uygula |
 | [ ] | `F2-028` | `0.89.0` | 20 dk | Kayıt offseti ve zaman indeksini oluştur |
 | [ ] | `F2-029` | `0.90.0` | 20 dk | Kanal ve olay indekslerini oluştur |
 | [ ] | `F2-030` | `0.91.0` | 20 dk | Kaynak fingerprint ve parser sürümünü kaydet |

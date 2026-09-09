@@ -118,8 +118,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F2-023` | 20 dk | 2 dk 2 sn | `7be2eae` | TX durumunu başlangıç/bitiş aralıklarına çevir |
 | `F2-024` | 15 dk | 3 dk 16 sn | `42a3abb` | parser teşhislerini sistem olaylarına çevir |
 | `F2-025` | 20 dk | 2 dk 26 sn | `85e428d` | cihaz tick dönüşüm adaptörünü ekle |
+| `F2-026` | 20 dk | 2 dk 22 sn | `0bd93b5` | wraparound ve saat resetini ayırt et |
 
-**100 commit · olculen toplam 1313 dk 35 sn · olculemeyen 1 (ilk commit)**
+**101 commit · olculen toplam 1315 dk 57 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
