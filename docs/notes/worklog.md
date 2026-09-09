@@ -98,8 +98,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F2-003` | 15 dk | 1 dk 34 sn | `b8a049e` | magic ve sürüm doğrulamasını ekle |
 | `F2-004` | 20 dk | 1 dk 56 sn | `d7f4361` | eksik header ve boyut sınırlarını denetle |
 | `F2-005` | 20 dk | 2 dk 54 sn | `6063b13` | tek Data kaydını çözümle |
+| `F2-006` | 20 dk | 1 dk 15 sn | `6821a9d` | ardışık kayıt iterator'unu ekle |
 
-**80 commit · olculen toplam 1254 dk 7 sn · olculemeyen 1 (ilk commit)**
+**81 commit · olculen toplam 1255 dk 22 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
