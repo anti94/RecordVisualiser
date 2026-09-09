@@ -1421,7 +1421,7 @@ Kabul: Örnek dosya güvenilir çözümlenmeli; kanal, olay ve zaman sorguları 
 | [x] | `F2-011` | `0.72.0` | 20 dk | Tekrarlı ve sıra dışı kayıtları raporla | Her durum kaynak offseti ve zamanıyla ayrılır | `F2-010` | `feat(parser): F2-011 tekrarlı ve sıra dışı kayıtları raporla` |
 | [x] | `F2-012` | `0.73.0` | 20 dk | Sürüme göre decoder seçimini ekle | Örnek format ile sürümlü genişletilmiş format ayrı decoder kullanır | `F2-011` | `feat(parser): F2-012 sürüme göre decoder seçimini ekle` |
 | [x] | `F2-013` | `0.74.0` | 20 dk | Kararlaştırılmış CRC hesaplamasını ekle | F0 CRC kararındaki bağımsız referans vektör eşleşir | `F2-012` | `feat(parser): F2-013 kararlaştırılmış CRC hesaplamasını ekle` |
-| [ ] | `F2-014` | `0.75.0` | 20 dk | CRC alanlı format doğrulamasını bağla | Tek byte bozulması yakalanır; CRC'siz örnek dosya doğrulanmış sayılmaz | `F2-013` | `feat(parser): F2-014 cRC alanlı format doğrulamasını bağla` |
+| [x] | `F2-014` | `0.75.0` | 20 dk | CRC alanlı format doğrulamasını bağla | Tek byte bozulması yakalanır; CRC'siz örnek dosya doğrulanmış sayılmaz | `F2-013` | `feat(parser): F2-014 cRC alanlı format doğrulamasını bağla` |
 | [ ] | `F2-015` | `0.76.0` | 20 dk | Bilinmeyen paket teşhisini ekle | Güvenilir uzunluk varsa sonraki pakete geçilir; yoksa konum raporlanır | `F2-014` | `feat(parser): F2-015 bilinmeyen paket teşhisini ekle` |
 
 ##### Fixture ve domain eşlemesi

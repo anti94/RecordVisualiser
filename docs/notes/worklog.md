@@ -105,8 +105,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F2-010` | 15 dk | 3 dk 35 sn | `36dead5` | kayıt adı ve sıra numarası tutarlılığını denetle |
 | `F2-011` | 20 dk | 8 dk 6 sn | `9b992de` | tekrarlı ve sıra dışı kayıtları raporla |
 | `F2-012` | 20 dk | 3 dk 44 sn | `74088ab` | sürüme göre decoder seçimini ekle |
+| `F2-013` | 20 dk | 2 dk 25 sn | `a172271` | kararlaştırılmış CRC hesaplamasını ekle |
 
-**87 commit · olculen toplam 1275 dk 55 sn · olculemeyen 1 (ilk commit)**
+**88 commit · olculen toplam 1278 dk 20 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
