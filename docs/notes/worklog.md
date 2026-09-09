@@ -69,8 +69,12 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F1-026` | 15 dk | 1 dk 59 sn | `d34620a` | alt Log/Messages alanı ve Events sekmesini ekle |
 | `F1-013` | 15 dk | 34 sn | `e6832b4` | worklog'a ..F1-026 durumları ve bulunan sorunları ekle |
 | `-` | — | 3 dk 25 sn | `720d5de` | pyright pythonVersion sabitini kaldır |
+| `-` | — | 2 dk 34 sn | `b905773` | CI'nin 3.12 pyright hatasını açık sorun olarak kaydet |
+| `-` | — | 344 dk 17 sn | `5f0d20b` | pyright bulgularını GitHub annotation'a çevir |
+| `-` | — | 3 dk 9 sn | `702ec61` | pyright çıkış kodunu yutup annotation adımına ulaş |
+| `-` | — | 3 dk 55 sn | `8c930f3` | PySide6 sürümünü sabitle, Qt None kontrollerini geri koy |
 
-**51 commit · olculen toplam 542 dk 27 sn · olculemeyen 1 (ilk commit)**
+**55 commit · olculen toplam 896 dk 22 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
@@ -144,28 +148,34 @@ Hiçbiri plan işi değildi; çalışırken ortaya çıktı.
 | Menülere Python referansı tutulmayınca PySide nesneyi serbest bırakıyordu ("C++ object already deleted") | `F1-023` | Menüler pencerede saklanıyor |
 | Kanal yolunda `/` hem ayraç hem ad parçasıydı; ağaçta `"Vehicle "` diye bozuk grup çıkıyordu | `F1-024` | Yol `Vehicle/Voltage` yapıldı, gösterim etiketi `GROUP_LABELS` ile eşlendi |
 | Qt tabified dock'ta aynı anda tek dock görünür sayıldığı için "kartlar duruyor mu" doğrulanamıyordu | `F1-025` | Sağ sütunda gerçek `QTabWidget` kullanıldı |
+| CI'da `pyright` yalnız 3.12 ayağında düşüyordu (PySide6 taslak farkı) | CI #26–#30 | PySide6 sabitlendi, `None` kontrolleri geri kondu; teşhis için pyright annotation adımı eklendi |
 
-## 3b. ÇÖZÜLMEMİŞ: CI'nin Python 3.12 ayağında pyright hatası
+## 3b. ÇÖZÜLDÜ: CI'nin Python 3.12 ayağında pyright hatası
 
-**Durum: AÇIK.** `main` üzerinde CI kırmızı.
+**Durum: KAPALI.** CI üç işte de yeşil (koşu #31).
 
-- Python **3.9** ayağı ve `todo-sync` işi **geçiyor**; yalnız **3.12** ayağı
-  `Tip kontrolu (pyright, strict)` adımında düşüyor.
-- Yerelde (Python 3.9 + pyright 1.1.411) pyright **0 hata** veriyor; ruff ve
-  284 testin tamamı geçiyor.
-- İki deneme yapıldı ve ikisi de yetmedi:
-  1. numpy `>=1.26,<2.1`'e sabitlendi (iki ayak aynı numpy'yi alsın diye) — `0d11b80`.
-  2. pyright'ın sabit `pythonVersion = "3.9"` ayarı kaldırıldı — `720d5de`.
-- **Neden teşhis edilemedi:** GitHub Actions job log'ları kimlik doğrulaması
-  istiyor; bu ortamdan hatanın tam metni okunamıyor. Teşhis yalnız "hangi ayak
-  düşüyor" bilgisiyle yapıldı.
+**Kök neden:** PySide6 tip taslakları sürüme göre değişiyor. Bir sürümde
+`QTreeWidgetItem.child()` / `.parent()` `QTreeWidgetItem`, diğerinde
+`QTreeWidgetItem | None` dönüyor. `F1-024`'te 3.9 ortamındaki taslağa uyup
+`is not None` kontrollerini kaldırmıştım; aynı kod 3.12 ayağında
+`reportOptionalMemberAccess` ve `reportArgumentType` hataları verdi. Kontroller
+runtime açısından **doğruydu** — Qt üst düzey öğede `parent()` için gerçekten
+null döndürüyor.
 
-**Önerilen sonraki adım:** Python 3.12 yerel makineye kurulup (D-20) o ortamda
-`pyright` bir kez çalıştırılmalı; hata büyük olasılıkla anında görünecek.
-Alternatif olarak depoya erişimi olan biri koşu log'unu açıp hatayı iletebilir.
+**Çözüm:** PySide6 `==6.10.3` olarak sabitlendi ve `None` kontrolleri geri kondu.
+Taslak yanlış olduğunda doğru kontrolü hataya çeviren `reportUnnecessaryComparison`
+stil kuralı kapatıldı; güvenlik kuralları açık bırakıldı.
 
-Bu sorun, kalite kapısını zayıflatmamak için **gizlenmedi**: 3.12 adımı
-devre dışı bırakılmadı, pyright gevşetilmedi.
+**Teşhisi mümkün kılan adım:** CI job log'ları kimlik doğrulaması istiyor, ama
+**annotations API'si istemiyor**. Bu yüzden `tools/pyright_annotations.py` eklendi:
+pyright'ın JSON çıktısını `::error file=...,line=...` komutlarına çeviriyor.
+İlk denemede annotation üretilmedi çünkü adım `bash -e` ile koşuyordu ve pyright
+hata bulunca 1 döndürüp betiği durduruyordu; çıkış kodu yutulunca hata metni
+okunabildi. Kalıcı fayda: pyright bulguları artık PR'larda satır satır görünüyor.
+
+**Ders:** denetleyici davranışını değiştiren her bağımlılık (ruff, pyright, numpy,
+PySide6) sabit sürümde tutulur; aralık bırakmak "bende geçti, CI'da kaldı"
+farkını üretiyor.
 
 ## 4. Açık engeller
 
