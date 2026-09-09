@@ -79,8 +79,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F1-029` | 20 dk | 242 dk 21 sn | `6a735d1` | mockup koyu temasını ve mavi vurgularını uygula |
 | `F1-030` | 20 dk | 2 dk 8 sn | `2bc3f14` | durum ikonları ve kanal paletini ekle |
 | `F1-031` | 20 dk | 2 dk 45 sn | `50da59f` | tek kanallı PlotPanel iskeletini ekle |
+| `F1-032` | 20 dk | 2 dk 4 sn | `a9eb0be` | mock repository seçimini grafiğe bağla |
 
-**61 commit · olculen toplam 1153 dk 44 sn · olculemeyen 1 (ilk commit)**
+**62 commit · olculen toplam 1155 dk 48 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
@@ -155,6 +156,7 @@ Hiçbiri plan işi değildi; çalışırken ortaya çıktı.
 | Kanal yolunda `/` hem ayraç hem ad parçasıydı; ağaçta `"Vehicle "` diye bozuk grup çıkıyordu | `F1-024` | Yol `Vehicle/Voltage` yapıldı, gösterim etiketi `GROUP_LABELS` ile eşlendi |
 | Qt tabified dock'ta aynı anda tek dock görünür sayıldığı için "kartlar duruyor mu" doğrulanamıyordu | `F1-025` | Sağ sütunda gerçek `QTabWidget` kullanıldı |
 | CI'da `pyright` yalnız 3.12 ayağında düşüyordu (PySide6 taslak farkı) | CI #26–#30 | PySide6 sabitlendi, `None` kontrolleri geri kondu; teşhis için pyright annotation adımı eklendi |
+| Offscreen Qt'de hiç yazı tipi yok; ekran görüntüsünde **tüm metinler kutu** çıkıyordu | `F1-032` görsel doğrulama | `QT_QPA_FONTDIR` conftest'te ve `tools/screenshot.py` içinde ayarlanıyor. Metin genişliği asgari widget boyutunu belirlediği için bu yerleşim testlerini de etkiliyordu. |
 
 ## 3b. ÇÖZÜLDÜ: CI'nin Python 3.12 ayağında pyright hatası
 
@@ -182,6 +184,17 @@ okunabildi. Kalıcı fayda: pyright bulguları artık PR'larda satır satır gö
 **Ders:** denetleyici davranışını değiştiren her bağımlılık (ruff, pyright, numpy,
 PySide6) sabit sürümde tutulur; aralık bırakmak "bende geçti, CI'da kaldı"
 farkını üretiyor.
+
+## 3c. Takip edilen küçük iş
+
+- **XYZ renk eşlemesi tek kanallı panelde uygulanmıyor.** `F1-030` kabulü
+  "XYZ serileri mavi/turuncu/yeşil" diyor ve bu kural, üç ekseni **aynı grafikte**
+  çizerken geçerli (mockup'taki `Acceleration (XYZ)` kartı). Tek kanallı
+  `PlotPanel` şu an kanal kimliğinden kararlı bir renk seçiyor; ekran
+  görüntüsünde `Accel X` mavi değil camgöbeği çıkıyor. Çok serili grafik işine
+  (`F3-*`) geldiğinde seri sırasına göre renk atanmalı. Kural
+  `ui/status_icons.py` `channel_color(..., index=...)` ile hâlihazırda test
+  edilmiş durumda.
 
 ## 4. Açık engeller
 

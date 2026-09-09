@@ -21,6 +21,12 @@ from sonar_analyzer.settings.store import SETTINGS_PATH_ENV
 # varsa (ornegin gercek ekranda hata ayiklama) ona dokunulmaz.
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
+# Offscreen platform sistem yazi tiplerini kendiliginden bulmuyor; ayarlanmazsa
+# tum metinler kutu (tofu) olarak ciziliyor. Metin genisligi widget'larin
+# asgari boyutunu belirledigi icin bu, yerlesim testlerini de etkiler.
+if "QT_QPA_FONTDIR" not in os.environ and Path("C:/Windows/Fonts").is_dir():
+    os.environ["QT_QPA_FONTDIR"] = "C:/Windows/Fonts"
+
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
     """PySide6 yoksa `gui` işaretli testleri atlar."""

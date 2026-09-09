@@ -77,6 +77,16 @@ pip install -e ".[dsp]"   # SciPy
 | Qt gerektirmeyenler | `python -m pytest -m "not gui"` |
 | Yalnız GUI | `python -m pytest -m gui` |
 
+Uygulamanın ekran görüntüsünü almak için (görünür pencere açmaz):
+
+```powershell
+.venv\Scripts\python.exe tools/screenshot.py docs/ui/app.png
+```
+
+> **Not:** Qt'nin `offscreen` platformu sistem yazı tiplerini kendiliğinden bulmaz.
+> `QT_QPA_FONTDIR` ayarlanmazsa tüm metinler kutu olarak çizilir; betik ve test
+> yapılandırması bunu kendiliğinden ayarlar.
+
 CI ile birebir aynı kontrolleri yerelde koşmak için:
 
 ```powershell
