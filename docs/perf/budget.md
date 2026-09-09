@@ -104,6 +104,14 @@ kullanımda sorun çıkarmaz. Spektrogram maliyeti pencere sayısıyla çarpıl�
 - [ ] Hedef ölçüm bilgisayarının CPU/RAM/disk/ekran bilgisi (E-10).
 - [ ] Soğuk disk okuma hızı — bu koşuda ölçülemedi (önbellek sıcaktı).
 - [ ] Gerçek kayıt boyutu ve süresi (E-01); 2,6 GiB/saat varsayımı gerçek veriyle doğrulanmalı.
-- [ ] Qt/PyQtGraph çizim maliyeti — GUI iskeleti kurulmadan (`F1-*`) ölçülemez; P-04, P-05, P-08
-      şu an **ölçülmemiştir**.
+- [x] Qt/PyQtGraph çizim maliyeti — iskelet kuruldu (`F1-*`); ilk ölçüm
+      `docs/perf/results/f1-spike-results.md` (`F1-041`..`F1-043`). **Yalnız ilk
+      büyüklük mertebesi**: offscreen platformda, tek tekrarda, tek kanalla
+      ölçüldü. P-04 (pan/zoom) belirgin biçimde karşılanmıyor (1M noktada 7,4
+      FPS, 10M noktada 0,8 FPS — hedef ≥ 30); darboğaz downsample piramidi
+      olmadan tüm noktaların her karede yeniden işlenmesi. P-05 (cursor) ucuz
+      çıktı ama crosshair/etiket zinciri henüz yok, bu yüzden P-05 **henüz
+      doğrulanmadı**, yalnız zincirin en ucuz parçası ölçüldü. P-08 (play/pause
+      tepkisi) hâlâ **ölçülmedi** — playback zamanlayıcısı henüz yok.
+      Dört kanallı senaryo ve 5 tekrar/medyan kuralı sonraki koşuya kaldı.
 - [ ] Bellek tavanı: hedef makinenin RAM'i bilinmeden P-09 için somut sınır yazılamaz.

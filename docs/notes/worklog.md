@@ -90,8 +90,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F1-039` | 20 dk | 3 dk 23 sn | `6a06651` | merkez dashboard grafik hücrelerini oluştur |
 | `F1-040` | 15 dk | 3 dk 57 sn | `6afad9d` | grafik hızlı araç şeridini yerleştir |
 | `F1-041` | 20 dk | 5 dk 47 sn | `f1d40e4` | bir ve on milyon noktalık spike girdilerini hazırla |
+| `F1-042` | 20 dk | 18 sn | `99a38a6` | pan/zoom ve cursor ölçüm koşucusunu ekle |
 
-**72 commit · olculen toplam 1227 dk 58 sn · olculemeyen 1 (ilk commit)**
+**73 commit · olculen toplam 1228 dk 16 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
