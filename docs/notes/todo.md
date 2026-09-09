@@ -4,9 +4,9 @@
 > Bir işi tamamlayınca `plan.md`'deki kutuyu `[x]` yap ve
 > `python tools/sync_todo.py` çalıştır.
 
-**Toplam 492 madde · 69 tamamlandı · 423 kaldı**
+**Toplam 492 madde · 70 tamamlandı · 422 kaldı**
 
-`[###.....................]` %14.0
+`[###.....................]` %14.2
 
 ## Özet
 
@@ -14,13 +14,13 @@
 | --- | --- | --- | --- |
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
-| Faz 2 — Parser, indeks ve kayıtlı veri | 8 | 33 | 41 |
+| Faz 2 — Parser, indeks ve kayıtlı veri | 9 | 32 | 41 |
 | Faz 3 — MVP analiz arayüzü | 0 | 80 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **69** | **423** | **492** |
+| **Toplam** | **70** | **422** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -95,7 +95,7 @@
 | [x] | `F1-043` | `0.60.0` | 20 dk | İlk spike sonuçlarını ve darboğazı kaydet |
 | [x] | `F1-044` | `0.61.0` | 15 dk | Uygulama iskeleti milestone kontrolünü yap |
 
-### Faz 2 — Parser, indeks ve kayıtlı veri (8/41)
+### Faz 2 — Parser, indeks ve kayıtlı veri (9/41)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -107,7 +107,7 @@
 | [x] | `F2-006` | `0.67.0` | 20 dk | Ardışık kayıt iterator'unu ekle |
 | [x] | `F2-007` | `0.68.0` | 15 dk | 125 ms kayıt zamanını kanonik ns'ye dönüştür |
 | [x] | `F2-008` | `0.69.0` | 20 dk | Sıra ve zaman boşluklarını raporla |
-| [ ] | `F2-009` | `0.70.0` | 15 dk | Kesik son kaydı raporlayarak okumayı bitir |
+| [x] | `F2-009` | `0.70.0` | 15 dk | Kesik son kaydı raporlayarak okumayı bitir |
 | [ ] | `F2-010` | `0.71.0` | 15 dk | Kayıt adı ve sıra numarası tutarlılığını denetle |
 | [ ] | `F2-011` | `0.72.0` | 20 dk | Tekrarlı ve sıra dışı kayıtları raporla |
 | [ ] | `F2-012` | `0.73.0` | 20 dk | Sürüme göre decoder seçimini ekle |
