@@ -93,8 +93,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F1-042` | 20 dk | 18 sn | `99a38a6` | pan/zoom ve cursor ölçüm koşucusunu ekle |
 | `F1-043` | 20 dk | 2 dk 46 sn | `659f26d` | ilk spike sonuçlarını ve darboğazı kaydet |
 | `F1-044` | 15 dk | 8 dk 39 sn | `228f6dd` | uygulama iskeleti milestone kontrolünü yap |
+| `F2-001` | 15 dk | 6 dk 21 sn | `7011f27` | header alan sabitlerini ve veri modelini ekle |
 
-**75 commit · olculen toplam 1239 dk 41 sn · olculemeyen 1 (ilk commit)**
+**76 commit · olculen toplam 1246 dk 2 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
