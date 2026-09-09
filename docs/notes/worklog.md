@@ -148,8 +148,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-011` | 20 dk | 3 dk 24 sn | `f941aef` | ad, ID, birim ve kaynak aramasını ekle |
 | `-` | — | 3 dk 32 sn | `60290a4` | todo.md üreticisine otonom çalışma kuralını ekle |
 | `F3-012` | 15 dk | 8 dk 37 sn | `0eb8559` | channels/Data Tree sekmeleri ve kategori filtrelerini bağla |
+| `F3-013` | 20 dk | 2 dk 34 sn | `9ea53f3` | çift tıkla kanalı grafiğe ekle |
 
-**130 commit · olculen toplam 1541 dk 2 sn · olculemeyen 1 (ilk commit)**
+**131 commit · olculen toplam 1543 dk 36 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
