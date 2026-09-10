@@ -78,6 +78,7 @@ from sonar_analyzer.ui.file_open import FileOpenController
 from sonar_analyzer.ui.plot_tool_bar import PlotToolBar
 from sonar_analyzer.ui.plots.dashboard import DashboardPanel
 from sonar_analyzer.ui.plots.transmission_panel import TransmissionPanel
+from sonar_analyzer.ui.shortcuts import install_shortcuts
 from sonar_analyzer.ui.status_bar import CANCELLED_TEXT, READY_TEXT, AppStatusBar
 from sonar_analyzer.ui.status_icons import severity_style
 from sonar_analyzer.ui.theme import apply_theme
@@ -224,6 +225,11 @@ class MainWindow(QMainWindow):
         # olayı Inspector'da göster.
         self.playback_dock.event_navigated.connect(self._on_event_activated)
         self.playback_dock.event_navigated.connect(self._on_event_selected)
+
+        # F3-072: Bölüm 16 klavye kısayolları.
+        #: Testler enjekte eder; `str | ""` döndürür.
+        self.workspace_save_dialog: Callable[[], str] | None = None
+        self.shortcuts = install_shortcuts(self)
 
     # -- eylemler --------------------------------------------------------
 
@@ -721,6 +727,71 @@ class MainWindow(QMainWindow):
                 self.restoreState(base64.b64decode(model.dock_state))
             except (ValueError, TypeError):
                 self.bottom_dock.append_log("Workspace dock yerlesimi okunamadi; atlandi.")
+
+    # -- klavye kısayolu işleyicileri (F3-072) ---------------------
+
+    def _default_workspace_save_dialog(self) -> str:
+        start_dir = self._settings.last_directory or str(Path.home())
+        path, _selected = QFileDialog.getSaveFileName(
+            self, "Workspace kaydet", start_dir, "SONAR workspace (*.json)"
+        )
+        return path
+
+    def save_workspace_via_dialog(self) -> Path | None:
+        """`Ctrl+S` — hedef sorar ve workspace'i kaydeder."""
+        dialog = self.workspace_save_dialog or self._default_workspace_save_dialog
+        chosen = dialog()
+        if not chosen:
+            return None
+        dest = chosen if chosen.lower().endswith(".json") else chosen + ".json"
+        return self.save_workspace(dest)
+
+    def toggle_playback(self) -> None:
+        """`Space` — oynat/duraklat (kayıt yoksa sessiz)."""
+        button = self.playback_dock.buttons["button_play"]
+        if button.isEnabled():
+            button.toggle()
+
+    def reset_plot_view(self) -> None:
+        """`Home` — grafiğin görünümünü ev aralığına döndürür."""
+        self.plot_panel.reset_view()
+
+    def set_zoom_mode_x(self) -> None:
+        self.plot_panel.set_zoom_mode("x")
+        self.bottom_dock.append_log("Zoom modu: X")
+
+    def set_zoom_mode_y(self) -> None:
+        self.plot_panel.set_zoom_mode("y")
+        self.bottom_dock.append_log("Zoom modu: Y")
+
+    def set_zoom_mode_xy(self) -> None:
+        self.plot_panel.set_zoom_mode("xy")
+        self.bottom_dock.append_log("Zoom modu: XY")
+
+    def toggle_cursor_mode(self) -> None:
+        """`C` — crosshair imlecini görünür/gizli yapar."""
+        if self.plot_panel.crosshair_visible():
+            self.plot_panel.clear_cursor()
+            return
+        x_min, x_max = self.plot_panel.visible_x_range()
+        self.plot_panel.set_cursor((x_min + x_max) / 2.0)
+
+    def toggle_region_selection(self) -> None:
+        """`R` — zaman bölgesi seçimini açar/kapatır."""
+        if self.plot_panel.time_region_x() is not None:
+            self.plot_panel.clear_time_region()
+            return
+        x_min, x_max = self.plot_panel.visible_x_range()
+        span = x_max - x_min
+        self.plot_panel.set_time_region(x_min + span / 3.0, x_max - span / 3.0)
+
+    def goto_next_event_shortcut(self) -> None:
+        """`F4` — sonraki olaya git."""
+        self.playback_dock.goto_next_event()
+
+    def goto_previous_event_shortcut(self) -> None:
+        """`Shift+F4` — önceki olaya git."""
+        self.playback_dock.goto_previous_event()
 
     def _on_axis_range_requested(self, axis: str, y_min: float, y_max: float) -> None:
         """Inspector Display'den gelen eksen aralığını seçili grafiğe uygular — `F3-036`.

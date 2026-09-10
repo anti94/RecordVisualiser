@@ -206,8 +206,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-068` | 20 dk | 5 dk 46 sn | `3885751` | dock ve grafik düzenini kaydet |
 | `F3-069` | 20 dk | 3 dk 36 sn | `c5e9e9c` | workspace dosyasını geri yükle |
 | `F3-070` | 20 dk | 4 dk 17 sn | `f429765` | eksik kaynak ve bozuk workspace davranışını ekle |
+| `F3-071` | 20 dk | 3 dk 16 sn | `b0d8fd2` | workspace sürüm geçiş yolunu ekle |
 
-**188 commit · olculen toplam 2316 dk 32 sn · olculemeyen 1 (ilk commit)**
+**189 commit · olculen toplam 2319 dk 48 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
