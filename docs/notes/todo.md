@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 254 tamamlandı · 238 kaldı**
+**Toplam 492 madde · 255 tamamlandı · 237 kaldı**
 
-`[############............]` %51.6
+`[############............]` %51.8
 
 ## Özet
 
@@ -38,11 +38,11 @@ Work in fully autonomous mode.
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
-| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 54 | 36 | 90 |
+| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 55 | 35 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **254** | **238** | **492** |
+| **Toplam** | **255** | **237** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -248,7 +248,7 @@ Work in fully autonomous mode.
 | [x] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır |
 | [x] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla |
 
-### Faz 4 — Mockup analiz panosu ve büyük veri performansı (54/90)
+### Faz 4 — Mockup analiz panosu ve büyük veri performansı (55/90)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -306,7 +306,7 @@ Work in fully autonomous mode.
 | [x] | `F4-052` | `1.52.0` | 20 dk | Zaman serisi, STFT, FFT ve istatistiği birlikte bağla |
 | [x] | `F4-053` | `1.53.0` | 20 dk | Memory mapping üzerinden blok okuma ekle |
 | [x] | `F4-054` | `1.54.0` | 20 dk | Yalnız görünür zaman bloklarını yükle |
-| [ ] | `F4-055` | `1.55.0` | 20 dk | Piksel genişliğine göre max_points uygula |
+| [x] | `F4-055` | `1.55.0` | 20 dk | Piksel genişliğine göre max_points uygula |
 | [ ] | `F4-056` | `1.56.0` | 20 dk | Min/max envelope downsampling ekle |
 | [ ] | `F4-057` | `1.57.0` | 20 dk | Çok seviyeli özet bloklarını üret |
 | [ ] | `F4-058` | `1.58.0` | 20 dk | Viewport için uygun özet seviyesini seç |

@@ -83,11 +83,13 @@ def test_opening_a_channel_updates_every_region(win: MainWindow) -> None:
     assert selection.sample_count > 0
 
 
-def test_the_sample_count_matches_the_plotted_series(win: MainWindow) -> None:
-    _x, raw = win.plot_panel.curve_data()
+def test_analysis_uses_full_samples_while_the_plot_is_bounded(win: MainWindow) -> None:
+    _x, plotted = win.plot_panel.curve_data()
     selection = win.dashboard.selection()
     assert selection is not None
-    assert selection.sample_count == raw.size
+    assert selection.sample_count == 12_000
+    assert plotted.size < selection.sample_count
+    assert plotted.size <= win.plot_point_budget()
 
 
 def test_switching_channels_moves_every_region_together(win: MainWindow) -> None:
@@ -118,16 +120,14 @@ def _select_region(win: MainWindow, qtbot: QtBot, start_s: float, end_s: float) 
 
 
 def test_a_roi_narrows_every_region_to_the_same_window(win: MainWindow, qtbot: QtBot) -> None:
-    before = win.dashboard.selection()
-    assert before is not None
-    full_count = before.sample_count
+    assert win.dashboard.selection() is not None
 
     _select_region(win, qtbot, 0.0, 15.0)  # 60 s kaydın ilk çeyreği
 
     after = win.dashboard.selection()
     assert after is not None
-    assert after.sample_count < full_count
-    assert after.region_seconds is not None
+    assert after.region_seconds == (0.0, 15.0)
+    assert after.sample_count == 3_000  # 15 s × 200 Hz; analiz azaltılmaz.
     _assert_consistent(win)
 
 

@@ -1671,7 +1671,7 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F4-053` | `1.53.0` | 20 dk | Memory mapping üzerinden blok okuma ekle | Seçili blok okunur; bütün dosya RAM'e kopyalanmaz | `F4-052` | `perf(parser): F4-053 memory mapping üzerinden blok okuma ekle` |
 | [x] | `F4-054` | `1.54.0` | 20 dk | Yalnız görünür zaman bloklarını yükle | Dar sorgu ilgili bloklarla sınırlı kalır | `F4-053` | `perf(repository): F4-054 yalnız görünür zaman bloklarını yükle` |
-| [ ] | `F4-055` | `1.55.0` | 20 dk | Piksel genişliğine göre max_points uygula | Viewport daraldığında dönen nokta sayısı bütçeye uyar | `F4-054` | `perf(repository): F4-055 piksel genişliğine göre max_points uygula` |
+| [x] | `F4-055` | `1.55.0` | 20 dk | Piksel genişliğine göre max_points uygula | Viewport daraldığında dönen nokta sayısı bütçeye uyar | `F4-054` | `perf(repository): F4-055 piksel genişliğine göre max_points uygula` |
 | [ ] | `F4-056` | `1.56.0` | 20 dk | Min/max envelope downsampling ekle | Dar impulslar görünür kalır; sonuç sıralı zaman taşır | `F4-055` | `perf(analysis): F4-056 min/max envelope downsampling ekle` |
 | [ ] | `F4-057` | `1.57.0` | 20 dk | Çok seviyeli özet bloklarını üret | Her seviye referans min/max özetleriyle eşleşir | `F4-056` | `perf(index): F4-057 çok seviyeli özet bloklarını üret` |
 | [ ] | `F4-058` | `1.58.0` | 20 dk | Viewport için uygun özet seviyesini seç | Farklı zoom seviyeleri bütçeye uygun veri döndürür | `F4-057` | `perf(repository): F4-058 viewport için uygun özet seviyesini seç` |

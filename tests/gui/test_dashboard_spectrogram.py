@@ -263,27 +263,18 @@ def test_opening_a_channel_fills_the_spectrogram_cell(win: MainWindow) -> None:
     assert "Pressure" in win.dashboard.spectrogram.title()
 
 
-def test_the_roi_narrows_the_spectrogram(
-    win: MainWindow, repo: MockRecordingRepository, qtbot: QtBot
-) -> None:
+def test_the_roi_narrows_the_spectrogram(win: MainWindow, qtbot: QtBot) -> None:
     full = win.dashboard.spectrogram.result()
     assert full is not None
-    full_frames = full.frame_count
 
-    span = repo.metadata().time_range
-    quarter = span.duration_ns // 4
-    win.plot_panel.time_region_changed.emit(span.start_ns, span.start_ns + quarter)
-    qtbot.waitUntil(
-        lambda: (
-            (r := win.dashboard.spectrogram.result()) is not None and r.frame_count < full_frames
-        ),
-        timeout=5_000,
-    )
+    win.plot_panel.set_time_region(0.0, 15.0)
+    qtbot.waitUntil(lambda: "s" in win.dashboard.spectrogram.title(), timeout=5_000)
 
     narrowed = win.dashboard.spectrogram.result()
     assert narrowed is not None
-    assert narrowed.frame_count < full_frames
-    assert "s" in win.dashboard.spectrogram.title()
+    # Seçilen aralık başlıkta ve STFT o pencereden hesaplandı.
+    assert "15" in win.dashboard.spectrogram.title()
+    assert 0 < narrowed.frame_count < full.frame_count
 
 
 def test_switching_channels_refreshes_the_cell(win: MainWindow) -> None:

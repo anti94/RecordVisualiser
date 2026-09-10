@@ -158,51 +158,33 @@ def test_opening_a_channel_fills_the_fft_cell(win: MainWindow) -> None:
     assert result.sample_rate_hz == 200.0
 
 
-def test_the_roi_narrows_the_spectrum_window(
-    win: MainWindow, repo: MockRecordingRepository, qtbot: QtBot
-) -> None:
-    full = win.dashboard.fft.result()
-    assert full is not None
-    full_count = full.sample_count
+def test_the_roi_narrows_the_spectrum_window(win: MainWindow, qtbot: QtBot) -> None:
+    assert win.dashboard.fft.result() is not None
 
-    span = repo.metadata().time_range
-    quarter = span.duration_ns // 4
-    win.plot_panel.time_region_changed.emit(span.start_ns, span.start_ns + quarter)
-    qtbot.waitUntil(
-        lambda: (r := win.dashboard.fft.result()) is not None and r.sample_count < full_count,
-        timeout=5_000,
-    )
+    # Gerçek ROI yolu: grafikte bölge kur (8 s kaydın ilk çeyreği).
+    win.plot_panel.set_time_region(0.0, 2.0)
+    qtbot.waitUntil(lambda: "s" in win.dashboard.fft.title(), timeout=5_000)
 
     narrowed = win.dashboard.fft.result()
     assert narrowed is not None
-    assert narrowed.sample_count < full_count
-    # Daha kısa pencere -> daha kaba frekans çözünürlüğü.
-    assert narrowed.resolution_hz > full.resolution_hz
-    assert "s" in win.dashboard.fft.title()
+    assert narrowed.sample_count == 400
+    assert narrowed.resolution_hz == 0.5
+    assert "0" in win.dashboard.fft.title()
+    assert "2" in win.dashboard.fft.title()
 
 
-def test_a_second_roi_change_refreshes_again(
-    win: MainWindow, repo: MockRecordingRepository, qtbot: QtBot
-) -> None:
-    span = repo.metadata().time_range
-    half = span.duration_ns // 2
-    quarter = span.duration_ns // 4
+def test_a_second_roi_change_refreshes_again(win: MainWindow, qtbot: QtBot) -> None:
+    win.plot_panel.set_time_region(0.0, 4.0)
+    qtbot.waitUntil(lambda: "s" in win.dashboard.fft.title(), timeout=5_000)
+    first_title = win.dashboard.fft.title()
+    assert win.dashboard.fft.result() is not None
 
-    win.plot_panel.time_region_changed.emit(span.start_ns, span.start_ns + half)
-    qtbot.waitUntil(lambda: win.dashboard.fft.has_spectrum, timeout=5_000)
-    first = win.dashboard.fft.result()
-    assert first is not None
-
-    win.plot_panel.time_region_changed.emit(span.start_ns, span.start_ns + quarter)
-    qtbot.waitUntil(
-        lambda: (
-            (r := win.dashboard.fft.result()) is not None and r.sample_count < first.sample_count
-        ),
-        timeout=5_000,
-    )
-    second = win.dashboard.fft.result()
-    assert second is not None
-    assert second.sample_count < first.sample_count
+    win.plot_panel.set_time_region(5.0, 7.0)
+    qtbot.waitUntil(lambda: win.dashboard.fft.title() != first_title, timeout=5_000)
+    assert win.dashboard.fft.result() is not None
+    assert "5" in win.dashboard.fft.title()
+    result = win.dashboard.fft.result()
+    assert result is not None and result.sample_count == 400
 
 
 def test_switching_channels_refreshes_the_cell(win: MainWindow) -> None:

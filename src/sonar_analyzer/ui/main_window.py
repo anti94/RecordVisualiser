@@ -49,6 +49,7 @@ from sonar_analyzer.application.file_loader import (
     LoaderCallable,
 )
 from sonar_analyzer.application.load_errors import describe_load_error
+from sonar_analyzer.application.point_budget import points_for_width
 from sonar_analyzer.application.scrub_debounce import ScrubDebouncer
 from sonar_analyzer.application.view_history import ViewCommand, ViewHistory
 from sonar_analyzer.domain.channel import ChannelMetadata
@@ -141,6 +142,7 @@ class MainWindow(QMainWindow):
 
         self._channels: tuple[ChannelMetadata, ...] = ()
         self._repository: RecordingRepository | None = None
+        self._dsp_projection: tuple[int, NDArray[np.int64]] | None = None
         #: `F3-041` görünüm ayarları (renk, eksen) undo/redo geçmişi.
         self._view_history = ViewHistory()
         #: `F3-065` dışa aktarma diyalog seam'leri (testler enjekte eder).
@@ -654,11 +656,19 @@ class MainWindow(QMainWindow):
         if not chain.enabled_steps:
             self.bottom_dock.append_log("Uygulanacak işlem adımı yok (Custom sekmesi).")
             return
-        _x, values = self.plot_panel.curve_data()
-        if values.size == 0:
+        if self._repository is None:
             return
+        chunk = self._repository.query(channel.id, self._repository.metadata().time_range)
+        if len(chunk) == 0:
+            return
+        x, _values = self.plot_panel.curve_data()
+        timestamps = np.array(
+            [self.plot_panel.timestamp_ns_for_x(float(t)) for t in x], dtype=np.int64
+        )
+        indices = np.searchsorted(chunk.timestamps_ns, timestamps).astype(np.int64)
+        self._dsp_projection = (len(chunk), indices)
         self._dsp_runner.set_selection(channel.id)
-        self._dsp_runner.submit(chain, values, channel.id)
+        self._dsp_runner.submit(chain, chunk.values, channel.id)
         self.bottom_dock.append_log(
             f"{channel.display_label}: {len(chain.enabled_steps)} adımlı işlem çalıştırıldı."
         )
@@ -675,9 +685,16 @@ class MainWindow(QMainWindow):
         primary = self.plot_panel.channel
         if not isinstance(result, ChainResult) or primary is None or primary.id != channel_id:
             return
+        projection = self._dsp_projection
+        if projection is None or result.values.size == 0:
+            return
+        source_count, indices = projection
+        # DSP tam çözünürlükte çalışır; yalnız sonuç çizilirken örnek azaltılır.
+        positions = np.arange(result.values.size) * (source_count / result.values.size)
+        plotted_values = np.interp(indices, positions, result.values)
         try:
             self.plot_panel.set_processed_overlay(
-                result.values,
+                plotted_values,
                 visible=self.right_dock.analysis_tools.show_filtered_data.isChecked(),
             )
         except (ValueError, RuntimeError) as exc:
@@ -969,6 +986,15 @@ class MainWindow(QMainWindow):
             return
         self.right_dock.inspector.show_raw_sample(inspection, channel.unit or "")
 
+    def plot_point_budget(self) -> int:
+        """Grafiğin piksel genişliğine karşılık gelen nokta bütçesi — `F4-055`.
+
+        Sorgular bu bütçeyle çağrılır: viewport daraldığında repository
+        daha az nokta döndürür. Ekranda ayırt edilemeyecek noktaları
+        okumak ne çözünürlük kazandırır ne görünümü değiştirir.
+        """
+        return points_for_width(self.plot_panel.plot_pixel_width())
+
     def refresh_analysis_views(
         self,
         channel: ChannelMetadata,
@@ -1046,8 +1072,15 @@ class MainWindow(QMainWindow):
         if channel is None or self._repository is None:
             return
 
-        chunk = self._repository.query(channel_id, self._repository.metadata().time_range)
-        self.plot_panel.set_channel(channel, chunk)
+        self._dsp_runner.cancel_all()
+        self._dsp_projection = None
+        span = self._repository.metadata().time_range
+        chunk = self._repository.query(
+            channel_id,
+            span,
+            max_points=self.plot_point_budget(),
+        )
+        self.plot_panel.set_channel(channel, chunk, time_origin_ns=span.start_ns)
         # F3-041: grafik tek seriye sıfırlandı; eski görünüm komutları
         # kaldırılmış serilere atıfta bulunur, geçmişi temizle.
         self._view_history.clear()
@@ -1056,7 +1089,8 @@ class MainWindow(QMainWindow):
         self.plot_panel.clear_processed_overlay()
         self.right_dock.analysis_tools.step_editor.set_input_channel(channel_id)
         self.right_dock.analysis_tools.step_editor.set_sample_rate(channel.sample_rate_hz or 0.0)
-        self.refresh_analysis_views(channel, chunk.values)
+        analysis_chunk = self._repository.query(channel_id, span)
+        self.refresh_analysis_views(channel, analysis_chunk.values)
         self.plot_tool_bar.set_current_channel(channel_id)
         self.show_plot()
         self.right_dock.show_channel(channel)
@@ -1074,8 +1108,14 @@ class MainWindow(QMainWindow):
         if channel is None or self._repository is None:
             return None
 
-        chunk = self._repository.query(channel_id, self._repository.metadata().time_range)
-        self.plot_panel.add_channel(channel, chunk)
+        chunk = self._repository.query(
+            channel_id,
+            self._repository.metadata().time_range,
+            max_points=self.plot_point_budget(),
+        )
+        self.plot_panel.add_channel(
+            channel, chunk, time_origin_ns=self._repository.metadata().time_range.start_ns
+        )
         self.plot_tool_bar.set_current_channel(channel_id)
         self.show_plot()
         self.right_dock.show_channel(channel)

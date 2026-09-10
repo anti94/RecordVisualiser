@@ -289,17 +289,12 @@ def test_the_waterfall_follows_the_open_channel(win: MainWindow) -> None:
     assert "Pressure" in win.waterfall_view.title()
 
 
-def test_the_roi_narrows_the_waterfall(
-    win: MainWindow, repo: MockRecordingRepository, qtbot: QtBot
-) -> None:
+def test_the_roi_narrows_the_waterfall(win: MainWindow, qtbot: QtBot) -> None:
     before = win.waterfall_view.slice_count()
     assert before > 0
 
-    span = repo.metadata().time_range
-    quarter = span.duration_ns // 4
-    win.plot_panel.time_region_changed.emit(span.start_ns, span.start_ns + quarter)
-    qtbot.waitUntil(
-        lambda: 0 < win.waterfall_view.slice_count() < before,
-        timeout=5_000,
-    )
-    assert win.waterfall_view.slice_count() < before
+    win.plot_panel.set_time_region(0.0, 15.0)
+    qtbot.waitUntil(lambda: "s" in win.waterfall_view.title(), timeout=5_000)
+
+    assert "15" in win.waterfall_view.title()
+    assert 0 < win.waterfall_view.slice_count() < before

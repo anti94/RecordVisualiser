@@ -81,7 +81,10 @@ def test_apply_from_the_filter_tab_draws_the_low_pass_result(win: MainWindow, qt
 
     processed = win.plot_panel.processed_overlay_values()
     assert processed.shape == raw.shape
-    assert np.allclose(processed, low_pass(raw, 200.0, 40.0, 4), atol=1e-9)
+    source = MockRecordingRepository(duration_s=8.0, sample_rate_hz=200.0)
+    full = source.query("ch0", source.metadata().time_range).values
+    indices = np.rint(_x * 200).astype(np.int64)
+    assert np.allclose(processed, low_pass(full, 200.0, 40.0, 4)[indices], atol=1e-9)
     # Ham seri değişmedi.
     _x2, raw_after = win.plot_panel.curve_data()
     assert np.array_equal(raw_after, raw)

@@ -274,16 +274,20 @@ class PlotPanel(QWidget):
 
     # -- veri ------------------------------------------------------------
 
-    def set_channel(self, channel: ChannelMetadata, chunk: DataChunk) -> None:
+    def set_channel(
+        self, channel: ChannelMetadata, chunk: DataChunk, *, time_origin_ns: int | None = None
+    ) -> None:
         """Grafiği **tek** bu kanala sıfırlar — `F1-031`'in özgün davranışı.
 
         Önceki tüm seriler (varsa) kaldırılır. Birden fazla kanalı bir
         arada tutmak için `add_channel()` kullanılır (`F3-014`).
         """
         self.clear()
-        self.add_channel(channel, chunk)
+        self.add_channel(channel, chunk, time_origin_ns=time_origin_ns)
 
-    def add_channel(self, channel: ChannelMetadata, chunk: DataChunk) -> None:
+    def add_channel(
+        self, channel: ChannelMetadata, chunk: DataChunk, *, time_origin_ns: int | None = None
+    ) -> None:
         """Grafiğe bir seri ekler/günceller; **var olan diğer seriler korunur** — `F3-014`.
 
         Aynı `channel.id` zaten grafikteyse verisi yerinde güncellenir
@@ -297,7 +301,7 @@ class PlotPanel(QWidget):
             )
 
         if self._t0_ns is None:
-            self._t0_ns = chunk.start_ns or 0
+            self._t0_ns = (chunk.start_ns or 0) if time_origin_ns is None else time_origin_ns
 
         seconds = to_seconds(chunk.timestamps_ns, self._t0_ns)
         values = np.asarray(chunk.values, dtype=np.float64)
@@ -1317,6 +1321,17 @@ class PlotPanel(QWidget):
             return np.empty(0, dtype=np.float64)
         _x, y = self._processed_overlay.getData()
         return np.asarray(y, dtype=np.float64) if y is not None else np.empty(0, dtype=np.float64)
+
+    def plot_pixel_width(self) -> int:
+        """Çizim alanının piksel genişliği — nokta bütçesi için (`F4-055`).
+
+        Panel henüz yerleşmemişse (genişlik 0) widget genişliğine düşer;
+        o da yoksa 1 döner — bütçe hesabı her zaman pozitif bir sayı alır.
+        """
+        view_width = int(self.plot.getPlotItem().getViewBox().width())
+        if view_width > 0:
+            return view_width
+        return max(int(self.width()), 1)
 
     def curve_data(
         self, channel_id: str | None = None

@@ -90,6 +90,10 @@ def test_apply_high_pass_from_the_filter_tab_draws_it(win: MainWindow, qtbot: Qt
     qtbot.waitUntil(lambda: win.plot_panel.has_processed_overlay, timeout=10_000)
 
     processed = win.plot_panel.processed_overlay_values()
-    assert np.allclose(processed, high_pass(raw, 200.0, 15.0, 4), atol=1e-9)
+    source = MockRecordingRepository(duration_s=8.0, sample_rate_hz=200.0)
+    full = source.query("ch0", source.metadata().time_range).values
+    indices = np.rint(_x * 200).astype(np.int64)
+    expected = high_pass(full, 200.0, 15.0, 4)
+    assert np.allclose(processed, expected[indices], atol=1e-9)
     # Yüksek geçiren çıktısı sıfır toplamlı (DC gitti).
-    assert abs(float(processed.sum())) < 1e-6 * float(np.abs(raw).sum())
+    assert abs(float(expected.sum())) < 1e-6 * float(np.abs(raw).sum())
