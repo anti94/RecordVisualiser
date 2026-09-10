@@ -17,6 +17,7 @@ import argparse
 import hashlib
 import math
 import sys
+from collections.abc import Iterator
 from pathlib import Path
 
 import numpy as np
@@ -68,12 +69,13 @@ _TONES: tuple[tuple[float, int], ...] = (
 ACOUSTIC_8RECORDS_SHA256 = "6c501175e295d10b57c4a3c86783e7710b933f2e501cc3061650fc13c9c7b4f5"
 
 
-def _channel_samples(channel_id: int, record_index: int) -> NDArray[np.int16]:
+def _channel_samples(channel_id: int, record_index: int, seed: int = 0) -> NDArray[np.int16]:
     """`record_index` kaydının `channel_id` kanalı için 6000 `int16` örnek."""
     tone_hz, amplitude = _TONES[channel_id]
     start = record_index * SAMPLES_PER_BLOCK
     n = np.arange(start, start + SAMPLES_PER_BLOCK, dtype=np.float64)
-    wave = amplitude * np.sin(2.0 * math.pi * tone_hz * n / ACOUSTIC_SAMPLE_RATE_HZ)
+    phase = 0.0 if seed == 0 else 2 * math.pi * ((seed + channel_id * 7919) % 104729) / 104729
+    wave = amplitude * np.sin(2.0 * math.pi * tone_hz * n / ACOUSTIC_SAMPLE_RATE_HZ + phase)
     return np.round(wave).astype(np.int16)
 
 
@@ -115,10 +117,10 @@ def _channel_table() -> bytes:
     return bytes(out)
 
 
-def _record(record_index: int) -> bytes:
+def _record(record_index: int, seed: int = 0) -> bytes:
     blocks = bytearray()
     for channel_id, _p, _n, _u in ACOUSTIC_CHANNELS:
-        payload = _channel_samples(channel_id, record_index).tobytes()
+        payload = _channel_samples(channel_id, record_index, seed).tobytes()
         assert len(payload) == ACOUSTIC_PAYLOAD_BYTES
         blocks += BLOCK_HEADER.pack(
             BLOCK_TYPE_SENSOR_RAW,
@@ -152,15 +154,21 @@ def _record(record_index: int) -> bytes:
     return header + bytes(blocks) + trailer
 
 
-def build_acoustic_fixture(record_count: int = 8) -> bytes:
-    """Deterministik Profil B akustik `.bin` içeriği."""
+def iter_acoustic_fixture(record_count: int, seed: int = 0) -> Iterator[bytes]:
+    """Header, kanal tablosu ve kayıtları sınırlı bellekle üretir — F4-063."""
     if record_count < 1:
         raise ValueError("record_count >= 1 olmalı")
-    out = bytearray(_file_header(record_count))
-    out += _channel_table()
+    if seed < 0:
+        raise ValueError("seed >= 0 olmalı")
+    yield _file_header(record_count)
+    yield _channel_table()
     for index in range(record_count):
-        out += _record(index)
-    return bytes(out)
+        yield _record(index, seed)
+
+
+def build_acoustic_fixture(record_count: int = 8) -> bytes:
+    """Deterministik Profil B akustik `.bin` içeriği."""
+    return b"".join(iter_acoustic_fixture(record_count))
 
 
 def _parse_args(argv: list[str] | None) -> argparse.Namespace:
