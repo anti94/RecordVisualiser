@@ -16,3 +16,19 @@ class RawRecordInspection:
     timestamp_ns: int | None
     fields: tuple[tuple[str, str], ...]
     quality: Quality = Quality.OK
+
+
+@dataclass(frozen=True)
+class SampleInspection:
+    """Tek bir örneğin geliştirici görünümü — `F3-040`.
+
+    `byte_offset`: örneği taşıyan kaydın dosyadaki başlangıcı.
+    `raw_value`: kayıtta saklanan ham değer (gain/offset uygulanmadan).
+    `scaled_value`: `raw_value * gain + offset` — fiziksel değer.
+    """
+
+    channel_id: str
+    timestamp_ns: int
+    byte_offset: int
+    raw_value: float
+    scaled_value: float

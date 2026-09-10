@@ -23,8 +23,12 @@ from PySide6.QtWidgets import (
 )
 
 from sonar_analyzer.domain.channel import ChannelMetadata
+from sonar_analyzer.domain.raw_record import SampleInspection
 
 PANEL_OBJECT_NAME = "panel_inspector"
+
+#: `F3-040` geliştirici ham görünümü alanları.
+RAW_FIELDS: tuple[str, ...] = ("Source offset", "Raw value", "Scaled value", "Sample time")
 
 #: `F3-036` Display sekmesindeki eksen seçenekleri (etiket -> PlotPanel ekseni).
 AXIS_CHOICES: tuple[tuple[str, str], ...] = (("Left axis", "left"), ("Right axis", "right"))
@@ -86,7 +90,44 @@ class InspectorPanel(QWidget):
         layout.addWidget(self.detail)
 
         layout.addWidget(self._build_display_group(body))
+        layout.addWidget(self._build_raw_group(body))
         layout.addStretch(1)
+
+    def _build_raw_group(self, parent: QWidget) -> QWidget:
+        """`F3-040` Raw: seçilen örneğin kaynak offseti + ham/ölçeklenmiş değeri."""
+        group = QGroupBox("Raw (developer)", parent)
+        group.setObjectName("group_inspector_raw")
+        form = QFormLayout(group)
+        form.setContentsMargins(6, 4, 6, 4)
+        self._raw_fields: dict[str, QLabel] = {}
+        for field in RAW_FIELDS:
+            value = QLabel(EMPTY_VALUE, group)
+            value.setObjectName(f"label_inspector_raw_{field.lower().replace(' ', '_')}")
+            value.setWordWrap(True)
+            value.setMinimumWidth(1)
+            self._raw_fields[field] = value
+            form.addRow(f"{field}:", value)
+        return group
+
+    def show_raw_sample(self, inspection: SampleInspection, unit: str = "") -> None:
+        """Seçilen örneğin ham kayıt ayrıntısını gösterir — `F3-040`."""
+        suffix = f" {unit}" if unit else ""
+        self._raw_fields["Source offset"].setText(
+            f"{inspection.byte_offset} (0x{inspection.byte_offset:X})"
+        )
+        self._raw_fields["Raw value"].setText(f"{inspection.raw_value:g}")
+        self._raw_fields["Scaled value"].setText(f"{inspection.scaled_value:g}{suffix}")
+        self._raw_fields["Sample time"].setText(f"{inspection.timestamp_ns} ns")
+
+    def clear_raw_sample(self) -> None:
+        for label in self._raw_fields.values():
+            label.setText(EMPTY_VALUE)
+
+    def raw_field_value(self, field: str) -> str:
+        try:
+            return self._raw_fields[field].text()
+        except KeyError as exc:
+            raise KeyError(f"Tanimsiz Raw alani: {field}") from exc
 
     def _build_display_group(self, parent: QWidget) -> QWidget:
         """`F3-036` Display: eksen seçimi + Y min/max, seçili grafiğe uygulanır."""
@@ -133,6 +174,7 @@ class InspectorPanel(QWidget):
         """Seçim yokken boş duruma döner."""
         for label in self._fields.values():
             label.setText(EMPTY_VALUE)
+        self.clear_raw_sample()
         self.detail.setVisible(False)
         self.hint.setVisible(True)
 

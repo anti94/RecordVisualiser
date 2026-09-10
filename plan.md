@@ -1522,7 +1522,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 | [x] | `F3-037` | `0.139.0` | 20 dk | Count, min, max ve mean hesabını ekle | Bilinen kısa dizi beklenen istatistikleri üretir | `F3-036` | `feat(analysis): F3-037 count, min, max ve mean hesabını ekle` |
 | [x] | `F3-038` | `0.140.0` | 20 dk | Median, RMS, std ve peak-to-peak ekle | Referans dizi sonuçlarıyla eşleşir; boş aralık tanımlı gösterilir | `F3-037` | `feat(analysis): F3-038 median, RMS, std ve peak-to-peak ekle` |
 | [x] | `F3-039` | `0.141.0` | 20 dk | ROI istatistiklerini dashboard kartına bağla | Sağ alt merkez kartı seçilen kanalın mean, std, RMS, min, max ve peak-peak değerlerini gösterir | `F3-038` | `feat(ui): F3-039 rOI istatistiklerini dashboard kartına bağla` |
-| [ ] | `F3-040` | `0.142.0` | 20 dk | Geliştirici ham kayıt görünümünü ekle | Seçim kaynak offseti ve ham/ölçeklenmiş değeri gösterir | `F3-039` | `feat(ui): F3-040 geliştirici ham kayıt görünümünü ekle` |
+| [x] | `F3-040` | `0.142.0` | 20 dk | Geliştirici ham kayıt görünümünü ekle | Seçim kaynak offseti ve ham/ölçeklenmiş değeri gösterir | `F3-039` | `feat(ui): F3-040 geliştirici ham kayıt görünümünü ekle` |
 | [ ] | `F3-041` | `0.143.0` | 20 dk | Görünüm ayarları için undo/redo ekle | Renk veya eksen değişikliği geri alınıp yeniden uygulanır | `F3-040` | `feat(app): F3-041 görünüm ayarları için undo/redo ekle` |
 
 ##### Events, BIT ve TX

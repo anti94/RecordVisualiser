@@ -236,6 +236,22 @@ class MainWindow(QMainWindow):
         except ValueError as exc:
             self.bottom_dock.append_log(f"Eksen araligi uygulanamadi: {exc}")
 
+    def _on_cursor_moved(self, sample_seconds: float, _value: float) -> None:
+        """Crosshair bir örneğe kenetlenince Inspector Raw görünümünü doldurur — `F3-040`.
+
+        Yalnız gerçek `.bin` kaydında (raw byte erişimi) çalışır; simülasyon
+        gibi ham offseti olmayan kaynaklarda Raw alanları boş kalır.
+        """
+        channel = self.plot_panel.channel
+        if channel is None or not isinstance(self._repository, FileRecordingRepository):
+            return
+        try:
+            timestamp_ns = self.plot_panel.timestamp_ns_for_x(sample_seconds)
+            inspection = self._repository.inspect_sample(channel.id, timestamp_ns)
+        except (RuntimeError, LookupError, KeyError):
+            return
+        self.right_dock.inspector.show_raw_sample(inspection, channel.unit or "")
+
     def _on_stats_region_changed(self, start_ns: int, end_ns: int) -> None:
         """Grafikte zaman bölgesi seçilince istatistik kartını o pencereye daraltır — `F3-039`.
 
@@ -679,6 +695,7 @@ class MainWindow(QMainWindow):
         self.plot_panel = self.dashboard.time_series
         self.plot_panel.channel_dropped.connect(self._on_channel_dropped)
         self.plot_panel.time_region_changed.connect(self._on_stats_region_changed)
+        self.plot_panel.cursor_moved.connect(self._on_cursor_moved)
 
         self.center_stack = QStackedWidget(container)
         self.center_stack.setObjectName("center_stack")

@@ -20,7 +20,7 @@ import numpy as np
 from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.data_chunk import DataChunk, Quality
 from sonar_analyzer.domain.event import BitResult, Event
-from sonar_analyzer.domain.raw_record import RawRecordInspection
+from sonar_analyzer.domain.raw_record import RawRecordInspection, SampleInspection
 from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.domain.transmission import TransmissionInterval
@@ -238,6 +238,35 @@ class FileRecordingRepository:
             timestamp if timestamp <= MAX_TIMESTAMP_NS - header.period_us * 1000 else None,
             tuple(fields),
             quality,
+        )
+
+    def inspect_sample(self, channel_id: str, timestamp_ns: int) -> SampleInspection:
+        """`timestamp_ns`'e **en yakın** örneğin ham/ölçeklenmiş görünümü — `F3-040`.
+
+        Kabul: seçim kaynak offsetini ve ham/ölçeklenmiş değeri gösterir.
+        Kayıt yoksa `LookupError`, bilinmeyen kanal `KeyError`.
+        """
+        data, _header = self._require_open()
+        slot = next(
+            (i for i, channel in enumerate(self._channels) if channel.id == channel_id), None
+        )
+        if slot is None:
+            raise KeyError(f"Bilinmeyen kanal: {channel_id}")
+        if not self._time_index:
+            raise LookupError("Kayitta ornek yok")
+
+        pos = bisect_left(self._times, timestamp_ns)
+        candidates = [i for i in (pos - 1, pos) if 0 <= i < len(self._time_index)]
+        nearest = min(candidates, key=lambda i: abs(self._times[i] - timestamp_ns))
+        entry = self._time_index[nearest]
+        record = read_data_record_v1(data, entry.byte_offset)
+        raw_value = float(record.sensor_values[slot])
+        return SampleInspection(
+            channel_id=channel_id,
+            timestamp_ns=entry.timestamp_ns,
+            byte_offset=entry.byte_offset,
+            raw_value=raw_value,
+            scaled_value=self._channels[slot].to_physical(raw_value),
         )
 
     def events(
