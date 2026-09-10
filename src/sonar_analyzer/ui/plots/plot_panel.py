@@ -119,6 +119,11 @@ class PlotPanel(QWidget):
         # programatik `zoom()` bu kipe uyar, öteki eksen sabit kalır.
         self._zoom_mode = DEFAULT_ZOOM_MODE
 
+        # F3-025: `reset_view()` için "ev" görünümü — veri her
+        # değiştiğinde yeniden yakalanır.
+        self._home_range: tuple[float, float, float, float] | None = None
+        self._home_right_y: tuple[float, float] | None = None
+
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.plot)
@@ -193,6 +198,9 @@ class PlotPanel(QWidget):
 
         self._refresh_labels()
         self._autorange()
+        # F3-025: "ev" aralığı = veri her değiştiğinde yeniden sığdırılan
+        # görünüm. `reset_view()` pan/zoom sonrası buraya döner.
+        self._capture_home_range()
 
     # -- iki Y ekseni (F3-020) ----------------------------------------
 
@@ -259,6 +267,47 @@ class PlotPanel(QWidget):
         if self._right_vb is not None:
             self._right_vb.enableAutoRange(axis=pg.ViewBox.YAxis)
 
+    # -- autoscale / gorunum sifirlama (F3-025) ----------------------
+
+    def _capture_home_range(self) -> None:
+        """Verinin şu anki tam görünümünü `reset_view()` için saklar."""
+        view_box = self.plot.getViewBox()
+        view_box.autoRange(padding=0.05)
+        self._home_range = self.visible_range()
+        self._home_right_y = self.right_axis_y_range()
+
+    def autoscale(self) -> None:
+        """Görünümü **tüm veriye** sığdırır ve otomatik-aralığı açık bırakır — `F3-025`.
+
+        Veri sonradan değişse de görünüm sığmayı sürdürür (pyqtgraph
+        auto-range). Grafikte seri yoksa etkisizdir.
+        """
+        if not self._series:
+            return
+        view_box = self.plot.getViewBox()
+        # autoRange() hemen sığdırır ama tek seferliktir (bayrağı kapatır);
+        # ardından enableAutoRange() ile veri değiştikçe sığmayı sürdürsün.
+        view_box.autoRange(padding=0.05)
+        view_box.enableAutoRange(x=True, y=True)
+        if self._right_vb is not None:
+            self._right_vb.autoRange(padding=0.05)
+            self._right_vb.enableAutoRange(axis=pg.ViewBox.YAxis)
+
+    def reset_view(self) -> None:
+        """Pan/zoom sonrası **ilk (ev) aralığa** döner — `F3-025`.
+
+        Ev aralığı, veri en son eklendiğinde/değiştiğinde sığdırılan
+        görünümdür; sabittir (autoscale gibi veriyi izlemez). Grafikte
+        seri yoksa etkisizdir.
+        """
+        if self._home_range is None or not self._series:
+            return
+        x_min, x_max, y_min, y_max = self._home_range
+        self.plot.getViewBox().setRange(xRange=(x_min, x_max), yRange=(y_min, y_max), padding=0)
+        if self._right_vb is not None and self._home_right_y is not None:
+            r_min, r_max = self._home_right_y
+            self._right_vb.setRange(yRange=(r_min, r_max), padding=0)
+
     def remove_channel(self, channel_id: str) -> None:
         """Bir seriyi ve legend girdisini kaldırır — `F3-014`.
 
@@ -283,6 +332,10 @@ class PlotPanel(QWidget):
         if not self._series:
             self._t0_ns = None
             self._left_unit = None
+            self._home_range = None
+            self._home_right_y = None
+        else:
+            self._capture_home_range()
 
         self._refresh_labels()
 
