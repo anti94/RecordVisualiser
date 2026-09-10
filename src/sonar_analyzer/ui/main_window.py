@@ -62,6 +62,7 @@ from sonar_analyzer.ui.file_open import FileOpenController
 from sonar_analyzer.ui.plot_tool_bar import PlotToolBar
 from sonar_analyzer.ui.plots.dashboard import DashboardPanel
 from sonar_analyzer.ui.status_bar import CANCELLED_TEXT, READY_TEXT, AppStatusBar
+from sonar_analyzer.ui.status_icons import severity_style
 from sonar_analyzer.ui.theme import apply_theme
 from sonar_analyzer.ui.view_tab_bar import ViewTabBar
 
@@ -676,7 +677,11 @@ class MainWindow(QMainWindow):
         self.set_recording(metadata, channels)
 
         span = metadata.time_range
-        self.bottom_dock.set_events(repository.events(span), start_ns=span.start_ns)
+        events = repository.events(span)
+        self.bottom_dock.set_events(events, start_ns=span.start_ns)
+        self.plot_panel.set_event_markers(
+            [(event.timestamp_ns, severity_style(event.severity).color) for event in events]
+        )
         self.right_dock.bit_status.set_results(repository.bit_results(span))
         self._refresh_recording_tree()
 
@@ -865,6 +870,7 @@ class MainWindow(QMainWindow):
         self.right_dock.close_inspector()
         self.right_dock.bit_status.clear()
         self.plot_panel.clear()
+        self.plot_panel.clear_event_markers()
         self._view_history.clear()
         self.dashboard.statistics.clear()
         self.bottom_dock.clear_events()

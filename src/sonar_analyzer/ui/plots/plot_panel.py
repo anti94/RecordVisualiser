@@ -36,6 +36,7 @@ grafik tek birime dönerse yine gizlenir.
 from __future__ import annotations
 
 import contextlib
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import cast
 
@@ -158,6 +159,12 @@ class PlotPanel(QWidget):
         # uygulanırken bu bayrak açılır ki `x_range_changed` yeniden
         # yayılmasın (geri besleme döngüsü olmaz).
         self._suppress_x_broadcast = False
+
+        # F3-045: olay zaman işaretleri. (timestamp_ns, renk) çiftleri
+        # saklanır; her biri X ekseninde `x_for_timestamp_ns` ile
+        # konumlanan bir dikey çizgiye dönüşür.
+        self._event_marks: list[tuple[int, str]] = []
+        self._event_lines: list[pg.InfiniteLine] = []
 
         #: F3-034: `dispose()` çağrıldı mı — ikinci çağrı sessizce döner.
         self._disposed = False
@@ -320,6 +327,8 @@ class PlotPanel(QWidget):
         # F3-025: "ev" aralığı = veri her değiştiğinde yeniden sığdırılan
         # görünüm. `reset_view()` pan/zoom sonrası buraya döner.
         self._capture_home_range()
+        # F3-045: ilk seri ankoru verince bekleyen olay işaretleri yerleşir.
+        self._rebuild_event_markers()
 
     # -- iki Y ekseni (F3-020) ----------------------------------------
 
@@ -663,6 +672,52 @@ class PlotPanel(QWidget):
             return None
         return min(lows), max(highs)
 
+    # -- olay zaman isaretleri (F3-045) -------------------------
+
+    def set_event_markers(self, marks: Sequence[tuple[int, str]]) -> None:
+        """Olay zaman işaretlerini `(timestamp_ns, renk)` çiftlerinden kurar — `F3-045`.
+
+        Her işaret, X ekseninde `x_for_timestamp_ns` ile hesaplanan
+        konuma bir dikey çizgi koyar — olay zamanı grafik X koordinatıyla
+        eşleşir (kabul kriteri). Henüz seri (zaman ankoru) yoksa çiftler
+        saklanır ve ilk seri eklenince yerleşir.
+        """
+        self._event_marks = list(marks)
+        self._rebuild_event_markers()
+
+    def clear_event_markers(self) -> None:
+        """Tüm olay işaretlerini kaldırır — `F3-045`."""
+        self._event_marks = []
+        self._rebuild_event_markers()
+
+    def _rebuild_event_markers(self) -> None:
+        for line in self._event_lines:
+            self.plot.removeItem(line)
+        self._event_lines = []
+        if self._t0_ns is None:
+            return
+        for timestamp_ns, color in self._event_marks:
+            line = pg.InfiniteLine(
+                pos=self.x_for_timestamp_ns(timestamp_ns),
+                angle=90,
+                movable=False,
+                pen=pg.mkPen(color, width=1, style=Qt.PenStyle.DashLine),
+            )
+            self.plot.addItem(line, ignoreBounds=True)
+            self._event_lines.append(line)
+
+    def event_marker_count(self) -> int:
+        """Şu an çizili olay işareti sayısı — testler için."""
+        return len(self._event_lines)
+
+    def event_marker_x(self, index: int) -> float:
+        """`index`. olay işaretinin X konumu (saniye)."""
+        return float(cast("float", self._event_lines[index].value()))
+
+    def event_marker_times_ns(self) -> list[int]:
+        """İşaretlerin mutlak epoch-ns zamanları, verildikleri sırayla."""
+        return [timestamp_ns for timestamp_ns, _color in self._event_marks]
+
     def remove_channel(self, channel_id: str) -> None:
         """Bir seriyi ve legend girdisini kaldırır — `F3-014`.
 
@@ -704,6 +759,7 @@ class PlotPanel(QWidget):
             self.clear_cursor()
             self.clear_delta_cursors()
             self.clear_time_region()
+            self._rebuild_event_markers()  # ankor gitti: işaretleri kaldır
         else:
             self._capture_home_range()
 
@@ -726,6 +782,7 @@ class PlotPanel(QWidget):
             return
         self._disposed = True
         self.clear()
+        self.clear_event_markers()
         self._teardown_right_axis()
         for signal, slot in (
             (self.plot.scene().sigMouseMoved, self._on_scene_mouse_moved),
