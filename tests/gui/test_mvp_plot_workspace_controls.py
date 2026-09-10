@@ -107,9 +107,10 @@ def test_roi_toggle_shortcut_opens_and_clears_the_region(win: MainWindow) -> Non
     assert win.plot_panel.time_region_x() is None
 
 
-def test_roi_rescopes_the_statistics_card(win: MainWindow) -> None:
+def test_roi_rescopes_the_statistics_card(win: MainWindow, qtbot: QtBot) -> None:
     plain = win.dashboard.statistics.title()
     win.plot_panel.set_time_region(1.0, 3.0)
+    qtbot.waitUntil(lambda: "1–3 s" in win.dashboard.statistics.title())
     assert win.dashboard.statistics.title() != plain
     assert "1" in win.dashboard.statistics.title()
 

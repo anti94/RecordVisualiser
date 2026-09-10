@@ -135,12 +135,15 @@ def test_engineer_compares_two_channels_on_one_axis(win: MainWindow) -> None:
 # -- ROI istatistiği --------------------------------------
 
 
-def test_selected_range_statistics_are_labelled_and_scoped(win: MainWindow) -> None:
+def test_selected_range_statistics_are_labelled_and_scoped(win: MainWindow, qtbot: QtBot) -> None:
     """§17.5: seçili zaman aralığının istatistiği anlaşılır (etiketli + pencereli)."""
     win.open_channel("ch0")
     plain_title = win.dashboard.statistics.title()
 
     win.plot_panel.set_time_region(2.0, 6.0)
+    # F4-061: analiz yüzeyleri en fazla 20 Hz boyanır; seçim bir sonraki
+    # karede yansır. Kabul ölçütü değişmez, yalnız kareyi bekleriz.
+    qtbot.waitUntil(lambda: win.dashboard.statistics.title() != plain_title, timeout=1_000)
 
     scoped_title = win.dashboard.statistics.title()
     assert scoped_title != plain_title

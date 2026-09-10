@@ -58,6 +58,7 @@ from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.export.csv_export import CsvExportResult, write_channel_csv
 from sonar_analyzer.export.image_export import export_widget_png
+from sonar_analyzer.logging.performance import measure
 from sonar_analyzer.repository.file_repository import FileRecordingRepository
 from sonar_analyzer.repository.mock_repository import SIMULATION_LABEL, MockRecordingRepository
 from sonar_analyzer.repository.protocol import RecordingRepository
@@ -163,6 +164,15 @@ class MainWindow(QMainWindow):
         self._plot_refresh_timer.setInterval(80)
         self._plot_refresh_timer.timeout.connect(self.refresh_plot_viewport)
         self._last_plot_request: tuple[float, float, int, tuple[str, ...]] | None = None
+        self._analysis_data: (
+            tuple[ChannelMetadata, NDArray[np.float64], tuple[float, float] | None] | None
+        ) = None
+        self._analysis_revision = 0
+        self._analysis_rendered: dict[QWidget, int] = {}
+        self._analysis_timer = QTimer(self)
+        self._analysis_timer.setSingleShot(True)
+        self._analysis_timer.setInterval(50)
+        self._analysis_timer.timeout.connect(self._flush_analysis_views)
         #: `F3-001` seçiminin sonucu; worker bu yolları açar.
         self.pending_load_paths: tuple[Path, ...] = ()
         #: Worker'dan dönen sonuçlar; ekrana bağlanması `F3-005`'in işi.
@@ -1013,6 +1023,8 @@ class MainWindow(QMainWindow):
     def refresh_plot_viewport(self) -> None:
         """Son viewport ve piksel bütçesine göre yalnız çizim serilerini yeniler."""
         self._plot_refresh_timer.stop()
+        if not self.center_shows_plot:
+            return
         if self._repository is None or self.plot_panel.channel is None:
             return
         request = self._plot_request()
@@ -1024,8 +1036,10 @@ class MainWindow(QMainWindow):
         )
         for channel_id in channel_ids:
             chunk = self._repository.query(channel_id, span, max_points=budget)
-            self.plot_panel.update_channel_data(channel_id, chunk)
-        self._refresh_processed_overlay()
+            with measure("render.plot", channel_id=channel_id, sample_count=len(chunk)):
+                self.plot_panel.update_channel_data(channel_id, chunk)
+        with measure("render.overlay"):
+            self._refresh_processed_overlay()
         self._last_plot_request = self._plot_request()
 
     def refresh_analysis_views(
@@ -1034,21 +1048,64 @@ class MainWindow(QMainWindow):
         values: NDArray[np.float64],
         region_seconds: tuple[float, float] | None = None,
     ) -> None:
-        """Merkezin analiz yüzeylerini **tek çağrıda aynı seçimle** günceller — `F4-052`.
+        """Son seçimi saklar; etkin yüzeyi en fazla 20 Hz günceller — F4-061.
 
-        Mockup'ın dört merkez bölgesi tek bir yoldan beslenir: zaman
-        serisi seçimin kaynağıdır (`PlotPanel`), istatistik / FFT /
-        spektrogram hücreleri (`DashboardPanel.set_channel_data`) ve tam
-        boy Spectrum + Waterfall görünümleri aynı `values` ile çizilir.
-        Böylece hiçbir bölge eski bir seçimi göstermez.
+        Gizli sekmeler hesaplama/çizim yapmaz; açılınca aynı son seçimi alır.
+        Ara sonuçlar kuyruk oluşturmaz: yalnız son veri snapshot'ı saklanır.
         """
-        data = np.asarray(values, dtype=np.float64)
-        self.dashboard.set_channel_data(channel, data, region_seconds=region_seconds)
-        self.spectrum_view.set_channel_data(channel, data, region_seconds=region_seconds)
-        self.waterfall_view.set_channel_data(channel, data, region_seconds=region_seconds)
+        data = np.array(values, dtype=np.float64, copy=True)
+        data.setflags(write=False)
+        self._analysis_data = (channel, data, region_seconds)
+        self._analysis_revision += 1
+        if not self._analysis_timer.isActive():
+            self._flush_analysis_views()
+
+    def _flush_analysis_views(self) -> None:
+        if self._analysis_data is None:
+            return
+        active = self.center_stack.currentWidget()
+        if active not in (self.dashboard, self.spectrum_view, self.waterfall_view):
+            return
+        if self._analysis_rendered.get(active) == self._analysis_revision:
+            return
+        channel, data, region = self._analysis_data
+        with measure(
+            "render.analysis",
+            panel=active.objectName(),
+            channel_id=channel.id,
+            sample_count=int(data.size),
+        ):
+            self._render_analysis_panel(active, channel, data, region)
+
+    def _render_analysis_panel(
+        self,
+        active: QWidget,
+        channel: ChannelMetadata,
+        data: NDArray[np.float64],
+        region: tuple[float, float] | None,
+    ) -> None:
+        if active is self.dashboard:
+            self.dashboard.set_channel_data(channel, data, region_seconds=region)
+        elif active is self.spectrum_view:
+            self.spectrum_view.set_channel_data(channel, data, region_seconds=region)
+        elif active is self.waterfall_view:
+            self.waterfall_view.set_channel_data(channel, data, region_seconds=region)
+        else:
+            return
+        self._analysis_rendered[active] = self._analysis_revision
+        self._analysis_timer.start()
+
+    def _on_center_view_changed(self, _index: int) -> None:
+        # Sekme açıldığında en son seçim ilk boyamadan önce hazır olur.
+        self._flush_analysis_views()
+        if self.center_shows_plot:
+            self._plot_refresh_timer.start()
 
     def clear_analysis_views(self) -> None:
         """Tüm analiz yüzeylerini boş duruma alır — `F4-052`."""
+        self._analysis_timer.stop()
+        self._analysis_data = None
+        self._analysis_rendered.clear()
         self.dashboard.clear_analysis()
         self.spectrum_view.clear()
         self.waterfall_view.clear()
@@ -1114,7 +1171,8 @@ class MainWindow(QMainWindow):
             span,
             max_points=self.plot_point_budget(),
         )
-        self.plot_panel.set_channel(channel, chunk, time_origin_ns=span.start_ns)
+        with measure("render.plot", channel_id=channel_id, sample_count=len(chunk)):
+            self.plot_panel.set_channel(channel, chunk, time_origin_ns=span.start_ns)
         # F3-041: grafik tek seriye sıfırlandı; eski görünüm komutları
         # kaldırılmış serilere atıfta bulunur, geçmişi temizle.
         self._view_history.clear()
@@ -1124,9 +1182,10 @@ class MainWindow(QMainWindow):
         self.right_dock.analysis_tools.step_editor.set_input_channel(channel_id)
         self.right_dock.analysis_tools.step_editor.set_sample_rate(channel.sample_rate_hz or 0.0)
         analysis_chunk = self._repository.query(channel_id, span)
+        self.clear_analysis_views()
+        self.show_plot()
         self.refresh_analysis_views(channel, analysis_chunk.values)
         self.plot_tool_bar.set_current_channel(channel_id)
-        self.show_plot()
         self.right_dock.show_channel(channel)
         self.bottom_dock.append_log(f"{channel.display_label} cizildi ({len(chunk)} ornek).")
         self._last_plot_request = self._plot_request()
@@ -1489,6 +1548,7 @@ class MainWindow(QMainWindow):
         self._dsp_runner.wait_all()
         self._plot_refresh_timer.stop()
         self._scrub_timer.stop()
+        self._analysis_timer.stop()
         self.file_loader.shutdown()
         self._close_owned_repositories()
         super().closeEvent(event)
@@ -1608,6 +1668,7 @@ class MainWindow(QMainWindow):
         self.center_stack.addWidget(self.spectrum_view)
         self.center_stack.addWidget(self.waterfall_view)
         self.center_stack.setCurrentWidget(self.empty_state)
+        self.center_stack.currentChanged.connect(self._on_center_view_changed)
 
         self.view_tabs.currentChanged.connect(self._on_view_tab_changed)
 

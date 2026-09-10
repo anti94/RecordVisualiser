@@ -13,6 +13,7 @@ from sonar_analyzer.io.index.record_index import RecordIndexEntry, build_record_
 from sonar_analyzer.io.index.storage import load_index_json, save_index_atomic
 from sonar_analyzer.io.profile_a_format import FileHeaderV1
 from sonar_analyzer.io.readers.binary_reader import ReadableBuffer
+from sonar_analyzer.logging.performance import measure
 
 INDEX_SCHEMA_VERSION = 1
 
@@ -21,6 +22,7 @@ INDEX_SCHEMA_VERSION = 1
 class CachedRecordIndex:
     entries: tuple[RecordIndexEntry, ...]
     reused: bool
+    fingerprint: SourceFingerprint
 
 
 def _records_digest(records: object) -> str:
@@ -80,6 +82,16 @@ def load_or_build_record_index(
     Çağıran header sözleşmesini önceden doğrular. Cache kaynak dosyanın kendisi
     olamaz. İndeks içeriğinin ayrı özeti, geçerli JSON'daki kazara değişimi yakalar.
     """
+    with measure("index", source_bytes=len(data), parser_version=parser_version):
+        return _load_or_build_record_index(data, header, cache_path, parser_version)
+
+
+def _load_or_build_record_index(
+    data: ReadableBuffer,
+    header: FileHeaderV1,
+    cache_path: Path,
+    parser_version: int,
+) -> CachedRecordIndex:
     fingerprint = SourceFingerprint.from_bytes(data)
     payload = load_index_json(cache_path)
     if payload is not None:
@@ -88,7 +100,7 @@ def load_or_build_record_index(
         except (ValueError, TypeError, OverflowError, RecursionError):
             entries = None
         if entries is not None:
-            return CachedRecordIndex(entries, reused=True)
+            return CachedRecordIndex(entries, reused=True, fingerprint=fingerprint)
 
     entries = tuple(build_record_index(data, header))
     records = [[entry.sequence_no, entry.byte_offset, entry.timestamp_ns] for entry in entries]
@@ -103,4 +115,4 @@ def load_or_build_record_index(
             "records_sha256": _records_digest(records),
         },
     )
-    return CachedRecordIndex(entries, reused=False)
+    return CachedRecordIndex(entries, reused=False, fingerprint=fingerprint)

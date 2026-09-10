@@ -163,7 +163,7 @@ def test_the_roi_narrows_the_spectrum_window(win: MainWindow, qtbot: QtBot) -> N
 
     # Gerçek ROI yolu: grafikte bölge kur (8 s kaydın ilk çeyreği).
     win.plot_panel.set_time_region(0.0, 2.0)
-    qtbot.waitUntil(lambda: "s" in win.dashboard.fft.title(), timeout=5_000)
+    qtbot.waitUntil(lambda: "0–2 s" in win.dashboard.fft.title(), timeout=5_000)
 
     narrowed = win.dashboard.fft.result()
     assert narrowed is not None
@@ -175,7 +175,7 @@ def test_the_roi_narrows_the_spectrum_window(win: MainWindow, qtbot: QtBot) -> N
 
 def test_a_second_roi_change_refreshes_again(win: MainWindow, qtbot: QtBot) -> None:
     win.plot_panel.set_time_region(0.0, 4.0)
-    qtbot.waitUntil(lambda: "s" in win.dashboard.fft.title(), timeout=5_000)
+    qtbot.waitUntil(lambda: "0–4 s" in win.dashboard.fft.title(), timeout=5_000)
     first_title = win.dashboard.fft.title()
     assert win.dashboard.fft.result() is not None
 

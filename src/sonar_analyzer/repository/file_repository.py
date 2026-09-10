@@ -31,6 +31,7 @@ from sonar_analyzer.io.decoders.channel_catalog import CHANNELS_8
 from sonar_analyzer.io.decoders.crc_validation import check_record_crc
 from sonar_analyzer.io.decoders.recording_events import RecordingEvents, scan_recording_events
 from sonar_analyzer.io.index.cache import load_or_build_record_index
+from sonar_analyzer.io.index.fingerprint import SourceFingerprint
 from sonar_analyzer.io.index.record_index import RecordIndexEntry, build_record_index
 from sonar_analyzer.io.profile_a_format import EXPECTED_PERIOD_US, FileHeaderV1
 from sonar_analyzer.io.readers.binary_reader import (
@@ -40,6 +41,8 @@ from sonar_analyzer.io.readers.binary_reader import (
 )
 from sonar_analyzer.io.readers.mapped_source import MappedSource
 from sonar_analyzer.io.readers.recording_reader import MAX_TIMESTAMP_NS, read_validated_header
+from sonar_analyzer.logging.performance import measure
+from sonar_analyzer.repository.cache_identity import CacheIdentity
 from sonar_analyzer.repository.display_query import DisplayQuery
 from sonar_analyzer.repository.protocol import EventFilter
 
@@ -48,7 +51,8 @@ class FileRecordingRepository:
     """Dosya açılmadan erişimi reddeder; başarılı açılış önceki snapshot'ı değiştirir."""
 
     def __init__(self) -> None:
-        self._display_query = DisplayQuery(self._query_raw)
+        self._display_query = DisplayQuery(self._query_raw, identity_for=self._cache_identity)
+        self._fingerprint: SourceFingerprint | None = None
         self._source: MappedSource | None = None
         self._data: ReadableBuffer | None = None
         self._header: FileHeaderV1 | None = None
@@ -84,10 +88,13 @@ class FileRecordingRepository:
             cached = load_or_build_record_index(data, header, target)
             entries = cached.entries
             reused = cached.reused
+            fingerprint = cached.fingerprint
         except OSError as exc:
             # Cache yazilamamasi salt okunur bir kaydin incelenmesini engellemez.
-            entries = tuple(build_record_index(data, header))
-            reused = False
+            with measure("index.fallback", source_bytes=len(data)):
+                entries = tuple(build_record_index(data, header))
+                reused = False
+                fingerprint = SourceFingerprint.from_bytes(data)
             messages.append(f"Indeks cache kullanilamadi: {exc}")
         period_ns = header.period_us * 1000
         valid_entries = [
@@ -121,11 +128,20 @@ class FileRecordingRepository:
         self._source, self._data, self._header = mapped, data, header
         self._metadata, self._channels = metadata, channels
         self._index, self._cache_reused = entries, reused
+        self._fingerprint = fingerprint
         self._time_index = tuple(sorted(valid_entries, key=lambda item: item.timestamp_ns))
         self._times = tuple(entry.timestamp_ns for entry in self._time_index)
         self._event_data = None
         self._event_times = ()
         self._display_query.clear()
+
+    def _cache_identity(self, channel_id: str) -> CacheIdentity:
+        self._require_open()
+        channel = next((channel for channel in self._channels if channel.id == channel_id), None)
+        if channel is None:
+            raise KeyError(f"Bilinmeyen kanal: {channel_id}")
+        assert self._fingerprint is not None
+        return CacheIdentity(self._fingerprint, channel)
 
     def _require_open(self) -> tuple[ReadableBuffer, FileHeaderV1]:
         if self._data is None or self._header is None:
@@ -329,6 +345,7 @@ class FileRecordingRepository:
         self._data = None
         self._header = None
         self._metadata = None
+        self._fingerprint = None
         self._channels = ()
         self._index = ()
         self._cache_reused = False

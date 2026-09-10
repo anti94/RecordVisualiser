@@ -46,6 +46,12 @@ def test_narrowing_plot_preserves_fft_roi_and_filter_input(
     assert counts[1] < counts[0]
 
     win.plot_panel.set_time_region(2.0, 4.0)
+    qtbot.waitUntil(
+        lambda: (
+            (selected := win.dashboard.selection()) is not None
+            and selected.region_seconds == (2, 4)
+        )
+    )
     selection = win.dashboard.selection()
     assert selection is not None and selection.sample_count == 2000
 

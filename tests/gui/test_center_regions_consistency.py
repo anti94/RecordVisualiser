@@ -61,12 +61,15 @@ def _assert_consistent(win: MainWindow) -> None:
     assert spectrogram.sample_rate_hz == channel.sample_rate_hz
     assert selection.channel_name in win.dashboard.spectrogram.title()
 
-    # Tam boy görünümler de aynı seçimde.
+    # Gizli görünümler F4-061 ile açıldıkları anda son seçimi hesaplar.
+    win.view_tabs.setCurrentIndex(win.view_tabs.tab_titles().index("Spectrum"))
     view_spectrum = win.spectrum_view.result()
     assert view_spectrum is not None
     assert view_spectrum.sample_count == selection.sample_count
+    win.view_tabs.setCurrentIndex(win.view_tabs.tab_titles().index("Spectrogram"))
     assert win.waterfall_view.has_slices
     assert selection.channel_name in win.waterfall_view.title()
+    win.view_tabs.setCurrentIndex(win.view_tabs.tab_titles().index("Time Series"))
 
 
 # --------------------------------------------------------------------------- #
@@ -114,7 +117,9 @@ def _select_region(win: MainWindow, qtbot: QtBot, start_s: float, end_s: float) 
     """Gerçek ROI yolunu sürer: grafikte bölge kur, sonucun gelmesini bekle."""
     win.plot_panel.set_time_region(start_s, end_s)
     qtbot.waitUntil(
-        lambda: (s := win.dashboard.selection()) is not None and s.region_seconds is not None,
+        lambda: (
+            (s := win.dashboard.selection()) is not None and s.region_seconds == (start_s, end_s)
+        ),
         timeout=5_000,
     )
 
@@ -133,6 +138,7 @@ def test_a_roi_narrows_every_region_to_the_same_window(win: MainWindow, qtbot: Q
 
 def test_the_same_region_text_appears_in_every_title(win: MainWindow, qtbot: QtBot) -> None:
     _select_region(win, qtbot, 5.0, 35.0)
+    _assert_consistent(win)
 
     selection = win.dashboard.selection()
     assert selection is not None and selection.region_seconds is not None

@@ -90,13 +90,14 @@ def window(qtbot: QtBot, tmp_path: Path) -> MainWindow:
     return win
 
 
-def test_selecting_a_time_region_rescopes_the_stats_card(window: MainWindow) -> None:
+def test_selecting_a_time_region_rescopes_the_stats_card(window: MainWindow, qtbot: QtBot) -> None:
     # CH0 (Pressure) = 100.0 + 0.5*n ; period 0.125 s ; n = 0..7
     window.left_dock.channel_activated.emit("ch0")
     stats = window.dashboard.statistics
 
     # [0.25, 0.55) s -> ornek n = 2, 3, 4 -> 101.0, 101.5, 102.0
     window.plot_panel.set_time_region(0.25, 0.55)
+    qtbot.waitUntil(lambda: "0.25–0.55 s" in stats.title())
 
     assert stats.field_value("Mean") == "101.5 bar"
     assert stats.field_value("Min") == "101 bar"
