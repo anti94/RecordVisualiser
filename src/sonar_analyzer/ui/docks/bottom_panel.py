@@ -18,18 +18,39 @@ from datetime import datetime, timezone
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QAbstractItemView,
+    QComboBox,
     QDockWidget,
+    QDoubleSpinBox,
+    QHBoxLayout,
     QHeaderView,
+    QLabel,
+    QLineEdit,
     QPlainTextEdit,
     QTableWidget,
     QTableWidgetItem,
     QTabWidget,
+    QVBoxLayout,
     QWidget,
 )
 
 from sonar_analyzer.domain.event import Event, Severity
-from sonar_analyzer.ui.docks.event_table_model import EVENT_COLUMNS, event_cell_text
+from sonar_analyzer.ui.docks.event_table_model import (
+    EVENT_COLUMNS,
+    distinct_sources,
+    event_cell_text,
+    filter_events,
+)
 from sonar_analyzer.ui.status_icons import make_status_icon, severity_style
+
+#: `F3-043` severity açılır kutusu: etiket -> alt sınır (`None` = hepsi).
+_SEVERITY_CHOICES: tuple[tuple[str, Severity | None], ...] = (
+    ("All severities", None),
+    ("Info+", Severity.INFO),
+    ("Warning+", Severity.WARNING),
+    ("Error+", Severity.ERROR),
+    ("Critical", Severity.CRITICAL),
+)
+_ALL_SOURCES = "All sources"
 
 DOCK_OBJECT_NAME = "dock_bottom_panel"
 DOCK_TITLE = "Log / Events"
@@ -77,7 +98,13 @@ class BottomPanelDock(QDockWidget):
         return self.log
 
     def _build_events(self) -> QWidget:
-        self.events = QTableWidget(0, len(EVENT_COLUMNS), self)
+        page = QWidget(self)
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(2)
+        layout.addWidget(self._build_event_filters(page))
+
+        self.events = QTableWidget(0, len(EVENT_COLUMNS), page)
         self.events.setObjectName("table_events")
         self.events.setHorizontalHeaderLabels(list(EVENT_COLUMNS))
         self.events.verticalHeader().setVisible(False)
@@ -86,7 +113,57 @@ class BottomPanelDock(QDockWidget):
         self.events.horizontalHeader().setSectionResizeMode(
             len(EVENT_COLUMNS) - 1, QHeaderView.ResizeMode.Stretch
         )
-        return self.events
+        layout.addWidget(self.events, 1)
+
+        # F3-043: filtre öncesi ham olaylar ve göreli-zaman ankoru.
+        self._all_events: tuple[Event, ...] = ()
+        self._events_start_ns = 0
+        self._suppress_filter_refresh = False
+        return page
+
+    def _build_event_filters(self, parent: QWidget) -> QWidget:
+        """`F3-043` zaman + severity + kaynak + metin filtre çubuğu."""
+        bar = QWidget(parent)
+        row = QHBoxLayout(bar)
+        row.setContentsMargins(2, 2, 2, 2)
+        row.setSpacing(4)
+
+        self.event_source_filter = QComboBox(bar)
+        self.event_source_filter.setObjectName("combo_event_source_filter")
+        self.event_source_filter.addItem(_ALL_SOURCES)
+        self.event_source_filter.currentIndexChanged.connect(self._apply_event_filters)
+        row.addWidget(self.event_source_filter)
+
+        self.event_severity_filter = QComboBox(bar)
+        self.event_severity_filter.setObjectName("combo_event_severity_filter")
+        for label, _level in _SEVERITY_CHOICES:
+            self.event_severity_filter.addItem(label)
+        self.event_severity_filter.currentIndexChanged.connect(self._apply_event_filters)
+        row.addWidget(self.event_severity_filter)
+
+        row.addWidget(QLabel("t≥", bar))
+        self.event_time_from = self._make_time_spin(bar, "spin_event_time_from")
+        row.addWidget(self.event_time_from)
+        row.addWidget(QLabel("t≤", bar))
+        self.event_time_to = self._make_time_spin(bar, "spin_event_time_to")
+        row.addWidget(self.event_time_to)
+
+        self.event_text_filter = QLineEdit(bar)
+        self.event_text_filter.setObjectName("input_event_text_filter")
+        self.event_text_filter.setPlaceholderText("Message contains…")
+        self.event_text_filter.setClearButtonEnabled(True)
+        self.event_text_filter.textChanged.connect(self._apply_event_filters)
+        row.addWidget(self.event_text_filter, 1)
+        return bar
+
+    def _make_time_spin(self, parent: QWidget, name: str) -> QDoubleSpinBox:
+        spin = QDoubleSpinBox(parent)
+        spin.setObjectName(name)
+        spin.setDecimals(3)
+        spin.setRange(0.0, 0.0)
+        spin.setSuffix(" s")
+        spin.valueChanged.connect(self._apply_event_filters)
+        return spin
 
     # -- log -------------------------------------------------------------
 
@@ -105,19 +182,65 @@ class BottomPanelDock(QDockWidget):
     # -- olaylar ---------------------------------------------------------
 
     def set_events(self, events: Sequence[Event], start_ns: int = 0) -> None:
-        """Olay tablosunu doldurur; mevcut satırları değiştirir — `F3-042`.
+        """Ham olay kümesini alır, filtre kontrollerini kurar ve tabloyu çizer.
 
-        Sütunlar plan Bölüm 5.5'e göre ortak `event_table_model`'den gelir.
-        Şiddet sütununda hem ikon hem metin bulunur: durum yalnız renkle
-        anlatılmaz (plan Bölüm 6.4). `start_ns` göreli zaman içindir.
+        Sütunlar plan Bölüm 5.5'e göre ortak `event_table_model`'den gelir
+        (`F3-042`). Filtre çubuğu (`F3-043`) bu tam kümenin üstüne uygulanır.
+        `start_ns` göreli zaman içindir.
         """
+        self._all_events = tuple(events)
+        self._events_start_ns = start_ns
+        self._suppress_filter_refresh = True
+        try:
+            self._populate_source_filter()
+            self._set_time_filter_bounds()
+        finally:
+            self._suppress_filter_refresh = False
+        self._apply_event_filters()
+
+    def _populate_source_filter(self) -> None:
+        self.event_source_filter.clear()
+        self.event_source_filter.addItem(_ALL_SOURCES)
+        for source in distinct_sources(self._all_events):
+            self.event_source_filter.addItem(source)
+
+    def _set_time_filter_bounds(self) -> None:
+        if not self._all_events:
+            span = 0.0
+        else:
+            latest = max(e.timestamp_ns for e in self._all_events)
+            span = max(0.0, (latest - self._events_start_ns) / 1_000_000_000)
+        for spin, value in ((self.event_time_from, 0.0), (self.event_time_to, span)):
+            spin.setRange(0.0, span)
+            spin.setValue(value)
+
+    def _current_event_filters(self) -> dict[str, object]:
+        source = self.event_source_filter.currentText()
+        _label, min_severity = _SEVERITY_CHOICES[self.event_severity_filter.currentIndex()]
+        return {
+            "start_ns": self._events_start_ns + round(self.event_time_from.value() * 1_000_000_000),
+            "end_ns": self._events_start_ns + round(self.event_time_to.value() * 1_000_000_000),
+            "min_severity": min_severity,
+            "source": "" if source == _ALL_SOURCES else source,
+            "text": self.event_text_filter.text().strip(),
+        }
+
+    def _apply_event_filters(self) -> None:
+        """`F3-043` — dört ölçütü birlikte uygular ve görünür satırları çizer."""
+        if getattr(self, "_suppress_filter_refresh", False):
+            return
+        visible = filter_events(self._all_events, **self._current_event_filters())  # type: ignore[arg-type]
+        self._render_events(visible)
+
+    def _render_events(self, events: Sequence[Event]) -> None:
         severity_column = EVENT_COLUMNS.index("Severity")
         self.events.setRowCount(len(events))
-
         for row, event in enumerate(events):
             style = severity_style(event.severity)
             for column, name in enumerate(EVENT_COLUMNS):
-                item = QTableWidgetItem(event_cell_text(event, name, start_ns=start_ns))
+                item = QTableWidgetItem(
+                    event_cell_text(event, name, start_ns=self._events_start_ns)
+                )
                 item.setData(Qt.ItemDataRole.UserRole, event.timestamp_ns)
                 if column == severity_column:
                     item.setIcon(make_status_icon(style))
@@ -130,6 +253,7 @@ class BottomPanelDock(QDockWidget):
         self.events.resizeColumnsToContents()
 
     def event_row_count(self) -> int:
+        """Filtreden sonra görünen satır sayısı."""
         return self.events.rowCount()
 
     def event_cell(self, row: int, column: str) -> str:
@@ -142,6 +266,15 @@ class BottomPanelDock(QDockWidget):
         return "" if item is None else item.text()
 
     def clear_events(self) -> None:
+        self._all_events = ()
+        self._suppress_filter_refresh = True
+        try:
+            self._populate_source_filter()
+            self._set_time_filter_bounds()
+            self.event_severity_filter.setCurrentIndex(0)
+            self.event_text_filter.clear()
+        finally:
+            self._suppress_filter_refresh = False
         self.events.setRowCount(0)
 
     # -- sorgular --------------------------------------------------------

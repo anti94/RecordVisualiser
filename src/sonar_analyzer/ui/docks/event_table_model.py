@@ -10,9 +10,11 @@ biçimlendirmeyi kullanır.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import datetime, timezone
 
-from sonar_analyzer.domain.event import Event
+from sonar_analyzer.domain.event import Event, Severity
+from sonar_analyzer.repository.protocol import EventFilter
 
 #: Plan Bölüm 5.5 sütunları, mockup sırasıyla.
 EVENT_COLUMNS: tuple[str, ...] = (
@@ -75,3 +77,43 @@ def event_cell_text(event: Event, column: str, *, start_ns: int) -> str:
 def event_row(event: Event, *, start_ns: int) -> tuple[str, ...]:
     """Bir olayın tüm sütunlarını sırayla döndürür."""
     return tuple(event_cell_text(event, column, start_ns=start_ns) for column in EVENT_COLUMNS)
+
+
+def filter_events(
+    events: Sequence[Event],
+    *,
+    start_ns: int | None = None,
+    end_ns: int | None = None,
+    min_severity: Severity | None = None,
+    source: str = "",
+    text: str = "",
+) -> list[Event]:
+    """Zaman + severity + kaynak + metin ölçütlerini **birlikte** (AND) uygular — `F3-043`.
+
+    Boş/`None` ölçüt o boyutta filtre uygulamaz. Zaman aralığı
+    kapalı-kapalıdır (`[start_ns, end_ns]`) — kullanıcı seçtiği pencerenin
+    sınırındaki olayı dışarıda bırakmasın diye.
+    """
+    criteria = EventFilter(
+        sources=[source] if source else [],
+        min_severity=min_severity,
+        text=text,
+    )
+    result: list[Event] = []
+    for event in events:
+        if start_ns is not None and event.timestamp_ns < start_ns:
+            continue
+        if end_ns is not None and event.timestamp_ns > end_ns:
+            continue
+        if criteria.matches(event):
+            result.append(event)
+    return result
+
+
+def distinct_sources(events: Sequence[Event]) -> list[str]:
+    """Olay listesindeki benzersiz kaynaklar, ilk görülme sırasıyla."""
+    seen: list[str] = []
+    for event in events:
+        if event.source not in seen:
+            seen.append(event.source)
+    return seen
