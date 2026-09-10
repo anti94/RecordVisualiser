@@ -71,23 +71,32 @@ def test_fft_and_statistics_are_side_by_side(dashboard: DashboardPanel) -> None:
     assert fft_x < stats_x
 
 
-def test_spectrogram_and_fft_are_unavailable_with_reason(dashboard: DashboardPanel) -> None:
-    """Hesaplama motoru yok (Faz 4); hücreler pasif olduğunu açıkça söylüyor."""
+def test_spectrogram_is_unavailable_with_reason(dashboard: DashboardPanel) -> None:
+    """Spektrogram motoru henüz yok (`F4-046`+); hücre bunu açıkça söylüyor."""
     from PySide6.QtWidgets import QLabel
 
     spec_label = dashboard.spectrogram.findChild(QLabel, "cell_spectrogram_label")
-    fft_label = dashboard.fft.findChild(QLabel, "cell_fft_label")
     assert spec_label is not None and NOT_YET_AVAILABLE in spec_label.text()
-    assert fft_label is not None and NOT_YET_AVAILABLE in fft_label.text()
+
+
+def test_fft_cell_is_a_real_spectrum_panel(dashboard: DashboardPanel) -> None:
+    """`F4-042`: FFT hücresi artık gerçek spektrumu çizer, yer tutucu değil."""
+    from sonar_analyzer.ui.plots.spectrum_panel import SpectrumPanel
+
+    assert isinstance(dashboard.fft, SpectrumPanel)
+    assert dashboard.spectrum() is dashboard.fft
+    # Veri gelmeden sonuç yok — sahte spektrum gösterilmiyor.
+    assert not dashboard.fft.has_spectrum
 
 
 def test_no_fake_spectral_result_is_shown(dashboard: DashboardPanel) -> None:
     from PySide6.QtWidgets import QLabel
 
-    for cell in (dashboard.spectrogram, dashboard.fft):
-        for label in cell.findChildren(QLabel):
-            assert "dB" not in label.text()
-            assert "Hz" not in label.text()
+    for label in dashboard.spectrogram.findChildren(QLabel):
+        assert "dB" not in label.text()
+        assert "Hz" not in label.text()
+    # FFT paneli veri gelmeden yalnız "örnek yok" der; sayısal sonuç vermez.
+    assert not dashboard.fft.has_spectrum
 
 
 # -- istatistik hesaplari ------------------------------------------------

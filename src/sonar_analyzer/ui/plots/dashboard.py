@@ -6,10 +6,11 @@ Mockup satır düzeni (`docs/ui/layout-map.md` §3, plan Bölüm 5.3):
     Satır 2  Spektrogram
     Satır 3  Sol FFT · Sağ İstatistik kartı
 
-Zaman serisi (`PlotPanel`, `F1-031`) ve istatistik kartı (`StatisticsPanel`,
-`F1-039`) gerçek veriyle çalışır. Spektrogram ve FFT hücreleri, hesaplama
-motoru gelene kadar (Faz 4, `F4-0xx`) açıkça pasif gösterilir — mockup'taki
-yerleri hazırdır ama sahte sonuç üretmezler (plan Bölüm 3.1).
+Zaman serisi (`PlotPanel`, `F1-031`), istatistik kartı (`StatisticsPanel`,
+`F1-039`) ve FFT hücresi (`SpectrumPanel`, `F4-042`) gerçek veriyle
+çalışır. Spektrogram hücresi, hesaplama motoru gelene kadar (`F4-046`+)
+açıkça pasif gösterilir — mockup'taki yeri hazırdır ama sahte sonuç
+üretmez (plan Bölüm 3.1).
 """
 
 from __future__ import annotations
@@ -19,6 +20,7 @@ from PySide6.QtWidgets import QGroupBox, QLabel, QSplitter, QVBoxLayout, QWidget
 
 from sonar_analyzer.ui.actions import NOT_YET_AVAILABLE
 from sonar_analyzer.ui.plots.plot_panel import PlotPanel
+from sonar_analyzer.ui.plots.spectrum_panel import SpectrumPanel
 from sonar_analyzer.ui.plots.statistics_panel import StatisticsPanel
 
 SPECTROGRAM_TITLE = "Spectrogram"
@@ -61,7 +63,8 @@ class DashboardPanel(QWidget):
         self.bottom = QSplitter(Qt.Orientation.Horizontal, self.rows)
         self.bottom.setObjectName("splitter_dashboard_bottom")
 
-        self.fft = _unavailable_cell(FFT_TITLE, "cell_fft")
+        # F4-042: FFT hücresi artık gerçek spektrumu çizer.
+        self.fft = SpectrumPanel(self.bottom)
         self.bottom.addWidget(self.fft)
 
         self.statistics = StatisticsPanel(self.bottom)
@@ -76,3 +79,7 @@ class DashboardPanel(QWidget):
     def row_titles(self) -> list[str]:
         """Kabul kontrolü için: üstten alta hücre başlıkları."""
         return [SPECTROGRAM_TITLE, FFT_TITLE]
+
+    def spectrum(self) -> SpectrumPanel:
+        """FFT hücresi — `F4-042`'den beri gerçek spektrum paneli."""
+        return self.fft

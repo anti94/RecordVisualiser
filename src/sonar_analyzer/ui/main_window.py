@@ -1005,6 +1005,8 @@ class MainWindow(QMainWindow):
             return
         span = self.plot_panel.time_region_x()
         self.dashboard.statistics.set_channel_data(channel, chunk.values, region_seconds=span)
+        # F4-042: ROI değişince FFT hücresi de o pencerenin spektrumunu çizer.
+        self.dashboard.fft.set_channel_data(channel, chunk.values, region_seconds=span)
 
     def open_channel(self, channel_id: str) -> None:
         """Seçilen kanalı çizer ve ayrıntısını gösterir.
@@ -1027,6 +1029,7 @@ class MainWindow(QMainWindow):
         self.right_dock.analysis_tools.step_editor.set_input_channel(channel_id)
         self.right_dock.analysis_tools.step_editor.set_sample_rate(channel.sample_rate_hz or 0.0)
         self.dashboard.statistics.set_channel_data(channel, chunk.values)
+        self.dashboard.fft.set_channel_data(channel, chunk.values)
         self.plot_tool_bar.set_current_channel(channel_id)
         self.show_plot()
         self.right_dock.show_channel(channel)
@@ -1522,6 +1525,7 @@ class MainWindow(QMainWindow):
         self.right_dock.bit_status.clear()
         self.plot_panel.clear()
         self.dashboard.statistics.clear()
+        self.dashboard.fft.clear()
         self.show_empty_state()
         self.playback_dock.set_recording_range(metadata.time_range)
         # F3-061: imleç zamanının UTC/yerel görünümü için kanonik köken.
@@ -1611,6 +1615,7 @@ class MainWindow(QMainWindow):
         self.status.set_time_origin(None)
         self.status.set_cursor_time(None)
         self.dashboard.statistics.clear()
+        self.dashboard.fft.clear()
         self.bottom_dock.clear_events()
         self.show_empty_state()
         self.status.set_field("file", "")
