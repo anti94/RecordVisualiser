@@ -103,6 +103,13 @@ class PlotPanel(QWidget):
         self.plot.setAcceptDrops(True)
         self.plot.installEventFilter(self)
 
+        # F3-021: sürükleyerek pan. Sol tık sürükleme görünür aralığı
+        # kaydırır (veriyi DEĞİL); tekerlek yakınlaştırır. pyqtgraph'ın
+        # öntanımlısı zaten budur, ama açıkça sabitliyoruz.
+        view_box = self.plot.getViewBox()
+        view_box.setMouseMode(pg.ViewBox.PanMode)
+        view_box.setMouseEnabled(x=True, y=True)
+
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.plot)
@@ -329,6 +336,27 @@ class PlotPanel(QWidget):
         if self._t0_ns is None:
             raise RuntimeError("Zaman ekseni ankoru yok: once bir kanal ekleyin.")
         return self._t0_ns + round(x_seconds * NS_PER_SECOND)
+
+    # -- pan / gorunur aralik (F3-021) --------------------------------
+
+    def pan(self, dx: float, dy: float = 0.0) -> None:
+        """Görünür aralığı `dx` saniye / `dy` birim kaydırır — `F3-021`.
+
+        Yalnız **görünümü** taşır; seri verisine (eğri dizileri, kaynak
+        `DataChunk`) dokunmaz. Fare sürüklemesinin programatik karşılığı;
+        pan sonrası autorange kapanır (pyqtgraph davranışı).
+        """
+        self.plot.getViewBox().translateBy(x=dx, y=dy)
+
+    def visible_range(self) -> tuple[float, float, float, float]:
+        """Görünür `(x_min, x_max, y_min, y_max)` — saniye / sol eksen birimi."""
+        (x_min, x_max), (y_min, y_max) = self.plot.getViewBox().viewRange()
+        return float(x_min), float(x_max), float(y_min), float(y_max)
+
+    def visible_x_range(self) -> tuple[float, float]:
+        """Görünür zaman aralığı `(x_min, x_max)` saniye."""
+        x_min, x_max, _y_min, _y_max = self.visible_range()
+        return x_min, x_max
 
     # -- sorgular --------------------------------------------------------
 
