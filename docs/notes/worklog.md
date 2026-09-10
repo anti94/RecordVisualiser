@@ -270,8 +270,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-052` | 20 dk | 8 dk 12 sn | `f42dd8b` | zaman serisi, STFT, FFT ve istatistiği birlikte bağla |
 | `F4-053` | 20 dk | 5 dk 45 sn | `30c9032` | memory mapping üzerinden blok okuma ekle |
 | `F4-054` | 20 dk | 23 dk 38 sn | `e107020` | yalnız görünür zaman bloklarını yükle |
+| `F4-055` | 20 dk | 22 dk 55 sn | `2957e2d` | piksel bütçesini analiz verisinden ayır |
 
-**252 commit · olculen toplam 2692 dk 1 sn · olculemeyen 1 (ilk commit)**
+**253 commit · olculen toplam 2714 dk 56 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

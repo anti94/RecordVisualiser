@@ -24,7 +24,7 @@ tetikleyici işten önce cevap bekliyor)
 | ADR-004 | Decoder versioning ve format detection | PLANLANDI | `F2-012` | `0.73.0` | Faz 2 | — |
 | ADR-005 | Index/cache formatı | PLANLANDI | `F2-028` (atomik yazım `F2-031`) | `0.89.0` | Faz 2 | — |
 | ADR-006 | Thread/process çalışma modeli | PLANLANDI | `F3-002` (DSP worker `F4-003`) | `0.104.0` | Faz 3 | — |
-| ADR-007 | Downsampling algoritması | PLANLANDI | `F4-056` (çok seviyeli özet `F4-057`) | `1.56.0` | Faz 4 | — |
+| ADR-007 | Downsampling algoritması | **YAZILDI** | `F4-056` (çok seviyeli özet `F4-057`) | `1.56.0` | Faz 4 | [ADR-007-downsampling.md](ADR-007-downsampling.md) |
 | ADR-008 | Workspace JSON şeması ve migration | PLANLANDI | `F3` workspace işleri | Faz 3 sonu | Faz 3 | — |
 | ADR-009 | Live-source / backpressure politikası | PLANLANDI | `F5-016` | `2.16.0` | Faz 5 | — |
 | ADR-010 | Native hızlandırmaya geçiş ölçütleri | PLANLANDI | `F4-067` | `1.67.0` | Faz 4 | — |

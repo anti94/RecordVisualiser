@@ -16,6 +16,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from sonar_analyzer.analysis.downsampling import downsample_chunk
 from sonar_analyzer.domain.channel import ChannelMetadata, ChannelSource
 from sonar_analyzer.domain.data_chunk import DataChunk
 from sonar_analyzer.domain.event import BitResult, BitState, Event, Severity
@@ -201,16 +202,12 @@ class MockRecordingRepository:
         selected_times = stamps[start:end]
         selected_values = full.values[start:end]
 
-        if max_points is not None and max_points > 0 and selected_times.size > max_points:
-            stride = int(np.ceil(selected_times.size / max_points))
-            selected_times = selected_times[::stride]
-            selected_values = selected_values[::stride]
-
-        return DataChunk(
+        chunk = DataChunk(
             channel_id=channel_id,
             timestamps_ns=np.ascontiguousarray(selected_times),
             values=np.ascontiguousarray(selected_values),
         )
+        return downsample_chunk(chunk, max_points)
 
     def events(
         self,

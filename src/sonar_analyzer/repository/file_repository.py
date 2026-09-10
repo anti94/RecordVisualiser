@@ -20,6 +20,7 @@ from types import TracebackType
 
 import numpy as np
 
+from sonar_analyzer.analysis.downsampling import envelope_indices
 from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.data_chunk import DataChunk, Quality
 from sonar_analyzer.domain.event import BitResult, Event
@@ -197,7 +198,11 @@ class FileRecordingRepository:
                 value = math.nan
             values.append(value)
             flags.append(int(quality))
-        keep = _bounded_indices(values, max_points)
+        keep = (
+            list(range(len(values)))
+            if max_points is None
+            else envelope_indices(np.asarray(values, dtype=np.float64), max_points).tolist()
+        )
         return DataChunk(
             channel_id=channel_id,
             timestamps_ns=np.array([selected[i].timestamp_ns for i in keep], dtype=np.int64),
@@ -341,31 +346,3 @@ class FileRecordingRepository:
         traceback: TracebackType | None,
     ) -> None:
         self.close()
-
-
-def _bounded_indices(values: list[float], max_points: int | None) -> list[int]:
-    """Sorgu bütçesi için küçük min/max özeti; kalıcı piramit Faz 4 işidir."""
-    if max_points is None or len(values) <= max_points:
-        return list(range(len(values)))
-    if max_points == 1:
-        return [
-            max(
-                range(len(values)),
-                key=lambda i: abs(values[i]) if math.isfinite(values[i]) else math.inf,
-            )
-        ]
-    buckets = max_points // 2
-    keep: list[int] = []
-    for bucket in range(buckets):
-        start = bucket * len(values) // buckets
-        stop = (bucket + 1) * len(values) // buckets
-        finite = [i for i in range(start, stop) if math.isfinite(values[i])]
-        missing = [i for i in range(start, stop) if not math.isfinite(values[i])]
-        if missing:
-            chosen = [missing[0]]
-            if finite:
-                chosen.append(max(finite, key=lambda i: abs(values[i])))
-        else:
-            chosen = [min(finite, key=lambda i: values[i]), max(finite, key=lambda i: values[i])]
-        keep.extend(sorted(set(chosen)))
-    return keep
