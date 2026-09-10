@@ -283,8 +283,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-059` | 20 dk | 44 dk 9 sn | `dd76eed` | bellek sınırlı LRU cache ekle |
 | `F4-059` | 20 dk | 5 dk 11 sn | `a7ac0ee` | girdi sınırı, katı boyut denetimi ve ölçülen bütçe raporu |
 | `F4-060` | 20 dk | 24 dk 28 sn | `49bee2f` | –F4-063 paralel hattını main ile birleştir |
+| `F4-064` | 20 dk | 20 dk 18 sn | `3ce9ff3` | büyük dosya benchmark koşusunu hazırla |
 
-**265 commit · olculen toplam 2884 dk 5 sn · olculemeyen 1 (ilk commit)**
+**266 commit · olculen toplam 2904 dk 23 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

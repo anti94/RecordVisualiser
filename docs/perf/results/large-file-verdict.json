@@ -1,0 +1,57 @@
+{
+  "task": "F4-065",
+  "source": "large-file",
+  "machine": {
+    "python": "3.9.13",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+    "cpu_count": 16,
+    "total_ram_bytes": 33685835776,
+    "numpy": "2.0.2"
+  },
+  "files_measured": [
+    "profile-b-64mb",
+    "profile-b-256mb",
+    "profile-b-1gb"
+  ],
+  "verdicts": [
+    {
+      "target": "metadata_seconds",
+      "goal": "<= 5 s",
+      "status": "gecti",
+      "measured": "0.148 ms (profile-b-64mb)",
+      "detail": "En kötü durum profile-b-64mb; 3 dosyanın hepsinde aralık header'dan O(1) türetilir."
+    },
+    {
+      "target": "query_ms",
+      "goal": "çoğu durumda <= 150 ms",
+      "status": "sapti",
+      "measured": "0/15 sorgu bütçede (%0)",
+      "detail": "En hızlı profile-b-64mb/0.01s 236.4 ms; en yavaş profile-b-1gb/full 190934.9 ms (1273x bütçe)."
+    },
+    {
+      "target": "pipeline_fps",
+      "goal": ">= 30 FPS",
+      "status": "sapti",
+      "measured": "0.24 FPS (profile-b-1gb) (koşu bütçeyi aşıp kesildi)",
+      "detail": "22/30 kare, medyan 4198.7 ms/kare. Qt paint hariç; algılanan FPS bundan yüksek olamaz."
+    },
+    {
+      "target": "memory_scaling",
+      "goal": "dosya boyutuyla doğrusal büyümemeli",
+      "status": "sapti",
+      "measured": "bayt başına tepe 5.11 -> 5.11 (1.00x)",
+      "detail": "profile-b-64mb (64 MB) ile profile-b-1gb (1000 MB) arasında dosya 15.6x büyüdü. Kullanım sabit olsaydı oran ~0.06x'e inerdi; 1.00x kalması kullanımın boyutla ölçeklendiğini gösterir."
+    }
+  ],
+  "passed": [
+    "metadata_seconds"
+  ],
+  "deviated": [
+    "query_ms",
+    "pipeline_fps",
+    "memory_scaling"
+  ],
+  "insufficient": [],
+  "status": "sapti"
+}
