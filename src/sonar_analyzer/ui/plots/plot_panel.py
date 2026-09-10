@@ -123,6 +123,10 @@ class PlotPanel(QWidget):
     #: `object`: epoch-ns değerleri C++ 32-bit `int`'e sığmaz, Python int
     #: olarak taşınır.
     time_region_changed = Signal(object, object)
+    #: F3-032: görünür X aralığı KULLANICI gezinmesiyle değişti — (x_min,
+    #: x_max) saniye. `apply_x_range()` ile gelen dış güncellemede yayılmaz
+    #: (döngü önleme).
+    x_range_changed = Signal(float, float)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -148,6 +152,11 @@ class PlotPanel(QWidget):
         # bir seri görünür; kapatınca solo ÖNCESİ görünürlükler geri gelir.
         self._solo_id: str | None = None
         self._pre_solo_visibility: dict[str, bool] | None = None
+
+        # F3-032: paneller arası X senkronizasyonu. Dıştan gelen aralık
+        # uygulanırken bu bayrak açılır ki `x_range_changed` yeniden
+        # yayılmasın (geri besleme döngüsü olmaz).
+        self._suppress_x_broadcast = False
 
         pg.setConfigOptions(antialias=True)
         self.plot = pg.PlotWidget(parent=self)
@@ -211,6 +220,9 @@ class PlotPanel(QWidget):
         self.plot.addItem(self._region, ignoreBounds=True)
         self._region_active = False
         self._region.sigRegionChangeFinished.connect(self._emit_time_region)
+
+        # F3-032: X aralığı değişince yayınla (dış güncelleme değilse).
+        view_box.sigXRangeChanged.connect(self._on_x_range_changed)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -773,6 +785,33 @@ class PlotPanel(QWidget):
         """Görünür zaman aralığı `(x_min, x_max)` saniye."""
         x_min, x_max, _y_min, _y_max = self.visible_range()
         return x_min, x_max
+
+    # -- paneller arasi X senkronu (F3-032) --------------------
+
+    def set_x_range(self, x_min: float, x_max: float) -> None:
+        """Görünür X aralığını kurar — kullanıcı gezinmesi sayılır — `F3-032`.
+
+        `x_range_changed` yayılır; bağlı paneller (`XAxisLink`) izler.
+        """
+        self.plot.getViewBox().setXRange(x_min, x_max, padding=0)
+
+    def apply_x_range(self, x_min: float, x_max: float) -> None:
+        """Bağlı bir panelden gelen X aralığını uygular — `F3-032`.
+
+        `x_range_changed` **yayılmaz**: aksi hâlde paneller birbirini
+        sonsuza dek tetiklerdi (döngü önleme).
+        """
+        self._suppress_x_broadcast = True
+        try:
+            self.plot.getViewBox().setXRange(x_min, x_max, padding=0)
+        finally:
+            self._suppress_x_broadcast = False
+
+    def _on_x_range_changed(self, _view_box: object, x_range: object) -> None:
+        if self._suppress_x_broadcast:
+            return
+        lo, hi = cast("tuple[float, float]", x_range)
+        self.x_range_changed.emit(float(lo), float(hi))
 
     def right_axis_y_range(self) -> tuple[float, float] | None:
         """İkinci (sağ) Y ekseninin görünür `(y_min, y_max)` aralığı; yoksa `None` — `F3-020`."""

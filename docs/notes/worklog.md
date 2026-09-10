@@ -166,8 +166,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-028` | 15 dk | 4 dk 32 sn | `fdd426e` | zaman bölgesi seçimini ekle |
 | `F3-029` | 15 dk | 2 dk 56 sn | `66b8035` | seçili bölgeye yakınlaşmayı bağla |
 | `F3-030` | 20 dk | 3 dk 38 sn | `34295ab` | legend gizleme ve solo eylemlerini ekle |
+| `F3-031` | 15 dk | 3 dk 31 sn | `a4bdf47` | seri rengi, çizgi ve marker ayarını ekle |
 
-**148 commit · olculen toplam 2075 dk 37 sn · olculemeyen 1 (ilk commit)**
+**149 commit · olculen toplam 2079 dk 8 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
