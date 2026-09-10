@@ -38,6 +38,7 @@ from sonar_analyzer.application.file_loader import (
 from sonar_analyzer.application.load_errors import describe_load_error
 from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.recording import RecordingMetadata
+from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.repository.file_repository import FileRecordingRepository
 from sonar_analyzer.repository.mock_repository import SIMULATION_LABEL, MockRecordingRepository
 from sonar_analyzer.repository.protocol import RecordingRepository
@@ -234,6 +235,19 @@ class MainWindow(QMainWindow):
             self.plot_panel.set_axis_range(axis, y_min, y_max)
         except ValueError as exc:
             self.bottom_dock.append_log(f"Eksen araligi uygulanamadi: {exc}")
+
+    def _on_stats_region_changed(self, start_ns: int, end_ns: int) -> None:
+        """Grafikte zaman bölgesi seçilince istatistik kartını o pencereye daraltır — `F3-039`.
+
+        Seçili (birincil) kanalın yalnız `[start_ns, end_ns)` aralığındaki
+        örnekleri için mean/std/RMS/min/max/peak-peak yeniden hesaplanır.
+        """
+        channel = self.plot_panel.channel
+        if channel is None or self._repository is None:
+            return
+        chunk = self._repository.query(channel.id, TimeRange(int(start_ns), int(end_ns)))
+        span = self.plot_panel.time_region_x()
+        self.dashboard.statistics.set_channel_data(channel, chunk.values, region_seconds=span)
 
     def open_channel(self, channel_id: str) -> None:
         """Seçilen kanalı çizer ve ayrıntısını gösterir.
@@ -664,6 +678,7 @@ class MainWindow(QMainWindow):
         self.dashboard = DashboardPanel(container)
         self.plot_panel = self.dashboard.time_series
         self.plot_panel.channel_dropped.connect(self._on_channel_dropped)
+        self.plot_panel.time_region_changed.connect(self._on_stats_region_changed)
 
         self.center_stack = QStackedWidget(container)
         self.center_stack.setObjectName("center_stack")

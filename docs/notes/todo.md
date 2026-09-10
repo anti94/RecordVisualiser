@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 140 tamamlandı · 352 kaldı**
+**Toplam 492 madde · 141 tamamlandı · 351 kaldı**
 
-`[#######.................]` %28.5
+`[#######.................]` %28.7
 
 ## Özet
 
@@ -37,12 +37,12 @@ Work in fully autonomous mode.
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
-| Faz 3 — MVP analiz arayüzü | 38 | 42 | 80 |
+| Faz 3 — MVP analiz arayüzü | 39 | 41 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **140** | **352** | **492** |
+| **Toplam** | **141** | **351** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -163,7 +163,7 @@ Work in fully autonomous mode.
 | [x] | `F2-040` | `0.101.0` | 20 dk | Kaynak dosyanın değişmediğini doğrula |
 | [x] | `F2-041` | `0.102.0` | 15 dk | Parser milestone kabulünü kaydet |
 
-### Faz 3 — MVP analiz arayüzü (38/80)
+### Faz 3 — MVP analiz arayüzü (39/80)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -205,7 +205,7 @@ Work in fully autonomous mode.
 | [x] | `F3-036` | `0.138.0` | 20 dk | Inspector görünüm ayarlarını grafiğe bağla |
 | [x] | `F3-037` | `0.139.0` | 20 dk | Count, min, max ve mean hesabını ekle |
 | [x] | `F3-038` | `0.140.0` | 20 dk | Median, RMS, std ve peak-to-peak ekle |
-| [ ] | `F3-039` | `0.141.0` | 20 dk | ROI istatistiklerini dashboard kartına bağla |
+| [x] | `F3-039` | `0.141.0` | 20 dk | ROI istatistiklerini dashboard kartına bağla |
 | [ ] | `F3-040` | `0.142.0` | 20 dk | Geliştirici ham kayıt görünümünü ekle |
 | [ ] | `F3-041` | `0.143.0` | 20 dk | Görünüm ayarları için undo/redo ekle |
 | [ ] | `F3-042` | `0.144.0` | 20 dk | Ortak olay tablo modelini ekle |

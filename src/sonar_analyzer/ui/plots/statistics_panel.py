@@ -1,10 +1,11 @@
-"""İstatistik kartı — `F1-039`.
+"""İstatistik kartı — `F1-039`, `F3-039`.
 
 Mockup satır 3 sağ hücresi (`docs/ui/layout-map.md` §3): `Statistics (kanal)`
 başlığı altında Mean, Std, RMS, Min, Max, Peak-Peak — altı satır, birimli.
 
-Plan Bölüm 3.1: "Seçili kanal için temel istatistikler" MVP kapsamındadır; bu
-panel gerçek hesap yapar, yer tutucu değildir.
+Sayısal hesap `analysis.statistics.summarize` tek kaynağından gelir
+(`F3-037`/`F3-038`); bu panel yalnız biçimlendirir. `F3-039`: kart bir
+zaman bölgesi (ROI) seçilince yalnız o pencerenin değerlerini gösterir.
 """
 
 from __future__ import annotations
@@ -13,31 +14,28 @@ import numpy as np
 from numpy.typing import NDArray
 from PySide6.QtWidgets import QFormLayout, QGroupBox, QLabel, QWidget
 
+from sonar_analyzer.analysis.statistics import summarize
 from sonar_analyzer.domain.channel import ChannelMetadata
 
 EMPTY_VALUE = "—"
 EMPTY_TITLE = "Statistics"
 
-#: Mockup sirasi.
+#: Mockup sirasi -> `SampleStatistics` alani.
 STAT_FIELDS: tuple[str, ...] = ("Mean", "Std", "RMS", "Min", "Max", "Peak-Peak")
+_FIELD_TO_ATTR: dict[str, str] = {
+    "Mean": "mean",
+    "Std": "std",
+    "RMS": "rms",
+    "Min": "minimum",
+    "Max": "maximum",
+    "Peak-Peak": "peak_to_peak",
+}
 
 
 def compute_statistics(values: NDArray[np.float64]) -> dict[str, float]:
-    """Altı temel istatistiği hesaplar. Boş dizide `NaN` döner."""
-    if values.size == 0:
-        return {name: float("nan") for name in STAT_FIELDS}
-
-    data = values.astype(np.float64)
-    minimum = float(data.min())
-    maximum = float(data.max())
-    return {
-        "Mean": float(data.mean()),
-        "Std": float(data.std()),
-        "RMS": float(np.sqrt(np.mean(np.square(data)))),
-        "Min": minimum,
-        "Max": maximum,
-        "Peak-Peak": maximum - minimum,
-    }
+    """Kartın altı alanını `summarize()`'dan biçimlenmemiş `float` olarak verir."""
+    stats = summarize(np.asarray(values, dtype=np.float64))
+    return {field: float(getattr(stats, attr)) for field, attr in _FIELD_TO_ATTR.items()}
 
 
 class StatisticsPanel(QGroupBox):
@@ -61,9 +59,22 @@ class StatisticsPanel(QGroupBox):
 
     # -- veri --------------------------------------------------------------
 
-    def set_channel_data(self, channel: ChannelMetadata, values: NDArray[np.float64]) -> None:
-        """Kanalın değerlerinden istatistikleri hesaplar ve gösterir."""
-        self.setTitle(f"Statistics ({channel.name})")
+    def set_channel_data(
+        self,
+        channel: ChannelMetadata,
+        values: NDArray[np.float64],
+        region_seconds: tuple[float, float] | None = None,
+    ) -> None:
+        """Kanalın değerlerinden istatistikleri hesaplar ve gösterir.
+
+        `region_seconds` verilirse (ROI, `F3-039`) başlığa aralık yazılır
+        ve `values` yalnız o pencerenin örnekleri olmalıdır.
+        """
+        if region_seconds is None:
+            self.setTitle(f"Statistics ({channel.name})")
+        else:
+            lo, hi = region_seconds
+            self.setTitle(f"Statistics ({channel.name} · {lo:.3g}–{hi:.3g} s)")
         stats = compute_statistics(values)
         unit = f" {channel.unit}" if channel.unit else ""
         for name in STAT_FIELDS:

@@ -173,8 +173,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-035` | 15 dk | 2 dk 25 sn | `6cbb983` | seçili kanal metadata'sını Inspector'a bağla |
 | `F3-036` | 20 dk | 3 dk 43 sn | `3865c71` | Inspector görünüm ayarlarını grafiğe bağla |
 | `F3-037` | 20 dk | 2 dk 44 sn | `5897127` | count, min, max ve mean hesabını ekle |
+| `F3-038` | 20 dk | 2 dk 27 sn | `9d35ae5` | median, RMS, std ve peak-to-peak ekle |
 
-**155 commit · olculen toplam 2098 dk 50 sn · olculemeyen 1 (ilk commit)**
+**156 commit · olculen toplam 2101 dk 17 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
