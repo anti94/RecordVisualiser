@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 148 tamamlandı · 344 kaldı**
+**Toplam 492 madde · 149 tamamlandı · 343 kaldı**
 
-`[#######.................]` %30.1
+`[#######.................]` %30.3
 
 ## Özet
 
@@ -37,12 +37,12 @@ Work in fully autonomous mode.
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
-| Faz 3 — MVP analiz arayüzü | 46 | 34 | 80 |
+| Faz 3 — MVP analiz arayüzü | 47 | 33 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **148** | **344** | **492** |
+| **Toplam** | **149** | **343** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -163,7 +163,7 @@ Work in fully autonomous mode.
 | [x] | `F2-040` | `0.101.0` | 20 dk | Kaynak dosyanın değişmediğini doğrula |
 | [x] | `F2-041` | `0.102.0` | 15 dk | Parser milestone kabulünü kaydet |
 
-### Faz 3 — MVP analiz arayüzü (46/80)
+### Faz 3 — MVP analiz arayüzü (47/80)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -213,7 +213,7 @@ Work in fully autonomous mode.
 | [x] | `F3-044` | `0.146.0` | 15 dk | Olay seçimini Inspector detayına bağla |
 | [x] | `F3-045` | `0.147.0` | 20 dk | Olay zaman işaretlerini çiz |
 | [x] | `F3-046` | `0.148.0` | 20 dk | Olay çift tıklamasını ortak zamana bağla |
-| [ ] | `F3-047` | `0.149.0` | 20 dk | TX aralıklarını gölgeli bölge olarak çiz |
+| [x] | `F3-047` | `0.149.0` | 20 dk | TX aralıklarını gölgeli bölge olarak çiz |
 | [ ] | `F3-048` | `0.150.0` | 15 dk | Transmission sekmesini TX aralıklarına bağla |
 | [ ] | `F3-049` | `0.151.0` | 20 dk | Yakın tekrar olaylarını grupla |
 | [ ] | `F3-050` | `0.152.0` | 15 dk | Marker ve TX görünürlüğü kontrollerini ekle |

@@ -1534,7 +1534,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 | [x] | `F3-044` | `0.146.0` | 15 dk | Olay seçimini Inspector detayına bağla | Kaynak, kod ve ilgili kanallar doğru gösterilir | `F3-043` | `feat(ui): F3-044 olay seçimini Inspector detayına bağla` |
 | [x] | `F3-045` | `0.147.0` | 20 dk | Olay zaman işaretlerini çiz | Olay zamanı grafik X koordinatıyla eşleşir | `F3-044` | `feat(plot): F3-045 olay zaman işaretlerini çiz` |
 | [x] | `F3-046` | `0.148.0` | 20 dk | Olay çift tıklamasını ortak zamana bağla | Senkronize grafikler seçilen olay zamanına gider | `F3-045` | `feat(ui): F3-046 olay çift tıklamasını ortak zamana bağla` |
-| [ ] | `F3-047` | `0.149.0` | 20 dk | TX aralıklarını gölgeli bölge olarak çiz | START/STOP sınırları zaman ekseniyle eşleşir | `F3-046` | `feat(plot): F3-047 tX aralıklarını gölgeli bölge olarak çiz` |
+| [x] | `F3-047` | `0.149.0` | 20 dk | TX aralıklarını gölgeli bölge olarak çiz | START/STOP sınırları zaman ekseniyle eşleşir | `F3-046` | `feat(plot): F3-047 tX aralıklarını gölgeli bölge olarak çiz` |
 | [ ] | `F3-048` | `0.150.0` | 15 dk | Transmission sekmesini TX aralıklarına bağla | Seçili kaydın TX durumu ve zaman aralıkları sekmede görünür | `F3-047` | `feat(ui): F3-048 transmission sekmesini TX aralıklarına bağla` |
 | [ ] | `F3-049` | `0.151.0` | 20 dk | Yakın tekrar olaylarını grupla | Grup sayısı ve açılan ayrıntılar özgün olayları korur | `F3-048` | `feat(ui): F3-049 yakın tekrar olaylarını grupla` |
 | [ ] | `F3-050` | `0.152.0` | 15 dk | Marker ve TX görünürlüğü kontrollerini ekle | Görünürlük değişimi olay verisini etkilemez | `F3-049` | `feat(ui): F3-050 marker ve TX görünürlüğü kontrollerini ekle` |

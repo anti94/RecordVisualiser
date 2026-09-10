@@ -166,6 +166,12 @@ class PlotPanel(QWidget):
         self._event_marks: list[tuple[int, str]] = []
         self._event_lines: list[pg.InfiniteLine] = []
 
+        # F3-047: TX (transmisyon) aralıkları — (start_ns, end_ns) çiftleri
+        # gölgeli bant olarak çizilir; START/STOP sınırları zaman ekseniyle
+        # eşleşir.
+        self._tx_spans: list[tuple[int, int]] = []
+        self._tx_regions: list[pg.LinearRegionItem] = []
+
         #: F3-034: `dispose()` çağrıldı mı — ikinci çağrı sessizce döner.
         self._disposed = False
 
@@ -329,6 +335,7 @@ class PlotPanel(QWidget):
         self._capture_home_range()
         # F3-045: ilk seri ankoru verince bekleyen olay işaretleri yerleşir.
         self._rebuild_event_markers()
+        self._rebuild_tx_regions()
 
     # -- iki Y ekseni (F3-020) ----------------------------------------
 
@@ -718,6 +725,53 @@ class PlotPanel(QWidget):
         """İşaretlerin mutlak epoch-ns zamanları, verildikleri sırayla."""
         return [timestamp_ns for timestamp_ns, _color in self._event_marks]
 
+    # -- TX araliklari: golgeli bolgeler (F3-047) --------------
+
+    def set_tx_regions(self, spans: Sequence[tuple[int, int]]) -> None:
+        """TX aralıklarını `(start_ns, end_ns)` çiftlerinden gölgeli bant çizer — `F3-047`.
+
+        Her bandın sol/sağ kenarı `x_for_timestamp_ns` ile hesaplanır —
+        START/STOP sınırları zaman ekseniyle eşleşir (kabul kriteri).
+        Zaman ankoru yoksa çiftler saklanır ve ilk seri eklenince yerleşir.
+        """
+        self._tx_spans = [(min(a, b), max(a, b)) for a, b in spans]
+        self._rebuild_tx_regions()
+
+    def clear_tx_regions(self) -> None:
+        """Tüm TX bantlarını kaldırır — `F3-047`."""
+        self._tx_spans = []
+        self._rebuild_tx_regions()
+
+    def _rebuild_tx_regions(self) -> None:
+        for region in self._tx_regions:
+            self.plot.removeItem(region)
+        self._tx_regions = []
+        if self._t0_ns is None:
+            return
+        for start_ns, end_ns in self._tx_spans:
+            region = pg.LinearRegionItem(
+                values=(self.x_for_timestamp_ns(start_ns), self.x_for_timestamp_ns(end_ns)),
+                orientation="vertical",
+                movable=False,
+                brush=pg.mkBrush(120, 170, 230, 45),
+            )
+            region.setZValue(-10)
+            self.plot.addItem(region, ignoreBounds=True)
+            self._tx_regions.append(region)
+
+    def tx_region_count(self) -> int:
+        """Şu an çizili TX bandı sayısı — testler için."""
+        return len(self._tx_regions)
+
+    def tx_region_x(self, index: int) -> tuple[float, float]:
+        """`index`. TX bandının `(x_start, x_end)` konumu (saniye)."""
+        lo, hi = cast("tuple[float, float]", self._tx_regions[index].getRegion())
+        return float(lo), float(hi)
+
+    def tx_region_times_ns(self) -> list[tuple[int, int]]:
+        """TX bantlarının `(start_ns, end_ns)` zamanları, verildikleri sırayla."""
+        return list(self._tx_spans)
+
     def remove_channel(self, channel_id: str) -> None:
         """Bir seriyi ve legend girdisini kaldırır — `F3-014`.
 
@@ -760,6 +814,7 @@ class PlotPanel(QWidget):
             self.clear_delta_cursors()
             self.clear_time_region()
             self._rebuild_event_markers()  # ankor gitti: işaretleri kaldır
+            self._rebuild_tx_regions()
         else:
             self._capture_home_range()
 
@@ -783,6 +838,7 @@ class PlotPanel(QWidget):
         self._disposed = True
         self.clear()
         self.clear_event_markers()
+        self.clear_tx_regions()
         self._teardown_right_axis()
         for signal, slot in (
             (self.plot.scene().sigMouseMoved, self._on_scene_mouse_moved),

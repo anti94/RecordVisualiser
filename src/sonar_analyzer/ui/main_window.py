@@ -704,6 +704,9 @@ class MainWindow(QMainWindow):
         self.plot_panel.set_event_markers(
             [(event.timestamp_ns, severity_style(event.severity).color) for event in events]
         )
+        self.plot_panel.set_tx_regions(
+            [(tx.start_ns, tx.end_ns) for tx in repository.transmissions(span)]
+        )
         self.right_dock.bit_status.set_results(repository.bit_results(span))
         self._refresh_recording_tree()
 
@@ -893,6 +896,7 @@ class MainWindow(QMainWindow):
         self.right_dock.bit_status.clear()
         self.plot_panel.clear()
         self.plot_panel.clear_event_markers()
+        self.plot_panel.clear_tx_regions()
         self._view_history.clear()
         self.dashboard.statistics.clear()
         self.bottom_dock.clear_events()
