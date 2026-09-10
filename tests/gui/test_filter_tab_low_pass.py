@@ -79,6 +79,8 @@ def test_apply_from_the_filter_tab_draws_the_low_pass_result(win: MainWindow, qt
     card.apply_filter_button.click()
     qtbot.waitUntil(lambda: win.plot_panel.has_processed_overlay, timeout=10_000)
 
+    # Qt yerleşimi tamamlanırken piksel bütçesi değişebilir; mevcut çizimi kontrol et.
+    _x, raw = win.plot_panel.curve_data()
     processed = win.plot_panel.processed_overlay_values()
     assert processed.shape == raw.shape
     source = MockRecordingRepository(duration_s=8.0, sample_rate_hz=200.0)

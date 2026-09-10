@@ -273,8 +273,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-055` | 20 dk | 22 dk 55 sn | `2957e2d` | piksel bütçesini analiz verisinden ayır |
 | `F4-056` | 20 dk | 2 dk 50 sn | `2d10f87` | dar darbeleri koruyan min/max azaltımı ekle |
 | `F4-056` | 20 dk | 1 dk 42 sn | `c99e482` | bütçe doğrulaması ve kalite tiplerini netleştir |
+| `F4-057` | 20 dk | 55 sn | `f4142eb` | çok seviyeli min/max özet blokları üret |
 
-**255 commit · olculen toplam 2719 dk 28 sn · olculemeyen 1 (ilk commit)**
+**256 commit · olculen toplam 2720 dk 23 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

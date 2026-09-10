@@ -16,7 +16,6 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from sonar_analyzer.analysis.downsampling import downsample_chunk
 from sonar_analyzer.domain.channel import ChannelMetadata, ChannelSource
 from sonar_analyzer.domain.data_chunk import DataChunk
 from sonar_analyzer.domain.event import BitResult, BitState, Event, Severity
@@ -24,6 +23,7 @@ from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import RECORD_PERIOD_NS, TimeRange
 from sonar_analyzer.domain.transmission import TransmissionInterval, TxState
 from sonar_analyzer.processing.signals import NS_PER_SECOND, noise, sine
+from sonar_analyzer.repository.display_query import DisplayQuery
 from sonar_analyzer.repository.protocol import EventFilter
 
 #: Simulasyon kaynaginin adi; arayuzde bu metin gosterilir.
@@ -149,6 +149,7 @@ class MockRecordingRepository:
         self._seed = seed
         self._schedule = schedule
         self._closed = False
+        self._display_query = DisplayQuery(self._query_raw)
         self._cache: dict[str, DataChunk] = {}
 
         self._channels = tuple(
@@ -190,7 +191,9 @@ class MockRecordingRepository:
     ) -> DataChunk:
         if self._closed:
             raise RuntimeError("Repository kapatildi")
+        return self._display_query.query(channel_id, time_range, max_points)
 
+    def _query_raw(self, channel_id: str, time_range: TimeRange) -> DataChunk:
         full = self._channel_data(channel_id)
         if full is None:
             raise KeyError(f"Bilinmeyen kanal: {channel_id}")
@@ -207,7 +210,7 @@ class MockRecordingRepository:
             timestamps_ns=np.ascontiguousarray(selected_times),
             values=np.ascontiguousarray(selected_values),
         )
-        return downsample_chunk(chunk, max_points)
+        return chunk
 
     def events(
         self,
@@ -234,6 +237,7 @@ class MockRecordingRepository:
         ]
 
     def close(self) -> None:
+        self._display_query.clear()
         self._closed = True
         self._cache.clear()
 

@@ -48,7 +48,11 @@ def window(qtbot: QtBot) -> tuple[MainWindow, _CountingRepo]:
     repo = _CountingRepo()
     win.set_repository(repo)
     win.left_dock.channel_activated.emit("ch0")
-    repo.query_calls.clear()  # kanal çizimindeki tam-aralık sorgusunu sayma
+    # `F4-058`: kanal çizildikten sonra viewport yenilemesi bir kez daha
+    # sorgu yapar (panel yerleşince piksel bütçesi değişir). Bu test ROI
+    # debounce'unu sayar; o yenilemenin oturmasını bekleyip sayacı sıfırla.
+    qtbot.wait(200)
+    repo.query_calls.clear()
     return win, repo
 
 

@@ -121,6 +121,7 @@ def test_apply_band_pass_from_the_filter_tab_draws_the_result(
     card.apply_filter_button.click()
     qtbot.waitUntil(lambda: win.plot_panel.has_processed_overlay, timeout=10_000)
 
+    x, _raw = win.plot_panel.curve_data()
     processed = win.plot_panel.processed_overlay_values()
     source = MockRecordingRepository(duration_s=8.0, sample_rate_hz=200.0)
     full = source.query("ch0", source.metadata().time_range).values

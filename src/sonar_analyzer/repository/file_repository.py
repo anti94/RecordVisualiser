@@ -20,7 +20,6 @@ from types import TracebackType
 
 import numpy as np
 
-from sonar_analyzer.analysis.downsampling import envelope_indices
 from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.data_chunk import DataChunk, Quality
 from sonar_analyzer.domain.event import BitResult, Event
@@ -41,6 +40,7 @@ from sonar_analyzer.io.readers.binary_reader import (
 )
 from sonar_analyzer.io.readers.mapped_source import MappedSource
 from sonar_analyzer.io.readers.recording_reader import MAX_TIMESTAMP_NS, read_validated_header
+from sonar_analyzer.repository.display_query import DisplayQuery
 from sonar_analyzer.repository.protocol import EventFilter
 
 
@@ -48,6 +48,7 @@ class FileRecordingRepository:
     """Dosya açılmadan erişimi reddeder; başarılı açılış önceki snapshot'ı değiştirir."""
 
     def __init__(self) -> None:
+        self._display_query = DisplayQuery(self._query_raw)
         self._source: MappedSource | None = None
         self._data: ReadableBuffer | None = None
         self._header: FileHeaderV1 | None = None
@@ -124,6 +125,7 @@ class FileRecordingRepository:
         self._times = tuple(entry.timestamp_ns for entry in self._time_index)
         self._event_data = None
         self._event_times = ()
+        self._display_query.clear()
 
     def _require_open(self) -> tuple[ReadableBuffer, FileHeaderV1]:
         if self._data is None or self._header is None:
@@ -146,6 +148,10 @@ class FileRecordingRepository:
         time_range: TimeRange,
         max_points: int | None = None,
     ) -> DataChunk:
+        self._require_open()
+        return self._display_query.query(channel_id, time_range, max_points)
+
+    def _query_raw(self, channel_id: str, time_range: TimeRange) -> DataChunk:
         """İkili aramayla [başlangıç, bitiş) içindeki kayıtları çözer — F2-034.
 
         Fiziksel indeks değişmez; zaman indeksi sırasız/tekrarlı zamanları sorgu
@@ -157,8 +163,6 @@ class FileRecordingRepository:
         )
         if slot is None:
             raise KeyError(f"Bilinmeyen kanal: {channel_id}")
-        if max_points is not None and max_points <= 0:
-            raise ValueError("max_points pozitif olmali")
         left = bisect_left(self._times, time_range.start_ns)
         right = bisect_left(self._times, time_range.end_ns)
         selected = self._time_index[left:right]
@@ -198,11 +202,7 @@ class FileRecordingRepository:
                 value = math.nan
             values.append(value)
             flags.append(int(quality))
-        keep = (
-            list(range(len(values)))
-            if max_points is None
-            else envelope_indices(np.asarray(values, dtype=np.float64), max_points).tolist()
-        )
+        keep = range(len(values))
         return DataChunk(
             channel_id=channel_id,
             timestamps_ns=np.array([selected[i].timestamp_ns for i in keep], dtype=np.int64),
@@ -322,6 +322,7 @@ class FileRecordingRepository:
         return self._cache_reused
 
     def close(self) -> None:
+        self._display_query.clear()
         if self._source is not None:
             self._source.close()
         self._source = None

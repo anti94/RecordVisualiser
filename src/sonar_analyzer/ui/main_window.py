@@ -143,6 +143,7 @@ class MainWindow(QMainWindow):
         self._channels: tuple[ChannelMetadata, ...] = ()
         self._repository: RecordingRepository | None = None
         self._dsp_projection: tuple[int, NDArray[np.int64]] | None = None
+        self._processed_values: NDArray[np.float64] | None = None
         #: `F3-041` görünüm ayarları (renk, eksen) undo/redo geçmişi.
         self._view_history = ViewHistory()
         #: `F3-065` dışa aktarma diyalog seam'leri (testler enjekte eder).
@@ -157,6 +158,11 @@ class MainWindow(QMainWindow):
         self._scrub_timer = QTimer(self)
         self._scrub_timer.setInterval(25)
         self._scrub_timer.timeout.connect(self._flush_scrub_region)
+        self._plot_refresh_timer = QTimer(self)
+        self._plot_refresh_timer.setSingleShot(True)
+        self._plot_refresh_timer.setInterval(80)
+        self._plot_refresh_timer.timeout.connect(self.refresh_plot_viewport)
+        self._last_plot_request: tuple[float, float, int, tuple[str, ...]] | None = None
         #: `F3-001` seçiminin sonucu; worker bu yolları açar.
         self.pending_load_paths: tuple[Path, ...] = ()
         #: Worker'dan dönen sonuçlar; ekrana bağlanması `F3-005`'in işi.
@@ -368,6 +374,7 @@ class MainWindow(QMainWindow):
         except RuntimeError:
             return
         self.playback_dock.timeline.set_viewport_ns(start_ns, end_ns)
+        self._plot_refresh_timer.start()
 
     def _on_timeline_viewport_changed(self, start_ns: object, end_ns: object) -> None:
         """`F3-055` — timeline viewport'u sürüklenince grafik(ler) o aralığa gider."""
@@ -661,12 +668,8 @@ class MainWindow(QMainWindow):
         chunk = self._repository.query(channel.id, self._repository.metadata().time_range)
         if len(chunk) == 0:
             return
-        x, _values = self.plot_panel.curve_data()
-        timestamps = np.array(
-            [self.plot_panel.timestamp_ns_for_x(float(t)) for t in x], dtype=np.int64
-        )
-        indices = np.searchsorted(chunk.timestamps_ns, timestamps).astype(np.int64)
-        self._dsp_projection = (len(chunk), indices)
+        self._dsp_projection = (len(chunk), chunk.timestamps_ns)
+        self._processed_values = None
         self._dsp_runner.set_selection(channel.id)
         self._dsp_runner.submit(chain, chunk.values, channel.id)
         self.bottom_dock.append_log(
@@ -685,13 +688,25 @@ class MainWindow(QMainWindow):
         primary = self.plot_panel.channel
         if not isinstance(result, ChainResult) or primary is None or primary.id != channel_id:
             return
+        self._processed_values = result.values
+        self._refresh_processed_overlay()
+        if result.invalid_count:
+            self.bottom_dock.append_log(
+                f"İşlenmiş veride {result.invalid_count} geçersiz örnek işaretli."
+            )
+
+    def _refresh_processed_overlay(self) -> None:
         projection = self._dsp_projection
-        if projection is None or result.values.size == 0:
+        values = self._processed_values
+        if projection is None or values is None or values.size == 0:
             return
-        source_count, indices = projection
-        # DSP tam çözünürlükte çalışır; yalnız sonuç çizilirken örnek azaltılır.
-        positions = np.arange(result.values.size) * (source_count / result.values.size)
-        plotted_values = np.interp(indices, positions, result.values)
+        source_count, source_times = projection
+        x, _raw = self.plot_panel.curve_data()
+        times = np.array([self.plot_panel.timestamp_ns_for_x(float(t)) for t in x], dtype=np.int64)
+        indices = np.searchsorted(source_times, times)
+        # Hesap tam çözünürlükte kalır; viewport değişince sonuç yeniden çizilir.
+        positions = np.arange(values.size) * (source_count / values.size)
+        plotted_values = np.interp(indices, positions, values)
         try:
             self.plot_panel.set_processed_overlay(
                 plotted_values,
@@ -700,10 +715,6 @@ class MainWindow(QMainWindow):
         except (ValueError, RuntimeError) as exc:
             self.bottom_dock.append_log(f"İşlenmiş veri gösterilemedi: {exc}")
             return
-        if result.invalid_count:
-            self.bottom_dock.append_log(
-                f"İşlenmiş veride {result.invalid_count} geçersiz örnek işaretli."
-            )
 
     def _on_dsp_failed(self, _job_id: int, message: str) -> None:
         self.bottom_dock.append_log(f"İşlem başarısız: {message}")
@@ -995,6 +1006,28 @@ class MainWindow(QMainWindow):
         """
         return points_for_width(self.plot_panel.plot_pixel_width())
 
+    def _plot_request(self) -> tuple[float, float, int, tuple[str, ...]]:
+        lo, hi = self.plot_panel.visible_x_range()
+        return lo, hi, self.plot_point_budget(), tuple(self.plot_panel.plotted_channel_ids())
+
+    def refresh_plot_viewport(self) -> None:
+        """Son viewport ve piksel bütçesine göre yalnız çizim serilerini yeniler."""
+        self._plot_refresh_timer.stop()
+        if self._repository is None or self.plot_panel.channel is None:
+            return
+        request = self._plot_request()
+        if request == self._last_plot_request:
+            return
+        lo, hi, budget, channel_ids = request
+        span = TimeRange(
+            self.plot_panel.timestamp_ns_for_x(lo), self.plot_panel.timestamp_ns_for_x(hi)
+        )
+        for channel_id in channel_ids:
+            chunk = self._repository.query(channel_id, span, max_points=budget)
+            self.plot_panel.update_channel_data(channel_id, chunk)
+        self._refresh_processed_overlay()
+        self._last_plot_request = self._plot_request()
+
     def refresh_analysis_views(
         self,
         channel: ChannelMetadata,
@@ -1074,6 +1107,7 @@ class MainWindow(QMainWindow):
 
         self._dsp_runner.cancel_all()
         self._dsp_projection = None
+        self._processed_values = None
         span = self._repository.metadata().time_range
         chunk = self._repository.query(
             channel_id,
@@ -1095,6 +1129,8 @@ class MainWindow(QMainWindow):
         self.show_plot()
         self.right_dock.show_channel(channel)
         self.bottom_dock.append_log(f"{channel.display_label} cizildi ({len(chunk)} ornek).")
+        self._last_plot_request = self._plot_request()
+        self._plot_refresh_timer.stop()
 
     def _add_channel_to_plot(self, channel_id: str) -> str | None:
         """Bir kanalı grafiğe **ekler** (SIFIRLAMADAN) — `F3-015`/`F3-016` ortak yolu.
@@ -1451,6 +1487,8 @@ class MainWindow(QMainWindow):
         # F4-008: süren DSP worker'ları da beklenir.
         self._dsp_runner.cancel_all()
         self._dsp_runner.wait_all()
+        self._plot_refresh_timer.stop()
+        self._scrub_timer.stop()
         self.file_loader.shutdown()
         self._close_owned_repositories()
         super().closeEvent(event)
@@ -1550,6 +1588,7 @@ class MainWindow(QMainWindow):
         self.plot_panel.time_region_changed.connect(self._on_stats_region_changed)
         self.plot_panel.cursor_moved.connect(self._on_cursor_moved)
         self.plot_panel.x_range_changed.connect(self._sync_timeline_viewport)
+        self.plot_panel.plot_width_changed.connect(self._plot_refresh_timer.start)
 
         self.transmission_panel = TransmissionPanel(container)
 
@@ -1689,6 +1728,11 @@ class MainWindow(QMainWindow):
     def _clear_recording_panels(self) -> None:
         """Hiç açık kayıt kalmadığında panelleri boş duruma döndürür."""
         self._channels = ()
+        self._plot_refresh_timer.stop()
+        self._last_plot_request = None
+        self._dsp_projection = None
+        self._processed_values = None
+        self._dsp_runner.cancel_all()
         self.left_dock.clear()
         self.plot_tool_bar.set_channels([])
         self.right_dock.close_inspector()

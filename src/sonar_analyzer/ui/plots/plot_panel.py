@@ -130,6 +130,7 @@ class PlotPanel(QWidget):
     #: x_max) saniye. `apply_x_range()` ile gelen dış güncellemede yayılmaz
     #: (döngü önleme).
     x_range_changed = Signal(float, float)
+    plot_width_changed = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -182,6 +183,7 @@ class PlotPanel(QWidget):
 
         pg.setConfigOptions(antialias=True)
         self.plot = pg.PlotWidget(parent=self)
+        self.plot.getViewBox().sigResized.connect(self._on_plot_resized)
         self.plot.setObjectName("plot_widget")
         self.plot.setBackground(DARK.surface)
         self.plot.showGrid(x=True, y=True, alpha=GRID_ALPHA)
@@ -345,6 +347,25 @@ class PlotPanel(QWidget):
         # F3-045: ilk seri ankoru verince bekleyen olay işaretleri yerleşir.
         self._rebuild_event_markers()
         self._rebuild_tx_regions()
+
+    def _on_plot_resized(self, _view_box: object) -> None:
+        self.plot_width_changed.emit()
+
+    def update_channel_data(self, channel_id: str, chunk: DataChunk) -> None:
+        """Viewport verisini değiştirir; stil, zaman kökeni ve görünüm korunur."""
+        if channel_id not in self._series or chunk.channel_id != channel_id:
+            raise KeyError(f"Grafikte yok veya kanal uyuşmuyor: {channel_id}")
+        assert self._t0_ns is not None
+        seconds = to_seconds(chunk.timestamps_ns, self._t0_ns)
+        curve = self._series[channel_id][1]
+        x0, x1, y0, y1 = self.visible_range()
+        self._suppress_x_broadcast = True
+        try:
+            self.plot.getViewBox().disableAutoRange()
+            curve.setData(seconds, np.asarray(chunk.values, dtype=np.float64))
+            self.plot.getViewBox().setRange(xRange=(x0, x1), yRange=(y0, y1), padding=0)
+        finally:
+            self._suppress_x_broadcast = False
 
     # -- iki Y ekseni (F3-020) ----------------------------------------
 
