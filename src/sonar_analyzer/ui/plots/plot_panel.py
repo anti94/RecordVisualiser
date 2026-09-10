@@ -73,6 +73,9 @@ class PlotPanel(QWidget):
     #: `MainWindow` bunu dinleyip gerçek veriyi `add_channel()`'a iletir —
     #: panel kendisi repository'ye erişmez (ADR-002 soyutlama sınırı).
     channel_dropped = Signal(str)
+    #: F3-026: crosshair hareket etti — (cursor zamanı [s], birincil seride
+    #: en yakın örnek değeri). Yakında örnek yoksa yayılmaz.
+    cursor_moved = Signal(float, float)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -123,6 +126,16 @@ class PlotPanel(QWidget):
         # değiştiğinde yeniden yakalanır.
         self._home_range: tuple[float, float, float, float] | None = None
         self._home_right_y: tuple[float, float] | None = None
+
+        # F3-026: fareyi izleyen crosshair + en yakın örnek okuması.
+        self._cursor_x: float | None = None
+        self._vline = pg.InfiniteLine(angle=90, movable=False, pen=pg.mkPen(DARK.text_secondary))
+        self._hline = pg.InfiniteLine(angle=0, movable=False, pen=pg.mkPen(DARK.text_secondary))
+        for line in (self._vline, self._hline):
+            line.setVisible(False)
+            self.plot.addItem(line, ignoreBounds=True)
+        self._cursor_text = ""
+        self.plot.scene().sigMouseMoved.connect(self._on_scene_mouse_moved)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -308,6 +321,77 @@ class PlotPanel(QWidget):
             r_min, r_max = self._home_right_y
             self._right_vb.setRange(yRange=(r_min, r_max), padding=0)
 
+    # -- crosshair / cursor okumasi (F3-026) ------------------------
+
+    def _on_scene_mouse_moved(self, scene_pos: object) -> None:
+        """Fare grafiğin üstündeyken crosshair'i taşır; dışına çıkınca gizler."""
+        vb = self.plot.getViewBox()
+        if not self.plot.sceneBoundingRect().contains(scene_pos):
+            self.clear_cursor()
+            return
+        point = vb.mapSceneToView(scene_pos)
+        self.set_cursor(float(point.x()), float(point.y()))
+
+    def set_cursor(self, x_seconds: float, y_value: float | None = None) -> None:
+        """Crosshair'i `x_seconds`'e (ve verilirse `y_value`'ya) taşır — `F3-026`.
+
+        Fare hareketinin programatik karşılığı. Dikey çizgi zamanı,
+        yatay çizgi (varsa) imlecin Y'sini gösterir; okuma metni birincil
+        seride **en yakın örneğe** göre hesaplanır ve `cursor_moved`
+        yayılır. Grafikte seri yoksa etkisizdir.
+        """
+        if not self._series:
+            return
+        self._cursor_x = x_seconds
+        self._vline.setPos(x_seconds)
+        self._vline.setVisible(True)
+        if y_value is not None:
+            self._hline.setPos(y_value)
+            self._hline.setVisible(True)
+
+        nearest = self.nearest_sample(x_seconds)
+        if nearest is None:
+            self._cursor_text = f"t={x_seconds:.3f} s"
+            return
+        sample_t, sample_v = nearest
+        primary = self.channel
+        unit = f" {primary.unit}" if primary and primary.unit else ""
+        label = primary.name if primary else "deger"
+        self._cursor_text = f"t={sample_t:.3f} s  |  {label}: {sample_v:.4g}{unit}"
+        self.cursor_moved.emit(sample_t, sample_v)
+
+    def clear_cursor(self) -> None:
+        """Crosshair'i gizler ve okuma metnini temizler — `F3-026`."""
+        self._cursor_x = None
+        self._cursor_text = ""
+        self._vline.setVisible(False)
+        self._hline.setVisible(False)
+
+    def cursor_x(self) -> float | None:
+        """Crosshair'in şu anki zaman konumu (saniye); yoksa `None`."""
+        return self._cursor_x
+
+    def cursor_readout_text(self) -> str:
+        """Cursor okuması: zaman ve en yakın örnek değeri — boşsa `""`."""
+        return self._cursor_text
+
+    def nearest_sample(
+        self, x_seconds: float, channel_id: str | None = None
+    ) -> tuple[float, float] | None:
+        """`x_seconds`'e en yakın örneğin `(zaman_s, deger)` çiftini döndürür — `F3-026`.
+
+        `channel_id` verilmezse birincil seri. Seri yoksa/boşsa `None`.
+        """
+        x_data, y_data = self.curve_data(channel_id)
+        if x_data.size == 0:
+            return None
+        idx = int(np.argmin(np.abs(x_data - x_seconds)))
+        return float(x_data[idx]), float(y_data[idx])
+
+    def crosshair_visible(self) -> bool:
+        """Dikey crosshair çizgisi şu an görünüyor mu — testler için."""
+        return bool(self._vline.isVisible())
+
     def remove_channel(self, channel_id: str) -> None:
         """Bir seriyi ve legend girdisini kaldırır — `F3-014`.
 
@@ -334,6 +418,7 @@ class PlotPanel(QWidget):
             self._left_unit = None
             self._home_range = None
             self._home_right_y = None
+            self.clear_cursor()
         else:
             self._capture_home_range()
 

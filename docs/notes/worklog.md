@@ -160,8 +160,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-022` | 15 dk | 64 dk 58 sn | `13e9ba1` | yalnız X zoom modunu ekle |
 | `F3-023` | 15 dk | 2 dk 12 sn | `f93a1dc` | yalnız Y zoom modunu ekle |
 | `F3-024` | 15 dk | 2 dk 36 sn | `55a0ac1` | XY zoom modunu ekle |
+| `F3-025` | 15 dk | 3 dk 38 sn | `8034ec7` | autoscale ve görünüm sıfırlamayı ekle |
 
-**142 commit · olculen toplam 2054 dk 0 sn · olculemeyen 1 (ilk commit)**
+**143 commit · olculen toplam 2057 dk 38 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

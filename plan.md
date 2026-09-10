@@ -1503,7 +1503,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 | [x] | `F3-023` | `0.125.0` | 15 dk | Yalnız Y zoom modunu ekle | Y aralığı değişirken X aralığı sabit kalır | `F3-022` | `feat(plot): F3-023 yalnız Y zoom modunu ekle` |
 | [x] | `F3-024` | `0.126.0` | 15 dk | XY zoom modunu ekle | İki eksen seçilen bölgeye yakınlaşır | `F3-023` | `feat(plot): F3-024 xY zoom modunu ekle` |
 | [x] | `F3-025` | `0.127.0` | 15 dk | Autoscale ve görünüm sıfırlamayı ekle | Görünür veriye sığdırma ve ilk aralığa dönüş çalışır | `F3-024` | `feat(plot): F3-025 autoscale ve görünüm sıfırlamayı ekle` |
-| [ ] | `F3-026` | `0.128.0` | 20 dk | Crosshair ve cursor okumasını ekle | Cursor zamanı ve en yakın örnek değeri doğru gösterilir | `F3-025` | `feat(plot): F3-026 crosshair ve cursor okumasını ekle` |
+| [x] | `F3-026` | `0.128.0` | 20 dk | Crosshair ve cursor okumasını ekle | Cursor zamanı ve en yakın örnek değeri doğru gösterilir | `F3-025` | `feat(plot): F3-026 crosshair ve cursor okumasını ekle` |
 | [ ] | `F3-027` | `0.129.0` | 20 dk | İki cursor fark ölçümünü ekle | Delta zaman, değer ve sıfır olmayan süre için frekans doğrudur | `F3-026` | `feat(plot): F3-027 iki cursor fark ölçümünü ekle` |
 | [ ] | `F3-028` | `0.130.0` | 15 dk | Zaman bölgesi seçimini ekle | Seçili başlangıç/bitiş repository aralığına dönüşür | `F3-027` | `feat(plot): F3-028 zaman bölgesi seçimini ekle` |
 | [ ] | `F3-029` | `0.131.0` | 15 dk | Seçili bölgeye yakınlaşmayı bağla | Grafik yalnız seçilen zaman aralığını gösterir | `F3-028` | `feat(plot): F3-029 seçili bölgeye yakınlaşmayı bağla` |
