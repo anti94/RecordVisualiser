@@ -16,8 +16,9 @@ import logging
 from collections.abc import Iterable, Sequence
 from dataclasses import replace
 from pathlib import Path
+from time import perf_counter
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QAction, QCloseEvent
 from PySide6.QtWidgets import (
     QFrame,
@@ -36,6 +37,7 @@ from sonar_analyzer.application.file_loader import (
     LoaderCallable,
 )
 from sonar_analyzer.application.load_errors import describe_load_error
+from sonar_analyzer.application.scrub_debounce import ScrubDebouncer
 from sonar_analyzer.application.view_history import ViewCommand, ViewHistory
 from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.event import Event
@@ -111,6 +113,11 @@ class MainWindow(QMainWindow):
         self._repository: RecordingRepository | None = None
         #: `F3-041` görünüm ayarları (renk, eksen) undo/redo geçmişi.
         self._view_history = ViewHistory()
+        #: `F3-060` zaman bölgesi sürüklemesinde sorguları coalesce eder.
+        self._scrub_debouncer: ScrubDebouncer[tuple[int, int]] = ScrubDebouncer(0.12)
+        self._scrub_timer = QTimer(self)
+        self._scrub_timer.setInterval(25)
+        self._scrub_timer.timeout.connect(self._flush_scrub_region)
         #: `F3-001` seçiminin sonucu; worker bu yolları açar.
         self.pending_load_paths: tuple[Path, ...] = ()
         #: Worker'dan dönen sonuçlar; ekrana bağlanması `F3-005`'in işi.
@@ -367,11 +374,39 @@ class MainWindow(QMainWindow):
 
         Seçili (birincil) kanalın yalnız `[start_ns, end_ns)` aralığındaki
         örnekleri için mean/std/RMS/min/max/peak-peak yeniden hesaplanır.
+
+        `F3-060`: hızlı sürüklemede her ara konum için sorgu yapılmaz;
+        ilk konum hemen, sonrası kısa bir sessizlikten sonra çizilir.
+        """
+        payload = (int(start_ns), int(end_ns))
+        immediate = self._scrub_debouncer.submit(payload, now=perf_counter())
+        if immediate is not None:
+            self._run_stats_region_query(immediate)
+        else:
+            self._scrub_timer.start()
+
+    def _flush_scrub_region(self) -> None:
+        """`F3-060` zamanlayıcı tiki: sessizlik dolduysa son bölgeyi çizer."""
+        pending = self._scrub_debouncer.poll(perf_counter())
+        if pending is None:
+            return
+        self._scrub_timer.stop()
+        self._run_stats_region_query(pending)
+
+    def _run_stats_region_query(self, region: tuple[int, int]) -> None:
+        """Bir zaman bölgesi için istatistikleri sorgular ve karta yazar — `F3-060`.
+
+        Sorgu bir token alır; sonuç geldiğinde daha yeni bir scrub sorgusu
+        başlatılmışsa sonuç atılır (eski sorgu görünümü ezmez).
         """
         channel = self.plot_panel.channel
         if channel is None or self._repository is None:
             return
-        chunk = self._repository.query(channel.id, TimeRange(int(start_ns), int(end_ns)))
+        start_ns, end_ns = region
+        token = self._scrub_debouncer.begin_query()
+        chunk = self._repository.query(channel.id, TimeRange(start_ns, end_ns))
+        if not self._scrub_debouncer.is_current(token):
+            return
         span = self.plot_panel.time_region_x()
         self.dashboard.statistics.set_channel_data(channel, chunk.values, region_seconds=span)
 
@@ -959,6 +994,8 @@ class MainWindow(QMainWindow):
         self.transmission_panel.clear()
         self.playback_dock.timeline.clear()
         self._view_history.clear()
+        self._scrub_timer.stop()
+        self._scrub_debouncer.cancel()
         self.dashboard.statistics.clear()
         self.bottom_dock.clear_events()
         self.show_empty_state()
