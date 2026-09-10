@@ -236,8 +236,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-018` | 15 dk | 4 dk 7 sn | `9fe0b3e` | moving average pencere kontrolünü bağla |
 | `F4-019` | 20 dk | 3 dk 57 sn | `e733e67` | normalize hesabını ekle |
 | `F4-020` | 15 dk | 3 dk 14 sn | `7a5ae7d` | normalize seçimini işlem editörüne bağla |
+| `F4-021` | 20 dk | 5 dk 43 sn | `f021523` | pencereli RMS ve envelope hesabını ekle |
 
-**218 commit · olculen toplam 2471 dk 46 sn · olculemeyen 1 (ilk commit)**
+**219 commit · olculen toplam 2477 dk 29 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

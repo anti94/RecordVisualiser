@@ -12,7 +12,7 @@ verilir; verilmemişse yeni adım eklenemez (buton pasif).
 
 from __future__ import annotations
 
-from typing import Union
+from typing import Union, cast
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
@@ -37,6 +37,11 @@ from sonar_analyzer.processing.steps import (
     StepKind,
     StepValidationError,
 )
+from sonar_analyzer.processing.windowing import (
+    WindowingError,
+    duration_for_samples,
+    samples_for_duration,
+)
 
 #: Parametre alanı geniş aralık: politika dışı değer de girilip
 #: **açıklanabilsin** diye (`F4-007`).
@@ -60,7 +65,17 @@ STEP_KIND_ORDER: tuple[StepKind, ...] = (
     StepKind.MOVING_AVERAGE,
     StepKind.DETREND,
     StepKind.NORMALIZE,
+    StepKind.WINDOWED_RMS,
+    StepKind.ENVELOPE,
 )
+
+#: `window` parametresi bir **süre** (saniye) olarak sunulan ve kanalın
+#: sample rate'i üzerinden örnek sayısına çevrilen işlem türleri (`F4-022`).
+#: `MOVING_AVERAGE` hariç: onun penceresi ham örnek sayısıdır (`F4-018`).
+_DURATION_WINDOW_KINDS: frozenset[StepKind] = frozenset({StepKind.WINDOWED_RMS, StepKind.ENVELOPE})
+
+#: Süre alanı sınırları (saniye).
+_DURATION_RANGE_S = (0.0, 3600.0)
 
 #: Bir parametre alanı widget'ı. `ParamSpec.choices` dolu str parametreler
 #: (örn. `DETREND.mode`) açılır liste, sayısal parametreler spin box olur.
@@ -95,6 +110,7 @@ class StepListEditor(QWidget):
         super().__init__(parent)
         self.setObjectName("editor_step_list")
         self._input_channel_id = ""
+        self._sample_rate_hz = 0.0
         self._steps: list[ProcessingStep] = []
 
         layout = QVBoxLayout(self)
@@ -149,6 +165,9 @@ class StepListEditor(QWidget):
         layout.addWidget(self.param_error)
 
         self._param_fields: dict[str, ParamField] = {}
+        #: Değeri **saniye** tutan ve modele örnek sayısı olarak çevrilen
+        #: parametre alanlarının adları (`F4-022`).
+        self._duration_fields: set[str] = set()
         self._suppress_param_signal = False
         self._error_active = False
 
@@ -172,6 +191,23 @@ class StepListEditor(QWidget):
     def set_input_channel(self, channel_id: str) -> None:
         self._input_channel_id = channel_id
         self._refresh_buttons()
+
+    def set_sample_rate(self, sample_rate_hz: float) -> None:
+        """Süre tabanlı pencere alanları için kanal sample rate'i (`F4-022`).
+
+        0 (ya da bilinmeyen) verilirse süre alanları yerine ham örnek
+        sayısı spin box'ı gösterilir.
+        """
+        new_rate = max(float(sample_rate_hz), 0.0)
+        if new_rate == self._sample_rate_hz:
+            return
+        self._sample_rate_hz = new_rate
+        row = self.list.currentRow()
+        self._rebuild_param_panel(self._steps[row] if 0 <= row < len(self._steps) else None)
+
+    @property
+    def sample_rate_hz(self) -> float:
+        return self._sample_rate_hz
 
     # -- düzenleme -------------------------------------------
 
@@ -272,6 +308,7 @@ class StepListEditor(QWidget):
         while self.param_form.rowCount():
             self.param_form.removeRow(0)
         self._param_fields = {}
+        self._duration_fields = set()
         self._set_param_error("")
 
         if step is None:
@@ -279,6 +316,8 @@ class StepListEditor(QWidget):
             self._suppress_param_signal = False
             return
         self.param_panel.setVisible(True)
+
+        want_duration = step.kind in _DURATION_WINDOW_KINDS and self._sample_rate_hz > 0.0
 
         for spec in PARAMETER_SPECS[step.kind]:
             value = step.parameters[spec.name]
@@ -290,6 +329,15 @@ class StepListEditor(QWidget):
                 index = field.findData(value)
                 field.setCurrentIndex(index if index >= 0 else 0)
                 field.currentIndexChanged.connect(self._on_param_edit)
+            elif want_duration and spec.name == "window":
+                field = QDoubleSpinBox(self.param_panel)
+                field.setRange(*_DURATION_RANGE_S)
+                field.setDecimals(4)
+                field.setSuffix(" s")
+                samples = int(value) if isinstance(value, (int, float)) else 1
+                field.setValue(duration_for_samples(samples, self._sample_rate_hz))
+                field.valueChanged.connect(self._on_param_edit)
+                self._duration_fields.add(spec.name)
             elif spec.kind is int:
                 field = QSpinBox(self.param_panel)
                 field.setRange(*_INT_RANGE_BY_PARAM.get(spec.name, _INT_RANGE))
@@ -315,9 +363,18 @@ class StepListEditor(QWidget):
         if not 0 <= row < len(self._steps):
             return
         old = self._steps[row]
-        params: dict[str, object] = {
-            name: self._field_value(fld) for name, fld in self._param_fields.items()
-        }
+        params: dict[str, object] = {}
+        for name, fld in self._param_fields.items():
+            raw = self._field_value(fld)
+            if name in self._duration_fields:
+                seconds = float(cast("float", raw)) if isinstance(raw, (int, float)) else 0.0
+                try:
+                    params[name] = samples_for_duration(seconds, self._sample_rate_hz)
+                except WindowingError as exc:
+                    self._set_param_error(str(exc))
+                    return
+            else:
+                params[name] = raw
         try:
             new_step = ProcessingStep(
                 kind=old.kind,

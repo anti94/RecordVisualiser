@@ -1004,6 +1004,7 @@ class MainWindow(QMainWindow):
         # bu kanala bağlanır.
         self.plot_panel.clear_processed_overlay()
         self.right_dock.analysis_tools.step_editor.set_input_channel(channel_id)
+        self.right_dock.analysis_tools.step_editor.set_sample_rate(channel.sample_rate_hz or 0.0)
         self.dashboard.statistics.set_channel_data(channel, chunk.values)
         self.plot_tool_bar.set_current_channel(channel_id)
         self.show_plot()

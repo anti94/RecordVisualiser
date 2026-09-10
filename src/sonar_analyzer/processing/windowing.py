@@ -73,6 +73,33 @@ def validate_window(window: int, *, maximum: int = MAX_WINDOW) -> int:
     return window
 
 
+def samples_for_duration(
+    duration_s: float,
+    sample_rate_hz: float,
+    *,
+    minimum: int = MIN_WINDOW,
+) -> int:
+    """Bir pencere **süresini** (saniye) örnek sayısına çevirir — `F4-022`.
+
+    ``round(duration_s * sample_rate_hz)`` (en yakın örnek), en az
+    ``minimum``. Üst sınır burada uygulanmaz; "aşırı pencere" denetimi
+    `ProcessingStep` / `validate_window` işidir.
+    """
+    if not np.isfinite(duration_s) or duration_s <= 0:
+        raise WindowingError(f"pencere süresi pozitif olmalı: {duration_s}")
+    if not np.isfinite(sample_rate_hz) or sample_rate_hz <= 0:
+        raise WindowingError(f"sample rate pozitif olmalı: {sample_rate_hz}")
+    # Her iki çarpan da pozitif: en yakın tam sayıya yuvarla (yarımı yukarı).
+    return max(minimum, int(float(duration_s) * float(sample_rate_hz) + 0.5))
+
+
+def duration_for_samples(window: int, sample_rate_hz: float) -> float:
+    """`window` örneğin `sample_rate_hz`'te karşılık geldiği süre (saniye)."""
+    if not np.isfinite(sample_rate_hz) or sample_rate_hz <= 0:
+        raise WindowingError(f"sample rate pozitif olmalı: {sample_rate_hz}")
+    return window / sample_rate_hz
+
+
 def _as_1d_float64(values: NDArray[np.generic] | Samples) -> Samples:
     data = np.asarray(values, dtype=np.float64)
     if data.ndim != 1:
