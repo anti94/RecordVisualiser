@@ -188,6 +188,43 @@ class BottomPanelDock(QDockWidget):
             return self._row_events[row]
         return None
 
+    def event_filter_state(self) -> dict[str, object]:
+        """Filtre çubuğunun kalıcılaştırılabilir durumu — `F3-068`.
+
+        `source` / `min_severity` metin ya da `None`; `text` düz metin;
+        `group_near` bool.
+        """
+        source = self.event_source_filter.currentText()
+        _label, severity = _SEVERITY_CHOICES[self.event_severity_filter.currentIndex()]
+        return {
+            "source": None if source == _ALL_SOURCES else source,
+            "min_severity": severity.value if severity is not None else None,
+            "text": self.event_text_filter.text().strip(),
+            "group_near": self.event_group_check.isChecked(),
+        }
+
+    def apply_event_filter_state(self, state: dict[str, object]) -> None:
+        """`event_filter_state()` çıktısını geri uygular — `F3-069`."""
+        self._suppress_filter_refresh = True
+        try:
+            source = state.get("source")
+            source_text = source if isinstance(source, str) and source else _ALL_SOURCES
+            index = self.event_source_filter.findText(source_text)
+            self.event_source_filter.setCurrentIndex(max(0, index))
+
+            severity = state.get("min_severity")
+            for row, (_label, level) in enumerate(_SEVERITY_CHOICES):
+                if (level.value if level is not None else None) == severity:
+                    self.event_severity_filter.setCurrentIndex(row)
+                    break
+
+            text = state.get("text")
+            self.event_text_filter.setText(text if isinstance(text, str) else "")
+            self.event_group_check.setChecked(bool(state.get("group_near", False)))
+        finally:
+            self._suppress_filter_refresh = False
+        self._apply_event_filters()
+
     def _build_event_filters(self, parent: QWidget) -> QWidget:
         """`F3-043` zaman + severity + kaynak + metin filtre çubuğu."""
         bar = QWidget(parent)

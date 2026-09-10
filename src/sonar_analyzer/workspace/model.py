@@ -52,6 +52,10 @@ def _empty_panel_list() -> list[PanelState]:
     return []
 
 
+def _empty_group_list() -> list[list[int]]:
+    return []
+
+
 # -- yardımcı doğrulayıcılar -----------------------------------
 
 
@@ -88,6 +92,18 @@ def _str_list(source: dict[str, object], key: str, where: str) -> list[str]:
         if all(isinstance(v, str) for v in items):
             return [v for v in items if isinstance(v, str)]
     raise WorkspaceError(f"{where}: '{key}' metin listesi olmalı")
+
+
+def _int_matrix(source: dict[str, object], key: str, where: str) -> list[list[int]]:
+    raw = source.get(key, [])
+    if isinstance(raw, list):
+        groups: list[list[int]] = []
+        for row in cast("list[object]", raw):
+            if not isinstance(row, list) or not all(_is_int(v) for v in cast("list[object]", row)):
+                raise WorkspaceError(f"{where}: '{key}' tam sayı listelerinden oluşmalı")
+            groups.append([cast("int", v) for v in cast("list[object]", row)])
+        return groups
+    raise WorkspaceError(f"{where}: '{key}' liste olmalı")
 
 
 def _one_of(value: str, allowed: tuple[str, ...], where: str, key: str) -> str:
@@ -228,6 +244,13 @@ class WorkspaceModel:
     panels: list[PanelState] = field(default_factory=_empty_panel_list)
     active_panel: int = 0
     layout_mode: str = "tabs"
+    #: X-senkronlu panel indeksi kümeleri; ör. ``[[0, 1], [2, 3]]``.
+    sync_groups: list[list[int]] = field(default_factory=_empty_group_list)
+    #: Merkezde gösterilen görünüm sekmesi ("Time Series", "Transmission"…).
+    active_view_tab: str = "Time Series"
+    #: Qt `QMainWindow.saveState()` çıktısının base64'ü — dock yerleşimi.
+    #: Opaktır; `F3-069` geri yüklerken uygular, model yorumlamaz.
+    dock_state: str | None = None
     view: ViewState = field(default_factory=ViewState)
     event_filter: EventFilterState = field(default_factory=EventFilterState)
     schema_version: int = WORKSPACE_SCHEMA_VERSION
@@ -238,6 +261,13 @@ class WorkspaceModel:
             raise WorkspaceError(
                 f"WorkspaceModel: active_panel {self.active_panel} panel aralığı dışında"
             )
+        panel_count = len(self.panels)
+        for group in self.sync_groups:
+            for index in group:
+                if not 0 <= index < panel_count:
+                    raise WorkspaceError(
+                        f"WorkspaceModel: sync_groups paneli {index} aralık dışında"
+                    )
 
     # -- serileştirme -------------------------------------------
 
@@ -248,6 +278,9 @@ class WorkspaceModel:
             "panels": [panel.to_dict() for panel in self.panels],
             "active_panel": self.active_panel,
             "layout_mode": self.layout_mode,
+            "sync_groups": [list(group) for group in self.sync_groups],
+            "active_view_tab": self.active_view_tab,
+            "dock_state": self.dock_state,
             "view": self.view.to_dict(),
             "event_filter": self.event_filter.to_dict(),
         }
@@ -277,6 +310,10 @@ class WorkspaceModel:
             raise WorkspaceError("WorkspaceModel: 'active_panel' tam sayı olmalı")
         assert isinstance(active_panel, int)
 
+        dock_state = data.get("dock_state")
+        if dock_state is not None and not isinstance(dock_state, str):
+            raise WorkspaceError("WorkspaceModel: 'dock_state' metin olmalı")
+
         return cls(
             source_paths=_str_list(data, "source_paths", "WorkspaceModel"),
             panels=[PanelState.from_dict(panel) for panel in cast("list[object]", panels_raw)],
@@ -284,6 +321,9 @@ class WorkspaceModel:
             layout_mode=_one_of(
                 str(data.get("layout_mode", "tabs")), LAYOUT_MODES, "WorkspaceModel", "layout_mode"
             ),
+            sync_groups=_int_matrix(data, "sync_groups", "WorkspaceModel"),
+            active_view_tab=str(data.get("active_view_tab", "Time Series")),
+            dock_state=dock_state,
             view=ViewState.from_dict(data.get("view", {})),
             event_filter=EventFilterState.from_dict(data.get("event_filter", {})),
             schema_version=version,

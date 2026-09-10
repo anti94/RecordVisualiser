@@ -202,8 +202,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-064` | 20 dk | 4 dk 57 sn | `4b6d386` | seçili kanal ve aralığı CSV olarak yaz |
 | `F3-065` | 20 dk | 8 dk 19 sn | `0cacfb6` | export hedefi ve üzerine yazma kontrolünü ekle |
 | `F3-066` | 20 dk | 23 dk 43 sn | `b456b11` | büyük export için worker ve iptal ekle |
+| `F3-067` | 20 dk | 7 dk 5 sn | `ea03959` | sürümlü workspace JSON modelini ekle |
 
-**184 commit · olculen toplam 2295 dk 48 sn · olculemeyen 1 (ilk commit)**
+**185 commit · olculen toplam 2302 dk 53 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

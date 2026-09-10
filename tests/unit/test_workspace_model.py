@@ -29,6 +29,9 @@ def _full() -> WorkspaceModel:
         ],
         active_panel=1,
         layout_mode="split",
+        sync_groups=[[0, 1]],
+        active_view_tab="Transmission",
+        dock_state="AAAA/wAAAAA=",
         view=ViewState(time_display_mode="utc", markers_visible=False, sync_x=False),
         event_filter=EventFilterState(
             source="BIT",
@@ -71,6 +74,28 @@ def test_to_dict_stamps_the_schema_version() -> None:
     assert doc["panels"][0]["x_range"] == [0.0, 12.5]
     assert doc["view"]["time_display_mode"] == "utc"
     assert doc["event_filter"]["source"] == "BIT"
+
+
+def test_document_contains_open_tabs_axes_and_sync_groups() -> None:
+    """`F3-068` kabulü: belge açık tab, eksen ve senkronizasyon grupları taşır."""
+    doc = json.loads(_full().dumps())
+    assert doc["active_view_tab"] == "Transmission"  # açık tab
+    assert doc["panels"][0]["x_range"] == [0.0, 12.5]  # eksen
+    assert doc["panels"][1]["y_range"] == [-1.0, 1.0]
+    assert doc["sync_groups"] == [[0, 1]]  # senkronizasyon grubu
+    assert doc["dock_state"] == "AAAA/wAAAAA="  # dock yerleşimi
+
+
+def test_sync_group_panel_index_out_of_range_is_rejected() -> None:
+    with pytest.raises(WorkspaceError, match="sync_groups"):
+        WorkspaceModel(panels=[PanelState()], sync_groups=[[0, 3]])
+
+
+def test_bad_sync_groups_shape_is_rejected() -> None:
+    doc = WorkspaceModel().to_dict()
+    doc["sync_groups"] = [["a", "b"]]
+    with pytest.raises(WorkspaceError, match="sync_groups"):
+        WorkspaceModel.from_dict(doc)
 
 
 # -- doğrulama --------------------------------------------------

@@ -12,6 +12,7 @@ hâle gelmez.
 
 from __future__ import annotations
 
+import base64
 import logging
 from collections.abc import Callable, Iterable, Sequence
 from dataclasses import replace
@@ -81,6 +82,13 @@ from sonar_analyzer.ui.status_bar import CANCELLED_TEXT, READY_TEXT, AppStatusBa
 from sonar_analyzer.ui.status_icons import severity_style
 from sonar_analyzer.ui.theme import apply_theme
 from sonar_analyzer.ui.view_tab_bar import ViewTabBar
+from sonar_analyzer.workspace.model import (
+    EventFilterState,
+    PanelState,
+    ViewState,
+    WorkspaceModel,
+)
+from sonar_analyzer.workspace.store import save_workspace
 
 logger = logging.getLogger("sonar_analyzer")
 
@@ -565,6 +573,70 @@ class MainWindow(QMainWindow):
                 include_metadata=card.wants_metadata(),
                 raw=card.selected_variant() is DataVariant.RAW,
             )
+
+    # -- workspace (F3-068) ----------------------------------------
+
+    def capture_workspace(self) -> WorkspaceModel:
+        """Şu anki oturumu bir `WorkspaceModel`'e dökümler — `F3-068`.
+
+        Açık kayıt dosyaları, grafik paneli (kanallar + eksen aralıkları +
+        zoom kipi), açık görünüm sekmesi, X-senkronizasyon grubu, marker/TX
+        görünürlüğü, imleç zamanı kipi ve olay filtresi yakalanır. Dock
+        yerleşimi Qt `saveState()` ile opak biçimde saklanır.
+        """
+        source_paths = [repo.metadata().source_path for repo in self._owned_repositories]
+
+        channel_ids = self.plot_panel.plotted_channel_ids()
+        x0, x1, y0, y1 = self.plot_panel.visible_range()
+        panel = PanelState(
+            channel_ids=list(channel_ids),
+            x_range=(x0, x1) if channel_ids else None,
+            y_range=(y0, y1) if channel_ids else None,
+            zoom_mode=self.plot_panel.zoom_mode,
+        )
+
+        sync_on = self.plot_tool_bar.sync_checkbox.isChecked()
+        sync_groups = [[0]] if sync_on else []
+
+        view = ViewState(
+            time_display_mode=self.status.cursor_time_mode.value,
+            markers_visible=self.plot_tool_bar.markers_checkbox.isChecked(),
+            tx_visible=self.plot_tool_bar.tx_checkbox.isChecked(),
+            sync_x=sync_on,
+        )
+
+        filter_state = self.bottom_dock.event_filter_state()
+        event_filter = EventFilterState(
+            source=filter_state["source"] if isinstance(filter_state["source"], str) else None,
+            min_severity=(
+                filter_state["min_severity"]
+                if isinstance(filter_state["min_severity"], str)
+                else None
+            ),
+            text=str(filter_state["text"]),
+            group_near=bool(filter_state["group_near"]),
+        )
+
+        dock_state = base64.b64encode(bytes(self.saveState().data())).decode("ascii")
+        current_tab = self.view_tabs.tabText(self.view_tabs.currentIndex())
+
+        return WorkspaceModel(
+            source_paths=source_paths,
+            panels=[panel],
+            active_panel=0,
+            layout_mode="tabs",
+            sync_groups=sync_groups,
+            active_view_tab=current_tab or "Time Series",
+            dock_state=dock_state,
+            view=view,
+            event_filter=event_filter,
+        )
+
+    def save_workspace(self, path: str | Path) -> Path:
+        """Şu anki oturumu bir workspace dosyasına yazar — `F3-068`."""
+        dest = save_workspace(self.capture_workspace(), path)
+        self.bottom_dock.append_log(f"Workspace kaydedildi: {dest}")
+        return dest
 
     def _on_axis_range_requested(self, axis: str, y_min: float, y_max: float) -> None:
         """Inspector Display'den gelen eksen aralığını seçili grafiğe uygular — `F3-036`.
