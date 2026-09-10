@@ -275,10 +275,16 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-056` | 20 dk | 1 dk 42 sn | `c99e482` | bütçe doğrulaması ve kalite tiplerini netleştir |
 | `F4-057` | 20 dk | 55 sn | `f4142eb` | çok seviyeli min/max özet blokları üret |
 | `F4-058` | 20 dk | 18 dk 25 sn | `b584eea` | viewport için uygun özet seviyesini seç |
-| `F4-059` | 20 dk | 115 dk 38 sn | `dd76eed` | bellek sınırlı LRU cache ekle |
+| `F4-059` | 20 dk | 49 dk 16 sn | `fdb48ec` | bellek sınırlı LRU cache ekle |
+| `F4-060` | 20 dk | 6 dk 31 sn | `db19ff2` | cache anahtarına kaynak ve işlem sürümünü ekle |
+| `F4-061` | 20 dk | 7 dk 45 sn | `d34eb2f` | render sıklığını ve gizli panel güncellemelerini sınırla |
+| `F4-062` | 20 dk | 4 dk 10 sn | `3c1ae1d` | sorgu, render ve indeks sürelerini kaydet |
+| `F4-063` | 20 dk | 3 dk 47 sn | `fad60f0` | büyük dosya üretim koşusunu hazırla |
+| `F4-059` | 20 dk | 44 dk 9 sn | `dd76eed` | bellek sınırlı LRU cache ekle |
 | `F4-059` | 20 dk | 5 dk 11 sn | `a7ac0ee` | girdi sınırı, katı boyut denetimi ve ölçülen bütçe raporu |
+| `F4-060` | 20 dk | 24 dk 28 sn | `49bee2f` | –F4-063 paralel hattını main ile birleştir |
 
-**259 commit · olculen toplam 2859 dk 37 sn · olculemeyen 1 (ilk commit)**
+**265 commit · olculen toplam 2884 dk 5 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
