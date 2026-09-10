@@ -277,8 +277,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-058` | 20 dk | 18 dk 25 sn | `b584eea` | viewport için uygun özet seviyesini seç |
 | `F4-059` | 20 dk | 49 dk 16 sn | `fdb48ec` | bellek sınırlı LRU cache ekle |
 | `F4-060` | 20 dk | 6 dk 31 sn | `db19ff2` | cache anahtarına kaynak ve işlem sürümünü ekle |
+| `F4-061` | 20 dk | 7 dk 45 sn | `d34eb2f` | render sıklığını ve gizli panel güncellemelerini sınırla |
 
-**259 commit · olculen toplam 2794 dk 35 sn · olculemeyen 1 (ilk commit)**
+**260 commit · olculen toplam 2802 dk 20 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

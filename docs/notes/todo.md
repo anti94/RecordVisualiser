@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 261 tamamlandı · 231 kaldı**
+**Toplam 492 madde · 262 tamamlandı · 230 kaldı**
 
-`[#############...........]` %53.0
+`[#############...........]` %53.3
 
 ## Özet
 
@@ -38,11 +38,11 @@ Work in fully autonomous mode.
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
-| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 61 | 29 | 90 |
+| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 62 | 28 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **261** | **231** | **492** |
+| **Toplam** | **262** | **230** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -248,7 +248,7 @@ Work in fully autonomous mode.
 | [x] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır |
 | [x] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla |
 
-### Faz 4 — Mockup analiz panosu ve büyük veri performansı (61/90)
+### Faz 4 — Mockup analiz panosu ve büyük veri performansı (62/90)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -313,7 +313,7 @@ Work in fully autonomous mode.
 | [x] | `F4-059` | `1.59.0` | 20 dk | Bellek sınırlı LRU cache ekle |
 | [x] | `F4-060` | `1.60.0` | 20 dk | Cache anahtarına kaynak ve işlem sürümünü ekle |
 | [x] | `F4-061` | `1.61.0` | 20 dk | Render sıklığını ve gizli panel güncellemelerini sınırla |
-| [ ] | `F4-062` | `1.62.0` | 20 dk | Sorgu, render ve indeks sürelerini kaydet |
+| [x] | `F4-062` | `1.62.0` | 20 dk | Sorgu, render ve indeks sürelerini kaydet |
 | [ ] | `F4-063` | `1.63.0` | 20 dk | Büyük dosya üretim koşusunu hazırla |
 | [ ] | `F4-064` | `1.64.0` | 20 dk | Büyük dosya benchmark koşusunu hazırla |
 | [ ] | `F4-065` | `1.65.0` | 20 dk | Büyük dosya koşusunun sonuçlarını değerlendir |

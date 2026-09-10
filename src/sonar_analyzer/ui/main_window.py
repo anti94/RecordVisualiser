@@ -58,6 +58,7 @@ from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.export.csv_export import CsvExportResult, write_channel_csv
 from sonar_analyzer.export.image_export import export_widget_png
+from sonar_analyzer.logging.performance import measure
 from sonar_analyzer.repository.file_repository import FileRecordingRepository
 from sonar_analyzer.repository.mock_repository import SIMULATION_LABEL, MockRecordingRepository
 from sonar_analyzer.repository.protocol import RecordingRepository
@@ -1035,8 +1036,10 @@ class MainWindow(QMainWindow):
         )
         for channel_id in channel_ids:
             chunk = self._repository.query(channel_id, span, max_points=budget)
-            self.plot_panel.update_channel_data(channel_id, chunk)
-        self._refresh_processed_overlay()
+            with measure("render.plot", channel_id=channel_id, sample_count=len(chunk)):
+                self.plot_panel.update_channel_data(channel_id, chunk)
+        with measure("render.overlay"):
+            self._refresh_processed_overlay()
         self._last_plot_request = self._plot_request()
 
     def refresh_analysis_views(
@@ -1061,9 +1064,26 @@ class MainWindow(QMainWindow):
         if self._analysis_data is None:
             return
         active = self.center_stack.currentWidget()
+        if active not in (self.dashboard, self.spectrum_view, self.waterfall_view):
+            return
         if self._analysis_rendered.get(active) == self._analysis_revision:
             return
         channel, data, region = self._analysis_data
+        with measure(
+            "render.analysis",
+            panel=active.objectName(),
+            channel_id=channel.id,
+            sample_count=int(data.size),
+        ):
+            self._render_analysis_panel(active, channel, data, region)
+
+    def _render_analysis_panel(
+        self,
+        active: QWidget,
+        channel: ChannelMetadata,
+        data: NDArray[np.float64],
+        region: tuple[float, float] | None,
+    ) -> None:
         if active is self.dashboard:
             self.dashboard.set_channel_data(channel, data, region_seconds=region)
         elif active is self.spectrum_view:
@@ -1151,7 +1171,8 @@ class MainWindow(QMainWindow):
             span,
             max_points=self.plot_point_budget(),
         )
-        self.plot_panel.set_channel(channel, chunk, time_origin_ns=span.start_ns)
+        with measure("render.plot", channel_id=channel_id, sample_count=len(chunk)):
+            self.plot_panel.set_channel(channel, chunk, time_origin_ns=span.start_ns)
         # F3-041: grafik tek seriye sıfırlandı; eski görünüm komutları
         # kaldırılmış serilere atıfta bulunur, geçmişi temizle.
         self._view_history.clear()

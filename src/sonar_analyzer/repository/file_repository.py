@@ -41,6 +41,7 @@ from sonar_analyzer.io.readers.binary_reader import (
 )
 from sonar_analyzer.io.readers.mapped_source import MappedSource
 from sonar_analyzer.io.readers.recording_reader import MAX_TIMESTAMP_NS, read_validated_header
+from sonar_analyzer.logging.performance import measure
 from sonar_analyzer.repository.cache_identity import CacheIdentity
 from sonar_analyzer.repository.display_query import DisplayQuery
 from sonar_analyzer.repository.protocol import EventFilter
@@ -90,9 +91,10 @@ class FileRecordingRepository:
             fingerprint = cached.fingerprint
         except OSError as exc:
             # Cache yazilamamasi salt okunur bir kaydin incelenmesini engellemez.
-            entries = tuple(build_record_index(data, header))
-            reused = False
-            fingerprint = SourceFingerprint.from_bytes(data)
+            with measure("index.fallback", source_bytes=len(data)):
+                entries = tuple(build_record_index(data, header))
+                reused = False
+                fingerprint = SourceFingerprint.from_bytes(data)
             messages.append(f"Indeks cache kullanilamadi: {exc}")
         period_ns = header.period_us * 1000
         valid_entries = [

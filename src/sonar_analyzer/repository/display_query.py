@@ -16,6 +16,7 @@ from sonar_analyzer.analysis.downsampling import downsample_chunk, extrema_indic
 from sonar_analyzer.domain.data_chunk import DataChunk
 from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.io.index.summary_pyramid import SummaryLevel, build_summary_pyramid
+from sonar_analyzer.logging.performance import measure
 from sonar_analyzer.repository.memory_cache import (
     DEFAULT_MAX_BYTES,
     CacheStats,
@@ -133,6 +134,17 @@ class DisplayQuery:
         return None
 
     def query(self, channel_id: str, span: TimeRange, max_points: int | None) -> DataChunk:
+        with measure(
+            "query",
+            channel_id=channel_id,
+            kind="analysis" if max_points is None else "display",
+            max_points=max_points,
+            start_ns=span.start_ns,
+            end_ns=span.end_ns,
+        ):
+            return self._query(channel_id, span, max_points)
+
+    def _query(self, channel_id: str, span: TimeRange, max_points: int | None) -> DataChunk:
         if max_points is None:
             return self._read(channel_id, span)
         # Boş/saklanmış sorgularda da aynı bütçe doğrulaması uygulanır.
