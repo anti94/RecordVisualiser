@@ -1652,7 +1652,7 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F4-039` | `1.39.0` | 20 dk | Window üretimi ve normalizasyonunu ekle | Seçili pencerenin genlik/enerji katsayıları referansla eşleşir | `F4-038` | `feat(analysis): F4-039 window üretimi ve normalizasyonunu ekle` |
 | [x] | `F4-040` | `1.40.0` | 20 dk | Tek taraflı FFT hesabını ekle | Bilinen sinüsün tepe frekansı ve genliği doğru çıkar | `F4-039` | `feat(analysis): F4-040 tek taraflı FFT hesabını ekle` |
-| [ ] | `F4-041` | `1.41.0` | 20 dk | FFT, dB ve Nyquist doğrulamalarını ekle | DC, Nyquist, sıfır sinyal ve kısa pencere kontrollü sonuç verir | `F4-040` | `test(analysis): F4-041 fFT, dB ve Nyquist doğrulamalarını ekle` |
+| [x] | `F4-041` | `1.41.0` | 20 dk | FFT, dB ve Nyquist doğrulamalarını ekle | DC, Nyquist, sıfır sinyal ve kısa pencere kontrollü sonuç verir | `F4-040` | `test(analysis): F4-041 fFT, dB ve Nyquist doğrulamalarını ekle` |
 | [ ] | `F4-042` | `1.42.0` | 20 dk | Seçili aralık FFT'sini mockup alt grafiğine bağla | ROI değişince FFT yenilenir; frekans ve genlik birimi görünür | `F4-041` | `feat(ui): F4-042 seçili aralık FFT'sini mockup alt grafiğine bağla` |
 | [ ] | `F4-043` | `1.43.0` | 20 dk | Welch PSD hesabını ekle | Referans sinyalin yoğunluğu ve entegre gücü toleransta eşleşir | `F4-042` | `feat(analysis): F4-043 welch PSD hesabını ekle` |
 | [ ] | `F4-044` | `1.44.0` | 15 dk | PSD pencere, overlap ve birim sınırlarını doğrula | Geçersiz overlap reddedilir; güç/Hz ve dB dönüşümü doğrudur | `F4-043` | `test(analysis): F4-044 pSD pencere, overlap ve birim sınırlarını doğrula` |

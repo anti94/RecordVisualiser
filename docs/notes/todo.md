@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 240 tamamlandı · 252 kaldı**
+**Toplam 492 madde · 241 tamamlandı · 251 kaldı**
 
-`[############............]` %48.8
+`[############............]` %49.0
 
 ## Özet
 
@@ -38,11 +38,11 @@ Work in fully autonomous mode.
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
-| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 40 | 50 | 90 |
+| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 41 | 49 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **240** | **252** | **492** |
+| **Toplam** | **241** | **251** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -248,7 +248,7 @@ Work in fully autonomous mode.
 | [x] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır |
 | [x] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla |
 
-### Faz 4 — Mockup analiz panosu ve büyük veri performansı (40/90)
+### Faz 4 — Mockup analiz panosu ve büyük veri performansı (41/90)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -292,7 +292,7 @@ Work in fully autonomous mode.
 | [x] | `F4-038` | `1.38.0` | 15 dk | Notch frekans ve Q kontrollerini bağla |
 | [x] | `F4-039` | `1.39.0` | 20 dk | Window üretimi ve normalizasyonunu ekle |
 | [x] | `F4-040` | `1.40.0` | 20 dk | Tek taraflı FFT hesabını ekle |
-| [ ] | `F4-041` | `1.41.0` | 20 dk | FFT, dB ve Nyquist doğrulamalarını ekle |
+| [x] | `F4-041` | `1.41.0` | 20 dk | FFT, dB ve Nyquist doğrulamalarını ekle |
 | [ ] | `F4-042` | `1.42.0` | 20 dk | Seçili aralık FFT'sini mockup alt grafiğine bağla |
 | [ ] | `F4-043` | `1.43.0` | 20 dk | Welch PSD hesabını ekle |
 | [ ] | `F4-044` | `1.44.0` | 15 dk | PSD pencere, overlap ve birim sınırlarını doğrula |
