@@ -116,6 +116,11 @@ class PlotPanel(QWidget):
         #: kanal kimliği -> "left" | "right".
         self._axis_of: dict[str, str] = {}
 
+        # F3-030: legend'den seri gizleme + solo. `solo` etkinken yalnız
+        # bir seri görünür; kapatınca solo ÖNCESİ görünürlükler geri gelir.
+        self._solo_id: str | None = None
+        self._pre_solo_visibility: dict[str, bool] | None = None
+
         pg.setConfigOptions(antialias=True)
         self.plot = pg.PlotWidget(parent=self)
         self.plot.setObjectName("plot_widget")
@@ -246,6 +251,12 @@ class PlotPanel(QWidget):
             axis = self._axis_for_unit(channel.unit or "")
             curve = self._new_curve(seconds, values, pen, channel.display_label, axis)
             self._axis_of[channel.id] = axis
+            # F3-030: solo etkinken eklenen yeni seri gizli başlar; solo
+            # kapanınca görünür olması için ön-görünürlüğe kaydedilir.
+            if self._solo_id is not None and channel.id != self._solo_id:
+                curve.setVisible(False)
+                if self._pre_solo_visibility is not None:
+                    self._pre_solo_visibility[channel.id] = True
 
         self._series[channel.id] = (channel, curve)
         if self._primary_id is None:
@@ -620,6 +631,17 @@ class PlotPanel(QWidget):
             self._primary_id = next(iter(self._series), None)
         if "right" not in self._axis_of.values():
             self._teardown_right_axis()
+        # F3-030: solo edilen seri gittiyse solo kapanır ve kalan seriler
+        # solo öncesi görünürlüğüne döner; başka seri gittiyse yalnız
+        # ön-görünürlük anlık görüntüsünden düşülür.
+        if self._solo_id == channel_id:
+            self._solo_id = None
+            snapshot = self._pre_solo_visibility or {}
+            for cid, (_c, other_curve) in self._series.items():
+                other_curve.setVisible(snapshot.get(cid, True))
+            self._pre_solo_visibility = None
+        elif self._pre_solo_visibility is not None:
+            self._pre_solo_visibility.pop(channel_id, None)
         if not self._series:
             self._t0_ns = None
             self._left_unit = None
@@ -794,6 +816,72 @@ class PlotPanel(QWidget):
     def plotted_channel_ids(self) -> list[str]:
         """Şu an grafikte bulunan kanal kimlikleri, ekleme sırasıyla — testler için."""
         return list(self._series)
+
+    # -- seri gorunurlugu / solo (F3-030) -----------------------
+
+    def set_series_visible(self, channel_id: str, visible: bool) -> None:
+        """Bir serinin görünürlüğünü açar/kapatır — `F3-030`.
+
+        Seri grafikten kaldırılmaz (`plotted_channel_ids` değişmez), yalnız
+        çizgisi gizlenir. Solo etkinken yapılan değişiklik solo çıkışında
+        geri alınacak duruma da yazılır.
+        """
+        entry = self._series.get(channel_id)
+        if entry is None:
+            raise KeyError(f"Grafikte yok: {channel_id}")
+        entry[1].setVisible(visible)
+        if self._pre_solo_visibility is not None:
+            self._pre_solo_visibility[channel_id] = visible
+
+    def is_series_visible(self, channel_id: str) -> bool:
+        """Seri şu an görünür mü — `F3-030`."""
+        entry = self._series.get(channel_id)
+        if entry is None:
+            raise KeyError(f"Grafikte yok: {channel_id}")
+        return bool(entry[1].isVisible())
+
+    def visible_channel_ids(self) -> list[str]:
+        """Görünür serilerin kimlikleri, ekleme sırasıyla."""
+        return [cid for cid, (_c, curve) in self._series.items() if curve.isVisible()]
+
+    def soloed_channel(self) -> str | None:
+        """Solo edilmiş kanal; solo kapalıysa `None`."""
+        return self._solo_id
+
+    def solo_series(self, channel_id: str) -> None:
+        """Yalnız `channel_id`'yi gösterir, diğerlerini gizler — `F3-030`.
+
+        Mevcut görünürlükler saklanır; `clear_solo()` bunları geri yükler.
+        Zaten bu kanal solo ise bir şey yapmaz. Bilinmeyen kanal `KeyError`.
+        """
+        if channel_id not in self._series:
+            raise KeyError(f"Grafikte yok: {channel_id}")
+        if self._solo_id == channel_id:
+            return
+        if self._pre_solo_visibility is None:
+            self._pre_solo_visibility = {
+                cid: bool(curve.isVisible()) for cid, (_c, curve) in self._series.items()
+            }
+        self._solo_id = channel_id
+        for cid, (_c, curve) in self._series.items():
+            curve.setVisible(cid == channel_id)
+
+    def clear_solo(self) -> None:
+        """Solo'yu kapatır ve solo öncesi görünürlükleri geri yükler — `F3-030`."""
+        if self._solo_id is None:
+            return
+        snapshot = self._pre_solo_visibility or {}
+        for cid, (_c, curve) in self._series.items():
+            curve.setVisible(snapshot.get(cid, True))
+        self._solo_id = None
+        self._pre_solo_visibility = None
+
+    def toggle_solo(self, channel_id: str) -> None:
+        """`channel_id` zaten solo ise solo'yu kapatır, değilse onu solo yapar."""
+        if self._solo_id == channel_id:
+            self.clear_solo()
+        else:
+            self.solo_series(channel_id)
 
     def title_text(self) -> str:
         item = self.plot.getPlotItem().titleLabel
