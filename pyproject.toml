@@ -106,9 +106,12 @@ reportMissingTypeStubs = false
 reportUnnecessaryComparison = false
 
 # PyQtGraph tip taslagi (stub) tasimiyor; strict modda her cagri "bilinmeyen tip"
-# sayiliyor. Gevsetme YALNIZ grafik adaptor katmaniyla sinirli: ADR-002'ye gore
-# PyQtGraph'in gorundugu tek yer burasi ve disariya DataChunk/ChannelMetadata
-# ciktigi icin bilinmeyen tipler bu klasorun disina sizmiyor.
+# sayiliyor. Ayrica `pg.ViewBox`/`pg.PlotDataItem` gibi yeniden disa aktarilan
+# siniflar pyright'ta alt-MODUL olarak cozuluyor: tip olarak kullanmak
+# (reportInvalidTypeForm), cagirmak (reportCallIssue) ve sinif sabitine erismek
+# (reportAttributeAccessIssue) hata veriyor. Gevsetme YALNIZ grafik adaptor
+# katmaniyla sinirli: ADR-002'ye gore PyQtGraph'in gorundugu tek yer burasi ve
+# disariya DataChunk/ChannelMetadata ciktigi icin bu bu klasorun disina sizmiyor.
 [[tool.pyright.executionEnvironments]]
 root = "src/sonar_analyzer/ui/plots"
 reportUnknownMemberType = "none"
@@ -117,6 +120,9 @@ reportUnknownVariableType = "none"
 reportUnknownParameterType = "none"
 reportMissingParameterType = "none"
 reportOptionalMemberAccess = "none"
+reportInvalidTypeForm = "none"
+reportCallIssue = "none"
+reportAttributeAccessIssue = "none"
 
 [[tool.pyright.executionEnvironments]]
 root = "."

@@ -24,6 +24,13 @@ yüzden **aynı mutlak ana denk gelen iki örnek — kanal, kayıt, örnekleme
 hızı ya da parça başlangıcı ne olursa olsun — aynı X koordinatına
 düşer**. `x_for_timestamp_ns()` / `timestamp_ns_for_x()` bu eşlemeyi
 dışarıya verir (cursor, ROI ve pan işleri bunun üstüne kurulur).
+
+`F3-020`: **ikinci (sağ) Y ekseni**. İlk serinin birimi sol ekseni
+sahiplenir; farklı birimli seriler sağ eksene (ayrı bir `ViewBox`)
+gider ve o eksen birimiyle etiketlenir. Böylece `bar` ve `°C` gibi
+ölçekleri çok farklı seriler aynı grafikte doğru okunur. Sağ eksen
+yalnız gerektiğinde (ikinci bir birim geldiğinde) görünür olur;
+grafik tek birime dönerse yine gizlenir.
 """
 
 from __future__ import annotations
@@ -32,7 +39,7 @@ import numpy as np
 import pyqtgraph as pg
 from numpy.typing import NDArray
 from PySide6.QtCore import QEvent, QObject, Signal
-from PySide6.QtGui import QDragEnterEvent, QDropEvent
+from PySide6.QtGui import QDragEnterEvent, QDropEvent, QPen
 from PySide6.QtWidgets import QVBoxLayout, QWidget
 
 from sonar_analyzer.domain.channel import ChannelMetadata
@@ -72,6 +79,14 @@ class PlotPanel(QWidget):
         #: `channel`/`sample_count`/`curve_data()` (parametresiz) için "birincil" seri.
         self._primary_id: str | None = None
         self._t0_ns: int | None = None
+
+        # F3-020: iki Y ekseni. Sol eksen ilk serinin birimini sahiplenir;
+        # farkli birimli seriler sag eksene (ayri ViewBox) gider.
+        self._left_unit: str | None = None
+        self._right_unit: str | None = None
+        self._right_vb: pg.ViewBox | None = None
+        #: kanal kimliği -> "left" | "right".
+        self._axis_of: dict[str, str] = {}
 
         pg.setConfigOptions(antialias=True)
         self.plot = pg.PlotWidget(parent=self)
@@ -144,23 +159,89 @@ class PlotPanel(QWidget):
         seconds = to_seconds(chunk.timestamps_ns, self._t0_ns)
         values = np.asarray(chunk.values, dtype=np.float64)
         color = channel_color(channel.id)
+        pen = pg.mkPen(color, width=1)
 
         existing = self._series.get(channel.id)
         if existing is not None:
             _previous_channel, curve = existing
-            curve.setPen(pg.mkPen(color, width=1))
+            curve.setPen(pen)
             curve.setData(seconds, values)
         else:
-            curve = self.plot.plot(
-                seconds, values, pen=pg.mkPen(color, width=1), name=channel.display_label
-            )
+            axis = self._axis_for_unit(channel.unit or "")
+            curve = self._new_curve(seconds, values, pen, channel.display_label, axis)
+            self._axis_of[channel.id] = axis
 
         self._series[channel.id] = (channel, curve)
         if self._primary_id is None:
             self._primary_id = channel.id
 
         self._refresh_labels()
+        self._autorange()
+
+    # -- iki Y ekseni (F3-020) ----------------------------------------
+
+    def _axis_for_unit(self, unit: str) -> str:
+        """Bu birim hangi eksene düşer? İlk birim sola; ilk **farklı** birim sağa."""
+        if self._left_unit is None:
+            self._left_unit = unit
+            return "left"
+        if unit == self._left_unit:
+            return "left"
+        if self._right_unit is None:
+            self._right_unit = unit
+        return "right"
+
+    def _new_curve(
+        self,
+        seconds: NDArray[np.float64],
+        values: NDArray[np.float64],
+        pen: QPen,
+        name: str,
+        axis: str,
+    ) -> pg.PlotDataItem:
+        if axis == "left":
+            return self.plot.plot(seconds, values, pen=pen, name=name)
+        self._ensure_right_axis()
+        curve = pg.PlotDataItem(seconds, values, pen=pen, name=name)
+        assert self._right_vb is not None
+        self._right_vb.addItem(curve)
+        self._legend.addItem(curve, name)
+        return curve
+
+    def _ensure_right_axis(self) -> None:
+        if self._right_vb is not None:
+            return
+        plot_item = self.plot.getPlotItem()
+        right_vb = pg.ViewBox()
+        plot_item.showAxis("right")
+        plot_item.scene().addItem(right_vb)
+        plot_item.getAxis("right").linkToView(right_vb)
+        right_vb.setXLink(plot_item)
+        self._right_vb = right_vb
+        self._sync_right_geometry()
+        plot_item.vb.sigResized.connect(self._sync_right_geometry)
+
+    def _sync_right_geometry(self) -> None:
+        if self._right_vb is None:
+            return
+        plot_item = self.plot.getPlotItem()
+        self._right_vb.setGeometry(plot_item.vb.sceneBoundingRect())
+        self._right_vb.linkedViewChanged(plot_item.vb, self._right_vb.XAxis)
+
+    def _teardown_right_axis(self) -> None:
+        if self._right_vb is None:
+            return
+        plot_item = self.plot.getPlotItem()
+        plot_item.vb.sigResized.disconnect(self._sync_right_geometry)
+        plot_item.scene().removeItem(self._right_vb)
+        plot_item.hideAxis("right")
+        self._right_vb = None
+        self._right_unit = None
+
+    def _autorange(self) -> None:
         self.plot.enableAutoRange()
+        if self._right_vb is not None:
+            self._right_vb.enableAutoRange(axis=pg.ViewBox.YAxis)
 
     def remove_channel(self, channel_id: str) -> None:
         """Bir seriyi ve legend girdisini kaldırır — `F3-014`.
@@ -173,13 +254,19 @@ class PlotPanel(QWidget):
         if entry is None:
             return
         _channel, curve = entry
-        self.plot.removeItem(curve)
+        if self._axis_of.pop(channel_id, "left") == "right" and self._right_vb is not None:
+            self._right_vb.removeItem(curve)
+        else:
+            self.plot.removeItem(curve)
         self._legend.removeItem(curve)
 
         if self._primary_id == channel_id:
             self._primary_id = next(iter(self._series), None)
+        if "right" not in self._axis_of.values():
+            self._teardown_right_axis()
         if not self._series:
             self._t0_ns = None
+            self._left_unit = None
 
         self._refresh_labels()
 
@@ -206,7 +293,11 @@ class PlotPanel(QWidget):
             self.plot.setLabel("left", channel.name, units=channel.unit or "")
         else:
             self.plot.setTitle(f"{len(self._series)} kanal", color=DARK.text_primary)
-            self.plot.setLabel("left", "")
+            # F3-020: birimler eksende. Tek birim varsa sol eksene yazılır;
+            # ikinci birim varsa sağ eksene (kendi ViewBox'ında) yazılır.
+            self.plot.setLabel("left", "", units=self._left_unit or "")
+        if self._right_vb is not None and self._right_unit:
+            self.plot.getPlotItem().getAxis("right").setLabel("", units=self._right_unit)
 
         self.plot.setLabel("bottom", TIME_AXIS_LABEL, units=TIME_AXIS_UNIT)
 
@@ -267,9 +358,30 @@ class PlotPanel(QWidget):
 
     def axis_label(self, axis: str) -> str:
         """Eksenin etiket metni (birim dahil) — testler ve kabul için."""
-        if axis not in ("left", "bottom"):
+        if axis not in ("left", "right", "bottom"):
             raise KeyError(f"Tanimsiz eksen: {axis}")
         return str(self.plot.getPlotItem().getAxis(axis).labelString())
+
+    def axis_for_channel(self, channel_id: str) -> str:
+        """Serinin çizildiği Y ekseni: `"left"` | `"right"` — `F3-020`."""
+        if channel_id not in self._series:
+            raise KeyError(f"Grafikte yok: {channel_id}")
+        return self._axis_of.get(channel_id, "left")
+
+    @property
+    def right_axis_visible(self) -> bool:
+        """Sağ Y ekseni (ikinci birim) şu an gösteriliyor mu — `F3-020`."""
+        return self._right_vb is not None
+
+    @property
+    def left_unit(self) -> str | None:
+        """Sol Y ekseninin sahiplendiği birim; seri yoksa `None`."""
+        return self._left_unit
+
+    @property
+    def right_unit(self) -> str | None:
+        """Sağ Y eksenine atanmış birim; ikinci birim yoksa `None`."""
+        return self._right_unit
 
     def legend_labels(self) -> list[str]:
         """Legend'de görünen etiketler, ekleme sırasıyla — testler için."""
