@@ -98,8 +98,8 @@ def test_switching_rows_reloads_the_fields(editor: StepListEditor) -> None:
 
     editor.list.setCurrentRow(0)
     assert set(editor.param_field_names()) == {"factor"}
-    assert editor.param_field("factor").value() == 2.0
+    assert editor.param_value("factor") == 2.0
 
     editor.list.setCurrentRow(1)
     assert set(editor.param_field_names()) == {"delta"}
-    assert editor.param_field("delta").value() == 4.0
+    assert editor.param_value("delta") == 4.0

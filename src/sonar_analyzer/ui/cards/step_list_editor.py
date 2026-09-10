@@ -12,6 +12,8 @@ verilir; verilmemişse yeni adım eklenemez (buton pasif).
 
 from __future__ import annotations
 
+from typing import Union
+
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QComboBox,
@@ -47,7 +49,12 @@ STEP_KIND_ORDER: tuple[StepKind, ...] = (
     StepKind.ABS,
     StepKind.CLIP,
     StepKind.MOVING_AVERAGE,
+    StepKind.DETREND,
 )
+
+#: Bir parametre alanı widget'ı. `ParamSpec.choices` dolu str parametreler
+#: (örn. `DETREND.mode`) açılır liste, sayısal parametreler spin box olur.
+ParamField = Union[QDoubleSpinBox, QSpinBox, QComboBox]
 
 
 def _format_value(value: object) -> str:
@@ -131,7 +138,7 @@ class StepListEditor(QWidget):
         self.param_error.hide()
         layout.addWidget(self.param_error)
 
-        self._param_fields: dict[str, QDoubleSpinBox | QSpinBox] = {}
+        self._param_fields: dict[str, ParamField] = {}
         self._suppress_param_signal = False
         self._error_active = False
 
@@ -221,17 +228,34 @@ class StepListEditor(QWidget):
         """Seçili adım için gösterilen parametre alanlarının adları."""
         return list(self._param_fields)
 
-    def param_field(self, name: str) -> QDoubleSpinBox | QSpinBox:
+    def param_field(self, name: str) -> ParamField:
         """Bir parametre alanı widget'ı — testler ve kabul için."""
         return self._param_fields[name]
 
-    def set_param_field(self, name: str, value: float) -> None:
-        """Bir parametre alanının değerini ayarlar (tip alanına göre)."""
+    def set_param_field(self, name: str, value: float | str) -> None:
+        """Bir parametre alanının değerini ayarlar (alan tipine göre)."""
         field = self._param_fields[name]
-        if isinstance(field, QSpinBox):
+        if isinstance(field, QComboBox):
+            index = field.findData(value)
+            if index < 0:
+                index = field.findText(str(value))
+            if index >= 0:
+                field.setCurrentIndex(index)
+        elif isinstance(field, QSpinBox):
             field.setValue(int(value))
         else:
             field.setValue(float(value))
+
+    def param_value(self, name: str) -> object:
+        """Bir parametre alanının o anki değeri (alan tipinden bağımsız) — testler için."""
+        return self._field_value(self._param_fields[name])
+
+    @staticmethod
+    def _field_value(field: ParamField) -> object:
+        """Alan tipinden bağımsız olarak o anki değeri döndürür."""
+        if isinstance(field, QComboBox):
+            return field.currentData()
+        return field.value()
 
     def _rebuild_param_panel(self, step: ProcessingStep | None) -> None:
         self._suppress_param_signal = True
@@ -248,8 +272,15 @@ class StepListEditor(QWidget):
 
         for spec in PARAMETER_SPECS[step.kind]:
             value = step.parameters[spec.name]
-            field: QDoubleSpinBox | QSpinBox
-            if spec.kind is int:
+            field: ParamField
+            if spec.choices:
+                field = QComboBox(self.param_panel)
+                for choice in spec.choices:
+                    field.addItem(str(choice), choice)
+                index = field.findData(value)
+                field.setCurrentIndex(index if index >= 0 else 0)
+                field.currentIndexChanged.connect(self._on_param_edit)
+            elif spec.kind is int:
                 field = QSpinBox(self.param_panel)
                 field.setRange(*_INT_RANGE)
                 field.setValue(int(value) if isinstance(value, (int, float)) else 0)
@@ -274,7 +305,9 @@ class StepListEditor(QWidget):
         if not 0 <= row < len(self._steps):
             return
         old = self._steps[row]
-        params: dict[str, object] = {name: fld.value() for name, fld in self._param_fields.items()}
+        params: dict[str, object] = {
+            name: self._field_value(fld) for name, fld in self._param_fields.items()
+        }
         try:
             new_step = ProcessingStep(
                 kind=old.kind,

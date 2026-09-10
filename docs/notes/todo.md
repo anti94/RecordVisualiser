@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 215 tamamlandı · 277 kaldı**
+**Toplam 492 madde · 216 tamamlandı · 276 kaldı**
 
-`[##########..............]` %43.7
+`[###########.............]` %43.9
 
 ## Özet
 
@@ -38,11 +38,11 @@ Work in fully autonomous mode.
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
-| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 15 | 75 | 90 |
+| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 16 | 74 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **215** | **277** | **492** |
+| **Toplam** | **216** | **276** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -248,7 +248,7 @@ Work in fully autonomous mode.
 | [x] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır |
 | [x] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla |
 
-### Faz 4 — Mockup analiz panosu ve büyük veri performansı (15/90)
+### Faz 4 — Mockup analiz panosu ve büyük veri performansı (16/90)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -267,7 +267,7 @@ Work in fully autonomous mode.
 | [x] | `F4-013` | `1.13.0` | 20 dk | Akustik blokları zaman sorgusuna bağla |
 | [x] | `F4-014` | `1.14.0` | 20 dk | Akustik boyut ve sample rate sınırlarını doğrula |
 | [x] | `F4-015` | `1.15.0` | 20 dk | Detrend ve DC kaldırma hesabını ekle |
-| [ ] | `F4-016` | `1.16.0` | 15 dk | Detrend türü seçimini işlem editörüne bağla |
+| [x] | `F4-016` | `1.16.0` | 15 dk | Detrend türü seçimini işlem editörüne bağla |
 | [ ] | `F4-017` | `1.17.0` | 20 dk | Moving average hesabını ekle |
 | [ ] | `F4-018` | `1.18.0` | 15 dk | Moving average pencere kontrolünü bağla |
 | [ ] | `F4-019` | `1.19.0` | 20 dk | Normalize hesabını ekle |

@@ -230,8 +230,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-012` | 20 dk | 3 dk 49 sn | `69cdb39` | blok içi örnek zamanlarını üret |
 | `F4-013` | 20 dk | 3 dk 41 sn | `fdba8f8` | akustik blokları zaman sorgusuna bağla |
 | `F4-014` | 20 dk | 12 dk 50 sn | `73c091e` | akustik boyut ve sample rate sınırlarını doğrula |
+| `F4-015` | 20 dk | 5 dk 45 sn | `8df389a` | detrend ve DC kaldırma hesabını ekle |
 
-**212 commit · olculen toplam 2443 dk 14 sn · olculemeyen 1 (ilk commit)**
+**213 commit · olculen toplam 2448 dk 59 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
