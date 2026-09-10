@@ -367,6 +367,13 @@ class PlotPanel(QWidget):
         x_min, x_max, _y_min, _y_max = self.visible_range()
         return x_min, x_max
 
+    def right_axis_y_range(self) -> tuple[float, float] | None:
+        """İkinci (sağ) Y ekseninin görünür `(y_min, y_max)` aralığı; yoksa `None` — `F3-020`."""
+        if self._right_vb is None:
+            return None
+        (_x0, _x1), (y_min, y_max) = self._right_vb.viewRange()
+        return float(y_min), float(y_max)
+
     # -- yakinlastirma kipi (F3-022 / F3-023 / F3-024) ---------------
 
     @property
@@ -398,6 +405,11 @@ class PlotPanel(QWidget):
         sx = factor if self._zoom_mode in ("x", "xy") else 1.0
         sy = factor if self._zoom_mode in ("y", "xy") else 1.0
         self.plot.getViewBox().scaleBy(x=sx, y=sy)
+        # F3-020 ikinci Y ekseni: X'e bağlı ama Y'si bağımsız — Y
+        # yakınlaştırmasında onu da aynı oranda ölçekle ki iki eksen
+        # tutarlı kalsın.
+        if self._right_vb is not None and sy != 1.0:
+            self._right_vb.scaleBy(y=sy)
 
     # -- sorgular --------------------------------------------------------
 
