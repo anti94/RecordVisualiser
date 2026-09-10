@@ -28,7 +28,12 @@ from dataclasses import dataclass
 import numpy as np
 from numpy.typing import NDArray
 
-from sonar_analyzer.analysis.windows import WindowKind, window_values
+from sonar_analyzer.analysis.windows import (
+    WindowError,
+    WindowKind,
+    resolve_kind,
+    window_values,
+)
 
 FloatArray = NDArray[np.float64]
 
@@ -141,7 +146,11 @@ def welch_psd(
     if length > data.size:
         raise PsdError(f"parça uzunluğu ({length}) sinyalden ({data.size}) uzun olamaz")
 
-    coefficients = window_values(window, length)
+    try:
+        resolved_window = resolve_kind(window)
+        coefficients = window_values(resolved_window, length)
+    except WindowError as exc:
+        raise PsdError(str(exc)) from exc
     window_power = float(np.square(coefficients).sum())
     if window_power == 0.0:  # pragma: no cover - desteklenen pencerelerde olmaz
         raise PsdError("pencere gücü sıfır; yoğunluk ölçeklemesi tanımsız")
@@ -169,7 +178,7 @@ def welch_psd(
         segment_length=length,
         segment_count=len(starts),
         overlap=float(overlap),
-        window_kind=window.value if isinstance(window, WindowKind) else WindowKind(window).value,
+        window_kind=resolved_window.value,
     )
 
 
