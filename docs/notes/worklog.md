@@ -224,8 +224,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-006` | 20 dk | 9 dk 42 sn | `79db489` | Analysis Tools işlem listesi editörünü ekle |
 | `F4-007` | 20 dk | 5 dk 46 sn | `e941eab` | analiz parametre hatalarını alanlarda göster |
 | `F4-008` | 15 dk | 6 dk 1 sn | `9718efa` | seçili kanala uygulama ve filtreli veri görünümünü bağla |
+| `F4-009` | 20 dk | 5 dk 58 sn | `17f3ef0` | ham akustik blok formatının ayrı sürümünü tanımla |
 
-**206 commit · olculen toplam 2403 dk 23 sn · olculemeyen 1 (ilk commit)**
+**207 commit · olculen toplam 2409 dk 21 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
