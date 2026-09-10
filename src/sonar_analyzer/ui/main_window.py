@@ -19,6 +19,8 @@ from dataclasses import replace
 from pathlib import Path
 from time import perf_counter
 
+import numpy as np
+from numpy.typing import NDArray
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QAction, QCloseEvent
 from PySide6.QtWidgets import (
@@ -967,6 +969,31 @@ class MainWindow(QMainWindow):
             return
         self.right_dock.inspector.show_raw_sample(inspection, channel.unit or "")
 
+    def refresh_analysis_views(
+        self,
+        channel: ChannelMetadata,
+        values: NDArray[np.float64],
+        region_seconds: tuple[float, float] | None = None,
+    ) -> None:
+        """Merkezin analiz yüzeylerini **tek çağrıda aynı seçimle** günceller — `F4-052`.
+
+        Mockup'ın dört merkez bölgesi tek bir yoldan beslenir: zaman
+        serisi seçimin kaynağıdır (`PlotPanel`), istatistik / FFT /
+        spektrogram hücreleri (`DashboardPanel.set_channel_data`) ve tam
+        boy Spectrum + Waterfall görünümleri aynı `values` ile çizilir.
+        Böylece hiçbir bölge eski bir seçimi göstermez.
+        """
+        data = np.asarray(values, dtype=np.float64)
+        self.dashboard.set_channel_data(channel, data, region_seconds=region_seconds)
+        self.spectrum_view.set_channel_data(channel, data, region_seconds=region_seconds)
+        self.waterfall_view.set_channel_data(channel, data, region_seconds=region_seconds)
+
+    def clear_analysis_views(self) -> None:
+        """Tüm analiz yüzeylerini boş duruma alır — `F4-052`."""
+        self.dashboard.clear_analysis()
+        self.spectrum_view.clear()
+        self.waterfall_view.clear()
+
     def _on_stats_region_changed(self, start_ns: int, end_ns: int) -> None:
         """Grafikte zaman bölgesi seçilince istatistik kartını o pencereye daraltır — `F3-039`.
 
@@ -1006,10 +1033,8 @@ class MainWindow(QMainWindow):
         if not self._scrub_debouncer.is_current(token):
             return
         span = self.plot_panel.time_region_x()
-        # F4-042/F4-048: ROI değişince FFT ve spektrogram da o pencereyi gösterir.
-        self.dashboard.set_channel_data(channel, chunk.values, region_seconds=span)
-        self.spectrum_view.set_channel_data(channel, chunk.values, region_seconds=span)
-        self.waterfall_view.set_channel_data(channel, chunk.values, region_seconds=span)
+        # F4-052: ROI değişince dört merkez bölgesi aynı seçimle güncellenir.
+        self.refresh_analysis_views(channel, chunk.values, region_seconds=span)
 
     def open_channel(self, channel_id: str) -> None:
         """Seçilen kanalı çizer ve ayrıntısını gösterir.
@@ -1031,9 +1056,7 @@ class MainWindow(QMainWindow):
         self.plot_panel.clear_processed_overlay()
         self.right_dock.analysis_tools.step_editor.set_input_channel(channel_id)
         self.right_dock.analysis_tools.step_editor.set_sample_rate(channel.sample_rate_hz or 0.0)
-        self.dashboard.set_channel_data(channel, chunk.values)
-        self.spectrum_view.set_channel_data(channel, chunk.values)
-        self.waterfall_view.set_channel_data(channel, chunk.values)
+        self.refresh_analysis_views(channel, chunk.values)
         self.plot_tool_bar.set_current_channel(channel_id)
         self.show_plot()
         self.right_dock.show_channel(channel)
@@ -1542,9 +1565,7 @@ class MainWindow(QMainWindow):
         self.right_dock.close_inspector()
         self.right_dock.bit_status.clear()
         self.plot_panel.clear()
-        self.dashboard.clear_analysis()
-        self.spectrum_view.clear()
-        self.waterfall_view.clear()
+        self.clear_analysis_views()
         self.show_empty_state()
         self.playback_dock.set_recording_range(metadata.time_range)
         # F3-061: imleç zamanının UTC/yerel görünümü için kanonik köken.
@@ -1633,9 +1654,7 @@ class MainWindow(QMainWindow):
         self._scrub_debouncer.cancel()
         self.status.set_time_origin(None)
         self.status.set_cursor_time(None)
-        self.dashboard.clear_analysis()
-        self.spectrum_view.clear()
-        self.waterfall_view.clear()
+        self.clear_analysis_views()
         self.bottom_dock.clear_events()
         self.show_empty_state()
         self.status.set_field("file", "")

@@ -14,6 +14,8 @@ FFT (`SpectrumPanel`, `F4-042`) ve istatistik kartı (`StatisticsPanel`,
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import numpy as np
 from numpy.typing import NDArray
 from PySide6.QtCore import Qt
@@ -27,6 +29,20 @@ from sonar_analyzer.ui.plots.statistics_panel import StatisticsPanel
 
 SPECTROGRAM_TITLE = "Spectrogram"
 FFT_TITLE = "FFT"
+
+
+@dataclass(frozen=True)
+class AnalysisSelection:
+    """Analiz hücrelerinin **hepsinin** gösterdiği seçim — `F4-052`.
+
+    Dört merkez bölgesinin tutarlılığı bu kayıtla denetlenir: aynı kanal,
+    aynı örnek sayısı, aynı zaman aralığı.
+    """
+
+    channel_id: str
+    channel_name: str
+    sample_count: int
+    region_seconds: tuple[float, float] | None = None
 
 
 class DashboardPanel(QWidget):
@@ -65,6 +81,8 @@ class DashboardPanel(QWidget):
 
         layout.addWidget(self.rows)
 
+        self._selection: AnalysisSelection | None = None
+
     def row_titles(self) -> list[str]:
         """Kabul kontrolü için: üstten alta hücre başlıkları."""
         return [SPECTROGRAM_TITLE, FFT_TITLE]
@@ -79,13 +97,29 @@ class DashboardPanel(QWidget):
         values: NDArray[np.float64],
         region_seconds: tuple[float, float] | None = None,
     ) -> None:
-        """İstatistik, FFT ve spektrogram hücrelerini birlikte besler — `F4-048`."""
-        self.statistics.set_channel_data(channel, values, region_seconds=region_seconds)
-        self.fft.set_channel_data(channel, values, region_seconds=region_seconds)
-        self.spectrogram.set_channel_data(channel, values, region_seconds=region_seconds)
+        """İstatistik, FFT ve spektrogram hücrelerini birlikte besler — `F4-048`.
+
+        Üç hücre **tek çağrıda ve aynı veriyle** güncellenir; gösterilen
+        seçim `selection()` ile dışarıya verilir (`F4-052`).
+        """
+        data = np.asarray(values, dtype=np.float64)
+        self.statistics.set_channel_data(channel, data, region_seconds=region_seconds)
+        self.fft.set_channel_data(channel, data, region_seconds=region_seconds)
+        self.spectrogram.set_channel_data(channel, data, region_seconds=region_seconds)
+        self._selection = AnalysisSelection(
+            channel_id=channel.id,
+            channel_name=channel.name,
+            sample_count=int(data.size),
+            region_seconds=region_seconds,
+        )
 
     def clear_analysis(self) -> None:
         """İstatistik, FFT ve spektrogram hücrelerini boş duruma alır."""
         self.statistics.clear()
         self.fft.clear()
         self.spectrogram.clear()
+        self._selection = None
+
+    def selection(self) -> AnalysisSelection | None:
+        """Analiz hücrelerinin gösterdiği seçim (yoksa `None`) — `F4-052`."""
+        return self._selection
