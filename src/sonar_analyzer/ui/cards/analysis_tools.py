@@ -41,10 +41,13 @@ FILTER_TYPES: tuple[str, ...] = ("Butterworth", "Chebyshev", "Bessel")
 
 #: Filtre yanıt türü. `F4-029` low-pass ile başlar; `F4-032`/`F4-035`/
 #: `F4-038` sırayla high-pass / band-pass / notch ekler.
-FILTER_RESPONSES: tuple[str, ...] = ("Low-pass",)
+FILTER_RESPONSES: tuple[str, ...] = ("Low-pass", "High-pass")
 
 #: `filter_response` etiketi -> `StepKind` eşlemesi.
-FILTER_RESPONSE_KINDS: dict[str, StepKind] = {"Low-pass": StepKind.LOW_PASS}
+FILTER_RESPONSE_KINDS: dict[str, StepKind] = {
+    "Low-pass": StepKind.LOW_PASS,
+    "High-pass": StepKind.HIGH_PASS,
+}
 
 
 class FilterTabError(ValueError):
