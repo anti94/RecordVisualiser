@@ -15,7 +15,16 @@ okunur bir eşleme (`mmap.ACCESS_READ`) olarak sarar ve blokları
 değişmeden mmap üzerinde çalışır.
 
 Sınır dışı bir blok **sessizce kırpılmaz**: `MappedSourceError` verilir.
-Boş dosya haritalanamaz (mmap kısıtı) ve aynı hatayla reddedilir.
+
+Boş dosya bir eşleme hatası değildir: ``mmap`` sıfır baytı haritalayamaz,
+ama boş bir kaynak da geçerli bir girdidir (bozuk/kesik kayıt). Bu durumda
+eşleme kurulmaz, `size` 0 ve `data()` boş bir görünüm olur — böylece
+"bu dosya biçim olarak bozuk" kararını **format katmanı** verir, okuyucu
+değil.
+
+Windows'ta eşlenen bir dosya, eşleme açıkken silinemez veya üzerine
+yazılamaz. Bu bilinçli bir ödünçtür: kopyalamamanın bedeli, kayıt açıkken
+kaynağın yerinde durmasıdır. `close()` kilidi bırakır.
 """
 
 from __future__ import annotations
@@ -39,12 +48,18 @@ class MappedSource:
             self._file = self._path.open("rb")
         except OSError as exc:
             raise MappedSourceError(f"kaynak açılamadı: {self._path} ({exc})") from exc
-        try:
-            self._map = mmap.mmap(self._file.fileno(), 0, access=mmap.ACCESS_READ)
-        except (OSError, ValueError) as exc:
-            self._file.close()
-            raise MappedSourceError(f"kaynak haritalanamadı: {self._path} ({exc})") from exc
-        self._view = memoryview(self._map)
+        # Boş dosya haritalanamaz (mmap kısıtı) ama geçerli bir girdidir:
+        # eşleme kurulmaz, boş bir görünüm verilir.
+        self._map: mmap.mmap | None = None
+        if self._path.stat().st_size == 0:
+            self._view = memoryview(b"")
+        else:
+            try:
+                self._map = mmap.mmap(self._file.fileno(), 0, access=mmap.ACCESS_READ)
+            except (OSError, ValueError) as exc:
+                self._file.close()
+                raise MappedSourceError(f"kaynak haritalanamadı: {self._path} ({exc})") from exc
+            self._view = memoryview(self._map)
         self._closed = False
 
     # -- yaşam döngüsü -----------------------------------------------------
@@ -72,9 +87,10 @@ class MappedSource:
             return
         self._closed = True
         self._view.release()
-        # Dışarıda blok görünümü varsa eşleme son görünümle serbest kalır.
-        with contextlib.suppress(BufferError):
-            self._map.close()
+        if self._map is not None:
+            # Dışarıda blok görünümü varsa eşleme son görünümle serbest kalır.
+            with contextlib.suppress(BufferError):
+                self._map.close()
         self._file.close()
 
     @property
@@ -89,9 +105,9 @@ class MappedSource:
 
     @property
     def size(self) -> int:
-        """Eşlenen dosyanın bayt uzunluğu."""
+        """Eşlenen dosyanın bayt uzunluğu (boş dosyada 0)."""
         self._ensure_open()
-        return len(self._map)
+        return len(self._view)
 
     def __len__(self) -> int:
         return self.size
@@ -113,7 +129,7 @@ class MappedSource:
         if length < 0:
             raise MappedSourceError(f"blok uzunluğu negatif olamaz: {length}")
         end = offset + length
-        total = len(self._map)
+        total = len(self._view)
         if end > total:
             raise MappedSourceError(f"blok dosya sonunu aşıyor: [{offset}, {end}) > {total} bayt")
         return self._view[offset:end]

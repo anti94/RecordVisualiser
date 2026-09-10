@@ -57,7 +57,7 @@ class UnknownPacket:
 
 
 def classify_record_bytes(
-    raw_record: bytes, byte_offset: int, record_size: int
+    raw_record: ReadableBuffer, byte_offset: int, record_size: int
 ) -> UnknownPacket | None:
     """Kaydın `name` alanı `b"Data"` ile başlamıyorsa `UnknownPacket` döner.
 

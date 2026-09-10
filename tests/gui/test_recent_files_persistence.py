@@ -166,6 +166,8 @@ def test_missing_recent_file_is_dropped_from_the_list(qtbot: QtBot, tmp_path: Pa
     _open(qtbot, window, [target])
     assert window.recent_files == (str(target),)
 
+    # `F4-054`: kaynak bellek esleniyor; silmeden once birakilmali.
+    window.close_recordings()
     target.unlink()
     window.open_recent(target)
     while window.active_load_request_id:

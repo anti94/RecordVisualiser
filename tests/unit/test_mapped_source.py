@@ -227,8 +227,14 @@ def test_a_missing_file_is_reported(tmp_path: Path) -> None:
         MappedSource(tmp_path / "yok.bin")
 
 
-def test_an_empty_file_cannot_be_mapped(tmp_path: Path) -> None:
+def test_an_empty_file_maps_to_an_empty_view(tmp_path: Path) -> None:
+    """Boş dosya bir eşleme hatası değil; biçim kararını format katmanı verir."""
     empty = tmp_path / "empty.bin"
     empty.write_bytes(b"")
-    with pytest.raises(MappedSourceError, match="haritalanamadı"):
-        MappedSource(empty)
+
+    with MappedSource(empty) as source:
+        assert source.size == 0
+        assert len(source.data()) == 0
+        assert len(source.block(0, 0)) == 0
+        with pytest.raises(MappedSourceError, match="dosya sonunu aşıyor"):
+            source.block(0, 1)

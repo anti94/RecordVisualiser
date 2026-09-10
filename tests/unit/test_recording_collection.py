@@ -67,6 +67,8 @@ def test_reopen_replaces_snapshot_without_duplicating_source(tmp_path: Path) -> 
     collection = RecordingCollection()
     identifier = collection.open(first)
     previous = collection.get(identifier)
+    # `F4-054`: kaynak bellek esleniyor; degistirmeden once birakilmali.
+    collection.close(identifier)
     first.write_bytes(build_valid_fixture(2))
     assert collection.open(first) == identifier
     assert len(collection.recordings()) == 1

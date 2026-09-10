@@ -140,6 +140,10 @@ def test_saved_group_survives_a_reload_and_reopens(qtbot: QtBot, tmp_path: Path)
     win.save_favorite_group("Seyir", ["ch0", "ch6"])
     assert writer.last is not None
 
+    # `F4-054`: kaynak bellek esleniyor; ikinci pencere ayni dosyayi yeniden
+    # kopyalamadan once ilk pencere kilidi birakmali.
+    win.close_recordings()
+
     # Kaydedilen ayarla yeni bir pencere: grup hâlâ açılabilir olmalı.
     win2, _writer2 = _open_window(qtbot, tmp_path, writer.last)
     win2.open_favorite_group("Seyir")

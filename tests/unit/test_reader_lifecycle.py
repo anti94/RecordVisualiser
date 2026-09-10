@@ -65,10 +65,11 @@ def test_repeated_open_close_and_snapshot_isolation(tmp_path: Path) -> None:
         repository.events(repository.metadata().time_range)
         repository.close()
     repository.open(path)
-    path.write_bytes(build_valid_fixture(2))
-    # Acik snapshot ayni kalir; yeni acilis yeni kaydi okur.
+    # Acik snapshot kendi kaydini gorur.
     assert len(repository.query("ch0", repository.metadata().time_range)) == 8
+    # `F4-054`: kaynak bellek esleniyor; degistirmeden once birakilmali.
     repository.close()
+    path.write_bytes(build_valid_fixture(2))
     repository.open(path)
     assert repository.metadata().record_count == 2
     repository.close()

@@ -1386,6 +1386,15 @@ class MainWindow(QMainWindow):
             return selected
         return self.plot_panel.plotted_channel_ids()
 
+    def close_recordings(self) -> None:
+        """Açık kayıtların kaynak dosyalarını bırakır — `F4-054`.
+
+        Kaynak bellek eşlemesiyle okunur (`MappedSource`); eşleme açıkken
+        Windows'ta dosya silinemez veya üzerine yazılamaz. Bu metot pencereyi
+        kapatmadan kilidi bırakır.
+        """
+        self._close_owned_repositories()
+
     def _close_owned_repositories(self) -> None:
         for repository in self._owned_repositories:
             repository.close()

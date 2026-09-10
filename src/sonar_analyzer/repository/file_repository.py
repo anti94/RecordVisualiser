@@ -1,9 +1,12 @@
-"""Kayıtlı dosyanın metadata ve kanal erişimi — F2-033.
+"""Kayıtlı dosyanın metadata ve kanal erişimi — F2-033, `F4-054`.
 
     BIN -> doğrulanmış header -> kayıt indeksi -> domain metadata
 
-Kaynak salt okunur bir snapshot olarak alınır. Memory mapping/lazy payload yükleme
-Faz 4 işidir; uygulama burada dosya tanıtıcısını açık tutmaz.
+Kaynak salt okunur bir snapshot olarak alınır. `F4-054`: dosya artık RAM'e
+kopyalanmaz, **bellek eşlemesi** (`MappedSource`, `F4-053`) üzerinden okunur.
+Böylece dar bir zaman sorgusu yalnız ilgili kayıtların baytlarına dokunur;
+işletim sistemi geri kalan sayfaları hiç getirmez. Repository eşlemeyi açık
+tutar ve `close()` ile bırakır.
 """
 
 from __future__ import annotations
@@ -30,7 +33,12 @@ from sonar_analyzer.io.decoders.recording_events import RecordingEvents, scan_re
 from sonar_analyzer.io.index.cache import load_or_build_record_index
 from sonar_analyzer.io.index.record_index import RecordIndexEntry, build_record_index
 from sonar_analyzer.io.profile_a_format import EXPECTED_PERIOD_US, FileHeaderV1
-from sonar_analyzer.io.readers.binary_reader import read_data_record_v1, read_data_record_v2
+from sonar_analyzer.io.readers.binary_reader import (
+    ReadableBuffer,
+    read_data_record_v1,
+    read_data_record_v2,
+)
+from sonar_analyzer.io.readers.mapped_source import MappedSource
 from sonar_analyzer.io.readers.recording_reader import MAX_TIMESTAMP_NS, read_validated_header
 from sonar_analyzer.repository.protocol import EventFilter
 
@@ -39,7 +47,8 @@ class FileRecordingRepository:
     """Dosya açılmadan erişimi reddeder; başarılı açılış önceki snapshot'ı değiştirir."""
 
     def __init__(self) -> None:
-        self._data: bytes | None = None
+        self._source: MappedSource | None = None
+        self._data: ReadableBuffer | None = None
         self._header: FileHeaderV1 | None = None
         self._metadata: RecordingMetadata | None = None
         self._channels: tuple[ChannelMetadata, ...] = ()
@@ -57,7 +66,9 @@ class FileRecordingRepository:
         )
         if target.resolve() == source or (target.exists() and target.samefile(source)):
             raise ValueError("Indeks hedefi kaynak kayit dosyasi olamaz")
-        data = source.read_bytes()
+        # F4-054: dosya kopyalanmaz; salt okunur eşleme üzerinden okunur.
+        mapped = MappedSource(source)
+        data = mapped.data()
         header = read_validated_header(data)
         messages: list[str] = []
         if header.version == 1:
@@ -103,7 +114,9 @@ class FileRecordingRepository:
             replace(channel, sample_rate_hz=1_000_000 / header.period_us, time_base_id=recording_id)
             for channel in CHANNELS_8
         )
-        self._data, self._header = data, header
+        if self._source is not None:
+            self._source.close()
+        self._source, self._data, self._header = mapped, data, header
         self._metadata, self._channels = metadata, channels
         self._index, self._cache_reused = entries, reused
         self._time_index = tuple(sorted(valid_entries, key=lambda item: item.timestamp_ns))
@@ -111,7 +124,7 @@ class FileRecordingRepository:
         self._event_data = None
         self._event_times = ()
 
-    def _require_open(self) -> tuple[bytes, FileHeaderV1]:
+    def _require_open(self) -> tuple[ReadableBuffer, FileHeaderV1]:
         if self._data is None or self._header is None:
             raise RuntimeError("Once bir kayit dosyasi acilmali")
         return self._data, self._header
@@ -209,7 +222,9 @@ class FileRecordingRepository:
         ):
             raise ValueError(f"Tam kayit siniri olmayan offset: {byte_offset}")
         record = read_data_record_v1(data, byte_offset)
-        raw = data[byte_offset : byte_offset + header.record_size]
+        # Ham kayıt kullanıcıya gösterilir ve kaynak kapandıktan sonra da
+        # yaşar; burada eşlemeden **kopyalanır** (tek kayıt, 64 bayt).
+        raw = bytes(data[byte_offset : byte_offset + header.record_size])
         quality = Quality.OK if record.name.startswith(b"Data") else Quality.SUSPECT
         timestamp = header.start_time_utc_ns + record.elapsed_us * 1000
         if timestamp > MAX_TIMESTAMP_NS - header.period_us * 1000:
@@ -302,6 +317,9 @@ class FileRecordingRepository:
         return self._cache_reused
 
     def close(self) -> None:
+        if self._source is not None:
+            self._source.close()
+        self._source = None
         self._data = None
         self._header = None
         self._metadata = None

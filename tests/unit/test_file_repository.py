@@ -90,6 +90,8 @@ def test_empty_and_truncated_recordings(tmp_path: Path) -> None:
     source.write_bytes(build_valid_fixture(record_count=0))
     repository.open(source)
     assert repository.metadata().time_range.is_empty
+    # `F4-054`: kaynak bellek esleniyor; degistirmeden once birakilmali.
+    repository.close()
     source.write_bytes(build_valid_fixture()[:-3])
     repository.open(source)
     assert repository.metadata().record_count == 7

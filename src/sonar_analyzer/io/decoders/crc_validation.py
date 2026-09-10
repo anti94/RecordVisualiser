@@ -21,6 +21,7 @@ from dataclasses import dataclass
 from sonar_analyzer.io.decoders.crc import header_crc32, record_crc32
 from sonar_analyzer.io.decoders.errors import FormatError
 from sonar_analyzer.io.profile_a_format import DataRecordV2, FileHeaderV2
+from sonar_analyzer.io.readers.binary_reader import ReadableBuffer
 
 
 class HeaderCrcMismatchError(FormatError):
@@ -52,7 +53,7 @@ class RecordCrcMismatch:
 
 
 def validate_header_crc(
-    header: FileHeaderV2, header_body_without_crc: bytes, byte_offset: int = 0
+    header: FileHeaderV2, header_body_without_crc: ReadableBuffer, byte_offset: int = 0
 ) -> None:
     """`header.header_crc32` ile hesaplanan CRC eşleşmezse `HeaderCrcMismatchError` yükseltir.
 
@@ -67,7 +68,7 @@ def validate_header_crc(
 
 
 def check_record_crc(
-    record: DataRecordV2, record_body_without_crc: bytes, byte_offset: int
+    record: DataRecordV2, record_body_without_crc: ReadableBuffer, byte_offset: int
 ) -> RecordCrcMismatch | None:
     """`record.record_crc32` ile hesaplanan CRC eşleşmezse `RecordCrcMismatch` döner.
 

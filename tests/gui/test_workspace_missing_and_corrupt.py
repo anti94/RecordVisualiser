@@ -42,6 +42,8 @@ def test_missing_source_is_reported_not_swallowed(qtbot: QtBot, tmp_path: Path) 
     saved = author.save_workspace(tmp_path / "s.json")
 
     # Kaynağı sil: geri yükleyen pencere onu bulamamalı ama bildirmeli.
+    # `F4-054`: kaynak bellek esleniyor; silmeden once birakilmali.
+    author.close_recordings()
     target.unlink()
 
     reader = MainWindow(error_notifier=lambda _p, _m: None)

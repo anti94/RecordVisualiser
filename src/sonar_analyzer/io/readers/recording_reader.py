@@ -8,12 +8,16 @@ from sonar_analyzer.io.decoders.limits import validate_buffer_has_header
 from sonar_analyzer.io.decoders.profile_a import validate_magic
 from sonar_analyzer.io.decoders.version_dispatch import select_decoder
 from sonar_analyzer.io.profile_a_format import EXPECTED_CHANNEL_COUNT, FileHeaderV1
-from sonar_analyzer.io.readers.binary_reader import read_file_header_v1, read_file_header_v2
+from sonar_analyzer.io.readers.binary_reader import (
+    ReadableBuffer,
+    read_file_header_v1,
+    read_file_header_v2,
+)
 
 MAX_TIMESTAMP_NS = (1 << 63) - 1
 
 
-def read_validated_header(data: bytes) -> FileHeaderV1:
+def read_validated_header(data: ReadableBuffer) -> FileHeaderV1:
     """Ortak ilk 32 byte alanlarını verir; v2'nin CRC'sini ayrıca doğrular.
 
     Dönen model v1 gövdesidir; version/header_size/record_size gerçek sürümün

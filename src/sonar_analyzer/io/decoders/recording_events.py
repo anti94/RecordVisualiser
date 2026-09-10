@@ -27,7 +27,11 @@ from sonar_analyzer.io.decoders.naming import check_name_consistency
 from sonar_analyzer.io.decoders.truncation import find_truncated_tail
 from sonar_analyzer.io.decoders.unknown_packet import classify_record_bytes
 from sonar_analyzer.io.profile_a_format import BIT_COMPONENT_BY_BIT, DataRecordV1, FileHeaderV1
-from sonar_analyzer.io.readers.binary_reader import read_data_record_v1, read_data_record_v2
+from sonar_analyzer.io.readers.binary_reader import (
+    ReadableBuffer,
+    read_data_record_v1,
+    read_data_record_v2,
+)
 from sonar_analyzer.io.readers.recording_reader import MAX_TIMESTAMP_NS
 
 
@@ -71,7 +75,7 @@ def _bit_samples(mask: int | None, timestamp: int) -> list[BitResult]:
     return results
 
 
-def scan_recording_events(data: bytes, header: FileHeaderV1) -> RecordingEvents:
+def scan_recording_events(data: ReadableBuffer, header: FileHeaderV1) -> RecordingEvents:
     """CRC'si bozuk veriden PASS/FAIL veya TX geçişi uydurmadan tüm dosyayı tarar."""
     events: list[Event] = []
     bits: list[BitResult] = []

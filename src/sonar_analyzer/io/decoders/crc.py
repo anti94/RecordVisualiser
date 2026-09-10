@@ -15,17 +15,19 @@ from __future__ import annotations
 
 import zlib
 
+from sonar_analyzer.io.readers.binary_reader import ReadableBuffer
 
-def crc32(data: bytes) -> int:
+
+def crc32(data: ReadableBuffer) -> int:
     """ADR-011 §2.1'deki CRC-32/ISO-HDLC değerini döner (`0..0xFFFFFFFF`)."""
     return zlib.crc32(data) & 0xFFFFFFFF
 
 
-def record_crc32(record_body_without_crc: bytes) -> int:
+def record_crc32(record_body_without_crc: ReadableBuffer) -> int:
     """ADR-011 §2.2: kaydın ilk baytından `crc32` alanının öncesine kadar."""
     return crc32(record_body_without_crc)
 
 
-def header_crc32(header_body_without_crc: bytes) -> int:
+def header_crc32(header_body_without_crc: ReadableBuffer) -> int:
     """ADR-011 §2.2: header'ın ilk baytından `header_crc32` alanının öncesine kadar."""
     return crc32(header_body_without_crc)

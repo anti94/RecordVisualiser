@@ -12,6 +12,8 @@ import hashlib
 from dataclasses import dataclass
 from pathlib import Path
 
+from sonar_analyzer.io.readers.binary_reader import ReadableBuffer
+
 #: Decoder/parser mantığı (struct sabitleri, teşhis kuralları) değiştiğinde
 #: bilinçli olarak artırılır — `VERSION` dosyasındaki proje sürümünden
 #: **bağımsızdır**; yalnız üretilen indeksin şekli değişince bumplenir.
@@ -26,7 +28,7 @@ class SourceFingerprint:
     content_sha256: str
 
     @staticmethod
-    def from_bytes(data: bytes) -> SourceFingerprint:
+    def from_bytes(data: ReadableBuffer) -> SourceFingerprint:
         return SourceFingerprint(
             file_size=len(data), content_sha256=hashlib.sha256(data).hexdigest()
         )

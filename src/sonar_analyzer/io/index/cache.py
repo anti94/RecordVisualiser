@@ -12,6 +12,7 @@ from sonar_analyzer.io.index.fingerprint import PARSER_VERSION, SourceFingerprin
 from sonar_analyzer.io.index.record_index import RecordIndexEntry, build_record_index
 from sonar_analyzer.io.index.storage import load_index_json, save_index_atomic
 from sonar_analyzer.io.profile_a_format import FileHeaderV1
+from sonar_analyzer.io.readers.binary_reader import ReadableBuffer
 
 INDEX_SCHEMA_VERSION = 1
 
@@ -68,7 +69,7 @@ def _restore(
 
 
 def load_or_build_record_index(
-    data: bytes,
+    data: ReadableBuffer,
     header: FileHeaderV1,
     cache_path: Path,
     *,
