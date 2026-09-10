@@ -31,6 +31,7 @@ from sonar_analyzer.processing.filters import (
     FilterError,
     validate_band,
     validate_cutoff,
+    validate_notch,
     validate_order,
 )
 from sonar_analyzer.processing.windowing import MAX_WINDOW as MAX_MOVING_AVERAGE_WINDOW
@@ -57,6 +58,7 @@ class StepKind(str, Enum):
     LOW_PASS = "low_pass"  # sıfır-fazlı Butterworth alçak geçiren — `F4-027`
     HIGH_PASS = "high_pass"  # sıfır-fazlı Butterworth yüksek geçiren — `F4-030`
     BAND_PASS = "band_pass"  # sıfır-fazlı Butterworth bant geçiren — `F4-033`
+    NOTCH = "notch"  # sıfır-fazlı Butterworth bant söndüren — `F4-036`
 
 
 #: `window` parametresi taşıyan ve `1 <= window <= MAX_MOVING_AVERAGE_WINDOW`
@@ -164,6 +166,12 @@ PARAMETER_SPECS: dict[StepKind, tuple[ParamSpec, ...]] = {
         ParamSpec("high_cutoff_hz", float, 5_000.0),
         ParamSpec("order", int, 4),
     ),
+    StepKind.NOTCH: (
+        ParamSpec("sample_rate_hz", float, 48_000.0),
+        ParamSpec("center_hz", float, 50.0),
+        ParamSpec("q", float, 30.0),
+        ParamSpec("order", int, 4),
+    ),
 }
 
 
@@ -232,6 +240,16 @@ class ProcessingStep:
                 validate_band(
                     cast("float", resolved["low_cutoff_hz"]),
                     cast("float", resolved["high_cutoff_hz"]),
+                    cast("float", resolved["sample_rate_hz"]),
+                )
+                validate_order(cast("int", resolved["order"]))
+            except FilterError as exc:
+                raise StepValidationError(f"{self.kind.value}: {exc}") from exc
+        if self.kind is StepKind.NOTCH:
+            try:
+                validate_notch(
+                    cast("float", resolved["center_hz"]),
+                    cast("float", resolved["q"]),
                     cast("float", resolved["sample_rate_hz"]),
                 )
                 validate_order(cast("int", resolved["order"]))

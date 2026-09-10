@@ -19,6 +19,8 @@ küreseldir: bir ``NaN`` tüm çıktıyı ``NaN`` yapar. Saf NumPy — Qt yok,
 
 from __future__ import annotations
 
+import math
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -93,9 +95,37 @@ def butterworth_highpass_response(freqs_hz: FloatArray, cutoff_hz: float, order:
     return response
 
 
+def validate_quality_factor(q: float) -> None:
+    """Notch kalite katsayısı ``Q > 0`` ve sonlu olmalı — `F4-036`/`F4-037`."""
+    if not np.isfinite(q) or q <= 0.0:
+        raise FilterError(f"Q pozitif ve sonlu olmalı: {q}")
+
+
+def validate_notch(center_hz: float, q: float, sample_rate_hz: float) -> None:
+    """Notch merkez frekansı Nyquist içinde, ``Q`` pozitif olmalı."""
+    validate_cutoff(center_hz, sample_rate_hz)
+    validate_quality_factor(q)
+
+
 def band_center_hz(low_cutoff_hz: float, high_cutoff_hz: float) -> float:
     """Bandın geometrik merkezi ``sqrt(f_lo * f_hi)`` — yanıtın tepe noktası."""
     return float(np.sqrt(low_cutoff_hz * high_cutoff_hz))
+
+
+def notch_bandwidth_hz(center_hz: float, q: float) -> float:
+    """Notch −3 dB bant genişliği ``f0 / Q``."""
+    return center_hz / q
+
+
+def notch_edges_hz(center_hz: float, q: float) -> tuple[float, float]:
+    """Notch'un −3 dB kenarları ``(f1, f2)``.
+
+    ``f2 - f1 = BW`` ve ``f1 * f2 = f0^2`` (geometrik çift) olacak şekilde
+    çözülür; bu iki noktada kazanç tam ``1/sqrt(2)``'dir.
+    """
+    half = notch_bandwidth_hz(center_hz, q) / 2.0
+    root = math.sqrt(half * half + center_hz * center_hz)
+    return (root - half, root + half)
 
 
 def butterworth_bandpass_response(
@@ -123,6 +153,36 @@ def butterworth_bandpass_response(
     active = freqs[nonzero]
     ratio = np.abs((active**2 - center_squared) / (active * bandwidth))
     response[nonzero] = 1.0 / np.sqrt(1.0 + ratio ** (2 * order))
+    return response
+
+
+def butterworth_notch_response(
+    freqs_hz: FloatArray,
+    center_hz: float,
+    q: float,
+    order: int,
+) -> FloatArray:
+    """Bant söndüren (notch) Butterworth genlik yanıtı.
+
+    Bant geçirenin tümleyeni::
+
+        H(f) = 1 / sqrt(1 + |(f * BW) / (f^2 - f0^2)|^(-2n))
+             = 1 / sqrt(1 + |(f^2 - f0^2) / (f * BW)|^(-2n))
+
+    Uygulamada ``|(f * BW) / (f^2 - f0^2)|^(2n)`` biçiminde hesaplanır.
+    ``BW = f0 / Q``. Değişmezler: ``H(f0) = 0`` (hedef ton tümüyle
+    bastırılır), ``H(0) = 1`` (DC geçer), −3 dB kenarları
+    `notch_edges_hz`'de, ``f`` uzaklaştıkça ``H -> 1``. Bant geçirenle
+    güç-tümleyicidir.
+    """
+    freqs = np.abs(np.asarray(freqs_hz, dtype=np.float64))
+    bandwidth = notch_bandwidth_hz(center_hz, q)
+    denominator = freqs**2 - center_hz**2
+    response = np.zeros_like(freqs)
+    off_center = denominator != 0.0
+    ratio = np.abs((freqs[off_center] * bandwidth) / denominator[off_center])
+    response[off_center] = 1.0 / np.sqrt(1.0 + ratio ** (2 * order))
+    # denominator == 0 yalnız f == f0'da olur; orada yanıt tam sıfır kalır.
     return response
 
 
@@ -209,4 +269,28 @@ def band_pass(
         return data.copy()
     freqs = np.fft.rfftfreq(data.size, d=1.0 / sample_rate_hz)
     response = butterworth_bandpass_response(freqs, low_cutoff_hz, high_cutoff_hz, order)
+    return _apply_response(data, sample_rate_hz, response)
+
+
+def notch(
+    values: NDArray[np.generic] | Samples,
+    sample_rate_hz: float,
+    center_hz: float,
+    q: float,
+    order: int,
+) -> Samples:
+    """`values`'a sıfır-fazlı Butterworth notch (bant söndüren) filtre uygular.
+
+    ``center_hz`` çevresindeki dar bant (``BW = center_hz / q``)
+    bastırılır; bandın dışı ~korunur. ``center_hz`` tam bir FFT binine
+    denk düşerse o bileşen tümüyle sıfırlanır. **Her zaman yeni** bir
+    dizi döndürür.
+    """
+    data = _as_1d_float64(values)
+    validate_notch(center_hz, q, sample_rate_hz)
+    validate_order(order)
+    if data.size == 0:
+        return data.copy()
+    freqs = np.fft.rfftfreq(data.size, d=1.0 / sample_rate_hz)
+    response = butterworth_notch_response(freqs, center_hz, q, order)
     return _apply_response(data, sample_rate_hz, response)
