@@ -1,0 +1,40 @@
+{
+  "environment": "offscreen (yazilim rasterlayici; ekran performansini TEMSIL ETMEZ)",
+  "reps": 25,
+  "duration_s": 30.0,
+  "all_pass": true,
+  "measurements": [
+    {
+      "key": "cursor",
+      "label": "Cursor geri bildirimi",
+      "budget_code": "P-05",
+      "budget_ms": 50.0,
+      "median_ms": 0.0525,
+      "pass": true
+    },
+    {
+      "key": "play_pause",
+      "label": "Play/pause tepkisi",
+      "budget_code": "P-08",
+      "budget_ms": 100.0,
+      "median_ms": 0.0472,
+      "pass": true
+    },
+    {
+      "key": "event_nav",
+      "label": "Event'e gitme",
+      "budget_code": "P-06",
+      "budget_ms": 200.0,
+      "median_ms": 1.3092,
+      "pass": true
+    },
+    {
+      "key": "tree_filter",
+      "label": "Kanal ağacı sonucu",
+      "budget_code": "MVP",
+      "budget_ms": 100.0,
+      "median_ms": 0.1183,
+      "pass": true
+    }
+  ]
+}

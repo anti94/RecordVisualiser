@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 178 tamamlandı · 314 kaldı**
+**Toplam 492 madde · 179 tamamlandı · 313 kaldı**
 
-`[#########...............]` %36.2
+`[#########...............]` %36.4
 
 ## Özet
 
@@ -37,12 +37,12 @@ Work in fully autonomous mode.
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
-| Faz 3 — MVP analiz arayüzü | 76 | 4 | 80 |
+| Faz 3 — MVP analiz arayüzü | 77 | 3 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **178** | **314** | **492** |
+| **Toplam** | **179** | **313** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -163,7 +163,7 @@ Work in fully autonomous mode.
 | [x] | `F2-040` | `0.101.0` | 20 dk | Kaynak dosyanın değişmediğini doğrula |
 | [x] | `F2-041` | `0.102.0` | 15 dk | Parser milestone kabulünü kaydet |
 
-### Faz 3 — MVP analiz arayüzü (76/80)
+### Faz 3 — MVP analiz arayüzü (77/80)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -243,7 +243,7 @@ Work in fully autonomous mode.
 | [x] | `F3-074` | `0.176.0` | 20 dk | Windows ölçekleme ve kontrast kontrolünü kaydet |
 | [x] | `F3-075` | `0.177.0` | 20 dk | Dosyadan olay gezinmesine entegrasyon senaryosu ekle |
 | [x] | `F3-076` | `0.178.0` | 20 dk | Kritik plot ve workspace GUI kontrollerini ekle |
-| [ ] | `F3-077` | `0.179.0` | 20 dk | MVP etkileşim bütçesini ölç |
+| [x] | `F3-077` | `0.179.0` | 20 dk | MVP etkileşim bütçesini ölç |
 | [ ] | `F3-078` | `0.180.0` | 20 dk | Operatör ve mühendis MVP senaryolarını kaydet |
 | [ ] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır |
 | [ ] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla |
