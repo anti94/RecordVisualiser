@@ -1593,7 +1593,7 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F4-001` | `1.1.0` | 20 dk | İşlem adımı ve parametre modelini ekle | Her adım girdi kanalı ve tekrar üretilebilir parametre taşır | `F3-080` | `feat(processing): F4-001 işlem adımı ve parametre modelini ekle` |
-| [ ] | `F4-002` | `1.2.0` | 20 dk | Sıralı işlem zinciri yürütücüsünü ekle | İki adım tanımlı sırayla uygulanır; ham dizi değişmez | `F4-001` | `feat(processing): F4-002 sıralı işlem zinciri yürütücüsünü ekle` |
+| [x] | `F4-002` | `1.2.0` | 20 dk | Sıralı işlem zinciri yürütücüsünü ekle | İki adım tanımlı sırayla uygulanır; ham dizi değişmez | `F4-001` | `feat(processing): F4-002 sıralı işlem zinciri yürütücüsünü ekle` |
 | [ ] | `F4-003` | `1.3.0` | 20 dk | DSP işlerini worker üzerinden çalıştır | Uzun hesaplama UI'ı durdurmaz; güncel iş sonucu yayınlanır | `F4-002` | `feat(processing): F4-003 dSP işlerini worker üzerinden çalıştır` |
 | [ ] | `F4-004` | `1.4.0` | 20 dk | DSP iptal ve eski sonuç denetimini ekle | İptal edilen veya eski seçime ait sonuç grafiğe uygulanmaz | `F4-003` | `feat(processing): F4-004 dSP iptal ve eski sonuç denetimini ekle` |
 | [ ] | `F4-005` | `1.5.0` | 20 dk | NaN ve kalite bayrağı politikasını uygula | Geçersiz örnekler sessizce geçerli değere dönüşmez | `F4-004` | `feat(processing): F4-005 naN ve kalite bayrağı politikasını uygula` |

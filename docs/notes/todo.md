@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 201 tamamlandı · 291 kaldı**
+**Toplam 492 madde · 202 tamamlandı · 290 kaldı**
 
-`[##########..............]` %40.9
+`[##########..............]` %41.1
 
 ## Özet
 
@@ -38,11 +38,11 @@ Work in fully autonomous mode.
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
-| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 1 | 89 | 90 |
+| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 2 | 88 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **201** | **291** | **492** |
+| **Toplam** | **202** | **290** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -248,12 +248,12 @@ Work in fully autonomous mode.
 | [x] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır |
 | [x] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla |
 
-### Faz 4 — Mockup analiz panosu ve büyük veri performansı (1/90)
+### Faz 4 — Mockup analiz panosu ve büyük veri performansı (2/90)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
 | [x] | `F4-001` | `1.1.0` | 20 dk | İşlem adımı ve parametre modelini ekle |
-| [ ] | `F4-002` | `1.2.0` | 20 dk | Sıralı işlem zinciri yürütücüsünü ekle |
+| [x] | `F4-002` | `1.2.0` | 20 dk | Sıralı işlem zinciri yürütücüsünü ekle |
 | [ ] | `F4-003` | `1.3.0` | 20 dk | DSP işlerini worker üzerinden çalıştır |
 | [ ] | `F4-004` | `1.4.0` | 20 dk | DSP iptal ve eski sonuç denetimini ekle |
 | [ ] | `F4-005` | `1.5.0` | 20 dk | NaN ve kalite bayrağı politikasını uygula |
