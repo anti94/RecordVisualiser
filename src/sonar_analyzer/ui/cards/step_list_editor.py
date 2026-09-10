@@ -15,16 +15,30 @@ from __future__ import annotations
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QComboBox,
+    QDoubleSpinBox,
+    QFormLayout,
     QHBoxLayout,
+    QLabel,
     QListWidget,
     QListWidgetItem,
     QPushButton,
+    QSpinBox,
     QVBoxLayout,
     QWidget,
 )
 
 from sonar_analyzer.processing.chain import ProcessingChain
-from sonar_analyzer.processing.steps import PARAMETER_SPECS, ProcessingStep, StepKind
+from sonar_analyzer.processing.steps import (
+    PARAMETER_SPECS,
+    ProcessingStep,
+    StepKind,
+    StepValidationError,
+)
+
+#: Parametre alanı geniş aralık: politika dışı değer de girilip
+#: **açıklanabilsin** diye (`F4-007`).
+_FLOAT_RANGE = (-1.0e9, 1.0e9)
+_INT_RANGE = (-1000, 1_000_000)
 
 #: Combobox'ta gösterilen sıra.
 STEP_KIND_ORDER: tuple[StepKind, ...] = (
@@ -103,7 +117,26 @@ class StepListEditor(QWidget):
             button_row.addWidget(widget)
         layout.addLayout(button_row)
 
+        # F4-007: seçili adımın parametreleri + alan içi hata açıklaması.
+        self.param_panel = QWidget(self)
+        self.param_panel.setObjectName("panel_step_params")
+        self.param_form = QFormLayout(self.param_panel)
+        self.param_form.setContentsMargins(0, 4, 0, 0)
+        layout.addWidget(self.param_panel)
+
+        self.param_error = QLabel(self)
+        self.param_error.setObjectName("label_param_error")
+        self.param_error.setWordWrap(True)
+        self.param_error.setStyleSheet("color: #EF5B5B;")
+        self.param_error.hide()
+        layout.addWidget(self.param_error)
+
+        self._param_fields: dict[str, QDoubleSpinBox | QSpinBox] = {}
+        self._suppress_param_signal = False
+        self._error_active = False
+
         self._refresh_buttons()
+        self._rebuild_param_panel(None)
 
     # -- model köprüsü -----------------------------------------
 
@@ -166,6 +199,98 @@ class StepListEditor(QWidget):
 
     def _on_row_changed(self, _row: int) -> None:
         self._refresh_buttons()
+        row = self.list.currentRow()
+        self._rebuild_param_panel(self._steps[row] if 0 <= row < len(self._steps) else None)
+
+    # -- parametre paneli (F4-007) ----------------------------
+
+    def parameter_error(self) -> str:
+        """Alan içi hata metni; hata yoksa boş — testler ve kabul için."""
+        return self.param_error.text() if self._error_active else ""
+
+    @property
+    def has_parameter_error(self) -> bool:
+        return self._error_active
+
+    def _set_param_error(self, message: str) -> None:
+        self._error_active = bool(message)
+        self.param_error.setText(message)
+        self.param_error.setVisible(self._error_active)
+
+    def param_field_names(self) -> list[str]:
+        """Seçili adım için gösterilen parametre alanlarının adları."""
+        return list(self._param_fields)
+
+    def param_field(self, name: str) -> QDoubleSpinBox | QSpinBox:
+        """Bir parametre alanı widget'ı — testler ve kabul için."""
+        return self._param_fields[name]
+
+    def set_param_field(self, name: str, value: float) -> None:
+        """Bir parametre alanının değerini ayarlar (tip alanına göre)."""
+        field = self._param_fields[name]
+        if isinstance(field, QSpinBox):
+            field.setValue(int(value))
+        else:
+            field.setValue(float(value))
+
+    def _rebuild_param_panel(self, step: ProcessingStep | None) -> None:
+        self._suppress_param_signal = True
+        while self.param_form.rowCount():
+            self.param_form.removeRow(0)
+        self._param_fields = {}
+        self._set_param_error("")
+
+        if step is None:
+            self.param_panel.setVisible(False)
+            self._suppress_param_signal = False
+            return
+        self.param_panel.setVisible(True)
+
+        for spec in PARAMETER_SPECS[step.kind]:
+            value = step.parameters[spec.name]
+            field: QDoubleSpinBox | QSpinBox
+            if spec.kind is int:
+                field = QSpinBox(self.param_panel)
+                field.setRange(*_INT_RANGE)
+                field.setValue(int(value) if isinstance(value, (int, float)) else 0)
+                field.valueChanged.connect(self._on_param_edit)
+            else:
+                field = QDoubleSpinBox(self.param_panel)
+                field.setRange(*_FLOAT_RANGE)
+                field.setDecimals(4)
+                field.setValue(float(value) if isinstance(value, (int, float)) else 0.0)
+                field.valueChanged.connect(self._on_param_edit)
+            field.setObjectName(f"field_param_{spec.name}")
+            self._param_fields[spec.name] = field
+            self.param_form.addRow(spec.name, field)
+
+        self._suppress_param_signal = False
+
+    def _on_param_edit(self) -> None:
+        """Alan değişince adımı **işlem başlamadan** doğrular; hatayı gösterir."""
+        if self._suppress_param_signal:
+            return
+        row = self.list.currentRow()
+        if not 0 <= row < len(self._steps):
+            return
+        old = self._steps[row]
+        params: dict[str, object] = {name: fld.value() for name, fld in self._param_fields.items()}
+        try:
+            new_step = ProcessingStep(
+                kind=old.kind,
+                input_channel_id=old.input_channel_id,
+                parameters=params,
+                enabled=old.enabled,
+            )
+        except StepValidationError as exc:
+            self._set_param_error(str(exc))
+            return
+        self._set_param_error("")
+        self._steps[row] = new_step
+        item = self.list.item(row)
+        if item is not None:
+            item.setText(step_label(new_step))
+        self.chain_changed.emit()
 
     def _refresh_buttons(self) -> None:
         row = self.list.currentRow()
