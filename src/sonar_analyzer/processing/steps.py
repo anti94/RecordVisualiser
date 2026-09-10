@@ -27,7 +27,12 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import cast
 
-from sonar_analyzer.processing.filters import FilterError, validate_cutoff, validate_order
+from sonar_analyzer.processing.filters import (
+    FilterError,
+    validate_band,
+    validate_cutoff,
+    validate_order,
+)
 from sonar_analyzer.processing.windowing import MAX_WINDOW as MAX_MOVING_AVERAGE_WINDOW
 
 
@@ -51,6 +56,7 @@ class StepKind(str, Enum):
     RESAMPLE = "resample"  # Fourier yöntemiyle yeniden örnekle / desime et — `F4-025`
     LOW_PASS = "low_pass"  # sıfır-fazlı Butterworth alçak geçiren — `F4-027`
     HIGH_PASS = "high_pass"  # sıfır-fazlı Butterworth yüksek geçiren — `F4-030`
+    BAND_PASS = "band_pass"  # sıfır-fazlı Butterworth bant geçiren — `F4-033`
 
 
 #: `window` parametresi taşıyan ve `1 <= window <= MAX_MOVING_AVERAGE_WINDOW`
@@ -62,6 +68,10 @@ WINDOWED_KINDS: frozenset[StepKind] = frozenset(
 #: `sample_rate_hz` + `cutoff_hz` + `order` taşıyan ve
 #: `filters.validate_cutoff` / `validate_order` ile denetlenen türler.
 FREQUENCY_FILTER_KINDS: frozenset[StepKind] = frozenset({StepKind.LOW_PASS, StepKind.HIGH_PASS})
+
+#: `low_cutoff_hz` + `high_cutoff_hz` + `order` taşıyan ve
+#: `filters.validate_band` ile denetlenen türler.
+BAND_FILTER_KINDS: frozenset[StepKind] = frozenset({StepKind.BAND_PASS})
 
 
 #: `DETREND` adımının `mode` parametresi için geçerli değerler.
@@ -148,6 +158,12 @@ PARAMETER_SPECS: dict[StepKind, tuple[ParamSpec, ...]] = {
         ParamSpec("cutoff_hz", float, 200.0),
         ParamSpec("order", int, 4),
     ),
+    StepKind.BAND_PASS: (
+        ParamSpec("sample_rate_hz", float, 48_000.0),
+        ParamSpec("low_cutoff_hz", float, 500.0),
+        ParamSpec("high_cutoff_hz", float, 5_000.0),
+        ParamSpec("order", int, 4),
+    ),
 }
 
 
@@ -206,6 +222,16 @@ class ProcessingStep:
             try:
                 validate_cutoff(
                     cast("float", resolved["cutoff_hz"]),
+                    cast("float", resolved["sample_rate_hz"]),
+                )
+                validate_order(cast("int", resolved["order"]))
+            except FilterError as exc:
+                raise StepValidationError(f"{self.kind.value}: {exc}") from exc
+        if self.kind in BAND_FILTER_KINDS:
+            try:
+                validate_band(
+                    cast("float", resolved["low_cutoff_hz"]),
+                    cast("float", resolved["high_cutoff_hz"]),
                     cast("float", resolved["sample_rate_hz"]),
                 )
                 validate_order(cast("int", resolved["order"]))

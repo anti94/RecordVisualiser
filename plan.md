@@ -1639,7 +1639,7 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 | [x] | `F4-030` | `1.30.0` | 20 dk | High-pass filtre hesabını ekle | DC ve düşük frekans referansa uygun bastırılır | `F4-029` | `feat(processing): F4-030 high-pass filtre hesabını ekle` |
 | [x] | `F4-031` | `1.31.0` | 15 dk | High-pass sınır ve transient davranışını doğrula | Kısa dizi ve sınır parametreleri kontrollü sonuç verir | `F4-030` | `test(processing): F4-031 high-pass sınır ve transient davranışını doğrula` |
 | [x] | `F4-032` | `1.32.0` | 15 dk | High-pass seçimini araç kartına bağla | Tür değişimi doğru parametrelerle zincire kaydedilir | `F4-031` | `feat(ui): F4-032 high-pass seçimini araç kartına bağla` |
-| [ ] | `F4-033` | `1.33.0` | 20 dk | Band-pass filtre hesabını ekle | Bant içi ve dışı tonlar referans davranışı gösterir | `F4-032` | `feat(processing): F4-033 band-pass filtre hesabını ekle` |
+| [x] | `F4-033` | `1.33.0` | 20 dk | Band-pass filtre hesabını ekle | Bant içi ve dışı tonlar referans davranışı gösterir | `F4-032` | `feat(processing): F4-033 band-pass filtre hesabını ekle` |
 | [ ] | `F4-034` | `1.34.0` | 15 dk | Band-pass alt/üst sınırlarını doğrula | Ters veya Nyquist dışı bant işlem başlamadan reddedilir | `F4-033` | `test(processing): F4-034 band-pass alt/üst sınırlarını doğrula` |
 | [ ] | `F4-035` | `1.35.0` | 15 dk | Band-pass iki cutoff alanını bağla | İki sınır doğru sırayla hesaplamaya iletilir | `F4-034` | `feat(ui): F4-035 band-pass iki cutoff alanını bağla` |
 | [ ] | `F4-036` | `1.36.0` | 20 dk | Notch filtre hesabını ekle | Hedef ton bastırılır; komşu ton referans toleransta kalır | `F4-035` | `feat(processing): F4-036 notch filtre hesabını ekle` |

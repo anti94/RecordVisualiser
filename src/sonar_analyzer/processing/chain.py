@@ -24,7 +24,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from sonar_analyzer.domain.data_chunk import Quality
-from sonar_analyzer.processing.filters import high_pass, low_pass
+from sonar_analyzer.processing.filters import band_pass, high_pass, low_pass
 from sonar_analyzer.processing.resampling import resample_to_rate
 from sonar_analyzer.processing.steps import (
     PHASE_UNWRAP_PERIOD,
@@ -213,6 +213,14 @@ def apply_step(values: Samples, step: ProcessingStep) -> Samples:
             data,
             float(params["sample_rate_hz"]),  # type: ignore[arg-type]
             float(params["cutoff_hz"]),  # type: ignore[arg-type]
+            int(params["order"]),  # type: ignore[arg-type]
+        )
+    if step.kind is StepKind.BAND_PASS:
+        return band_pass(
+            data,
+            float(params["sample_rate_hz"]),  # type: ignore[arg-type]
+            float(params["low_cutoff_hz"]),  # type: ignore[arg-type]
+            float(params["high_cutoff_hz"]),  # type: ignore[arg-type]
             int(params["order"]),  # type: ignore[arg-type]
         )
     if step.kind is StepKind.DETREND:

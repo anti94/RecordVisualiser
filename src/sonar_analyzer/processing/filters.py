@@ -61,6 +61,17 @@ def validate_cutoff(cutoff_hz: float, sample_rate_hz: float) -> None:
         raise FilterError(f"cutoff 0 < f < Nyquist ({nyq:g} Hz) olmalı: {cutoff_hz}")
 
 
+def validate_band(low_cutoff_hz: float, high_cutoff_hz: float, sample_rate_hz: float) -> None:
+    """Her iki sınır Nyquist içinde ve ``low < high`` olmalı — `F4-033`/`F4-034`."""
+    validate_cutoff(low_cutoff_hz, sample_rate_hz)
+    validate_cutoff(high_cutoff_hz, sample_rate_hz)
+    if low_cutoff_hz >= high_cutoff_hz:
+        raise FilterError(
+            f"bant alt sınırı üst sınırdan küçük olmalı (ters bant): "
+            f"{low_cutoff_hz:g} >= {high_cutoff_hz:g}"
+        )
+
+
 def butterworth_lowpass_response(freqs_hz: FloatArray, cutoff_hz: float, order: int) -> FloatArray:
     """Alçak geçiren Butterworth genlik yanıtı ``1/sqrt(1 + (f/fc)^(2n))``."""
     ratio = np.abs(np.asarray(freqs_hz, dtype=np.float64)) / cutoff_hz
@@ -78,6 +89,39 @@ def butterworth_highpass_response(freqs_hz: FloatArray, cutoff_hz: float, order:
     response = np.zeros_like(freqs)
     nonzero = freqs > 0.0
     ratio = cutoff_hz / freqs[nonzero]
+    response[nonzero] = 1.0 / np.sqrt(1.0 + ratio ** (2 * order))
+    return response
+
+
+def band_center_hz(low_cutoff_hz: float, high_cutoff_hz: float) -> float:
+    """Bandın geometrik merkezi ``sqrt(f_lo * f_hi)`` — yanıtın tepe noktası."""
+    return float(np.sqrt(low_cutoff_hz * high_cutoff_hz))
+
+
+def butterworth_bandpass_response(
+    freqs_hz: FloatArray,
+    low_cutoff_hz: float,
+    high_cutoff_hz: float,
+    order: int,
+) -> FloatArray:
+    """Bant geçiren Butterworth genlik yanıtı.
+
+    Alçak geçiren prototipin bant geçiren dönüşümü::
+
+        H(f) = 1 / sqrt(1 + |(f^2 - f0^2) / (f * BW)|^(2n))
+
+    ``f0 = sqrt(f_lo * f_hi)`` (geometrik merkez), ``BW = f_hi - f_lo``.
+    Değişmezler: ``H(f0) = 1``, ``H(f_lo) = H(f_hi) = 1/sqrt(2)`` (her
+    ``n`` için), ``H(0) = 0``, ``f -> inf`` iken ``H -> 0``. Yanıt
+    log-frekansta ``f0`` etrafında simetriktir.
+    """
+    freqs = np.abs(np.asarray(freqs_hz, dtype=np.float64))
+    center_squared = low_cutoff_hz * high_cutoff_hz
+    bandwidth = high_cutoff_hz - low_cutoff_hz
+    response = np.zeros_like(freqs)
+    nonzero = freqs > 0.0
+    active = freqs[nonzero]
+    ratio = np.abs((active**2 - center_squared) / (active * bandwidth))
     response[nonzero] = 1.0 / np.sqrt(1.0 + ratio ** (2 * order))
     return response
 
@@ -142,4 +186,27 @@ def high_pass(
         return data.copy()
     freqs = np.fft.rfftfreq(data.size, d=1.0 / sample_rate_hz)
     response = butterworth_highpass_response(freqs, cutoff_hz, order)
+    return _apply_response(data, sample_rate_hz, response)
+
+
+def band_pass(
+    values: NDArray[np.generic] | Samples,
+    sample_rate_hz: float,
+    low_cutoff_hz: float,
+    high_cutoff_hz: float,
+    order: int,
+) -> Samples:
+    """`values`'a sıfır-fazlı Butterworth bant geçiren filtre uygular.
+
+    ``[low_cutoff_hz, high_cutoff_hz]`` bandı ~korunur; bandın altı ve
+    üstü ``-20n dB/dekad`` eğimiyle bastırılır. **Her zaman yeni** bir
+    dizi döndürür.
+    """
+    data = _as_1d_float64(values)
+    validate_band(low_cutoff_hz, high_cutoff_hz, sample_rate_hz)
+    validate_order(order)
+    if data.size == 0:
+        return data.copy()
+    freqs = np.fft.rfftfreq(data.size, d=1.0 / sample_rate_hz)
+    response = butterworth_bandpass_response(freqs, low_cutoff_hz, high_cutoff_hz, order)
     return _apply_response(data, sample_rate_hz, response)

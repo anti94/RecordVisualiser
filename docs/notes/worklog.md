@@ -247,8 +247,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-029` | 15 dk | 5 dk 35 sn | `adfaa03` | low-pass araç alanlarını bağla |
 | `F4-030` | 20 dk | 3 dk 53 sn | `591590c` | high-pass filtre hesabını ekle |
 | `F4-031` | 15 dk | 3 dk 15 sn | `d11ee8a` | high-pass sınır ve transient davranışını doğrula |
+| `F4-032` | 15 dk | 25 dk 36 sn | `2e75269` | high-pass seçimini araç kartına bağla |
 
-**229 commit · olculen toplam 2526 dk 59 sn · olculemeyen 1 (ilk commit)**
+**230 commit · olculen toplam 2552 dk 35 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
