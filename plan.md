@@ -1644,7 +1644,7 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 | [x] | `F4-035` | `1.35.0` | 15 dk | Band-pass iki cutoff alanını bağla | İki sınır doğru sırayla hesaplamaya iletilir | `F4-034` | `feat(ui): F4-035 band-pass iki cutoff alanını bağla` |
 | [x] | `F4-036` | `1.36.0` | 20 dk | Notch filtre hesabını ekle | Hedef ton bastırılır; komşu ton referans toleransta kalır | `F4-035` | `feat(processing): F4-036 notch filtre hesabını ekle` |
 | [x] | `F4-037` | `1.37.0` | 15 dk | Notch frekans ve Q sınırlarını doğrula | Geçersiz frekans ve Q açıklamalı hata üretir | `F4-036` | `test(processing): F4-037 notch frekans ve Q sınırlarını doğrula` |
-| [ ] | `F4-038` | `1.38.0` | 15 dk | Notch frekans ve Q kontrollerini bağla | Uygulanan ayarlar kaydedilip yeniden yüklenir | `F4-037` | `feat(ui): F4-038 notch frekans ve Q kontrollerini bağla` |
+| [x] | `F4-038` | `1.38.0` | 15 dk | Notch frekans ve Q kontrollerini bağla | Uygulanan ayarlar kaydedilip yeniden yüklenir | `F4-037` | `feat(ui): F4-038 notch frekans ve Q kontrollerini bağla` |
 
 ##### FFT, PSD, spektrogram ve waterfall
 

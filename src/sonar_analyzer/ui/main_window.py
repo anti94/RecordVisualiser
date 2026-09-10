@@ -748,6 +748,7 @@ class MainWindow(QMainWindow):
             dock_state=dock_state,
             view=view,
             event_filter=event_filter,
+            filter_tool=self.right_dock.analysis_tools.filter_tool_state(),
         )
 
     def save_workspace(self, path: str | Path) -> Path:
@@ -828,6 +829,9 @@ class MainWindow(QMainWindow):
 
         # 6) Olay filtresi.
         self.bottom_dock.apply_event_filter_state(model.event_filter.to_dict())
+
+        # 6b) Filter sekmesi ayarları (F4-038).
+        self.right_dock.analysis_tools.apply_filter_tool_state(model.filter_tool)
 
         # 7) Dock yerleşimi (opak Qt state).
         if model.dock_state:

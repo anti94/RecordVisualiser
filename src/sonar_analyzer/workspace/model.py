@@ -121,6 +121,18 @@ def _opt_str(source: dict[str, object], key: str, where: str) -> str | None:
     return raw
 
 
+def _int_or(source: dict[str, object], key: str, fallback: int) -> int:
+    """`key` tam sayı ise onu, değilse `fallback`'i döndürür (`F4-038`)."""
+    value = source.get(key)
+    return value if _is_int(value) and isinstance(value, int) else fallback
+
+
+def _float_or(source: dict[str, object], key: str, fallback: float) -> float:
+    """`key` sayı ise `float`'ını, değilse `fallback`'i döndürür (`F4-038`)."""
+    value = source.get(key)
+    return float(value) if _is_number(value) and isinstance(value, (int, float)) else fallback
+
+
 def _opt_int(source: dict[str, object], key: str, where: str) -> int | None:
     raw = source.get(key)
     if raw is None:
@@ -237,6 +249,49 @@ class EventFilterState:
 
 
 @dataclass(frozen=True)
+class FilterToolState:
+    """Analysis Tools `Filter` sekmesinin uygulanan ayarları — `F4-038`.
+
+    Yalnız ilkel değerler taşır; UI katmanı bunları alanlara yazar ve
+    alanlardan okur. Eski workspace belgelerinde bu bölüm bulunmayabilir
+    — o durumda varsayılanlar kullanılır (şema sürümü değişmez).
+    """
+
+    family: str = "Butterworth"
+    response: str = "Low-pass"
+    cutoff_hz: int = 100
+    high_cutoff_hz: int = 500
+    q: float = 30.0
+    order: int = 4
+    show_filtered: bool = False
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "family": self.family,
+            "response": self.response,
+            "cutoff_hz": self.cutoff_hz,
+            "high_cutoff_hz": self.high_cutoff_hz,
+            "q": self.q,
+            "order": self.order,
+            "show_filtered": self.show_filtered,
+        }
+
+    @classmethod
+    def from_dict(cls, value: object) -> FilterToolState:
+        data = _as_dict(value, "FilterToolState")
+        defaults = cls()
+        return cls(
+            family=str(data.get("family", defaults.family)),
+            response=str(data.get("response", defaults.response)),
+            cutoff_hz=_int_or(data, "cutoff_hz", defaults.cutoff_hz),
+            high_cutoff_hz=_int_or(data, "high_cutoff_hz", defaults.high_cutoff_hz),
+            q=_float_or(data, "q", defaults.q),
+            order=_int_or(data, "order", defaults.order),
+            show_filtered=bool(data.get("show_filtered", defaults.show_filtered)),
+        )
+
+
+@dataclass(frozen=True)
 class WorkspaceModel:
     """Bir çalışma oturumunun tamamı — sürümlü, JSON'a serileştirilebilir."""
 
@@ -253,6 +308,8 @@ class WorkspaceModel:
     dock_state: str | None = None
     view: ViewState = field(default_factory=ViewState)
     event_filter: EventFilterState = field(default_factory=EventFilterState)
+    #: `F4-038` — Analysis Tools `Filter` sekmesinin uygulanan ayarları.
+    filter_tool: FilterToolState = field(default_factory=FilterToolState)
     schema_version: int = WORKSPACE_SCHEMA_VERSION
 
     def __post_init__(self) -> None:
@@ -283,6 +340,7 @@ class WorkspaceModel:
             "dock_state": self.dock_state,
             "view": self.view.to_dict(),
             "event_filter": self.event_filter.to_dict(),
+            "filter_tool": self.filter_tool.to_dict(),
         }
 
     def dumps(self, *, indent: int | None = 2) -> str:
@@ -326,6 +384,7 @@ class WorkspaceModel:
             dock_state=dock_state,
             view=ViewState.from_dict(data.get("view", {})),
             event_filter=EventFilterState.from_dict(data.get("event_filter", {})),
+            filter_tool=FilterToolState.from_dict(data.get("filter_tool", {})),
             schema_version=version,
         )
 

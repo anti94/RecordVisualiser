@@ -252,8 +252,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-034` | 15 dk | 2 dk 31 sn | `233de3d` | band-pass alt/üst sınırlarını doğrula |
 | `F4-035` | 15 dk | 4 dk 21 sn | `aef54fb` | band-pass iki cutoff alanını bağla |
 | `F4-036` | 20 dk | 4 dk 41 sn | `30c576e` | notch filtre hesabını ekle |
+| `F4-037` | 15 dk | 2 dk 39 sn | `d4db9c1` | notch frekans ve Q sınırlarını doğrula |
 
-**234 commit · olculen toplam 2568 dk 47 sn · olculemeyen 1 (ilk commit)**
+**235 commit · olculen toplam 2571 dk 26 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
