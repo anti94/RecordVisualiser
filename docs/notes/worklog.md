@@ -175,8 +175,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-037` | 20 dk | 2 dk 44 sn | `5897127` | count, min, max ve mean hesabını ekle |
 | `F3-038` | 20 dk | 2 dk 27 sn | `9d35ae5` | median, RMS, std ve peak-to-peak ekle |
 | `F3-039` | 20 dk | 3 dk 32 sn | `9604fdb` | ROI istatistiklerini dashboard kartına bağla |
+| `F3-040` | 20 dk | 5 dk 8 sn | `3adca5e` | geliştirici ham kayıt görünümünü ekle |
 
-**157 commit · olculen toplam 2104 dk 49 sn · olculemeyen 1 (ilk commit)**
+**158 commit · olculen toplam 2109 dk 57 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

@@ -36,6 +36,7 @@ from sonar_analyzer.application.file_loader import (
     LoaderCallable,
 )
 from sonar_analyzer.application.load_errors import describe_load_error
+from sonar_analyzer.application.view_history import ViewCommand, ViewHistory
 from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import TimeRange
@@ -104,6 +105,8 @@ class MainWindow(QMainWindow):
 
         self._channels: tuple[ChannelMetadata, ...] = ()
         self._repository: RecordingRepository | None = None
+        #: `F3-041` görünüm ayarları (renk, eksen) undo/redo geçmişi.
+        self._view_history = ViewHistory()
         #: `F3-001` seçiminin sonucu; worker bu yolları açar.
         self.pending_load_paths: tuple[Path, ...] = ()
         #: Worker'dan dönen sonuçlar; ekrana bağlanması `F3-005`'in işi.
@@ -230,11 +233,48 @@ class MainWindow(QMainWindow):
         self.bottom_dock.append_log(f"Yol panoya kopyalandi: {path}")
 
     def _on_axis_range_requested(self, axis: str, y_min: float, y_max: float) -> None:
-        """Inspector Display'den gelen eksen aralığını seçili grafiğe uygular — `F3-036`."""
+        """Inspector Display'den gelen eksen aralığını seçili grafiğe uygular — `F3-036`.
+
+        `F3-041`: değişiklik undo/redo geçmişine yazılır.
+        """
+        if axis == "left":
+            _x0, _x1, old_min, old_max = self.plot_panel.visible_range()
+        else:
+            current = self.plot_panel.right_axis_y_range()
+            if current is None:
+                return
+            old_min, old_max = current
         try:
-            self.plot_panel.set_axis_range(axis, y_min, y_max)
+            self._view_history.push(
+                ViewCommand(
+                    label="Eksen araligi",
+                    apply=lambda: self.plot_panel.set_axis_range(axis, y_min, y_max),
+                    revert=lambda: self.plot_panel.set_axis_range(axis, old_min, old_max),
+                )
+            )
         except ValueError as exc:
             self.bottom_dock.append_log(f"Eksen araligi uygulanamadi: {exc}")
+
+    def apply_series_color(self, channel_id: str, color: str) -> None:
+        """Bir serinin rengini **geri alınabilir** biçimde değiştirir — `F3-041`."""
+        old_color = self.plot_panel.series_color(channel_id)
+        if old_color == color:
+            return
+        self._view_history.push(
+            ViewCommand(
+                label="Renk degisikligi",
+                apply=lambda: self.plot_panel.set_series_style(channel_id, color=color),
+                revert=lambda: self.plot_panel.set_series_style(channel_id, color=old_color),
+            )
+        )
+
+    def undo_view_change(self) -> bool:
+        """Son görünüm değişikliğini geri alır — `F3-041`."""
+        return self._view_history.undo()
+
+    def redo_view_change(self) -> bool:
+        """Geri alınan son görünüm değişikliğini yeniden uygular — `F3-041`."""
+        return self._view_history.redo()
 
     def _on_cursor_moved(self, sample_seconds: float, _value: float) -> None:
         """Crosshair bir örneğe kenetlenince Inspector Raw görünümünü doldurur — `F3-040`.
@@ -277,6 +317,9 @@ class MainWindow(QMainWindow):
 
         chunk = self._repository.query(channel_id, self._repository.metadata().time_range)
         self.plot_panel.set_channel(channel, chunk)
+        # F3-041: grafik tek seriye sıfırlandı; eski görünüm komutları
+        # kaldırılmış serilere atıfta bulunur, geçmişi temizle.
+        self._view_history.clear()
         self.dashboard.statistics.set_channel_data(channel, chunk.values)
         self.plot_tool_bar.set_current_channel(channel_id)
         self.show_plot()
@@ -809,6 +852,7 @@ class MainWindow(QMainWindow):
         self.right_dock.close_inspector()
         self.right_dock.bit_status.clear()
         self.plot_panel.clear()
+        self._view_history.clear()
         self.dashboard.statistics.clear()
         self.bottom_dock.clear_events()
         self.show_empty_state()
