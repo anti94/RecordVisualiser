@@ -29,8 +29,12 @@ from PySide6.QtWidgets import (
 
 from sonar_analyzer.application.playback_state import PlaybackMachine
 from sonar_analyzer.domain.event import Event
-from sonar_analyzer.domain.time_range import NS_PER_SECOND, TimeRange
+from sonar_analyzer.domain.time_range import NS_PER_SECOND, RECORD_PERIOD_NS, TimeRange
+from sonar_analyzer.ui.docks.playback_clock import PlaybackClock
 from sonar_analyzer.ui.docks.timeline_overview import TimelineOverview
+
+#: Kayıt periyodu saniye cinsinden (125 ms ızgara).
+RECORD_PERIOD_S = RECORD_PERIOD_NS / NS_PER_SECOND
 
 DOCK_OBJECT_NAME = "dock_playback"
 DOCK_TITLE = "Playback / Time Control"
@@ -79,6 +83,9 @@ class PlaybackDock(QDockWidget):
         self._duration_s = 0.0
         #: F3-056: saf oynatma durum makinesi (play/pause/stop).
         self.machine = PlaybackMachine(0.0)
+        #: F3-057: PLAYING iken makineyi kayıt zamanına göre ilerleten saat.
+        self.clock = PlaybackClock(self.machine, parent=self)
+        self.machine.add_listener(self._on_machine_changed)
         self._updating = False
 
         self.setWidget(self._build_body())
@@ -157,6 +164,11 @@ class PlaybackDock(QDockWidget):
         self._duration_s = max(0.0, duration_s)
         self.machine.stop()
         self.machine.set_duration(self._duration_s)
+        # F3-057: 125 ms kayıt ızgarasının sınır zamanları.
+        boundary_count = int(self._duration_s / RECORD_PERIOD_S + 1e-9) + 1
+        self.machine.set_record_boundaries(
+            tuple(i * RECORD_PERIOD_S for i in range(boundary_count))
+        )
 
         self._updating = True
         self.slider.setRange(0, round(self._duration_s * SLIDER_STEPS_PER_SECOND))
@@ -195,8 +207,10 @@ class PlaybackDock(QDockWidget):
     def set_position(self, seconds: float) -> None:
         """İmleci taşır; sınırların dışına çıkmaz."""
         clamped = min(max(0.0, seconds), self._duration_s)
-        self.machine.seek(clamped)
+        # Kaydırıcı önce güncellenir ki `position_changed` bir kez yayılsın;
+        # ardından makine aynı konuma aranır (F3-057 sınır indeksi için).
         self.slider.setValue(round(clamped * SLIDER_STEPS_PER_SECOND))
+        self.machine.seek(clamped)
 
     @property
     def is_playing(self) -> bool:
@@ -229,6 +243,18 @@ class PlaybackDock(QDockWidget):
         self._refresh_label()
         if not self._updating:
             self.position_changed.emit(value / SLIDER_STEPS_PER_SECOND)
+
+    def _on_machine_changed(self) -> None:
+        """`F3-057` — saat makineyi ilerletince kaydırıcı/etiket onu izler."""
+        target = round(self.machine.position_s * SLIDER_STEPS_PER_SECOND)
+        if self.slider.value() != target:
+            self._updating = True
+            self.slider.setValue(target)
+            self._updating = False
+        self.buttons["button_play"].setText("||" if self.machine.is_playing else ">")
+        if not self.machine.is_playing and self.buttons["button_play"].isChecked():
+            self.buttons["button_play"].setChecked(False)
+        self._refresh_label()
 
     def _on_go(self) -> None:
         start = self.start_input.value()
