@@ -1561,7 +1561,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F3-062` | `0.164.0` | 20 dk | Seçili grafiği PNG olarak dışa aktar | Dosya açılabilir; başlık ve birimler görünür | `F3-061` | `feat(export): F3-062 seçili grafiği PNG olarak dışa aktar` |
 | [x] | `F3-063` | `0.165.0` | 20 dk | Seçili grafiği SVG olarak dışa aktar | Vektörel çıktı açılır; seri ve eksenler görünür | `F3-062` | `feat(export): F3-063 seçili grafiği SVG olarak dışa aktar` |
-| [ ] | `F3-064` | `0.166.0` | 20 dk | Seçili kanal ve aralığı CSV olarak yaz | Satır sayısı, zaman, birim ve kaynak metadata doğru çıkar | `F3-063` | `feat(export): F3-064 seçili kanal ve aralığı CSV olarak yaz` |
+| [x] | `F3-064` | `0.166.0` | 20 dk | Seçili kanal ve aralığı CSV olarak yaz | Satır sayısı, zaman, birim ve kaynak metadata doğru çıkar | `F3-063` | `feat(export): F3-064 seçili kanal ve aralığı CSV olarak yaz` |
 | [ ] | `F3-065` | `0.167.0` | 20 dk | Export hedefi ve üzerine yazma kontrolünü ekle | Var olan dosya onaysız değişmez; raw/processed seçimi açıktır | `F3-064` | `feat(ui): F3-065 export hedefi ve üzerine yazma kontrolünü ekle` |
 | [ ] | `F3-066` | `0.168.0` | 20 dk | Büyük export için worker ve iptal ekle | UI yanıt verir; iptal yarım dosyayı tamamlanmış diye sunmaz | `F3-065` | `feat(export): F3-066 büyük export için worker ve iptal ekle` |
 | [ ] | `F3-067` | `0.169.0` | 20 dk | Sürümlü workspace JSON modelini ekle | Panel, kanal, görünüm ve filtre alanları serialize edilebilir | `F3-066` | `feat(workspace): F3-067 sürümlü workspace JSON modelini ekle` |

@@ -43,6 +43,7 @@ from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.event import Event
 from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import TimeRange
+from sonar_analyzer.export.csv_export import CsvExportResult, write_channel_csv
 from sonar_analyzer.export.image_export import export_widget_png
 from sonar_analyzer.repository.file_repository import FileRecordingRepository
 from sonar_analyzer.repository.mock_repository import SIMULATION_LABEL, MockRecordingRepository
@@ -334,6 +335,54 @@ class MainWindow(QMainWindow):
         dest = self.plot_panel.export_svg(path)
         self.bottom_dock.append_log(f"Grafik SVG olarak yazildi: {dest}")
         return dest
+
+    def export_channel_csv(
+        self,
+        path: str | Path,
+        *,
+        channel_id: str | None = None,
+        selected_range_only: bool = False,
+        include_metadata: bool = True,
+    ) -> CsvExportResult:
+        """Seçili kanal (ve isteğe bağlı seçili aralığı) CSV olarak yazar — `F3-064`.
+
+        `channel_id` verilmezse grafiğin birincil kanalı kullanılır.
+        `selected_range_only` ise ve grafikte bir zaman bölgesi seçiliyse
+        yalnız o aralık; aksi hâlde kaydın tamamı yazılır. Metadata
+        yorum satırları `include_metadata` ile açılıp kapanır.
+
+        Açık kayıt ya da hedef kanal yoksa `ValueError` verir.
+        """
+        if self._repository is None:
+            raise ValueError("Acik kayit yok: CSV disa aktarilamaz")
+        primary = self.plot_panel.channel
+        target_id = channel_id or (primary.id if primary is not None else None)
+        if target_id is None:
+            raise ValueError("Disa aktarilacak kanal yok: once bir kanal secin")
+        channel = next((c for c in self._channels if c.id == target_id), None)
+        if channel is None:
+            raise ValueError(f"Bilinmeyen kanal: {target_id}")
+
+        metadata = self._repository.metadata()
+        exported_range = metadata.time_range
+        if selected_range_only:
+            region = self.plot_panel.time_region_range()
+            if region is not None:
+                exported_range = region
+
+        chunk = self._repository.query(target_id, exported_range)
+        result = write_channel_csv(
+            chunk,
+            channel,
+            path,
+            recording=metadata,
+            exported_range=exported_range,
+            include_metadata=include_metadata,
+        )
+        self.bottom_dock.append_log(
+            f"Kanal CSV olarak yazildi: {result.path} ({result.row_count} satir)"
+        )
+        return result
 
     def _on_axis_range_requested(self, axis: str, y_min: float, y_max: float) -> None:
         """Inspector Display'den gelen eksen aralığını seçili grafiğe uygular — `F3-036`.
