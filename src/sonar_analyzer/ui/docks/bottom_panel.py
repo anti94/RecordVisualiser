@@ -18,6 +18,7 @@ from datetime import datetime, timezone
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QAbstractItemView,
+    QCheckBox,
     QComboBox,
     QDockWidget,
     QDoubleSpinBox,
@@ -36,9 +37,11 @@ from PySide6.QtWidgets import (
 from sonar_analyzer.domain.event import Event, Severity
 from sonar_analyzer.ui.docks.event_table_model import (
     EVENT_COLUMNS,
+    EventGroup,
     distinct_sources,
     event_cell_text,
     filter_events,
+    group_near_events,
 )
 from sonar_analyzer.ui.status_icons import make_status_icon, severity_style
 
@@ -126,27 +129,41 @@ class BottomPanelDock(QDockWidget):
 
         # F3-043: filtre öncesi ham olaylar ve göreli-zaman ankoru.
         self._all_events: tuple[Event, ...] = ()
-        self._visible_events: tuple[Event, ...] = ()
         self._events_start_ns = 0
         self._suppress_filter_refresh = False
+        # F3-049: satır -> (tür, olay); tür "event" | "group" | "member".
+        self._row_kinds: list[str] = []
+        self._row_events: list[Event] = []
+        self._row_group_index: list[int | None] = []
+        self._row_groups: list[EventGroup] = []
+        self._expanded_groups: set[int] = set()
         return page
 
     def _on_event_row_selected(self) -> None:
         row = self.events.currentRow()
-        event = self._visible_events[row] if 0 <= row < len(self._visible_events) else None
+        event = self._row_events[row] if 0 <= row < len(self._row_events) else None
         self.event_selected.emit(event)
 
     def _on_event_row_activated(self, item: object) -> None:
         del item
         row = self.events.currentRow()
-        if 0 <= row < len(self._visible_events):
-            self.event_activated.emit(self._visible_events[row])
+        if not (0 <= row < len(self._row_events)):
+            return
+        if self._row_kinds[row] == "group":
+            # F3-049: grup başlığına çift tıklama açar/kapatır — özgün
+            # olayları alt satır olarak gösterir/gizler.
+            group_index = self._group_index_for_row(row)
+            if group_index is not None:
+                self._expanded_groups ^= {group_index}
+                self._render_grouped()
+            return
+        self.event_activated.emit(self._row_events[row])
 
     def selected_event(self) -> Event | None:
         """Şu an seçili olay; seçim yoksa `None` — `F3-044`."""
         row = self.events.currentRow()
-        if 0 <= row < len(self._visible_events):
-            return self._visible_events[row]
+        if 0 <= row < len(self._row_events):
+            return self._row_events[row]
         return None
 
     def _build_event_filters(self, parent: QWidget) -> QWidget:
@@ -182,6 +199,11 @@ class BottomPanelDock(QDockWidget):
         self.event_text_filter.setClearButtonEnabled(True)
         self.event_text_filter.textChanged.connect(self._apply_event_filters)
         row.addWidget(self.event_text_filter, 1)
+
+        self.event_group_check = QCheckBox("Group repeats", bar)
+        self.event_group_check.setObjectName("check_event_group_repeats")
+        self.event_group_check.toggled.connect(self._apply_event_filters)
+        row.addWidget(self.event_group_check)
         return bar
 
     def _make_time_spin(self, parent: QWidget, name: str) -> QDoubleSpinBox:
@@ -254,22 +276,47 @@ class BottomPanelDock(QDockWidget):
         }
 
     def _apply_event_filters(self) -> None:
-        """`F3-043` — dört ölçütü birlikte uygular ve görünür satırları çizer."""
+        """`F3-043`/`F3-049` — filtreler + isteğe bağlı gruplama, satırları çizer."""
         if getattr(self, "_suppress_filter_refresh", False):
             return
         visible = filter_events(self._all_events, **self._current_event_filters())  # type: ignore[arg-type]
-        self._render_events(visible)
+        if self.event_group_check.isChecked():
+            self._row_groups = group_near_events(visible)
+            self._render_grouped()
+        else:
+            self._row_groups = []
+            self._expanded_groups.clear()
+            self._render_rows([("event", event, None) for event in visible])
 
-    def _render_events(self, events: Sequence[Event]) -> None:
-        self._visible_events = tuple(events)
+    def _render_grouped(self) -> None:
+        rows: list[tuple[str, Event, int | None]] = []
+        for index, group in enumerate(self._row_groups):
+            expanded = group.is_group and index in self._expanded_groups
+            kind = "group" if group.is_group else "event"
+            rows.append((kind, group.representative, index if group.is_group else None))
+            if expanded:
+                rows.extend(("member", member, None) for member in group.events)
+        self._render_rows(rows)
+
+    def _render_rows(self, rows: Sequence[tuple[str, Event, int | None]]) -> None:
+        self._row_kinds = [kind for kind, _event, _gi in rows]
+        self._row_events = [event for _kind, event, _gi in rows]
+        self._row_group_index = [gi for _kind, _event, gi in rows]
         severity_column = EVENT_COLUMNS.index("Severity")
-        self.events.setRowCount(len(events))
-        for row, event in enumerate(events):
+        message_column = EVENT_COLUMNS.index("Message")
+        time_column = EVENT_COLUMNS.index("Time")
+        self.events.setRowCount(len(rows))
+        for row, (kind, event, group_index) in enumerate(rows):
             style = severity_style(event.severity)
+            group = self._row_groups[group_index] if group_index is not None else None
             for column, name in enumerate(EVENT_COLUMNS):
-                item = QTableWidgetItem(
-                    event_cell_text(event, name, start_ns=self._events_start_ns)
-                )
+                text = event_cell_text(event, name, start_ns=self._events_start_ns)
+                if column == message_column and group is not None:
+                    prefix = "▾ " if group_index in self._expanded_groups else "▸ "
+                    text = f"{prefix}{text}  (×{group.count})"
+                elif kind == "member" and column == time_column:
+                    text = f"    {text}"
+                item = QTableWidgetItem(text)
                 item.setData(Qt.ItemDataRole.UserRole, event.timestamp_ns)
                 if column == severity_column:
                     item.setIcon(make_status_icon(style))
@@ -281,9 +328,25 @@ class BottomPanelDock(QDockWidget):
                 self.events.setItem(row, column, item)
         self.events.resizeColumnsToContents()
 
+    def _group_index_for_row(self, row: int) -> int | None:
+        if 0 <= row < len(self._row_group_index):
+            return self._row_group_index[row]
+        return None
+
     def event_row_count(self) -> int:
-        """Filtreden sonra görünen satır sayısı."""
+        """Filtre + gruplama sonrası görünen satır sayısı."""
         return self.events.rowCount()
+
+    def group_count(self) -> int:
+        """Gruplama açıkken oluşan grup sayısı — `F3-049`."""
+        return len(self._row_groups)
+
+    def is_group_expanded(self, group_index: int) -> bool:
+        return group_index in self._expanded_groups
+
+    def group_members(self, group_index: int) -> list[Event]:
+        """Bir grubun özgün olayları — hiç değiştirilmeden — `F3-049`."""
+        return list(self._row_groups[group_index].events)
 
     def event_cell(self, row: int, column: str) -> str:
         """Bir hücrenin metni — testler ve kabul için."""
@@ -296,7 +359,11 @@ class BottomPanelDock(QDockWidget):
 
     def clear_events(self) -> None:
         self._all_events = ()
-        self._visible_events = ()
+        self._row_kinds = []
+        self._row_events = []
+        self._row_group_index = []
+        self._row_groups = []
+        self._expanded_groups = set()
         self._suppress_filter_refresh = True
         try:
             self._populate_source_filter()

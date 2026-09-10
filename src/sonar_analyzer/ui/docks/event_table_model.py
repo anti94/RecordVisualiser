@@ -11,6 +11,7 @@ biçimlendirmeyi kullanır.
 from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import dataclass
 from datetime import datetime, timezone
 
 from sonar_analyzer.domain.channel import ChannelMetadata
@@ -109,6 +110,67 @@ def filter_events(
         if criteria.matches(event):
             result.append(event)
     return result
+
+
+#: `F3-049` yakın tekrarları gruplama penceresi (varsayılan).
+EVENT_GROUP_WINDOW_NS = 200_000_000
+
+
+@dataclass(frozen=True)
+class EventGroup:
+    """Aynı türden, zamanca yakın olayların kümesi — `F3-049`.
+
+    `events` özgün olayları **değiştirmeden** taşır (kabul kriteri: açılan
+    ayrıntılar özgün olayları korur). `representative` en erken olaydır.
+    """
+
+    events: tuple[Event, ...]
+
+    @property
+    def representative(self) -> Event:
+        return self.events[0]
+
+    @property
+    def count(self) -> int:
+        return len(self.events)
+
+    @property
+    def is_group(self) -> bool:
+        return len(self.events) > 1
+
+    @property
+    def span_ns(self) -> int:
+        return self.events[-1].timestamp_ns - self.events[0].timestamp_ns
+
+
+def group_near_events(
+    events: Sequence[Event],
+    *,
+    window_ns: int = EVENT_GROUP_WINDOW_NS,
+    same_kind: bool = True,
+) -> list[EventGroup]:
+    """Zamanca sıralı olayları yakın **tekrarlara** göre gruplar — `F3-049`.
+
+    Bir olay öncekiyle aynı gruba girer eğer aralarındaki süre
+    `window_ns`'yi aşmıyorsa (ve `same_kind` ise `(source, code, category)`
+    de aynıysa). Hiçbir olay atılmaz/birleştirilmez; her grup özgün
+    olayları sırayla tutar.
+    """
+    ordered = sorted(events, key=lambda event: event.timestamp_ns)
+    groups: list[list[Event]] = []
+    for event in ordered:
+        if groups:
+            last = groups[-1][-1]
+            close = event.timestamp_ns - last.timestamp_ns <= window_ns
+            kind_ok = not same_kind or (
+                (event.source, event.code, event.category)
+                == (last.source, last.code, last.category)
+            )
+            if close and kind_ok:
+                groups[-1].append(event)
+                continue
+        groups.append([event])
+    return [EventGroup(tuple(members)) for members in groups]
 
 
 def distinct_sources(events: Sequence[Event]) -> list[str]:

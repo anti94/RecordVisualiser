@@ -183,8 +183,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-045` | 20 dk | 4 dk 46 sn | `0f4003f` | olay zaman işaretlerini çiz |
 | `F3-046` | 20 dk | 3 dk 5 sn | `768cb2f` | olay çift tıklamasını ortak zamana bağla |
 | `F3-047` | 20 dk | 3 dk 35 sn | `c719118` | TX aralıklarını gölgeli bölge olarak çiz |
+| `F3-048` | 15 dk | 4 dk 50 sn | `0f0f6fb` | transmission sekmesini TX aralıklarına bağla |
 
-**165 commit · olculen toplam 2139 dk 58 sn · olculemeyen 1 (ilk commit)**
+**166 commit · olculen toplam 2144 dk 48 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
