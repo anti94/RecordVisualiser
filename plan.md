@@ -1609,7 +1609,7 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 | [x] | `F4-010` | `1.10.0` | 20 dk | 48 kHz akustik blok fixture üretecini ekle | Her kanalda 125 ms için 6000 örnek oluşur; bloklar Data sırasını korur | `F4-009` | `feat(fixtures): F4-010 48 kHz akustik blok fixture üretecini ekle` |
 | [x] | `F4-011` | `1.11.0` | 20 dk | Akustik blok payload decoder'ını ekle | Kanal ve örnek sırası fixture referansıyla eşleşir | `F4-010` | `feat(parser): F4-011 akustik blok payload decoder'ını ekle` |
 | [x] | `F4-012` | `1.12.0` | 20 dk | Blok içi örnek zamanlarını üret | 6000 örnek 125 ms aralığı kapsar; blok sınırında örnek tekrarı olmaz | `F4-011` | `feat(time): F4-012 blok içi örnek zamanlarını üret` |
-| [ ] | `F4-013` | `1.13.0` | 20 dk | Akustik blokları zaman sorgusuna bağla | Bloklar arası seçim doğru örnek aralığını döndürür | `F4-012` | `feat(repository): F4-013 akustik blokları zaman sorgusuna bağla` |
+| [x] | `F4-013` | `1.13.0` | 20 dk | Akustik blokları zaman sorgusuna bağla | Bloklar arası seçim doğru örnek aralığını döndürür | `F4-012` | `feat(repository): F4-013 akustik blokları zaman sorgusuna bağla` |
 | [ ] | `F4-014` | `1.14.0` | 20 dk | Akustik boyut ve sample rate sınırlarını doğrula | Bozuk sample count reddedilir; 8 Hz telemetri 10 kHz veri diye sunulmaz | `F4-013` | `test(parser): F4-014 akustik boyut ve sample rate sınırlarını doğrula` |
 
 ##### Temel sayısal işlemler

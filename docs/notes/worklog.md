@@ -227,8 +227,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-009` | 20 dk | 5 dk 58 sn | `17f3ef0` | ham akustik blok formatının ayrı sürümünü tanımla |
 | `F4-010` | 20 dk | 6 dk 38 sn | `bcb48d7` | 48 kHz akustik blok fixture üretecini ekle |
 | `F4-011` | 20 dk | 6 dk 55 sn | `02ff761` | akustik blok payload decoder'ını ekle |
+| `F4-012` | 20 dk | 3 dk 49 sn | `69cdb39` | blok içi örnek zamanlarını üret |
 
-**209 commit · olculen toplam 2422 dk 54 sn · olculemeyen 1 (ilk commit)**
+**210 commit · olculen toplam 2426 dk 43 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
