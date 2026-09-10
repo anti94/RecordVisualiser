@@ -35,10 +35,12 @@ grafik tek birime dönerse yine gizlenir.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import numpy as np
 import pyqtgraph as pg
 from numpy.typing import NDArray
-from PySide6.QtCore import QEvent, QObject, Signal
+from PySide6.QtCore import QEvent, QObject, Qt, Signal
 from PySide6.QtGui import QDragEnterEvent, QDropEvent, QPen
 from PySide6.QtWidgets import QVBoxLayout, QWidget
 
@@ -59,6 +61,19 @@ DEFAULT_ZOOM_MODE = "xy"
 
 #: Grid'in gorunurlugu: veri cizgisinden belirgin sekilde daha soluk (plan 6.3).
 GRID_ALPHA = 0.15
+
+
+@dataclass(frozen=True)
+class DeltaReading:
+    """İki ölçüm cursoru (A→B) arasındaki fark — `F3-027`.
+
+    `dt_seconds` ve `dvalue` işaretlidir (B − A). `frequency_hz`, `dt`
+    sıfır değilse `1 / |dt|`, sıfırsa `None` (sıfıra bölme yok).
+    """
+
+    dt_seconds: float
+    dvalue: float
+    frequency_hz: float | None
 
 
 def to_seconds(timestamps_ns: NDArray[np.int64], t0_ns: int) -> NDArray[np.float64]:
@@ -136,6 +151,18 @@ class PlotPanel(QWidget):
             self.plot.addItem(line, ignoreBounds=True)
         self._cursor_text = ""
         self.plot.scene().sigMouseMoved.connect(self._on_scene_mouse_moved)
+
+        # F3-027: iki ölçüm cursoru (A, B) — en yakın örneğe kenetlenir;
+        # aralarındaki Δt / Δdeğer / frekans raporlanır.
+        self._cursor_a: tuple[float, float] | None = None
+        self._cursor_b: tuple[float, float] | None = None
+        _delta_pen = pg.mkPen(DARK.text_primary, style=Qt.PenStyle.DashLine)
+        self._aline = pg.InfiniteLine(angle=90, movable=False, pen=_delta_pen, label="A")
+        self._bline = pg.InfiniteLine(angle=90, movable=False, pen=_delta_pen, label="B")
+        for line in (self._aline, self._bline):
+            line.setVisible(False)
+            self.plot.addItem(line, ignoreBounds=True)
+        self._delta_text = ""
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -392,6 +419,79 @@ class PlotPanel(QWidget):
         """Dikey crosshair çizgisi şu an görünüyor mu — testler için."""
         return bool(self._vline.isVisible())
 
+    # -- iki cursor fark olcumu (F3-027) --------------------------
+
+    def set_cursor_a(self, x_seconds: float) -> None:
+        """A ölçüm cursorunu `x_seconds`'e en yakın örneğe kenetler — `F3-027`."""
+        self._cursor_a = self._place_delta_cursor(self._aline, x_seconds)
+        self._refresh_delta_text()
+
+    def set_cursor_b(self, x_seconds: float) -> None:
+        """B ölçüm cursorunu `x_seconds`'e en yakın örneğe kenetler — `F3-027`."""
+        self._cursor_b = self._place_delta_cursor(self._bline, x_seconds)
+        self._refresh_delta_text()
+
+    def _place_delta_cursor(
+        self, line: pg.InfiniteLine, x_seconds: float
+    ) -> tuple[float, float] | None:
+        nearest = self.nearest_sample(x_seconds)
+        if nearest is None:
+            line.setVisible(False)
+            return None
+        sample_t, _sample_v = nearest
+        line.setPos(sample_t)
+        line.setVisible(True)
+        return nearest
+
+    def clear_delta_cursors(self) -> None:
+        """A ve B ölçüm cursorlarını kaldırır — `F3-027`."""
+        self._cursor_a = None
+        self._cursor_b = None
+        self._delta_text = ""
+        self._aline.setVisible(False)
+        self._bline.setVisible(False)
+
+    def cursor_a_x(self) -> float | None:
+        """A cursorunun kenetlendiği örnek zamanı (saniye); yoksa `None`."""
+        return None if self._cursor_a is None else self._cursor_a[0]
+
+    def cursor_b_x(self) -> float | None:
+        """B cursorunun kenetlendiği örnek zamanı (saniye); yoksa `None`."""
+        return None if self._cursor_b is None else self._cursor_b[0]
+
+    def delta_measurement(self) -> DeltaReading | None:
+        """A→B farkı; iki cursor da yerleştirilmemişse `None` — `F3-027`.
+
+        `dt`/`dvalue` işaretlidir (B − A). Frekans yalnız `dt != 0` iken
+        `1 / |dt|`, aksi hâlde `None`.
+        """
+        if self._cursor_a is None or self._cursor_b is None:
+            return None
+        a_t, a_v = self._cursor_a
+        b_t, b_v = self._cursor_b
+        dt = b_t - a_t
+        frequency = 1.0 / abs(dt) if dt != 0.0 else None
+        return DeltaReading(dt_seconds=dt, dvalue=b_v - a_v, frequency_hz=frequency)
+
+    def delta_readout_text(self) -> str:
+        """Δt / Δdeğer / frekans okuması — iki cursor yoksa `""`."""
+        return self._delta_text
+
+    def _refresh_delta_text(self) -> None:
+        reading = self.delta_measurement()
+        if reading is None:
+            self._delta_text = ""
+            return
+        primary = self.channel
+        unit = f" {primary.unit}" if primary and primary.unit else ""
+        parts = [
+            f"Δt={reading.dt_seconds:.3f} s",
+            f"Δ={reading.dvalue:.4g}{unit}",
+        ]
+        if reading.frequency_hz is not None:
+            parts.append(f"f={reading.frequency_hz:.4g} Hz")
+        self._delta_text = "  |  ".join(parts)
+
     def remove_channel(self, channel_id: str) -> None:
         """Bir seriyi ve legend girdisini kaldırır — `F3-014`.
 
@@ -419,6 +519,7 @@ class PlotPanel(QWidget):
             self._home_range = None
             self._home_right_y = None
             self.clear_cursor()
+            self.clear_delta_cursors()
         else:
             self._capture_home_range()
 
