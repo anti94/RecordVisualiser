@@ -43,6 +43,7 @@ def test_nan_extrema_quality_and_irregular_timestamps_stay_aligned() -> None:
     result = downsample_chunk(chunk, 3)
     assert np.array_equal(result.timestamps_ns, times[[2, 3, 4]])
     assert np.array_equal(result.values, values[[2, 3, 4]], equal_nan=True)
+    assert result.quality is not None
     assert np.array_equal(result.quality, flags[[2, 3, 4]])
     assert np.isnan(chunk.values[2]) and len(chunk) == 8
 

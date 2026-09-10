@@ -25,7 +25,7 @@ def extrema_indices(values: NDArray[np.generic]) -> NDArray[np.int64]:
     return np.array(sorted(set(chosen)), dtype=np.int64)
 
 
-def envelope_indices(values: NDArray[np.generic], max_points: int) -> NDArray[np.int64]:
+def envelope_indices(values: NDArray[np.generic], max_points: object) -> NDArray[np.int64]:
     """Bitişik kovalardan orijinal örnekler seçer; sonuç bütçeyi aşmaz."""
     if isinstance(max_points, bool) or not isinstance(max_points, int) or max_points < 1:
         raise ValueError("max_points pozitif tam sayı olmalı")
