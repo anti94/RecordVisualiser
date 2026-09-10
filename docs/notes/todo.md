@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 229 tamamlandı · 263 kaldı**
+**Toplam 492 madde · 230 tamamlandı · 262 kaldı**
 
-`[###########.............]` %46.5
+`[###########.............]` %46.7
 
 ## Özet
 
@@ -38,11 +38,11 @@ Work in fully autonomous mode.
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
-| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 29 | 61 | 90 |
+| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 30 | 60 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **229** | **263** | **492** |
+| **Toplam** | **230** | **262** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -248,7 +248,7 @@ Work in fully autonomous mode.
 | [x] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır |
 | [x] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla |
 
-### Faz 4 — Mockup analiz panosu ve büyük veri performansı (29/90)
+### Faz 4 — Mockup analiz panosu ve büyük veri performansı (30/90)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -281,7 +281,7 @@ Work in fully autonomous mode.
 | [x] | `F4-027` | `1.27.0` | 20 dk | Low-pass filtre hesabını ekle |
 | [x] | `F4-028` | `1.28.0` | 15 dk | Low-pass cutoff ve order sınırlarını doğrula |
 | [x] | `F4-029` | `1.29.0` | 15 dk | Low-pass araç alanlarını bağla |
-| [ ] | `F4-030` | `1.30.0` | 20 dk | High-pass filtre hesabını ekle |
+| [x] | `F4-030` | `1.30.0` | 20 dk | High-pass filtre hesabını ekle |
 | [ ] | `F4-031` | `1.31.0` | 15 dk | High-pass sınır ve transient davranışını doğrula |
 | [ ] | `F4-032` | `1.32.0` | 15 dk | High-pass seçimini araç kartına bağla |
 | [ ] | `F4-033` | `1.33.0` | 20 dk | Band-pass filtre hesabını ekle |

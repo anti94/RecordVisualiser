@@ -67,6 +67,21 @@ def butterworth_lowpass_response(freqs_hz: FloatArray, cutoff_hz: float, order: 
     return np.asarray(1.0 / np.sqrt(1.0 + ratio ** (2 * order)), dtype=np.float64)
 
 
+def butterworth_highpass_response(freqs_hz: FloatArray, cutoff_hz: float, order: int) -> FloatArray:
+    """Yüksek geçiren Butterworth genlik yanıtı ``1/sqrt(1 + (fc/f)^(2n))``.
+
+    ``f = 0``'da yanıt tam olarak ``0``'dır (DC tümüyle bloklanır);
+    ``f = fc``'de ``1/sqrt(2)``. Alçak geçirenle güç-tümleyicidir:
+    ``H_lp^2 + H_hp^2 == 1``.
+    """
+    freqs = np.abs(np.asarray(freqs_hz, dtype=np.float64))
+    response = np.zeros_like(freqs)
+    nonzero = freqs > 0.0
+    ratio = cutoff_hz / freqs[nonzero]
+    response[nonzero] = 1.0 / np.sqrt(1.0 + ratio ** (2 * order))
+    return response
+
+
 def _apply_response(
     data: Samples,
     sample_rate_hz: float,
@@ -105,4 +120,26 @@ def low_pass(
         return data.copy()
     freqs = np.fft.rfftfreq(data.size, d=1.0 / sample_rate_hz)
     response = butterworth_lowpass_response(freqs, cutoff_hz, order)
+    return _apply_response(data, sample_rate_hz, response)
+
+
+def high_pass(
+    values: NDArray[np.generic] | Samples,
+    sample_rate_hz: float,
+    cutoff_hz: float,
+    order: int,
+) -> Samples:
+    """`values`'a sıfır-fazlı Butterworth yüksek geçiren filtre uygular.
+
+    DC ve ``cutoff_hz`` altındaki bileşenler ``-20n dB/dekad`` eğimiyle
+    bastırılır (DC tam olarak sıfırlanır), üstündekiler ~korunur. **Her
+    zaman yeni** bir dizi döndürür.
+    """
+    data = _as_1d_float64(values)
+    validate_cutoff(cutoff_hz, sample_rate_hz)
+    validate_order(order)
+    if data.size == 0:
+        return data.copy()
+    freqs = np.fft.rfftfreq(data.size, d=1.0 / sample_rate_hz)
+    response = butterworth_highpass_response(freqs, cutoff_hz, order)
     return _apply_response(data, sample_rate_hz, response)
