@@ -219,8 +219,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-001` | 20 dk | 3 dk 48 sn | `8ac0bdb` | işlem adımı ve parametre modelini ekle |
 | `F4-002` | 20 dk | 3 dk 40 sn | `b070b05` | sıralı işlem zinciri yürütücüsünü ekle |
 | `F4-003` | 20 dk | 3 dk 48 sn | `ee31a2f` | DSP işlerini worker üzerinden çalıştır |
+| `F4-004` | 20 dk | 4 dk 2 sn | `11ae172` | DSP iptal ve eski sonuç denetimini ekle |
 
-**201 commit · olculen toplam 2374 dk 11 sn · olculemeyen 1 (ilk commit)**
+**202 commit · olculen toplam 2378 dk 13 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

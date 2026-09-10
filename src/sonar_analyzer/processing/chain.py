@@ -23,13 +23,43 @@ from dataclasses import dataclass, field
 import numpy as np
 from numpy.typing import NDArray
 
+from sonar_analyzer.domain.data_chunk import Quality
 from sonar_analyzer.processing.steps import ProcessingStep, StepKind
 
 Samples = NDArray[np.float64]
+InvalidMask = NDArray[np.bool_]
+
+#: `F4-005` — bir örneğin **değerini** güvenilmez kılan kalite bayrakları.
+#: CRC hatası ve fiziksel olarak sıra dışı örnek DSP'ye sokulmaz; zaman
+#: bayrakları (`GAP_BEFORE`, `JITTER`, `CLOCK_UNLOCKED`) değeri değil
+#: konumu ilgilendirir ve burada geçersiz sayılmaz.
+INVALID_QUALITY_MASK = int(Quality.CRC_ERROR | Quality.SUSPECT)
 
 
 class ChainExecutionError(ValueError):
     """Zincir yürütülemedi (boş girdi bir adım için geçersiz vb.)."""
+
+
+def invalid_input_mask(
+    values: Samples,
+    quality: NDArray[np.generic] | None = None,
+) -> InvalidMask:
+    """DSP için geçersiz örneklerin bool maskesi — `F4-005`.
+
+    Geçersiz sayılanlar: NaN, ±Inf ve `INVALID_QUALITY_MASK` bayraklarından
+    en az birini taşıyan örnekler. **Sessizce düzeltilmezler**; çağıran
+    zincir bunları NaN'a çevirir ve NaN tüm adımlarda yayılır.
+    """
+    mask = ~np.isfinite(values)
+    if quality is not None:
+        flags = np.asarray(quality)
+        if flags.shape != values.shape:
+            raise ChainExecutionError(
+                f"Kalite dizisi örnek dizisiyle aynı uzunlukta olmalı "
+                f"({flags.shape} vs {values.shape})"
+            )
+        mask = mask | ((flags.astype(np.int64) & INVALID_QUALITY_MASK) != 0)
+    return mask
 
 
 def _as_float64(values: NDArray[np.generic]) -> Samples:
@@ -70,6 +100,10 @@ def apply_step(values: Samples, step: ProcessingStep) -> Samples:
     raise ChainExecutionError(f"Uygulanmayan işlem türü: {step.kind}")  # pragma: no cover
 
 
+def _empty_mask() -> InvalidMask:
+    return np.zeros(0, dtype=np.bool_)
+
+
 @dataclass(frozen=True)
 class ChainResult:
     """Bir zincir yürütmesinin sonucu."""
@@ -77,10 +111,17 @@ class ChainResult:
     values: Samples
     #: Uygulanan (etkin) adımların imzaları, sırayla.
     applied: tuple[str, ...]
+    #: `F4-005` — çıktıda **güvenilmez** (NaN / non-finite) örneklerin maskesi.
+    #: Geçersiz girdiler burada işaretli kalır; geçerli bir değere dönüşmezler.
+    invalid_mask: InvalidMask = field(default_factory=_empty_mask)
 
     @property
     def step_count(self) -> int:
         return len(self.applied)
+
+    @property
+    def invalid_count(self) -> int:
+        return int(np.count_nonzero(self.invalid_mask))
 
 
 def _empty_steps() -> list[ProcessingStep]:
@@ -120,17 +161,38 @@ class ProcessingChain:
 
     # -- yürütme --------------------------------------------------
 
-    def run(self, values: NDArray[np.generic]) -> ChainResult:
-        """Etkin adımları sırayla uygular; **girdiyi değiştirmez**."""
+    def run(
+        self,
+        values: NDArray[np.generic],
+        quality: NDArray[np.generic] | None = None,
+    ) -> ChainResult:
+        """Etkin adımları sırayla uygular; **girdiyi değiştirmez** — `F4-002`, `F4-005`.
+
+        `F4-005` politikası: NaN / ±Inf ve `INVALID_QUALITY_MASK`
+        bayraklı örnekler işleme **girmeden** NaN'a çevrilir; NaN tüm
+        adımlarda yayılır ve hiçbir adım onu geçerli bir sayıya
+        dönüştürmez (`np.clip(inf, …)` gibi sessiz "iyileşme" engellenir).
+        Çıktıdaki güvenilmez örnekler `ChainResult.invalid_mask`'te
+        işaretli kalır.
+        """
         source = _as_float64(values)
+        bad_in = invalid_input_mask(source, quality)
         current = source.copy()
+        if bad_in.any():
+            current[bad_in] = np.nan
+
         applied: list[str] = []
         for step in self.steps:
             if not step.enabled:
                 continue
             current = _as_float64(apply_step(current, step))
             applied.append(step.signature())
-        return ChainResult(values=current, applied=tuple(applied))
+
+        return ChainResult(
+            values=current,
+            applied=tuple(applied),
+            invalid_mask=~np.isfinite(current),
+        )
 
     # -- tekrar üretilebilirlik / serileştirme -----------------
 
