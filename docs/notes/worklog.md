@@ -261,8 +261,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-043` | 20 dk | 4 dk 31 sn | `09e47aa` | Welch PSD hesabını ekle |
 | `F4-044` | 15 dk | 3 dk 38 sn | `77058be` | PSD pencere, overlap ve birim sınırlarını doğrula |
 | `F4-045` | 20 dk | 9 dk 46 sn | `f3e6734` | spectrum sekmesinde PSD görünümünü ekle |
+| `F4-046` | 20 dk | 4 dk 24 sn | `f2ac165` | STFT ve spektrogram matrisini hesapla |
 
-**243 commit · olculen toplam 2615 dk 15 sn · olculemeyen 1 (ilk commit)**
+**244 commit · olculen toplam 2619 dk 39 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
