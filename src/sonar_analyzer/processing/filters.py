@@ -44,10 +44,12 @@ def validate_sample_rate(sample_rate_hz: float) -> None:
         raise FilterError(f"sample rate pozitif olmalı: {sample_rate_hz}")
 
 
-def validate_order(order: int) -> None:
-    if isinstance(order, bool) or not FILTER_MIN_ORDER <= order <= FILTER_MAX_ORDER:
+def validate_order(order: object) -> None:
+    if isinstance(order, bool) or not isinstance(order, int):
+        raise FilterError(f"filtre order bir tam sayı olmalı: {order!r}")
+    if not FILTER_MIN_ORDER <= order <= FILTER_MAX_ORDER:
         raise FilterError(
-            f"filtre order {FILTER_MIN_ORDER}..{FILTER_MAX_ORDER} aralığında olmalı: {order!r}"
+            f"filtre order {FILTER_MIN_ORDER}..{FILTER_MAX_ORDER} aralığında olmalı: {order}"
         )
 
 
