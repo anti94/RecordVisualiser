@@ -213,8 +213,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-075` | 20 dk | 3 dk 28 sn | `d3bc38e` | dosyadan olay gezinmesine entegrasyon senaryosu ekle |
 | `F3-076` | 20 dk | 3 dk 28 sn | `3998b47` | kritik plot ve workspace GUI kontrollerini ekle |
 | `F3-077` | 20 dk | 5 dk 16 sn | `66f4d3a` | MVP etkileşim bütçesini ölç |
+| `F3-078` | 20 dk | 3 dk 50 sn | `51f30fd` | operatör ve mühendis MVP senaryolarını kaydet |
 
-**195 commit · olculen toplam 2347 dk 28 sn · olculemeyen 1 (ilk commit)**
+**196 commit · olculen toplam 2351 dk 18 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
