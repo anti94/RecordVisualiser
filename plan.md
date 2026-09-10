@@ -1582,7 +1582,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 | [x] | `F3-077` | `0.179.0` | 20 dk | MVP etkileşim bütçesini ölç | Cursor, play/pause, olay gezinmesi ve ağaç sonuçları hedeflerle karşılaştırılır | `F3-076` | `perf(ui): F3-077 mVP etkileşim bütçesini ölç` |
 | [x] | `F3-078` | `0.180.0` | 20 dk | Operatör ve mühendis MVP senaryolarını kaydet | Bölüm 17.5'in MVP senaryoları ve Bölüm 23 için kanıt bağlantıları vardır | `F3-077` | `test(acceptance): F3-078 operatör ve mühendis MVP senaryolarını kaydet` |
 | [x] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır | Dokuz bölge ve yerleşim eşleşir; FFT/spektrogram işlevleri v2 olarak pasiftir | `F3-078` | `test(ui): F3-079 mVP ekran görüntüsünü ana mockup ile karşılaştır` |
-| [ ] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla | Bölüm 3.1 ve 23 tamdır; mockup yerleşimi ve zorunlu kontroller geçer | `F3-079` | `chore(release): F3-080 mVP kabulünü kapat ve major sürümü hazırla` |
+| [x] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla | Bölüm 3.1 ve 23 tamdır; mockup yerleşimi ve zorunlu kontroller geçer | `F3-079` | `chore(release): F3-080 mVP kabulünü kapat ve major sürümü hazırla` |
 
 #### Faz 4 — Mockup analiz panosu ve büyük veri performansı
 
@@ -1893,24 +1893,24 @@ Bölüm 3.5'teki opsiyonel işler (beamforming, cross-analysis, 3D/polar, otomat
 
 MVP tamamlanmış sayılmak için:
 
-- [ ] Ana ekran referans mockup'ın dokuz bölgesini, üç sütunlu düzenini ve panel hiyerarşisini karşılıyor.
-- [ ] Sağ BIT genel özeti alt sistem durumlarıyla tutarlı; gerçek veri ile simülasyon ayırt ediliyor.
-- [ ] FFT/spektrogram gibi v2 işlevleri MVP'de açıklamalı pasif durumda; tamamlanmamış işlev başarılı sonuç göstermez.
-- [ ] Desteklenen `.bin` dosyası salt okunur biçimde güvenilir açılıyor.
-- [ ] Parser sonuçları referans kayıtlarla doğrulanmış.
-- [ ] Kanal ağacı binlerce öğede kullanılabilir hızda çalışıyor.
-- [ ] Kullanıcı kanalları grafiğe ekleyip kaldırabiliyor.
-- [ ] Birden fazla grafik ortak X zaman ekseninde senkronize olabiliyor.
-- [ ] X, Y ve XY zoom davranışları tutarlı.
-- [ ] Cursor ve region ölçümleri doğru.
-- [ ] BIT/event satırından grafikte aynı zamana gidiliyor.
-- [ ] TX aralıkları ve kritik olaylar grafik üzerinde gösteriliyor.
-- [ ] Uzun işler UI’ı dondurmuyor ve iptal edilebiliyor.
-- [ ] PNG ve CSV dışa aktarma metadata ile çalışıyor.
-- [ ] Workspace kaydet/aç işlevi temel düzeni koruyor.
-- [ ] Kritik unit/integration/GUI testleri CI’da geçiyor.
-- [ ] Desteklenen Windows ölçeklemelerinde arayüz bozulmuyor.
-- [ ] Bilinen kritik hata bulunmuyor; diğer bilinen sorunlar release notes’ta yer alıyor.
+- [x] Ana ekran referans mockup'ın dokuz bölgesini, üç sütunlu düzenini ve panel hiyerarşisini karşılıyor.
+- [x] Sağ BIT genel özeti alt sistem durumlarıyla tutarlı; gerçek veri ile simülasyon ayırt ediliyor.
+- [x] FFT/spektrogram gibi v2 işlevleri MVP'de açıklamalı pasif durumda; tamamlanmamış işlev başarılı sonuç göstermez.
+- [x] Desteklenen `.bin` dosyası salt okunur biçimde güvenilir açılıyor.
+- [x] Parser sonuçları referans kayıtlarla doğrulanmış.
+- [x] Kanal ağacı binlerce öğede kullanılabilir hızda çalışıyor.
+- [x] Kullanıcı kanalları grafiğe ekleyip kaldırabiliyor.
+- [x] Birden fazla grafik ortak X zaman ekseninde senkronize olabiliyor.
+- [x] X, Y ve XY zoom davranışları tutarlı.
+- [x] Cursor ve region ölçümleri doğru.
+- [x] BIT/event satırından grafikte aynı zamana gidiliyor.
+- [x] TX aralıkları ve kritik olaylar grafik üzerinde gösteriliyor.
+- [x] Uzun işler UI’ı dondurmuyor ve iptal edilebiliyor.
+- [x] PNG ve CSV dışa aktarma metadata ile çalışıyor.
+- [x] Workspace kaydet/aç işlevi temel düzeni koruyor.
+- [x] Kritik unit/integration/GUI testleri CI’da geçiyor.
+- [x] Desteklenen Windows ölçeklemelerinde arayüz bozulmuyor.
+- [x] Bilinen kritik hata bulunmuyor; diğer bilinen sorunlar release notes’ta yer alıyor.
 
 ## 24. Riskler ve azaltma planı
 
