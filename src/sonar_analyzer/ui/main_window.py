@@ -647,6 +647,12 @@ class MainWindow(QMainWindow):
         self.bottom_dock.append_log(
             f"{channel.display_label}: {len(chain.enabled_steps)} adımlı işlem çalıştırıldı."
         )
+        derived = self.right_dock.analysis_tools.step_editor.derived_channel_metadata(channel)
+        if derived.id != channel.id and derived.sample_rate_hz is not None:
+            self.bottom_dock.append_log(
+                f"Türetilmiş kanal: {derived.name} @ {derived.sample_rate_hz:g} Hz "
+                f"(kaynak {channel.sample_rate_hz or 0:g} Hz)."
+            )
 
     def _on_dsp_result(self, _job_id: int, channel_id: str, result: object) -> None:
         from sonar_analyzer.processing.chain import ChainResult

@@ -29,6 +29,12 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from sonar_analyzer.application.derived_channel import (
+    chain_changes_sample_rate,
+    derive_channel_metadata,
+    derived_sample_rate,
+)
+from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.processing.chain import ProcessingChain
 from sonar_analyzer.processing.steps import (
     MAX_MOVING_AVERAGE_WINDOW,
@@ -68,6 +74,7 @@ STEP_KIND_ORDER: tuple[StepKind, ...] = (
     StepKind.WINDOWED_RMS,
     StepKind.ENVELOPE,
     StepKind.PHASE_UNWRAP,
+    StepKind.RESAMPLE,
 )
 
 #: `window` parametresi bir **süre** (saniye) olarak sunulan ve kanalın
@@ -165,6 +172,13 @@ class StepListEditor(QWidget):
         self.param_error.hide()
         layout.addWidget(self.param_error)
 
+        # F4-026: RESAMPLE adımı varken türetilmiş kanalın yeni sample rate'i.
+        self.derived_info = QLabel(self)
+        self.derived_info.setObjectName("label_derived_channel")
+        self.derived_info.setWordWrap(True)
+        self.derived_info.hide()
+        layout.addWidget(self.derived_info)
+
         self._param_fields: dict[str, ParamField] = {}
         #: Değeri **saniye** tutan ve modele örnek sayısı olarak çevrilen
         #: parametre alanlarının adları (`F4-022`).
@@ -186,6 +200,10 @@ class StepListEditor(QWidget):
         self._steps = list(chain.steps)
         self._rebuild_list()
 
+    def derived_channel_metadata(self, base: ChannelMetadata) -> ChannelMetadata:
+        """`base` kanalının o anki zincir uygulandıktan sonraki metadata'sı (`F4-026`)."""
+        return derive_channel_metadata(base, self.chain())
+
     def step_count(self) -> int:
         return len(self._steps)
 
@@ -205,6 +223,7 @@ class StepListEditor(QWidget):
         self._sample_rate_hz = new_rate
         row = self.list.currentRow()
         self._rebuild_param_panel(self._steps[row] if 0 <= row < len(self._steps) else None)
+        self._refresh_derived_info()
 
     @property
     def sample_rate_hz(self) -> float:
@@ -217,7 +236,11 @@ class StepListEditor(QWidget):
             return
         data = self.kind_selector.currentData()
         kind = data if isinstance(data, StepKind) else StepKind(str(data))
-        self._steps.append(ProcessingStep.default(kind, self._input_channel_id))
+        step = ProcessingStep.default(kind, self._input_channel_id)
+        if kind is StepKind.RESAMPLE and self._sample_rate_hz > 0.0:
+            # Kaynak oranı kanaldan otomatik doldur; kullanıcı yalnız hedefi verir.
+            step = step.with_parameters(source_rate_hz=self._sample_rate_hz)
+        self._steps.append(step)
         self._rebuild_list()
         self.list.setCurrentRow(len(self._steps) - 1)
         self.chain_changed.emit()
@@ -250,6 +273,21 @@ class StepListEditor(QWidget):
             item.setData(Qt.ItemDataRole.UserRole, step.kind.value)
             self.list.addItem(item)
         self._refresh_buttons()
+        self._refresh_derived_info()
+
+    def _refresh_derived_info(self) -> None:
+        """RESAMPLE varsa türetilmiş kanalın yeni sample rate'ini gösterir (`F4-026`)."""
+        chain = self.chain()
+        if self._sample_rate_hz > 0.0 and chain_changes_sample_rate(chain):
+            new_rate = derived_sample_rate(self._sample_rate_hz, chain)
+            self.derived_info.setText(
+                f"Türetilmiş kanal sample rate: {new_rate:g} Hz "
+                f"(kaynak {self._sample_rate_hz:g} Hz)"
+            )
+            self.derived_info.setVisible(True)
+        else:
+            self.derived_info.clear()
+            self.derived_info.setVisible(False)
 
     def _on_row_changed(self, _row: int) -> None:
         self._refresh_buttons()
@@ -391,6 +429,7 @@ class StepListEditor(QWidget):
         item = self.list.item(row)
         if item is not None:
             item.setText(step_label(new_step))
+        self._refresh_derived_info()
         self.chain_changed.emit()
 
     def _refresh_buttons(self) -> None:

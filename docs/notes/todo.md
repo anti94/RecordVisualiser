@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 225 tamamlandı · 267 kaldı**
+**Toplam 492 madde · 226 tamamlandı · 266 kaldı**
 
-`[###########.............]` %45.7
+`[###########.............]` %45.9
 
 ## Özet
 
@@ -38,11 +38,11 @@ Work in fully autonomous mode.
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
-| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 25 | 65 | 90 |
+| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 26 | 64 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **225** | **267** | **492** |
+| **Toplam** | **226** | **266** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -248,7 +248,7 @@ Work in fully autonomous mode.
 | [x] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır |
 | [x] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla |
 
-### Faz 4 — Mockup analiz panosu ve büyük veri performansı (25/90)
+### Faz 4 — Mockup analiz panosu ve büyük veri performansı (26/90)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -277,7 +277,7 @@ Work in fully autonomous mode.
 | [x] | `F4-023` | `1.23.0` | 20 dk | Phase unwrap hesabını ekle |
 | [x] | `F4-024` | `1.24.0` | 15 dk | Phase unwrap parametrelerini bağla |
 | [x] | `F4-025` | `1.25.0` | 20 dk | Resample/decimate işlemini ekle |
-| [ ] | `F4-026` | `1.26.0` | 15 dk | Resample hedef frekans kontrolünü bağla |
+| [x] | `F4-026` | `1.26.0` | 15 dk | Resample hedef frekans kontrolünü bağla |
 | [ ] | `F4-027` | `1.27.0` | 20 dk | Low-pass filtre hesabını ekle |
 | [ ] | `F4-028` | `1.28.0` | 15 dk | Low-pass cutoff ve order sınırlarını doğrula |
 | [ ] | `F4-029` | `1.29.0` | 15 dk | Low-pass araç alanlarını bağla |

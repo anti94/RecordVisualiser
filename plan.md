@@ -1627,7 +1627,7 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 | [x] | `F4-023` | `1.23.0` | 20 dk | Phase unwrap hesabını ekle | Bilinen faz sıçramaları sürekliliğe dönüşür | `F4-022` | `feat(processing): F4-023 phase unwrap hesabını ekle` |
 | [x] | `F4-024` | `1.24.0` | 15 dk | Phase unwrap parametrelerini bağla | Faz birimi ve eşik hataları işlem öncesi görünür | `F4-023` | `feat(ui): F4-024 phase unwrap parametrelerini bağla` |
 | [x] | `F4-025` | `1.25.0` | 20 dk | Resample/decimate işlemini ekle | Hedef sample rate, örnek sayısı ve alias denetimi referansla eşleşir | `F4-024` | `feat(processing): F4-025 resample/decimate işlemini ekle` |
-| [ ] | `F4-026` | `1.26.0` | 15 dk | Resample hedef frekans kontrolünü bağla | Yeni sample rate türetilmiş kanal metadata'sında görünür | `F4-025` | `feat(ui): F4-026 resample hedef frekans kontrolünü bağla` |
+| [x] | `F4-026` | `1.26.0` | 15 dk | Resample hedef frekans kontrolünü bağla | Yeni sample rate türetilmiş kanal metadata'sında görünür | `F4-025` | `feat(ui): F4-026 resample hedef frekans kontrolünü bağla` |
 
 ##### Filtreler
 

@@ -240,8 +240,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-022` | 15 dk | 9 dk 25 sn | `8d661a5` | RMS/envelope pencere kontrollerini bağla |
 | `F4-023` | 20 dk | 4 dk 27 sn | `2e15fcd` | phase unwrap hesabını ekle |
 | `F4-024` | 15 dk | 3 dk 4 sn | `cc867bf` | phase unwrap parametrelerini bağla |
+| `F4-025` | 20 dk | 5 dk 11 sn | `1db9f61` | resample/decimate işlemini ekle |
 
-**222 commit · olculen toplam 2494 dk 25 sn · olculemeyen 1 (ilk commit)**
+**223 commit · olculen toplam 2499 dk 36 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
