@@ -16,7 +16,8 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 from datetime import datetime, timezone
 
-from PySide6.QtCore import QMimeData, Qt, Signal
+from PySide6.QtCore import QMimeData, QPoint, Qt, Signal
+from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import (
     QDockWidget,
     QFormLayout,
@@ -25,6 +26,7 @@ from PySide6.QtWidgets import (
     QHeaderView,
     QLabel,
     QLineEdit,
+    QMenu,
     QPushButton,
     QTabWidget,
     QTreeWidget,
@@ -93,6 +95,9 @@ _CATEGORY_BUTTON_TEXT = {
 #: Her kategori düğmesinin sabit genişliği (piksel); üç düğme bir satırda
 #: (3 × 46 + boşluklar) 200 px sütuna sığar.
 _CATEGORY_BUTTON_WIDTH = 46
+
+#: `F3-018` kanal sağ tık menüsü eylemleri, menüde görünen sırayla.
+CHANNEL_MENU_ACTIONS: tuple[str, ...] = ("Plot", "Inspect", "Copy Path")
 
 
 def _category_slug(category: str) -> str:
@@ -199,10 +204,14 @@ class _DraggableChannelTree(QTreeWidget):
 class DataExplorerDock(QDockWidget):
     """Sol sütundaki veri gezgini."""
 
-    #: Kullanici bir kanali cift tikladi.
+    #: Kullanici bir kanali cift tikladi (veya sag tik > Plot).
     channel_activated = Signal(str)
     #: `F3-016`: coklu secimden "secilenleri grafige ekle" istendi (kanal kimlikleri).
     channels_add_requested = Signal(list)
+    #: `F3-018`: sag tik > Inspect — kanalin Inspector'da gosterilmesi istendi.
+    channel_inspect_requested = Signal(str)
+    #: `F3-018`: sag tik > Copy Path — kanal yolu panoya kopyalandi (yol metni).
+    channel_path_copied = Signal(str)
     #: `Open .bin File` tiklandi.
     open_requested = Signal()
 
@@ -224,6 +233,9 @@ class DataExplorerDock(QDockWidget):
         #: Bos = hicbiri kapali degil, hepsi gorunur.
         self._disabled_group_labels: set[str] = set()
         self.category_buttons: dict[str, QPushButton] = {}
+        #: `F3-018`: en son açılan sağ tık menüsü — referans tutulmazsa
+        #: PySide nesneyi serbest bırakır; testler de buradan tetikler.
+        self.context_menu: QMenu | None = None
 
         self.setWidget(self._build_body())
         self.clear()
@@ -338,6 +350,9 @@ class DataExplorerDock(QDockWidget):
         # F3-016: birden fazla kanal secilip tek komutla grafige eklenebilir.
         self.tree.setSelectionMode(QTreeWidget.SelectionMode.ExtendedSelection)
         self.tree.itemSelectionChanged.connect(self._refresh_add_selected_enabled)
+        # F3-018: kanal yapraginda sag tik menusu (Plot / Inspect / Copy Path).
+        self.tree.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.tree.customContextMenuRequested.connect(self._context_menu_handler(self.tree))
         layout.addWidget(self.tree, 1)
 
         self.add_selected_button = QPushButton("Grafige Ekle", page)
@@ -380,6 +395,11 @@ class DataExplorerDock(QDockWidget):
         # F3-016: bu sekmede de coklu secim + tek komutla ekleme.
         self.data_tree.setSelectionMode(QTreeWidget.SelectionMode.ExtendedSelection)
         self.data_tree.itemSelectionChanged.connect(self._refresh_add_selected_enabled)
+        # F3-018: bu sekmede de kanal sag tik menusu.
+        self.data_tree.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.data_tree.customContextMenuRequested.connect(
+            self._context_menu_handler(self.data_tree)
+        )
         layout.addWidget(self.data_tree, 1)
 
         self.add_selected_data_tree_button = QPushButton("Grafige Ekle", page)
@@ -679,6 +699,68 @@ class DataExplorerDock(QDockWidget):
         channel_id = item.data(0, Qt.ItemDataRole.UserRole)
         if channel_id:
             self.channel_activated.emit(str(channel_id))
+
+    # -- kanal sag tik menusu (F3-018) ---------------------------------
+
+    def _context_menu_handler(self, tree: QTreeWidget) -> Callable[[QPoint], None]:
+        """`QPoint -> None` imzalı tam tipli geri çağrı — pyright, sinyal
+        taslağından `pos` tipini çıkaramıyor (bkz. `_make_category_toggle_handler`)."""
+
+        def handler(pos: QPoint) -> None:
+            self._show_channel_menu(tree, pos)
+
+        return handler
+
+    def _show_channel_menu(self, tree: QTreeWidget, pos: QPoint) -> None:
+        """Sağ tıklanan **kanal yaprağı** için Plot / Inspect / Copy Path menüsü.
+
+        Menü, imlecin ALTINDAKİ öğeye bağlanır (`itemAt`), o an *seçili*
+        olana değil — "doğru seçime uygulanır" kabul kriteri. Grup/kayıt/
+        cihaz düğümünde (UserRole boş) menü açılmaz. `exec()` yerine
+        `popup()`: modal değil, testleri kilitlemez.
+        """
+        item = tree.itemAt(pos)
+        channel_id = item.data(0, Qt.ItemDataRole.UserRole) if item is not None else None
+        if not channel_id:
+            return
+
+        menu = QMenu(tree)
+        for label in CHANNEL_MENU_ACTIONS:
+            menu.addAction(label).triggered.connect(
+                self._channel_menu_handler(str(channel_id), label)
+            )
+        self.context_menu = menu
+        menu.popup(tree.viewport().mapToGlobal(pos))
+
+    def _channel_menu_handler(self, channel_id: str, action: str) -> Callable[[bool], None]:
+        """`bool -> None` imzalı tam tipli geri çağrı (bkz. `_make_category_toggle_handler`)."""
+
+        def handler(_checked: bool = False) -> None:
+            self.apply_channel_context_action(channel_id, action)
+
+        return handler
+
+    def apply_channel_context_action(self, channel_id: str, action: str) -> None:
+        """Bir sağ tık eylemini kanala uygular — `F3-018`.
+
+        Menü ve testler aynı yolu kullanır; `action` `CHANNEL_MENU_ACTIONS`
+        içinden gelmelidir.
+        """
+        if action == "Plot":
+            self.channel_activated.emit(channel_id)
+        elif action == "Inspect":
+            self.channel_inspect_requested.emit(channel_id)
+        elif action == "Copy Path":
+            self._copy_channel_path(channel_id)
+        else:
+            raise ValueError(f"Bilinmeyen kanal eylemi: {action!r}")
+
+    def _copy_channel_path(self, channel_id: str) -> None:
+        channel = next((c for c in self._channels if c.id == channel_id), None)
+        if channel is None:
+            return
+        QGuiApplication.clipboard().setText(channel.path)
+        self.channel_path_copied.emit(channel.path)
 
     # -- coklu secim: secilenleri grafige ekle (F3-016) -----------------
 

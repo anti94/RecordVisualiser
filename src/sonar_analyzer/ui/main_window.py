@@ -146,6 +146,8 @@ class MainWindow(QMainWindow):
         self._connect_layout_actions()
         self.left_dock.channel_activated.connect(self.open_channel)
         self.left_dock.channels_add_requested.connect(self._on_channels_add_requested)
+        self.left_dock.channel_inspect_requested.connect(self.show_channel_in_inspector)
+        self.left_dock.channel_path_copied.connect(self._on_channel_path_copied)
         self.right_dock.bit_status.analysis_requested.connect(self.refresh_bit_analysis)
         self.action("action_load_simulation").triggered.connect(self.load_simulation)
 
@@ -220,6 +222,10 @@ class MainWindow(QMainWindow):
         if channel is None:
             return
         self.right_dock.show_channel(channel)
+
+    def _on_channel_path_copied(self, path: str) -> None:
+        """Sağ tık > Copy Path sonrası kullanıcıya geri bildirim — `F3-018`."""
+        self.bottom_dock.append_log(f"Yol panoya kopyalandi: {path}")
 
     def open_channel(self, channel_id: str) -> None:
         """Seçilen kanalı çizer ve ayrıntısını gösterir.

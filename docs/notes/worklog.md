@@ -152,8 +152,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-014` | 15 dk | 4 dk 45 sn | `a445bc7` | grafikten kanal kaldırmayı ekle |
 | `F3-015` | 20 dk | 14 dk 17 sn | `126567a` | kanal sürükle-bırak akışını ekle |
 | `F3-016` | 20 dk | 396 dk 38 sn | `0165c36` | çoklu kanal ekleme eylemlerini ekle |
+| `F3-017` | 20 dk | 7 dk 5 sn | `cb1a0e4` | favori kanal gruplarını kaydet |
 
-**134 commit · olculen toplam 1959 dk 16 sn · olculemeyen 1 (ilk commit)**
+**135 commit · olculen toplam 1966 dk 21 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
