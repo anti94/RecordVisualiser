@@ -35,6 +35,7 @@ grafik tek birime dönerse yine gizlenir.
 
 from __future__ import annotations
 
+import contextlib
 from dataclasses import dataclass
 from typing import cast
 
@@ -157,6 +158,9 @@ class PlotPanel(QWidget):
         # uygulanırken bu bayrak açılır ki `x_range_changed` yeniden
         # yayılmasın (geri besleme döngüsü olmaz).
         self._suppress_x_broadcast = False
+
+        #: F3-034: `dispose()` çağrıldı mı — ikinci çağrı sessizce döner.
+        self._disposed = False
 
         pg.setConfigOptions(antialias=True)
         self.plot = pg.PlotWidget(parent=self)
@@ -710,6 +714,29 @@ class PlotPanel(QWidget):
         for channel_id in list(self._series):
             self.remove_channel(channel_id)
 
+    def dispose(self) -> None:
+        """Paneli kalıcı olarak kapatır: sinyalleri koparır, veriyi bırakır — `F3-034`.
+
+        Kapatılan panel bir daha kullanılmamalıdır. Tüm seriler (ve
+        taşıdıkları `DataChunk` dizileri) bırakılır, pyqtgraph sinyal
+        abonelikleri sökülür ki panel çöp toplanınca geç sinyaller
+        çalışan koda dokunamasın. İki kez çağrılması güvenlidir.
+        """
+        if self._disposed:
+            return
+        self._disposed = True
+        self.clear()
+        self._teardown_right_axis()
+        for signal, slot in (
+            (self.plot.scene().sigMouseMoved, self._on_scene_mouse_moved),
+            (self._region.sigRegionChangeFinished, self._emit_time_region),
+            (self.plot.getViewBox().sigXRangeChanged, self._on_x_range_changed),
+        ):
+            with contextlib.suppress(RuntimeError, TypeError):
+                signal.disconnect(slot)
+        self._styles.clear()
+        self._pre_solo_visibility = None
+
     def _refresh_labels(self) -> None:
         """Başlık ve sol eksen etiketini şu anki seri sayısına göre günceller.
 
@@ -808,7 +835,7 @@ class PlotPanel(QWidget):
             self._suppress_x_broadcast = False
 
     def _on_x_range_changed(self, _view_box: object, x_range: object) -> None:
-        if self._suppress_x_broadcast:
+        if self._suppress_x_broadcast or self._disposed:
             return
         lo, hi = cast("tuple[float, float]", x_range)
         self.x_range_changed.emit(float(lo), float(hi))

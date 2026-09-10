@@ -24,6 +24,10 @@ from sonar_analyzer.ui.plots.x_axis_link import XAxisLink
 WORKSPACE_LAYOUTS: tuple[str, ...] = ("tabs", "split")
 DEFAULT_LAYOUT = "tabs"
 
+#: `F3-034` aynı anda açık tutulabilecek panel üst sınırı. Sınırsız
+#: panel açmak belleği ve X-senkron sinyal trafiğini kontrolsüz büyütür.
+MAX_PANELS = 8
+
 
 class PlotWorkspace(QWidget):
     """Tab/bölünmüş yerleşimde birden çok `PlotPanel` barındıran alan."""
@@ -46,6 +50,11 @@ class PlotWorkspace(QWidget):
     @property
     def count(self) -> int:
         return len(self._panels)
+
+    @property
+    def at_capacity(self) -> bool:
+        """Panel üst sınırına (`MAX_PANELS`) ulaşıldı mı — `F3-034`."""
+        return len(self._panels) >= MAX_PANELS
 
     @property
     def layout_mode(self) -> str:
@@ -84,7 +93,13 @@ class PlotWorkspace(QWidget):
     # -- panel yasam dongusu --------------------------------------
 
     def open_panel(self, title: str | None = None) -> PlotPanel:
-        """Yeni bir `PlotPanel` açar, ortak X bağlantısına katar ve döndürür."""
+        """Yeni bir `PlotPanel` açar, ortak X bağlantısına katar ve döndürür.
+
+        `MAX_PANELS`'a ulaşılmışsa `RuntimeError` — çağıran önce bir panel
+        kapatmalı (`F3-034` kaynak sınırı).
+        """
+        if self.at_capacity:
+            raise RuntimeError(f"Panel limiti asildi (en fazla {MAX_PANELS}).")
         panel = PlotPanel(self)
         name = title or f"Grafik {len(self._panels) + 1}"
         self._titles[id(panel)] = name
@@ -101,6 +116,9 @@ class PlotWorkspace(QWidget):
         self._detach(panel)
         self._panels.remove(panel)
         self._titles.pop(id(panel), None)
+        # F3-034: sinyalleri kopar, taşınan veriyi bırak — geç sinyaller
+        # çalışan koda dokunamasın, bellek serbest kalsın.
+        panel.dispose()
         panel.setParent(None)
         panel.deleteLater()
 

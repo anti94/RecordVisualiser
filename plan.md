@@ -1511,7 +1511,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 | [x] | `F3-031` | `0.133.0` | 15 dk | Seri rengi, çizgi ve marker ayarını ekle | Aynı kanal paneller arasında tutarlı varsayılan renkle açılır | `F3-030` | `feat(plot): F3-031 seri rengi, çizgi ve marker ayarını ekle` |
 | [x] | `F3-032` | `0.134.0` | 20 dk | Paneller arasında X senkronizasyonunu ekle | Bir grafikte gezinme bağlı grafikleri günceller; döngü oluşmaz | `F3-031` | `feat(plot): F3-032 paneller arasında X senkronizasyonunu ekle` |
 | [x] | `F3-033` | `0.135.0` | 20 dk | Grafik tabı ve bölünmüş görünüm ekle | Paneller açılır, bölünür ve bağımsız kapatılır | `F3-032` | `feat(ui): F3-033 grafik tabı ve bölünmüş görünüm ekle` |
-| [ ] | `F3-034` | `0.136.0` | 15 dk | Panel kaynak sınırını ve kapatma temizliğini ekle | Kapanan panelin signal ve sorgu kaynakları serbest kalır | `F3-033` | `perf(ui): F3-034 panel kaynak sınırını ve kapatma temizliğini ekle` |
+| [x] | `F3-034` | `0.136.0` | 15 dk | Panel kaynak sınırını ve kapatma temizliğini ekle | Kapanan panelin signal ve sorgu kaynakları serbest kalır | `F3-033` | `perf(ui): F3-034 panel kaynak sınırını ve kapatma temizliğini ekle` |
 
 ##### Inspector ve istatistik
 
