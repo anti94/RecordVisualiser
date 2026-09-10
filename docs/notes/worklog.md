@@ -217,8 +217,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-079` | 20 dk | 5 dk 4 sn | `439617f` | MVP ekran görüntüsünü ana mockup ile karşılaştır |
 | `F3-080` | 15 dk | 6 dk 33 sn | `40a2f7c` | MVP kabulünü kapat ve major sürümü hazırla |
 | `F4-001` | 20 dk | 3 dk 48 sn | `8ac0bdb` | işlem adımı ve parametre modelini ekle |
+| `F4-002` | 20 dk | 3 dk 40 sn | `b070b05` | sıralı işlem zinciri yürütücüsünü ekle |
 
-**199 commit · olculen toplam 2366 dk 43 sn · olculemeyen 1 (ilk commit)**
+**200 commit · olculen toplam 2370 dk 23 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
