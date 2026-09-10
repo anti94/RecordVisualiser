@@ -260,9 +260,9 @@ def test_three_channels_must_all_share_one_grid(chunks: dict[str, DataChunk]) ->
 def test_aligned_channels_that_merely_differ_in_values_are_fine(
     chunks: dict[str, DataChunk],
 ) -> None:
-    chunks["ch2"] = _chunk("ch2", VALUES_0 * 3)
+    chunks["ch2"] = _chunk("ch2", VALUES_0 * 3.0)
     result = _evaluate("ch0 + ch1 + ch2", chunks)
-    assert np.array_equal(result.values, VALUES_0 + VALUES_1 + VALUES_0 * 3)
+    assert np.array_equal(result.values, VALUES_0 + VALUES_1 + VALUES_0 * 3.0)
 
 
 # --------------------------------------------------------------------------- #

@@ -290,8 +290,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-068` | 20 dk | 7 dk 5 sn | `d990af8` | derivedChannelDefinition modelini ekle |
 | `F4-069` | 20 dk | 6 dk 28 sn | `72d4001` | türetilmiş kanalları repository'ye ekle |
 | `F4-070` | 20 dk | 7 dk 13 sn | `903cff9` | sınırlı aritmetik formül ayrıştırıcısını ekle |
+| `F4-071` | 20 dk | 6 dk 41 sn | `610252d` | formül değerlendirmesini kanal dizilerine bağla |
 
-**272 commit · olculen toplam 2953 dk 52 sn · olculemeyen 1 (ilk commit)**
+**273 commit · olculen toplam 2960 dk 33 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

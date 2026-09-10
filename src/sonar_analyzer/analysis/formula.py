@@ -24,6 +24,7 @@ Saf Python — Qt yok, `GUI olmadan` doğrulanır.
 from __future__ import annotations
 
 import ast
+import math
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from typing import Union, cast
@@ -193,7 +194,16 @@ def _convert(
         value = node.value
         if isinstance(value, bool) or not isinstance(value, (int, float)):
             raise FormulaError(f"Yalnız sayı sabitine izin verilir, verilen: {value!r}")
-        return Literal(value=float(value))
+        try:
+            number = float(value)
+        except OverflowError as exc:
+            # `9`*400 gibi bir tamsayı `float`'a sığmaz; çağıran `FormulaError`
+            # bekler, `OverflowError` değil.
+            raise FormulaError(f"Sayı sabiti çok büyük: {str(value)[:32]}…") from exc
+        if not math.isfinite(number):
+            # `1e400` sessizce `inf` olur ve tüm seriyi zehirlerdi.
+            raise FormulaError(f"Sayı sabiti sonlu olmalı, verilen: {value!r}")
+        return Literal(value=number)
 
     if isinstance(node, ast.UnaryOp):
         symbol = UNARY_OPERATORS.get(type(node.op))
