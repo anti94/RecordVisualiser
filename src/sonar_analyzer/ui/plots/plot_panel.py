@@ -53,6 +53,10 @@ TIME_AXIS_LABEL = "Time"
 TIME_AXIS_UNIT = "s"
 EMPTY_TITLE = "Kanal secilmedi"
 
+#: `F3-022`–`F3-024` yakınlaştırma kipleri: yalnız X, yalnız Y, iki eksen.
+ZOOM_MODES: tuple[str, ...] = ("x", "y", "xy")
+DEFAULT_ZOOM_MODE = "xy"
+
 #: Grid'in gorunurlugu: veri cizgisinden belirgin sekilde daha soluk (plan 6.3).
 GRID_ALPHA = 0.15
 
@@ -109,6 +113,11 @@ class PlotPanel(QWidget):
         view_box = self.plot.getViewBox()
         view_box.setMouseMode(pg.ViewBox.PanMode)
         view_box.setMouseEnabled(x=True, y=True)
+
+        # F3-022–F3-024: yakınlaştırma kipi. "xy" (öntanımlı) iki ekseni
+        # birlikte ölçekler; "x"/"y" yalnız o ekseni — fare tekerleği ve
+        # programatik `zoom()` bu kipe uyar, öteki eksen sabit kalır.
+        self._zoom_mode = DEFAULT_ZOOM_MODE
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -357,6 +366,38 @@ class PlotPanel(QWidget):
         """Görünür zaman aralığı `(x_min, x_max)` saniye."""
         x_min, x_max, _y_min, _y_max = self.visible_range()
         return x_min, x_max
+
+    # -- yakinlastirma kipi (F3-022 / F3-023 / F3-024) ---------------
+
+    @property
+    def zoom_mode(self) -> str:
+        """Etkin yakınlaştırma kipi: `"x"`, `"y"` ya da `"xy"`."""
+        return self._zoom_mode
+
+    def set_zoom_mode(self, mode: str) -> None:
+        """Yakınlaştırma kipini değiştirir — `F3-022`–`F3-024`.
+
+        Kip, hem fare tekerleğini hem programatik `zoom()`'u etkiler:
+        `"x"` kipinde Y ekseni (aralığı ve etkileşimi) dokunulmadan
+        kalır, `"y"` kipinde X. Pan da aynı eksen kısıtına uyar —
+        "yalnız X" gerçekten yalnız X demektir.
+        """
+        if mode not in ZOOM_MODES:
+            raise ValueError(f"Bilinmeyen yakinlastirma kipi: {mode!r}")
+        self._zoom_mode = mode
+        self.plot.getViewBox().setMouseEnabled(x=mode in ("x", "xy"), y=mode in ("y", "xy"))
+
+    def zoom(self, factor: float) -> None:
+        """Görünür aralığı etkin kipin eksen(ler)inde `factor` kadar ölçekler.
+
+        `factor < 1` yakınlaşır (aralık daralır), `factor > 1` uzaklaşır.
+        Ölçekleme görünür alanın merkezine göredir; **veri değişmez**.
+        """
+        if factor <= 0:
+            raise ValueError(f"Olcek pozitif olmali: {factor}")
+        sx = factor if self._zoom_mode in ("x", "xy") else 1.0
+        sy = factor if self._zoom_mode in ("y", "xy") else 1.0
+        self.plot.getViewBox().scaleBy(x=sx, y=sy)
 
     # -- sorgular --------------------------------------------------------
 
