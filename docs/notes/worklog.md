@@ -171,8 +171,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-033` | 20 dk | 3 dk 25 sn | `55a3d63` | grafik tabı ve bölünmüş görünüm ekle |
 | `F3-034` | 15 dk | 3 dk 45 sn | `c95570c` | panel kaynak sınırını ve kapatma temizliğini ekle |
 | `F3-035` | 15 dk | 2 dk 25 sn | `6cbb983` | seçili kanal metadata'sını Inspector'a bağla |
+| `F3-036` | 20 dk | 3 dk 43 sn | `3865c71` | Inspector görünüm ayarlarını grafiğe bağla |
 
-**153 commit · olculen toplam 2092 dk 23 sn · olculemeyen 1 (ilk commit)**
+**154 commit · olculen toplam 2096 dk 6 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
