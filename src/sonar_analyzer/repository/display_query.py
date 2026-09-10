@@ -1,4 +1,10 @@
-"""Viewport için özet seviyesi seçimi; tam analiz sorguları özet kullanmaz."""
+"""Viewport için özet seviyesi seçimi; tam analiz sorguları özet kullanmaz.
+
+`F4-059`: üretilen pencere özetleri **bellek sınırlı bir LRU önbellekte**
+tutulur. Kullanıcı ileri geri gezindikçe daha önce çözülmüş pencereler
+yeniden decode edilmez; bütçe aşılınca en az kullanılan pencere çıkar ve
+ölçülen kullanım `cache_stats()` ile raporlanır.
+"""
 
 from __future__ import annotations
 
@@ -10,6 +16,11 @@ from sonar_analyzer.analysis.downsampling import downsample_chunk, extrema_indic
 from sonar_analyzer.domain.data_chunk import DataChunk
 from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.io.index.summary_pyramid import SummaryLevel, build_summary_pyramid
+from sonar_analyzer.repository.memory_cache import (
+    DEFAULT_MAX_BYTES,
+    CacheStats,
+    MemoryBoundedCache,
+)
 
 
 class ViewportSummary:
@@ -77,29 +88,47 @@ class ViewportSummary:
 
 
 class DisplayQuery:
-    """Son çizim penceresini tutar; içindeki pan/zoom sorguları tekrar decode edilmez."""
+    """Çizilen pencereleri tutar; içlerindeki pan/zoom sorguları tekrar decode edilmez.
 
-    def __init__(self, read: Callable[[str, TimeRange], DataChunk]) -> None:
+    Pencereler `F4-059` bellek sınırlı LRU önbelleğinde saklanır: bütçe
+    aşılınca en az kullanılan pencere çıkar, ölçülen kullanım
+    `cache_stats()` ile raporlanır.
+    """
+
+    def __init__(
+        self,
+        read: Callable[[str, TimeRange], DataChunk],
+        *,
+        max_bytes: int = DEFAULT_MAX_BYTES,
+    ) -> None:
         self._read = read
-        self._cached: tuple[str, TimeRange, ViewportSummary] | None = None
+        self._cache: MemoryBoundedCache[tuple[str, int, int], ViewportSummary] = MemoryBoundedCache(
+            max_bytes
+        )
 
     def clear(self) -> None:
-        self._cached = None
+        self._cache.clear()
+
+    def cache_stats(self) -> CacheStats:
+        """Önbelleğin ölçülen kullanımı ve sayaçları — `F4-059`."""
+        return self._cache.stats()
+
+    def _covering(self, channel_id: str, span: TimeRange) -> ViewportSummary | None:
+        """`span`'i **kapsayan** saklı bir pencere varsa onu döndürür."""
+        for key in reversed(self._cache.keys()):  # en yeniden en eskiye
+            cached_channel, start_ns, end_ns = key
+            if cached_channel == channel_id and start_ns <= span.start_ns and end_ns >= span.end_ns:
+                return self._cache.get(key)
+        self._cache.get((channel_id, span.start_ns, span.end_ns))  # ıska sayılsın
+        return None
 
     def query(self, channel_id: str, span: TimeRange, max_points: int | None) -> DataChunk:
         if max_points is None:
             return self._read(channel_id, span)
         # Boş/saklanmış sorgularda da aynı bütçe doğrulaması uygulanır.
         downsample_chunk(DataChunk.empty(channel_id), max_points)
-        cached = self._cached
-        if (
-            cached is None
-            or cached[0] != channel_id
-            or cached[1].start_ns > span.start_ns
-            or cached[1].end_ns < span.end_ns
-        ):
+        summary = self._covering(channel_id, span)
+        if summary is None:
             summary = ViewportSummary(self._read(channel_id, span))
-            self._cached = (channel_id, span, summary)
-        else:
-            summary = cached[2]
+            self._cache.put((channel_id, span.start_ns, span.end_ns), summary)
         return summary.query(span, max_points)

@@ -53,3 +53,27 @@ def test_contained_display_queries_reuse_summary_but_analysis_reads_full_data() 
     query.clear()
     query.query("a", TimeRange(100, 1000), 100)
     assert len(calls) == 3
+
+
+def test_real_summaries_evict_and_oversize_windows_are_not_retained() -> None:
+    calls: list[str] = []
+
+    def read(channel_id: str, span: TimeRange) -> DataChunk:
+        calls.append(channel_id)
+        times = np.arange(span.start_ns, span.end_ns, dtype=np.int64)
+        return DataChunk(channel_id, times, np.sin(times))
+
+    span = TimeRange(0, 1000)
+    measured = ViewportSummary(read("a", span)).nbytes
+    query = DisplayQuery(read, max_bytes=2 * measured)
+    calls.clear()
+    for channel in ("a", "b", "a", "c", "b"):
+        query.query(channel, span, 100)
+        assert query.cache_stats().used_bytes <= 2 * measured
+    assert calls == ["a", "b", "c", "b"]
+    assert query.cache_stats().evictions == 2
+    query.query("large", TimeRange(0, 10_000), 100)
+    assert query.cache_stats().rejections == 1
+    assert query.cache_stats().entries == 2
+    query.clear()
+    assert query.cache_stats().used_bytes == 0

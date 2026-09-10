@@ -274,8 +274,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-056` | 20 dk | 2 dk 50 sn | `2d10f87` | dar darbeleri koruyan min/max azaltımı ekle |
 | `F4-056` | 20 dk | 1 dk 42 sn | `c99e482` | bütçe doğrulaması ve kalite tiplerini netleştir |
 | `F4-057` | 20 dk | 55 sn | `f4142eb` | çok seviyeli min/max özet blokları üret |
+| `F4-058` | 20 dk | 18 dk 25 sn | `b584eea` | viewport için uygun özet seviyesini seç |
 
-**256 commit · olculen toplam 2720 dk 23 sn · olculemeyen 1 (ilk commit)**
+**257 commit · olculen toplam 2738 dk 48 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
