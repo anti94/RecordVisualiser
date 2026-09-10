@@ -47,6 +47,7 @@ class StepKind(str, Enum):
     WINDOWED_RMS = "windowed_rms"  # kayan pencere RMS'i — `F4-021`
     ENVELOPE = "envelope"  # kayan pencere tepe-tutma zarfı — `F4-021`
     PHASE_UNWRAP = "phase_unwrap"  # faz sıçramalarını sürekliliğe çevir — `F4-023`
+    RESAMPLE = "resample"  # Fourier yöntemiyle yeniden örnekle / desime et — `F4-025`
 
 
 #: `window` parametresi taşıyan ve `1 <= window <= MAX_MOVING_AVERAGE_WINDOW`
@@ -126,6 +127,10 @@ PARAMETER_SPECS: dict[StepKind, tuple[ParamSpec, ...]] = {
         ParamSpec("unit", str, "radians", choices=PHASE_UNWRAP_UNITS),
         ParamSpec("discontinuity", float, math.pi),
     ),
+    StepKind.RESAMPLE: (
+        ParamSpec("source_rate_hz", float, 48_000.0),
+        ParamSpec("target_rate_hz", float, 24_000.0),
+    ),
 }
 
 
@@ -175,6 +180,11 @@ class ProcessingStep:
                     f"phase_unwrap: discontinuity < tam periyot ({period:.6g} {unit}) olmalı; "
                     f"verilen {discontinuity:.6g}"
                 )
+        if self.kind is StepKind.RESAMPLE:
+            for name in ("source_rate_hz", "target_rate_hz"):
+                rate = cast("float", resolved[name])
+                if rate <= 0.0 or not math.isfinite(rate):
+                    raise StepValidationError(f"resample: {name} pozitif olmalı; verilen {rate}")
         # frozen dataclass: normalize edilmiş parametreleri geri yaz.
         object.__setattr__(self, "parameters", resolved)
 

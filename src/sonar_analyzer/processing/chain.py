@@ -24,6 +24,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from sonar_analyzer.domain.data_chunk import Quality
+from sonar_analyzer.processing.resampling import resample_to_rate
 from sonar_analyzer.processing.steps import (
     PHASE_UNWRAP_PERIOD,
     ProcessingStep,
@@ -192,6 +193,12 @@ def apply_step(values: Samples, step: ProcessingStep) -> Samples:
             data,
             str(params["unit"]),
             float(params["discontinuity"]),  # type: ignore[arg-type]
+        )
+    if step.kind is StepKind.RESAMPLE:
+        return resample_to_rate(
+            data,
+            float(params["source_rate_hz"]),  # type: ignore[arg-type]
+            float(params["target_rate_hz"]),  # type: ignore[arg-type]
         )
     if step.kind is StepKind.DETREND:
         return _detrend(data, str(params["mode"]))
