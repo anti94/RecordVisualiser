@@ -24,7 +24,11 @@ import numpy as np
 from numpy.typing import NDArray
 
 from sonar_analyzer.domain.data_chunk import Quality
-from sonar_analyzer.processing.steps import ProcessingStep, StepKind
+from sonar_analyzer.processing.steps import (
+    PHASE_UNWRAP_PERIOD,
+    ProcessingStep,
+    StepKind,
+)
 from sonar_analyzer.processing.windowing import (
     moving_average,
     windowed_envelope,
@@ -147,6 +151,24 @@ def _normalize(values: Samples, mode: str, reference: float) -> Samples:
     return values * (reference / norm)
 
 
+def _phase_unwrap(values: Samples, unit: str, discontinuity: float) -> Samples:
+    """Faz dizisindeki tam-periyot sıçramalarını sürekliliğe çevirir — `F4-023`.
+
+    Ardışık iki örnek arasındaki fark ``discontinuity``'yi aşarsa aradaki
+    fark tam periyot katları eklenip/çıkarılıp ``(-period/2, period/2]``
+    aralığına çekilir (``numpy.unwrap``). ``unit`` = ``radians``
+    (periyot ``2π``) ya da ``degrees`` (periyot ``360``).
+
+    Faz unwrap **kümülatiftir**: bir ``NaN``'dan sonrası tanımsızdır ve
+    ``NaN`` olur; ``NaN``'dan önceki örnekler etkilenmez.
+    """
+    period = PHASE_UNWRAP_PERIOD.get(unit)
+    if period is None:  # pragma: no cover - `ProcessingStep` doğrulaması engeller
+        raise ChainExecutionError(f"Bilinmeyen faz birimi: {unit!r}")
+    unwrapped = np.unwrap(values, discont=discontinuity, period=period)
+    return np.asarray(unwrapped, dtype=np.float64)
+
+
 def apply_step(values: Samples, step: ProcessingStep) -> Samples:
     """Tek bir adımı uygular; **her zaman yeni** bir `float64` dizi döndürür."""
     data = _as_float64(values)
@@ -165,6 +187,12 @@ def apply_step(values: Samples, step: ProcessingStep) -> Samples:
         return windowed_rms(data, int(params["window"]))  # type: ignore[arg-type]
     if step.kind is StepKind.ENVELOPE:
         return windowed_envelope(data, int(params["window"]))  # type: ignore[arg-type]
+    if step.kind is StepKind.PHASE_UNWRAP:
+        return _phase_unwrap(
+            data,
+            str(params["unit"]),
+            float(params["discontinuity"]),  # type: ignore[arg-type]
+        )
     if step.kind is StepKind.DETREND:
         return _detrend(data, str(params["mode"]))
     if step.kind is StepKind.NORMALIZE:

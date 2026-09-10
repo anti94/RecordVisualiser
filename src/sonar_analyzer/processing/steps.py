@@ -22,6 +22,7 @@ sessizce varsayılana düşülmez.
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import cast
@@ -45,6 +46,7 @@ class StepKind(str, Enum):
     NORMALIZE = "normalize"  # sinyali referans genliğe ölçekle — `F4-019`
     WINDOWED_RMS = "windowed_rms"  # kayan pencere RMS'i — `F4-021`
     ENVELOPE = "envelope"  # kayan pencere tepe-tutma zarfı — `F4-021`
+    PHASE_UNWRAP = "phase_unwrap"  # faz sıçramalarını sürekliliğe çevir — `F4-023`
 
 
 #: `window` parametresi taşıyan ve `1 <= window <= MAX_MOVING_AVERAGE_WINDOW`
@@ -62,6 +64,15 @@ DETREND_MODES: tuple[str, ...] = ("constant", "linear")
 #: `NORMALIZE` adımının `mode` parametresi için geçerli değerler.
 #: `peak` = |x| tepesini `reference`'a getir; `rms` = RMS'i `reference`'a getir.
 NORMALIZE_MODES: tuple[str, ...] = ("peak", "rms")
+
+#: `PHASE_UNWRAP` adımının `unit` parametresi için geçerli değerler ve
+#: her birinin tam periyodu (bir sarım). `discontinuity` bu periyottan
+#: küçük olmalıdır.
+PHASE_UNWRAP_UNITS: tuple[str, ...] = ("radians", "degrees")
+PHASE_UNWRAP_PERIOD: dict[str, float] = {
+    "radians": 2.0 * math.pi,
+    "degrees": 360.0,
+}
 
 
 @dataclass(frozen=True)
@@ -111,6 +122,10 @@ PARAMETER_SPECS: dict[StepKind, tuple[ParamSpec, ...]] = {
     ),
     StepKind.WINDOWED_RMS: (ParamSpec("window", int, 5),),
     StepKind.ENVELOPE: (ParamSpec("window", int, 5),),
+    StepKind.PHASE_UNWRAP: (
+        ParamSpec("unit", str, "radians", choices=PHASE_UNWRAP_UNITS),
+        ParamSpec("discontinuity", float, math.pi),
+    ),
 }
 
 
@@ -149,6 +164,17 @@ class ProcessingStep:
                 )
         if self.kind is StepKind.NORMALIZE and cast("float", resolved["reference"]) <= 0.0:
             raise StepValidationError("normalize: reference > 0 olmalı")
+        if self.kind is StepKind.PHASE_UNWRAP:
+            unit = cast("str", resolved["unit"])
+            discontinuity = cast("float", resolved["discontinuity"])
+            period = PHASE_UNWRAP_PERIOD[unit]
+            if discontinuity <= 0.0:
+                raise StepValidationError("phase_unwrap: discontinuity > 0 olmalı")
+            if discontinuity >= period:
+                raise StepValidationError(
+                    f"phase_unwrap: discontinuity < tam periyot ({period:.6g} {unit}) olmalı; "
+                    f"verilen {discontinuity:.6g}"
+                )
         # frozen dataclass: normalize edilmiş parametreleri geri yaz.
         object.__setattr__(self, "parameters", resolved)
 
