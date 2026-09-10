@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 157 tamamlandı · 335 kaldı**
+**Toplam 492 madde · 158 tamamlandı · 334 kaldı**
 
-`[########................]` %31.9
+`[########................]` %32.1
 
 ## Özet
 
@@ -37,12 +37,12 @@ Work in fully autonomous mode.
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
-| Faz 3 — MVP analiz arayüzü | 55 | 25 | 80 |
+| Faz 3 — MVP analiz arayüzü | 56 | 24 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **157** | **335** | **492** |
+| **Toplam** | **158** | **334** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -163,7 +163,7 @@ Work in fully autonomous mode.
 | [x] | `F2-040` | `0.101.0` | 20 dk | Kaynak dosyanın değişmediğini doğrula |
 | [x] | `F2-041` | `0.102.0` | 15 dk | Parser milestone kabulünü kaydet |
 
-### Faz 3 — MVP analiz arayüzü (55/80)
+### Faz 3 — MVP analiz arayüzü (56/80)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -222,7 +222,7 @@ Work in fully autonomous mode.
 | [x] | `F3-053` | `0.155.0` | 15 dk | Yükleme ve analiz mesajlarını alt loga bağla |
 | [x] | `F3-054` | `0.156.0` | 20 dk | Kayıt geneli Timeline özetini çiz |
 | [x] | `F3-055` | `0.157.0` | 20 dk | Timeline viewport seçimini grafiğe bağla |
-| [ ] | `F3-056` | `0.158.0` | 20 dk | Play, pause ve stop durum makinesini ekle |
+| [x] | `F3-056` | `0.158.0` | 20 dk | Play, pause ve stop durum makinesini ekle |
 | [ ] | `F3-057` | `0.159.0` | 20 dk | Kayıt zamanına göre ilerleme saatini ekle |
 | [ ] | `F3-058` | `0.160.0` | 15 dk | Oynatma hızlarını bağla |
 | [ ] | `F3-059` | `0.161.0` | 20 dk | Zamana ve önceki/sonraki olaya gitmeyi ekle |

@@ -27,6 +27,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from sonar_analyzer.application.playback_state import PlaybackMachine
 from sonar_analyzer.domain.event import Event
 from sonar_analyzer.domain.time_range import NS_PER_SECOND, TimeRange
 from sonar_analyzer.ui.docks.timeline_overview import TimelineOverview
@@ -76,7 +77,8 @@ class PlaybackDock(QDockWidget):
 
         self.buttons: dict[str, QPushButton] = {}
         self._duration_s = 0.0
-        self._is_playing = False
+        #: F3-056: saf oynatma durum makinesi (play/pause/stop).
+        self.machine = PlaybackMachine(0.0)
         self._updating = False
 
         self.setWidget(self._build_body())
@@ -111,7 +113,7 @@ class PlaybackDock(QDockWidget):
         self.buttons["button_play"].setCheckable(True)
         self.buttons["button_play"].toggled.connect(self._on_play_toggled)
         self.buttons["button_loop"].setCheckable(True)
-        self.buttons["button_skip_start"].clicked.connect(lambda: self.set_position(0.0))
+        self.buttons["button_skip_start"].clicked.connect(self._on_stop)
         self.buttons["button_skip_end"].clicked.connect(lambda: self.set_position(self._duration_s))
 
         self.slider = QSlider(Qt.Orientation.Horizontal, body)
@@ -153,6 +155,8 @@ class PlaybackDock(QDockWidget):
     def set_duration(self, duration_s: float) -> None:
         """Kayıt süresini uygular; kaydırıcı ve alan sınırlarını günceller."""
         self._duration_s = max(0.0, duration_s)
+        self.machine.stop()
+        self.machine.set_duration(self._duration_s)
 
         self._updating = True
         self.slider.setRange(0, round(self._duration_s * SLIDER_STEPS_PER_SECOND))
@@ -191,11 +195,12 @@ class PlaybackDock(QDockWidget):
     def set_position(self, seconds: float) -> None:
         """İmleci taşır; sınırların dışına çıkmaz."""
         clamped = min(max(0.0, seconds), self._duration_s)
+        self.machine.seek(clamped)
         self.slider.setValue(round(clamped * SLIDER_STEPS_PER_SECOND))
 
     @property
     def is_playing(self) -> bool:
-        return self._is_playing
+        return self.machine.is_playing
 
     def time_text(self) -> str:
         return self.time_label.text()
@@ -203,9 +208,22 @@ class PlaybackDock(QDockWidget):
     # -- olaylar ---------------------------------------------------------
 
     def _on_play_toggled(self, checked: bool) -> None:
-        self._is_playing = checked
-        self.buttons["button_play"].setText("||" if checked else ">")
-        self.play_toggled.emit(checked)
+        if checked:
+            self.machine.play()
+        else:
+            self.machine.pause()
+        self.buttons["button_play"].setText("||" if self.machine.is_playing else ">")
+        self.play_toggled.emit(self.machine.is_playing)
+
+    def _on_stop(self) -> None:
+        """`|<` — durdurur ve imleci başa döndürür — `F3-056`."""
+        self.machine.stop()
+        play_button = self.buttons["button_play"]
+        if play_button.isChecked():
+            play_button.setChecked(False)  # _on_play_toggled(False) tetikler
+        else:
+            play_button.setText(">")
+        self.set_position(0.0)
 
     def _on_slider_moved(self, value: int) -> None:
         self._refresh_label()
