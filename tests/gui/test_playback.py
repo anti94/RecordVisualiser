@@ -71,7 +71,19 @@ def test_strip_has_stable_object_name(window: MainWindow) -> None:
 
 def test_transport_buttons_exist_in_mockup_order(strip: PlaybackDock) -> None:
     assert list(strip.buttons) == [name for name, _, _ in TRANSPORT_BUTTONS]
-    assert len(TRANSPORT_BUTTONS) == 5
+    # Mockup'ın 5 taşıma düğmesi + F3-059 ile eklenen 2 komşu-olay düğmesi.
+    mockup_order = [
+        "button_skip_start",
+        "button_play",
+        "button_loop",
+        "button_forward",
+        "button_skip_end",
+    ]
+    assert [name for name, _, _ in TRANSPORT_BUTTONS][:5] == mockup_order
+    assert [name for name, _, _ in TRANSPORT_BUTTONS][5:] == [
+        "button_prev_event",
+        "button_next_event",
+    ]
 
 
 def test_controls_are_disabled_without_a_recording(qtbot: QtBot) -> None:

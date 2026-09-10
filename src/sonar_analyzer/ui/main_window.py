@@ -182,6 +182,10 @@ class MainWindow(QMainWindow):
 
         self.playback_dock.position_changed.connect(self.status.set_cursor_time)
         self.playback_dock.timeline.viewport_changed.connect(self._on_timeline_viewport_changed)
+        # F3-059: önceki/sonraki olaya atlayınca grafiği o zamana götür ve
+        # olayı Inspector'da göster.
+        self.playback_dock.event_navigated.connect(self._on_event_activated)
+        self.playback_dock.event_navigated.connect(self._on_event_selected)
 
     # -- eylemler --------------------------------------------------------
 

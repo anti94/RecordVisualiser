@@ -28,6 +28,11 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from sonar_analyzer.application.event_navigation import (
+    clamp_time_ns,
+    next_event,
+    previous_event,
+)
 from sonar_analyzer.application.playback_state import PlaybackMachine
 from sonar_analyzer.domain.event import Event
 from sonar_analyzer.domain.time_range import NS_PER_SECOND, RECORD_PERIOD_NS, TimeRange
@@ -52,13 +57,16 @@ DOCK_TITLE = "Playback / Time Control"
 #: Kaydiriciyi tamsayi tutmak icin kullanilan cozunurluk (1 adim = 1 ms).
 SLIDER_STEPS_PER_SECOND = 1000
 
-#: (nesne adi, etiket, ipucu) — mockup sirasiyla.
+#: (nesne adi, etiket, ipucu) — mockup sirasiyla; sondaki iki dugme
+#: `F3-059` ile eklendi (komsu olaya atla).
 TRANSPORT_BUTTONS: tuple[tuple[str, str, str], ...] = (
     ("button_skip_start", "|<", "Basa sar"),
     ("button_play", ">", "Oynat / duraklat"),
     ("button_loop", "O", "Secili araligi dongude oynat"),
     ("button_forward", ">>", "Ileri sar"),
     ("button_skip_end", ">|", "Sona git"),
+    ("button_prev_event", "‹E", "Onceki olaya git"),
+    ("button_next_event", "E›", "Sonraki olaya git"),
 )
 
 
@@ -81,6 +89,8 @@ class PlaybackDock(QDockWidget):
     range_requested = Signal(float, float)
     #: `F3-058` oynatma hızı çarpanı değişti.
     speed_changed = Signal(float)
+    #: `F3-059` komşu olaya atlandı; yük = hedef `Event`.
+    event_navigated = Signal(object)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(DOCK_TITLE, parent)
@@ -93,6 +103,10 @@ class PlaybackDock(QDockWidget):
 
         self.buttons: dict[str, QPushButton] = {}
         self._duration_s = 0.0
+        #: F3-059: kayıt başlangıcının kanonik ns'si (olay zamanları mutlaktır).
+        self._recording_start_ns = 0
+        #: F3-059: komşu olaya atlamada kullanılan olaylar (zaman sırasız olabilir).
+        self._events: list[Event] = []
         #: F3-056: saf oynatma durum makinesi (play/pause/stop).
         self.machine = PlaybackMachine(0.0)
         #: F3-057: PLAYING iken makineyi kayıt zamanına göre ilerleten saat.
@@ -134,6 +148,9 @@ class PlaybackDock(QDockWidget):
         self.buttons["button_loop"].setCheckable(True)
         self.buttons["button_skip_start"].clicked.connect(self._on_stop)
         self.buttons["button_skip_end"].clicked.connect(lambda: self.set_position(self._duration_s))
+        # F3-059: komşu olaya atla.
+        self.buttons["button_prev_event"].clicked.connect(lambda: self.goto_previous_event())
+        self.buttons["button_next_event"].clicked.connect(lambda: self.goto_next_event())
 
         # F3-058: oynatma hızı seçici (0.25x–10x).
         self.speed_selector = QComboBox(body)
@@ -210,11 +227,16 @@ class PlaybackDock(QDockWidget):
 
     def set_recording_range(self, time_range: TimeRange) -> None:
         """Kayıt aralığından süreyi türetir ve overview timeline'ı besler."""
+        self._recording_start_ns = time_range.start_ns
         self.set_duration(time_range.duration_ns / NS_PER_SECOND)
         self.timeline.set_recording(time_range)
 
     def set_events(self, events: Sequence[Event]) -> None:
-        """Overview timeline'ın olay yoğunluğunu günceller — `F3-054`."""
+        """Overview timeline'ın olay yoğunluğunu ve komşu-olay atlamasını besler.
+
+        `F3-054` yoğunluk şeridi + `F3-059` önceki/sonraki olay.
+        """
+        self._events = list(events)
         self.timeline.set_events(events)
 
     @property
@@ -232,6 +254,42 @@ class PlaybackDock(QDockWidget):
         # ardından makine aynı konuma aranır (F3-057 sınır indeksi için).
         self.slider.setValue(round(clamped * SLIDER_STEPS_PER_SECOND))
         self.machine.seek(clamped)
+
+    # -- gezinme (F3-059) ----------------------------------------------
+
+    def _current_abs_ns(self) -> int:
+        """İmlecin kanonik (mutlak) ns konumu."""
+        return self._recording_start_ns + round(self.position_s * NS_PER_SECOND)
+
+    def _abs_to_position_s(self, abs_ns: int) -> float:
+        return (abs_ns - self._recording_start_ns) / NS_PER_SECOND
+
+    def goto_time_ns(self, abs_ns: int) -> None:
+        """İmleci kanonik bir zamana taşır; sınır dışı zaman **güvenle** kenetlenir.
+
+        `F3-059` — kabul: sınır dışı zaman güvenli sınırlanır.
+        """
+        end_ns = self._recording_start_ns + round(self._duration_s * NS_PER_SECOND)
+        safe_ns = clamp_time_ns(abs_ns, self._recording_start_ns, end_ns)
+        self.set_position(self._abs_to_position_s(safe_ns))
+
+    def goto_previous_event(self) -> bool:
+        """İmleçten **kesin olarak önceki** olaya atlar; yoksa `False` — `F3-059`."""
+        target = previous_event(self._events, self._current_abs_ns())
+        if target is None:
+            return False
+        self.set_position(self._abs_to_position_s(target.timestamp_ns))
+        self.event_navigated.emit(target)
+        return True
+
+    def goto_next_event(self) -> bool:
+        """İmleçten **kesin olarak sonraki** olaya atlar; yoksa `False` — `F3-059`."""
+        target = next_event(self._events, self._current_abs_ns())
+        if target is None:
+            return False
+        self.set_position(self._abs_to_position_s(target.timestamp_ns))
+        self.event_navigated.emit(target)
+        return True
 
     @property
     def is_playing(self) -> bool:

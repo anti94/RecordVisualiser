@@ -193,8 +193,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-055` | 20 dk | 4 dk 30 sn | `adef90e` | timeline viewport seçimini grafiğe bağla |
 | `F3-056` | 20 dk | 4 dk 0 sn | `ad13fd0` | play, pause ve stop durum makinesini ekle |
 | `F3-057` | 20 dk | 5 dk 8 sn | `b6f209b` | kayıt zamanına göre ilerleme saatini ekle |
+| `F3-058` | 15 dk | 9 dk 20 sn | `22e4fb9` | oynatma hızlarını bağla |
 
-**175 commit · olculen toplam 2180 dk 33 sn · olculemeyen 1 (ilk commit)**
+**176 commit · olculen toplam 2189 dk 53 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
