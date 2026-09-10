@@ -16,13 +16,21 @@ import ctypes
 import sys
 from dataclasses import dataclass
 
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QMouseEvent
 from PySide6.QtWidgets import (
     QLabel,
     QProgressBar,
     QPushButton,
     QStatusBar,
     QWidget,
+)
+
+from sonar_analyzer.application.time_display import (
+    MODE_LABEL,
+    TimeDisplayMode,
+    format_instant,
+    next_mode,
 )
 
 EMPTY_VALUE = "—"
@@ -126,22 +134,47 @@ def read_memory_usage() -> MemoryUsage | None:
         return None
 
 
+class ClickableLabel(QLabel):
+    """Sol tıklamada sinyal yayan etiket (imleç zamanı kipini döndürmek için)."""
+
+    clicked = Signal()
+
+    def mousePressEvent(self, ev: QMouseEvent) -> None:  # Qt override
+        if ev.button() == Qt.MouseButton.LeftButton:
+            self.clicked.emit()
+            ev.accept()
+            return
+        super().mousePressEvent(ev)
+
+
 class AppStatusBar(QStatusBar):
     """Mockup alt şeridi."""
 
     #: Kullanıcı yükleme iptalini istedi (`F3-003`).
     cancel_requested = Signal()
+    #: `F3-061` imleç zamanı gösterim kipi değişti.
+    cursor_time_mode_changed = Signal(object)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.setObjectName("status_bar")
 
+        self.cursor_time_label = ClickableLabel(EMPTY_VALUE, self)
+
         self._fields: dict[str, QLabel] = {}
         for name, default in FIELD_SPECS:
-            label = QLabel(default, self)
+            label: QLabel = self.cursor_time_label if name == "cursor" else QLabel(default, self)
+            label.setText(default)
             label.setObjectName(f"status_{name}")
             self._fields[name] = label
             self.addWidget(label)
+
+        # F3-061: imleç anı üç görünüm arasında tıklamayla döner.
+        self._cursor_mode = TimeDisplayMode.ELAPSED
+        self._cursor_seconds: float | None = None
+        self._time_origin_ns: int | None = None
+        self.cursor_time_label.setToolTip("Tikla: UTC / yerel / gecen sure")
+        self.cursor_time_label.clicked.connect(self.cycle_cursor_time_mode)
 
         self.memory_label = QLabel(EMPTY_VALUE, self)
         self.memory_label.setObjectName("status_memory")
@@ -196,9 +229,52 @@ class AppStatusBar(QStatusBar):
         """Sol taraftaki işlem durumu (`Ready`, `Parsing…`, `Indexing…`)."""
         self.set_field("status", text or READY_TEXT)
 
+    def set_time_origin(self, start_ns: int | None) -> None:
+        """Kayıt başlangıcının kanonik anı — UTC/yerel görünümler bunu kullanır."""
+        self._time_origin_ns = start_ns
+        self._render_cursor()
+
     def set_cursor_time(self, seconds: float | None) -> None:
-        """İmlecin bulunduğu an; `None` ise alan boşalır."""
-        self.set_field("cursor", EMPTY_VALUE if seconds is None else f"t = {seconds:.3f} s")
+        """İmlecin kayıt başından bu yana geçen süresi; `None` ise alan boşalır."""
+        self._cursor_seconds = seconds
+        self._render_cursor()
+
+    @property
+    def cursor_time_mode(self) -> TimeDisplayMode:
+        return self._cursor_mode
+
+    def cycle_cursor_time_mode(self) -> TimeDisplayMode:
+        """İmleç zamanı görünümünü döndürür (elapsed -> UTC -> local -> ...)."""
+        self._cursor_mode = next_mode(self._cursor_mode)
+        self._render_cursor()
+        self.cursor_time_mode_changed.emit(self._cursor_mode)
+        return self._cursor_mode
+
+    def _render_cursor(self) -> None:
+        """`cursor` alanını mevcut kip ve ana göre yeniden çizer — `F3-061`."""
+        seconds = self._cursor_seconds
+        if seconds is None:
+            self.set_field("cursor", EMPTY_VALUE)
+            return
+        elapsed_ns = round(seconds * 1_000_000_000)
+        mode = self._cursor_mode
+        origin = self._time_origin_ns
+        if mode is not TimeDisplayMode.ELAPSED and origin is None:
+            # Mutlak an bilinmiyor: geçen süreye düş, ama kip seçimi korunur.
+            self.set_field(
+                "cursor",
+                format_instant(elapsed_ns, TimeDisplayMode.ELAPSED, start_ns=0),
+            )
+            return
+        timestamp_ns = elapsed_ns + (origin or 0)
+        self.set_field(
+            "cursor",
+            format_instant(timestamp_ns, mode, start_ns=origin or 0),
+        )
+
+    def cursor_time_mode_label(self) -> str:
+        """Mevcut kipin kısa adı — ipuçları / testler için."""
+        return MODE_LABEL[self._cursor_mode]
 
     # -- yukleme ilerlemesi (F3-003) --------------------------------------
 

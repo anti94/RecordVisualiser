@@ -914,6 +914,8 @@ class MainWindow(QMainWindow):
         self.dashboard.statistics.clear()
         self.show_empty_state()
         self.playback_dock.set_recording_range(metadata.time_range)
+        # F3-061: imleç zamanının UTC/yerel görünümü için kanonik köken.
+        self.status.set_time_origin(metadata.time_range.start_ns)
         self.status.set_field("file", metadata.source_path)
         self.status.set_field(
             "connection",
@@ -996,6 +998,8 @@ class MainWindow(QMainWindow):
         self._view_history.clear()
         self._scrub_timer.stop()
         self._scrub_debouncer.cancel()
+        self.status.set_time_origin(None)
+        self.status.set_cursor_time(None)
         self.dashboard.statistics.clear()
         self.bottom_dock.clear_events()
         self.show_empty_state()

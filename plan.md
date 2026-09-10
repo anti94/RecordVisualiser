@@ -1553,7 +1553,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 | [x] | `F3-058` | `0.160.0` | 15 dk | Oynatma hızlarını bağla | 0.25x–10x seçenekleri kayıt zamanı ilerlemesini ölçekler | `F3-057` | `feat(playback): F3-058 oynatma hızlarını bağla` |
 | [x] | `F3-059` | `0.161.0` | 20 dk | Zamana ve önceki/sonraki olaya gitmeyi ekle | Sınır dışı zaman güvenli sınırlanır; olay sırası korunur | `F3-058` | `feat(playback): F3-059 zamana ve önceki/sonraki olaya gitmeyi ekle` |
 | [x] | `F3-060` | `0.162.0` | 20 dk | Scrubbing sorgularını debounce et | Hızlı sürüklemede son konum çizilir; eski sorgu görünümü ezmez | `F3-059` | `perf(ui): F3-060 scrubbing sorgularını debounce et` |
-| [ ] | `F3-061` | `0.163.0` | 15 dk | UTC, yerel ve geçen süre gösterimini ekle | Üç görünüm aynı kanonik anı temsil eder | `F3-060` | `feat(ui): F3-061 uTC, yerel ve geçen süre gösterimini ekle` |
+| [x] | `F3-061` | `0.163.0` | 15 dk | UTC, yerel ve geçen süre gösterimini ekle | Üç görünüm aynı kanonik anı temsil eder | `F3-060` | `feat(ui): F3-061 uTC, yerel ve geçen süre gösterimini ekle` |
 
 ##### Dışa aktarma ve workspace
 
