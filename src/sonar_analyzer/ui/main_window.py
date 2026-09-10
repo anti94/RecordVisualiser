@@ -29,7 +29,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from sonar_analyzer.application import recent_files
+from sonar_analyzer.application import favorite_groups, recent_files
 from sonar_analyzer.application.file_loader import (
     FileLoadResult,
     FileLoadService,
@@ -49,7 +49,7 @@ from sonar_analyzer.ui.actions import (
     build_action,
 )
 from sonar_analyzer.ui.docks.bottom_panel import BottomPanelDock
-from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock
+from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock, selected_channel_ids
 from sonar_analyzer.ui.docks.playback import PlaybackDock
 from sonar_analyzer.ui.docks.right_column import RightColumnDock
 from sonar_analyzer.ui.empty_state import EmptyStatePanel
@@ -497,6 +497,65 @@ class MainWindow(QMainWindow):
     def open_recent(self, path: Path) -> None:
         """Son dosyalar listesinden bir kaydı açar — seçiciyle aynı yolu izler."""
         self._on_load_requested([str(path)])
+
+    # -- favori kanal gruplari (F3-017) --------------------------------
+
+    @property
+    def favorite_group_names(self) -> tuple[str, ...]:
+        """Kayıtlı favori grup adları, saklanma sırasıyla."""
+        return tuple(favorite_groups.names(self._settings.favorite_groups))
+
+    def save_favorite_group(self, name: str, channel_ids: Sequence[str] | None = None) -> None:
+        """Bir kanal kümesini adlandırılmış favori grup olarak kalıcı kaydeder — `F3-017`.
+
+        `channel_ids` verilmezse önce Channels ağacındaki seçim, o da
+        boşsa grafikteki seriler kullanılır. Kaydedilecek kanal yoksa
+        işlem yapılmaz (adsız/boş grup oluşturulmaz).
+        """
+        ids = list(channel_ids) if channel_ids is not None else self._favorite_source_ids()
+        if not ids:
+            self.bottom_dock.append_log("Favori grup icin kanal secili degil.")
+            return
+        try:
+            updated = favorite_groups.save(self._settings.favorite_groups, name, ids)
+        except ValueError as exc:
+            self.bottom_dock.append_log(str(exc))
+            return
+        self._settings = replace(self._settings, favorite_groups=updated)
+        self._persist_settings()
+        self.bottom_dock.append_log(f"Favori grup kaydedildi: {name.strip()} ({len(ids)} kanal).")
+
+    def open_favorite_group(self, name: str) -> None:
+        """Kayıtlı bir favori grubu grafiğe açar; bulunamayan kanalları ayrı raporlar — `F3-017`.
+
+        Kabul kriteri: grup tekrar açılır; bu kayıtta olmayan kanallar
+        eklenmeden, ayrı bir log satırında bildirilir.
+        """
+        group = favorite_groups.get(self._settings.favorite_groups, name)
+        if group is None:
+            self.bottom_dock.append_log(f"Favori grup bulunamadi: {name}")
+            return
+
+        resolution = favorite_groups.resolve(group, (c.id for c in self._channels))
+        added = [
+            label
+            for cid in resolution.found
+            if (label := self._add_channel_to_plot(cid)) is not None
+        ]
+        self.bottom_dock.append_log(
+            f"Favori grup '{group.name}': {len(added)} kanal grafige eklendi."
+        )
+        if resolution.has_missing:
+            self.bottom_dock.append_log(
+                f"Favori grup '{group.name}': {len(resolution.missing)} kanal bu kayitta yok: "
+                f"{', '.join(resolution.missing)}"
+            )
+
+    def _favorite_source_ids(self) -> list[str]:
+        selected = selected_channel_ids(self.left_dock.tree)
+        if selected:
+            return selected
+        return self.plot_panel.plotted_channel_ids()
 
     def _close_owned_repositories(self) -> None:
         for repository in self._owned_repositories:

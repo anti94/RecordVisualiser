@@ -22,7 +22,8 @@ from pathlib import Path
 from typing import Any, cast
 
 #: Ayar semasinin surumu. Alan eklendiginde/anlamı degistiginde artar.
-SCHEMA_VERSION = 1
+#: v2 (`F3-017`): `favorite_groups` alani eklendi.
+SCHEMA_VERSION = 2
 
 #: `save_settings`'in imzasi — kalici hale getirmeyi enjekte etmek icin
 #: (testler gercek ayar dosyasina yazmasin diye, bkz. `F3-008`).
@@ -37,6 +38,23 @@ def _empty_str_list() -> list[str]:
     return []
 
 
+def _empty_group_list() -> list[FavoriteGroup]:
+    return []
+
+
+@dataclass(frozen=True)
+class FavoriteGroup:
+    """Adlandırılmış bir kanal kimliği kümesi — `F3-017`.
+
+    Kayıttan bağımsız saklanır: bir grup, o an açık olmayan (hatta artık
+    var olmayan) kanalları da içerebilir. Grubu yeniden açarken var
+    olmayanlar `favorite_groups.resolve()` ile ayrı raporlanır.
+    """
+
+    name: str
+    channel_ids: list[str] = field(default_factory=_empty_str_list)
+
+
 @dataclass(frozen=True)
 class AppSettings:
     """Uygulamanın kalıcı temel ayarları."""
@@ -47,6 +65,7 @@ class AppSettings:
     last_directory: str = ""
     window_geometry: str = ""
     recent_files: list[str] = field(default_factory=_empty_str_list)
+    favorite_groups: list[FavoriteGroup] = field(default_factory=_empty_group_list)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -96,6 +115,7 @@ def _coerce(raw: dict[str, Any], warnings: list[str]) -> AppSettings:
         time_display = defaults.time_display
 
     recent = _string_list(raw.get("recent_files", []), warnings)
+    favorites = _favorite_groups(raw.get("favorite_groups", []), warnings)
 
     def _text(key: str, fallback: str) -> str:
         value = raw.get(key, fallback)
@@ -111,6 +131,7 @@ def _coerce(raw: dict[str, Any], warnings: list[str]) -> AppSettings:
         last_directory=_text("last_directory", defaults.last_directory),
         window_geometry=_text("window_geometry", defaults.window_geometry),
         recent_files=recent,
+        favorite_groups=favorites,
     )
 
 
@@ -122,6 +143,38 @@ def _string_list(value: object, warnings: list[str]) -> list[str]:
             return [item for item in items if isinstance(item, str)]
     warnings.append("recent_files listesi okunamadi; bos liste kullanildi.")
     return []
+
+
+def _favorite_groups(value: object, warnings: list[str]) -> list[FavoriteGroup]:
+    """Favori grup listesini savunmacı biçimde okur — `F3-017`.
+
+    Beklenen biçim: `[{"name": str, "channel_ids": [str, ...]}, ...]`.
+    Adı boş/metin olmayan ya da biçimi bozuk girdiler **atlanır** (uyarı
+    üretilir); tek bir bozuk girdi tüm listeyi düşürmez.
+    """
+    if not isinstance(value, list):
+        warnings.append("favorite_groups listesi okunamadi; bos liste kullanildi.")
+        return []
+
+    groups: list[FavoriteGroup] = []
+    for entry in cast("list[object]", value):
+        if not isinstance(entry, dict):
+            warnings.append("Bir favori grup girdisi sozluk degil; atlandi.")
+            continue
+        record = cast("dict[str, object]", entry)
+        name = record.get("name")
+        if not isinstance(name, str) or not name.strip():
+            warnings.append("Adi olmayan bir favori grup girdisi atlandi.")
+            continue
+        raw_ids = record.get("channel_ids", [])
+        if not isinstance(raw_ids, list) or not all(
+            isinstance(item, str) for item in cast("list[object]", raw_ids)
+        ):
+            warnings.append(f"{name!r} favori grubunun kanal listesi bozuk; atlandi.")
+            continue
+        ids = list(cast("list[str]", raw_ids))
+        groups.append(FavoriteGroup(name=name.strip(), channel_ids=ids))
+    return groups
 
 
 def _migrate(raw: dict[str, Any], warnings: list[str]) -> dict[str, Any]:
@@ -143,7 +196,9 @@ def _migrate(raw: dict[str, Any], warnings: list[str]) -> dict[str, Any]:
         )
         return raw
 
-    # version < SCHEMA_VERSION oldugunda buraya gocurme adimlari eklenir.
+    # version < SCHEMA_VERSION: eksik alanlar `_coerce`'de varsayilanina
+    # duser. v1 -> v2 (`F3-017`): `favorite_groups` yoksa bos liste olur,
+    # ayrica bir donusum gerekmez.
     return raw
 
 
