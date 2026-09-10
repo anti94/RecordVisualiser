@@ -1650,7 +1650,7 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `F4-039` | `1.39.0` | 20 dk | Window üretimi ve normalizasyonunu ekle | Seçili pencerenin genlik/enerji katsayıları referansla eşleşir | `F4-038` | `feat(analysis): F4-039 window üretimi ve normalizasyonunu ekle` |
+| [x] | `F4-039` | `1.39.0` | 20 dk | Window üretimi ve normalizasyonunu ekle | Seçili pencerenin genlik/enerji katsayıları referansla eşleşir | `F4-038` | `feat(analysis): F4-039 window üretimi ve normalizasyonunu ekle` |
 | [ ] | `F4-040` | `1.40.0` | 20 dk | Tek taraflı FFT hesabını ekle | Bilinen sinüsün tepe frekansı ve genliği doğru çıkar | `F4-039` | `feat(analysis): F4-040 tek taraflı FFT hesabını ekle` |
 | [ ] | `F4-041` | `1.41.0` | 20 dk | FFT, dB ve Nyquist doğrulamalarını ekle | DC, Nyquist, sıfır sinyal ve kısa pencere kontrollü sonuç verir | `F4-040` | `test(analysis): F4-041 fFT, dB ve Nyquist doğrulamalarını ekle` |
 | [ ] | `F4-042` | `1.42.0` | 20 dk | Seçili aralık FFT'sini mockup alt grafiğine bağla | ROI değişince FFT yenilenir; frekans ve genlik birimi görünür | `F4-041` | `feat(ui): F4-042 seçili aralık FFT'sini mockup alt grafiğine bağla` |
