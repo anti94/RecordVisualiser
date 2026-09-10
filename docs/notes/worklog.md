@@ -200,8 +200,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-062` | 20 dk | 41 dk 58 sn | `1d329e5` | seçili grafiği PNG olarak dışa aktar |
 | `F3-063` | 20 dk | 5 dk 40 sn | `439cc35` | seçili grafiği SVG olarak dışa aktar |
 | `F3-064` | 20 dk | 4 dk 57 sn | `4b6d386` | seçili kanal ve aralığı CSV olarak yaz |
+| `F3-065` | 20 dk | 8 dk 19 sn | `0cacfb6` | export hedefi ve üzerine yazma kontrolünü ekle |
 
-**182 commit · olculen toplam 2263 dk 46 sn · olculemeyen 1 (ilk commit)**
+**183 commit · olculen toplam 2272 dk 5 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

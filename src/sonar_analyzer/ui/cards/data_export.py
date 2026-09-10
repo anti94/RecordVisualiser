@@ -97,3 +97,13 @@ class DataExportCard(QGroupBox):
 
     def wants_metadata(self) -> bool:
         return self.include_metadata.isChecked()
+
+    def set_running(self, running: bool) -> None:
+        """Bir dışa aktarma sürerken buton `İptal`e döner — `F3-066`."""
+        self.export_button.setText("İptal" if running else "Export Data")
+        for widget in (self.export_format, self.data_variant):
+            widget.setEnabled(not running)
+
+    @property
+    def is_running(self) -> bool:
+        return self.export_button.text() == "İptal"

@@ -72,6 +72,7 @@ from sonar_analyzer.ui.docks.playback import PlaybackDock
 from sonar_analyzer.ui.docks.right_column import RightColumnDock
 from sonar_analyzer.ui.empty_state import EmptyStatePanel
 from sonar_analyzer.ui.error_dialogs import LoadErrorNotifier
+from sonar_analyzer.ui.export_runner import ExportRunner
 from sonar_analyzer.ui.file_open import FileOpenController
 from sonar_analyzer.ui.plot_tool_bar import PlotToolBar
 from sonar_analyzer.ui.plots.dashboard import DashboardPanel
@@ -128,6 +129,8 @@ class MainWindow(QMainWindow):
         #: `F3-065` dışa aktarma diyalog seam'leri (testler enjekte eder).
         self.export_save_dialog: Callable[[str, str], str] | None = None
         self.export_confirm_overwrite: Callable[[Path], bool] | None = None
+        #: `F3-066` süren CSV dışa aktarma worker'ı (yoksa `None`).
+        self._export_runner: ExportRunner | None = None
         #: `F3-060` zaman bölgesi sürüklemesinde sorguları coalesce eder.
         self._scrub_debouncer: ScrubDebouncer[tuple[int, int]] = ScrubDebouncer(0.12)
         self._scrub_timer = QTimer(self)
@@ -369,6 +372,33 @@ class MainWindow(QMainWindow):
 
         Açık kayıt ya da hedef kanal yoksa `ValueError` verir.
         """
+        job = self._build_csv_export_job(
+            path,
+            channel_id=channel_id,
+            selected_range_only=selected_range_only,
+            include_metadata=include_metadata,
+            raw=raw,
+        )
+        result = job(lambda: False, None)
+        self.bottom_dock.append_log(
+            f"Kanal CSV olarak yazildi: {result.path} ({result.row_count} satir)"
+        )
+        return result
+
+    def _build_csv_export_job(
+        self,
+        path: str | Path,
+        *,
+        channel_id: str | None,
+        selected_range_only: bool,
+        include_metadata: bool,
+        raw: bool,
+    ) -> Callable[[Callable[[], bool], Callable[[int, int], None] | None], CsvExportResult]:
+        """Sorgu + doğrulamayı şimdi yapar; asıl yazma çağrıya bırakılır — `F3-066`.
+
+        Döndürülen `job(should_cancel, on_progress)` hem senkron (GUI
+        thread) hem de `ExportRunner` içinde (worker thread) çağrılabilir.
+        """
         if self._repository is None:
             raise ValueError("Acik kayit yok: CSV disa aktarilamaz")
         primary = self.plot_panel.channel
@@ -387,19 +417,86 @@ class MainWindow(QMainWindow):
                 exported_range = region
 
         chunk = self._repository.query(target_id, exported_range)
-        result = write_channel_csv(
-            chunk,
-            channel,
+
+        def _job(
+            should_cancel: Callable[[], bool],
+            on_progress: Callable[[int, int], None] | None,
+        ) -> CsvExportResult:
+            return write_channel_csv(
+                chunk,
+                channel,
+                path,
+                recording=metadata,
+                exported_range=exported_range,
+                include_metadata=include_metadata,
+                raw=raw,
+                should_cancel=should_cancel,
+                on_progress=on_progress,
+            )
+
+        return _job
+
+    def start_channel_csv_export(
+        self,
+        path: str | Path,
+        *,
+        channel_id: str | None = None,
+        selected_range_only: bool = False,
+        include_metadata: bool = True,
+        raw: bool = False,
+    ) -> ExportRunner:
+        """CSV dışa aktarımını worker thread'de başlatır — `F3-066`.
+
+        GUI donmaz; ilerleme durum çubuğuna gider, `cancel_export()` işi
+        durdurur ve yarım dosya bırakılmaz. Sorgu/doğrulama hatası
+        (`ValueError`) hemen fırlatılır; yazma hataları `failed`
+        sinyaliyle bildirilir.
+        """
+        job = self._build_csv_export_job(
             path,
-            recording=metadata,
-            exported_range=exported_range,
+            channel_id=channel_id,
+            selected_range_only=selected_range_only,
             include_metadata=include_metadata,
             raw=raw,
         )
-        self.bottom_dock.append_log(
-            f"Kanal CSV olarak yazildi: {result.path} ({result.row_count} satir)"
-        )
-        return result
+        runner = ExportRunner(job)
+        self._export_runner = runner
+        self.status.start_load_progress(1)
+        self.right_dock.data_export.set_running(True)
+        runner.progress.connect(self._on_export_progress)
+        runner.export_finished.connect(self._on_export_finished)
+        runner.cancelled.connect(self._on_export_cancelled)
+        runner.failed.connect(self._on_export_failed)
+        runner.start()
+        return runner
+
+    def cancel_export(self) -> None:
+        """Süren CSV dışa aktarımını iptal eder — `F3-066`."""
+        if self._export_runner is not None:
+            self._export_runner.cancel()
+
+    def _on_export_progress(self, written: int, total: int) -> None:
+        self.status.set_load_progress(written, max(1, total))
+
+    def _finish_export_ui(self) -> None:
+        self.status.finish_load_progress()
+        self.right_dock.data_export.set_running(False)
+        self._export_runner = None
+
+    def _on_export_finished(self, result: object) -> None:
+        if isinstance(result, CsvExportResult):
+            self.bottom_dock.append_log(
+                f"Kanal CSV olarak yazildi: {result.path} ({result.row_count} satir)"
+            )
+        self._finish_export_ui()
+
+    def _on_export_cancelled(self) -> None:
+        self.bottom_dock.append_log("Disa aktarma iptal edildi: dosya yazilmadi.")
+        self._finish_export_ui()
+
+    def _on_export_failed(self, message: str) -> None:
+        self.bottom_dock.append_log(f"Disa aktarma basarisiz: {message}")
+        self._finish_export_ui()
 
     # -- dışa aktarma akışı (F3-065) ---------------------------------
 
@@ -419,12 +516,17 @@ class MainWindow(QMainWindow):
         return answer == QMessageBox.StandardButton.Yes
 
     def _on_export_requested(self) -> None:
-        """Data Export kartındaki `Export Data`'yı işler — `F3-065`.
+        """Data Export kartındaki `Export Data`'yı işler — `F3-065`, `F3-066`.
 
         Biçim ve ham/işlenmiş seçimi karttan okunur, hedef dosya adı
         sorulur, dosya varsa üzerine yazma onayı istenir. Onay yoksa
-        **hiçbir şey yazılmaz** (var olan dosya dokunulmaz).
+        **hiçbir şey yazılmaz** (var olan dosya dokunulmaz). Zaten bir
+        CSV dışa aktarımı sürüyorsa buton iptal düğmesi gibi davranır.
         """
+        if self._export_runner is not None:
+            self.cancel_export()
+            return
+
         card = self.right_dock.data_export
         try:
             kind = kind_for_format(card.selected_format())
@@ -456,7 +558,8 @@ class MainWindow(QMainWindow):
         elif kind is ExportKind.SVG:
             self.export_plot_svg(target)
         else:
-            self.export_channel_csv(
+            # F3-066: CSV büyük olabilir; worker thread'de, iptal edilebilir.
+            self.start_channel_csv_export(
                 target,
                 selected_range_only=card.wants_selected_range(),
                 include_metadata=card.wants_metadata(),
@@ -916,6 +1019,12 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event: QCloseEvent) -> None:
         """Pencere kapanırken worker thread'i ve açık snapshot'lar bırakılır."""
+        if self._export_runner is not None:
+            # F3-066: süren dışa aktarma worker'ı çalışırken pencere çöpe
+            # giderse "QThread destroyed while running" süreci çökertir.
+            self._export_runner.cancel()
+            self._export_runner.wait_done()
+            self._export_runner = None
         self.file_loader.shutdown()
         self._close_owned_repositories()
         super().closeEvent(event)

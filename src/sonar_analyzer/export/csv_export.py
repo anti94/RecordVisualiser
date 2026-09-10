@@ -1,4 +1,4 @@
-"""Seçili kanal ve aralığı CSV olarak yazma — `F3-064`.
+"""Seçili kanal ve aralığı CSV olarak yazma — `F3-064`, `F3-066`.
 
 Saf Python: Qt yok, `GUI olmadan` doğrulanır. Bir `DataChunk` (kanonik
 `int64` ns zaman + değer) ve kanalın değişmez tanımını alır, isteğe
@@ -12,12 +12,20 @@ Dosya düzeni:
 * Bir başlık satırı: ``timestamp_ns,timestamp_utc,value``.
 * Her örnek için bir satır; zaman hem kanonik ns hem de UTC ISO-8601.
 
+`F3-066`: yazma **atomiktir** — önce `<hedef>.part` geçici dosyasına
+yazılır, tamamlanınca `os.replace` ile hedefe taşınır. Böylece iptal
+edilen (ya da hata veren) bir dışa aktarma **yarım bir dosyayı
+tamamlanmış gibi bırakmaz**: hedef ya tam ya hiç yoktur. `should_cancel`
+her satırda yoklanır; iptal `ExportCancelled` fırlatır.
+
 Kabul: satır sayısı, zaman, birim ve kaynak metadata doğru çıkar.
 """
 
 from __future__ import annotations
 
 import csv
+import os
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -33,7 +41,22 @@ DATA_COLUMNS: tuple[str, ...] = ("timestamp_ns", "timestamp_utc", "value")
 #: Metadata yorum satırlarının öneki.
 METADATA_PREFIX = "# "
 
+#: Yazma sürerken kullanılan geçici dosya son eki.
+PARTIAL_SUFFIX = ".part"
+
+#: İlerleme geri çağrısı kaç satırda bir tetiklenir.
+PROGRESS_INTERVAL = 2048
+
 _NS_PER_SECOND = 1_000_000_000
+
+#: `should_cancel() -> bool` — True dönerse yazma iptal edilir.
+ShouldCancel = Callable[[], bool]
+#: `on_progress(written, total)` — yazılan / toplam satır.
+OnProgress = Callable[[int, int], None]
+
+
+class ExportCancelled(RuntimeError):
+    """Dışa aktarma iptal edildi. Geçici dosya silinir; hedef oluşmaz."""
 
 
 @dataclass(frozen=True)
@@ -97,6 +120,8 @@ def write_channel_csv(
     exported_range: TimeRange | None = None,
     include_metadata: bool = True,
     raw: bool = False,
+    should_cancel: ShouldCancel | None = None,
+    on_progress: OnProgress | None = None,
 ) -> CsvExportResult:
     """`chunk`'ı `path`'e CSV olarak yazar; özet döndürür.
 
@@ -104,12 +129,15 @@ def write_channel_csv(
     (kalibrasyonsuz) hâline döndürülür ve metadata `variant=raw` olur;
     aksi hâlde repository'den gelen işlenmiş (ölçekli) değerler yazılır.
 
+    Yazma atomiktir (`F3-066`): `<path>.part`'a yazılıp `os.replace` ile
+    taşınır. `should_cancel` her satırda yoklanır; ``True`` dönerse
+    `ExportCancelled` fırlatılır, geçici dosya silinir ve **hedef
+    oluşmaz**. `on_progress(written, total)` ilerlemeyi bildirir.
+
     * `ValueError` — `chunk` başka bir kanala ait (`channel_id` uyuşmuyor)
       ya da `raw` istendi ama `channel.gain == 0` (ters çevrilemez).
+    * `ExportCancelled` — `should_cancel` iptal istedi.
     * `OSError` — dosya açılamadı / yazılamadı.
-
-    Var olan dosyanın üzerine yazılır; üzerine yazma onayı `F3-065`'in
-    işidir (bu katman saf yazıcıdır).
     """
     if chunk.channel_id != channel.id:
         raise ValueError(f"Parça kanalı ({chunk.channel_id}) hedef kanaldan ({channel.id}) farklı")
@@ -118,6 +146,7 @@ def write_channel_csv(
 
     dest = Path(path)
     dest.parent.mkdir(parents=True, exist_ok=True)
+    partial = dest.with_name(dest.name + PARTIAL_SUFFIX)
 
     metadata_lines = (
         build_metadata_lines(
@@ -133,17 +162,30 @@ def write_channel_csv(
     if raw:
         values = [(value - channel.offset) / channel.gain for value in values]
 
-    with dest.open("w", encoding="utf-8", newline="") as handle:
-        for line in metadata_lines:
-            handle.write(f"{METADATA_PREFIX}{line}\n")
-        writer = csv.writer(handle)
-        writer.writerow(DATA_COLUMNS)
-        for timestamp_ns, value in zip(timestamps, values):
-            writer.writerow([int(timestamp_ns), _utc_iso(int(timestamp_ns)), value])
+    total = len(timestamps)
+    try:
+        with partial.open("w", encoding="utf-8", newline="") as handle:
+            for line in metadata_lines:
+                handle.write(f"{METADATA_PREFIX}{line}\n")
+            writer = csv.writer(handle)
+            writer.writerow(DATA_COLUMNS)
+            for index, (timestamp_ns, value) in enumerate(zip(timestamps, values)):
+                if should_cancel is not None and should_cancel():
+                    raise ExportCancelled(f"{dest.name}: dışa aktarma iptal edildi")
+                writer.writerow([int(timestamp_ns), _utc_iso(int(timestamp_ns)), value])
+                if on_progress is not None and index % PROGRESS_INTERVAL == 0:
+                    on_progress(index + 1, total)
+        os.replace(partial, dest)  # atomik: hedef ya tam ya hiç
+    except BaseException:
+        partial.unlink(missing_ok=True)
+        raise
+
+    if on_progress is not None:
+        on_progress(total, total)
 
     return CsvExportResult(
         path=dest,
-        row_count=len(chunk),
+        row_count=total,
         column_names=DATA_COLUMNS,
         metadata_lines=tuple(metadata_lines),
     )

@@ -18,7 +18,9 @@ from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.export.csv_export import (
     DATA_COLUMNS,
+    PARTIAL_SUFFIX,
     CsvExportResult,
+    ExportCancelled,
     write_channel_csv,
 )
 
@@ -200,6 +202,60 @@ def test_raw_variant_needs_a_non_zero_gain(tmp_path: Path) -> None:
 def test_processed_variant_is_recorded_in_metadata(tmp_path: Path) -> None:
     result = write_channel_csv(_chunk(2), _channel(), tmp_path / "p.csv")
     assert "variant=processed" in result.metadata_lines
+
+
+# -- F3-066: atomik yazma + iptal --------------------------------
+
+
+def _big_chunk(n: int) -> DataChunk:
+    stamps = np.array([T0 + i * PERIOD for i in range(n)], dtype=np.int64)
+    values = np.arange(n, dtype=np.float64)
+    return DataChunk(channel_id="ch0", timestamps_ns=stamps, values=values)
+
+
+def test_successful_write_leaves_no_partial_file(tmp_path: Path) -> None:
+    dest = tmp_path / "ok.csv"
+    write_channel_csv(_big_chunk(50), _channel(), dest)
+
+    assert dest.exists()
+    assert not dest.with_name(dest.name + PARTIAL_SUFFIX).exists()
+
+
+def test_cancel_midway_raises_and_leaves_no_target(tmp_path: Path) -> None:
+    dest = tmp_path / "cancelled.csv"
+    written: list[int] = []
+
+    def _cancel_after_three() -> bool:
+        written.append(1)
+        return len(written) > 3
+
+    with pytest.raises(ExportCancelled):
+        write_channel_csv(_big_chunk(1000), _channel(), dest, should_cancel=_cancel_after_three)
+
+    # Kabul: yarım dosya tamamlanmış gibi sunulmaz.
+    assert not dest.exists()
+    assert not dest.with_name(dest.name + PARTIAL_SUFFIX).exists()
+
+
+def test_cancel_does_not_touch_a_pre_existing_target(tmp_path: Path) -> None:
+    dest = tmp_path / "keep.csv"
+    dest.write_text("ONCEDEN VAR", encoding="utf-8")
+
+    with pytest.raises(ExportCancelled):
+        write_channel_csv(_big_chunk(500), _channel(), dest, should_cancel=lambda: True)
+
+    assert dest.read_text(encoding="utf-8") == "ONCEDEN VAR"
+
+
+def test_progress_callback_reports_written_and_total(tmp_path: Path) -> None:
+    seen: list[tuple[int, int]] = []
+    write_channel_csv(
+        _big_chunk(10), _channel(), tmp_path / "p.csv", on_progress=lambda w, t: seen.append((w, t))
+    )
+
+    assert seen  # en az bir kez çağrıldı
+    assert seen[-1] == (10, 10)  # son çağrı: tamamlandı
+    assert all(0 < w <= t == 10 for w, t in seen)
 
 
 def test_empty_chunk_writes_only_header_and_metadata(tmp_path: Path) -> None:
