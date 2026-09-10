@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 250 tamamlandı · 242 kaldı**
+**Toplam 492 madde · 251 tamamlandı · 241 kaldı**
 
-`[############............]` %50.8
+`[############............]` %51.0
 
 ## Özet
 
@@ -38,11 +38,11 @@ Work in fully autonomous mode.
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
-| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 50 | 40 | 90 |
+| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 51 | 39 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **250** | **242** | **492** |
+| **Toplam** | **251** | **241** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -248,7 +248,7 @@ Work in fully autonomous mode.
 | [x] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır |
 | [x] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla |
 
-### Faz 4 — Mockup analiz panosu ve büyük veri performansı (50/90)
+### Faz 4 — Mockup analiz panosu ve büyük veri performansı (51/90)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -302,7 +302,7 @@ Work in fully autonomous mode.
 | [x] | `F4-048` | `1.48.0` | 20 dk | Mockup orta spektrogramını sonuçlara bağla |
 | [x] | `F4-049` | `1.49.0` | 15 dk | Spektrogram renk ölçeği kontrollerini ekle |
 | [x] | `F4-050` | `1.50.0` | 20 dk | Waterfall zaman dilimi modelini ekle |
-| [ ] | `F4-051` | `1.51.0` | 20 dk | Waterfall görünümünü ekle |
+| [x] | `F4-051` | `1.51.0` | 20 dk | Waterfall görünümünü ekle |
 | [ ] | `F4-052` | `1.52.0` | 20 dk | Zaman serisi, STFT, FFT ve istatistiği birlikte bağla |
 | [ ] | `F4-053` | `1.53.0` | 20 dk | Memory mapping üzerinden blok okuma ekle |
 | [ ] | `F4-054` | `1.54.0` | 20 dk | Yalnız görünür zaman bloklarını yükle |

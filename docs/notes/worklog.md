@@ -265,8 +265,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-047` | 20 dk | 3 dk 41 sn | `33a84cd` | STFT kenar, overlap ve eksen eşlemesini doğrula |
 | `F4-048` | 20 dk | 10 dk 48 sn | `034eebc` | mockup orta spektrogramını sonuçlara bağla |
 | `F4-049` | 15 dk | 6 dk 59 sn | `ec7bc33` | spektrogram renk ölçeği kontrollerini ekle |
+| `F4-050` | 20 dk | 4 dk 31 sn | `35e413f` | waterfall zaman dilimi modelini ekle |
 
-**247 commit · olculen toplam 2641 dk 7 sn · olculemeyen 1 (ilk commit)**
+**248 commit · olculen toplam 2645 dk 38 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

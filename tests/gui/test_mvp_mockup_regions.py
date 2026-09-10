@@ -115,10 +115,11 @@ def test_view_tab_bar_has_the_eight_mockup_tabs(win: MainWindow) -> None:
 
 
 def test_remaining_v2_view_tabs_are_disabled_with_a_reason(win: MainWindow) -> None:
-    # `F4-045` ile "Spectrum" etkinleşti; "Spectrogram" hâlâ v2 (`F4-048`).
+    # `F4-045` Spectrum, `F4-051` Spectrogram etkinleşti; kalanlar hâlâ v2.
     v2_tabs = [t for t in TAB_TITLES if t not in ENABLED_TABS]
-    assert "Spectrogram" in v2_tabs
+    assert {"Cross Analysis", "3D View", "Report"} <= set(v2_tabs)
     assert "Spectrum" not in v2_tabs
+    assert "Spectrogram" not in v2_tabs
     for index, title in enumerate(win.view_tabs.tab_titles()):
         if title in v2_tabs:
             assert not win.view_tabs.isTabEnabled(index), f"{title} pasif olmalı"

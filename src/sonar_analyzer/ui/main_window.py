@@ -81,6 +81,7 @@ from sonar_analyzer.ui.plot_tool_bar import PlotToolBar
 from sonar_analyzer.ui.plots.dashboard import DashboardPanel
 from sonar_analyzer.ui.plots.spectrum_panel import SpectrumPanel
 from sonar_analyzer.ui.plots.transmission_panel import TransmissionPanel
+from sonar_analyzer.ui.plots.waterfall_panel import WaterfallPanel
 from sonar_analyzer.ui.shortcuts import install_shortcuts
 from sonar_analyzer.ui.status_bar import CANCELLED_TEXT, READY_TEXT, AppStatusBar
 from sonar_analyzer.ui.status_icons import severity_style
@@ -1008,6 +1009,7 @@ class MainWindow(QMainWindow):
         # F4-042/F4-048: ROI değişince FFT ve spektrogram da o pencereyi gösterir.
         self.dashboard.set_channel_data(channel, chunk.values, region_seconds=span)
         self.spectrum_view.set_channel_data(channel, chunk.values, region_seconds=span)
+        self.waterfall_view.set_channel_data(channel, chunk.values, region_seconds=span)
 
     def open_channel(self, channel_id: str) -> None:
         """Seçilen kanalı çizer ve ayrıntısını gösterir.
@@ -1031,6 +1033,7 @@ class MainWindow(QMainWindow):
         self.right_dock.analysis_tools.step_editor.set_sample_rate(channel.sample_rate_hz or 0.0)
         self.dashboard.set_channel_data(channel, chunk.values)
         self.spectrum_view.set_channel_data(channel, chunk.values)
+        self.waterfall_view.set_channel_data(channel, chunk.values)
         self.plot_tool_bar.set_current_channel(channel_id)
         self.show_plot()
         self.right_dock.show_channel(channel)
@@ -1482,12 +1485,17 @@ class MainWindow(QMainWindow):
         self.spectrum_view = SpectrumPanel(container)
         self.spectrum_view.setObjectName("panel_spectrum_view")
 
+        # F4-051: "Spectrogram" sekmesi tam boy waterfall görünümü.
+        self.waterfall_view = WaterfallPanel(container)
+        self.waterfall_view.setObjectName("panel_waterfall_view")
+
         self.center_stack = QStackedWidget(container)
         self.center_stack.setObjectName("center_stack")
         self.center_stack.addWidget(self.empty_state)
         self.center_stack.addWidget(self.dashboard)
         self.center_stack.addWidget(self.transmission_panel)
         self.center_stack.addWidget(self.spectrum_view)
+        self.center_stack.addWidget(self.waterfall_view)
         self.center_stack.setCurrentWidget(self.empty_state)
 
         self.view_tabs.currentChanged.connect(self._on_view_tab_changed)
@@ -1502,6 +1510,8 @@ class MainWindow(QMainWindow):
             self.center_stack.setCurrentWidget(self.transmission_panel)
         elif title == "Spectrum" and self._repository is not None:
             self.center_stack.setCurrentWidget(self.spectrum_view)
+        elif title == "Spectrogram" and self._repository is not None:
+            self.center_stack.setCurrentWidget(self.waterfall_view)
         elif self._repository is not None:
             self.show_plot()
         else:
@@ -1534,6 +1544,7 @@ class MainWindow(QMainWindow):
         self.plot_panel.clear()
         self.dashboard.clear_analysis()
         self.spectrum_view.clear()
+        self.waterfall_view.clear()
         self.show_empty_state()
         self.playback_dock.set_recording_range(metadata.time_range)
         # F3-061: imleç zamanının UTC/yerel görünümü için kanonik köken.
@@ -1624,6 +1635,7 @@ class MainWindow(QMainWindow):
         self.status.set_cursor_time(None)
         self.dashboard.clear_analysis()
         self.spectrum_view.clear()
+        self.waterfall_view.clear()
         self.bottom_dock.clear_events()
         self.show_empty_state()
         self.status.set_field("file", "")
