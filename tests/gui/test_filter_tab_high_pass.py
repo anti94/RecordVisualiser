@@ -38,7 +38,8 @@ def _card(win: MainWindow):
 def test_response_selector_offers_low_and_high_pass(win: MainWindow) -> None:
     card = _card(win)
     values = [card.filter_response.itemText(i) for i in range(card.filter_response.count())]
-    assert values == ["Low-pass", "High-pass"]
+    # Liste sonraki işlerle büyür; sıra ve varlık denetlenir.
+    assert values[:2] == ["Low-pass", "High-pass"]
 
 
 def test_selecting_high_pass_builds_a_high_pass_step(win: MainWindow) -> None:

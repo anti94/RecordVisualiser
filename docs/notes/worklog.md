@@ -249,8 +249,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-031` | 15 dk | 3 dk 15 sn | `d11ee8a` | high-pass sınır ve transient davranışını doğrula |
 | `F4-032` | 15 dk | 25 dk 36 sn | `2e75269` | high-pass seçimini araç kartına bağla |
 | `F4-033` | 20 dk | 4 dk 39 sn | `a8022a9` | band-pass filtre hesabını ekle |
+| `F4-034` | 15 dk | 2 dk 31 sn | `233de3d` | band-pass alt/üst sınırlarını doğrula |
 
-**231 commit · olculen toplam 2557 dk 14 sn · olculemeyen 1 (ilk commit)**
+**232 commit · olculen toplam 2559 dk 45 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

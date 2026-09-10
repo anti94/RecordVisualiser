@@ -41,13 +41,21 @@ FILTER_TYPES: tuple[str, ...] = ("Butterworth", "Chebyshev", "Bessel")
 
 #: Filtre yanıt türü. `F4-029` low-pass ile başlar; `F4-032`/`F4-035`/
 #: `F4-038` sırayla high-pass / band-pass / notch ekler.
-FILTER_RESPONSES: tuple[str, ...] = ("Low-pass", "High-pass")
+FILTER_RESPONSES: tuple[str, ...] = ("Low-pass", "High-pass", "Band-pass")
 
 #: `filter_response` etiketi -> `StepKind` eşlemesi.
 FILTER_RESPONSE_KINDS: dict[str, StepKind] = {
     "Low-pass": StepKind.LOW_PASS,
     "High-pass": StepKind.HIGH_PASS,
+    "Band-pass": StepKind.BAND_PASS,
 }
+
+#: İki cutoff alanı isteyen yanıt türleri (`F4-035`).
+BAND_RESPONSES: frozenset[str] = frozenset({"Band-pass"})
+
+CUTOFF_LABEL_SINGLE = "Cutoff Frequency (Hz)"
+CUTOFF_LABEL_LOW = "Low Cutoff (Hz)"
+CUTOFF_LABEL_HIGH = "High Cutoff (Hz)"
 
 
 class FilterTabError(ValueError):
@@ -111,7 +119,15 @@ class AnalysisToolsCard(QGroupBox):
         self.cutoff_frequency.setRange(1, 1_000_000)
         self.cutoff_frequency.setValue(100)
         self.cutoff_frequency.setSuffix(" Hz")
-        form.addRow("Cutoff Frequency (Hz)", self.cutoff_frequency)
+        form.addRow(CUTOFF_LABEL_SINGLE, self.cutoff_frequency)
+
+        # F4-035: band-pass ikinci sınırı; yalnız "Band-pass" seçiliyken görünür.
+        self.high_cutoff_frequency = QSpinBox(page)
+        self.high_cutoff_frequency.setObjectName("spin_high_cutoff_frequency")
+        self.high_cutoff_frequency.setRange(1, 1_000_000)
+        self.high_cutoff_frequency.setValue(500)
+        self.high_cutoff_frequency.setSuffix(" Hz")
+        form.addRow(CUTOFF_LABEL_HIGH, self.high_cutoff_frequency)
 
         self.order = QSpinBox(page)
         self.order.setObjectName("spin_filter_order")
@@ -139,7 +155,18 @@ class AnalysisToolsCard(QGroupBox):
         self.apply_filter_button.clicked.connect(self.apply_requested)
         form.addRow(self.apply_filter_button)
 
+        self._filter_form = form
+        self.filter_response.currentTextChanged.connect(self._refresh_filter_fields)
+        self._refresh_filter_fields()
         return page
+
+    def _refresh_filter_fields(self) -> None:
+        """Yanıt türüne göre cutoff alanlarını gösterir/gizler — `F4-035`."""
+        is_band = self.filter_response.currentText() in BAND_RESPONSES
+        self._filter_form.setRowVisible(self.high_cutoff_frequency, is_band)
+        label = self._filter_form.labelForField(self.cutoff_frequency)
+        if isinstance(label, QLabel):
+            label.setText(CUTOFF_LABEL_LOW if is_band else CUTOFF_LABEL_SINGLE)
 
     # -- sorgular ----------------------------------------------------------
 
@@ -148,6 +175,11 @@ class AnalysisToolsCard(QGroupBox):
 
     def active_tab_title(self) -> str:
         return self.tabs.tabText(self.tabs.currentIndex())
+
+    def cutoff_label_text(self) -> str:
+        """İlk cutoff alanının o anki etiketi — yanıt türüne göre değişir (`F4-035`)."""
+        label = self._filter_form.labelForField(self.cutoff_frequency)
+        return label.text() if isinstance(label, QLabel) else ""
 
     def build_filter_chain(self, channel_id: str, sample_rate_hz: float) -> ProcessingChain:
         """Filter sekmesi alanlarından tek adımlı bir `ProcessingChain` kurar — `F4-029`.
@@ -167,15 +199,22 @@ class AnalysisToolsCard(QGroupBox):
         if kind is None:  # pragma: no cover - combo yalnız bilinen değerleri taşır
             raise FilterTabError(f"Bilinmeyen yanıt türü: {response}")
 
+        parameters: dict[str, object] = {
+            "sample_rate_hz": float(sample_rate_hz),
+            "order": int(self.order.value()),
+        }
+        if response in BAND_RESPONSES:
+            # F4-035: alt sınır ilk alandan, üst sınır ikinci alandan — bu sırayla.
+            parameters["low_cutoff_hz"] = float(self.cutoff_frequency.value())
+            parameters["high_cutoff_hz"] = float(self.high_cutoff_frequency.value())
+        else:
+            parameters["cutoff_hz"] = float(self.cutoff_frequency.value())
+
         try:
             step = ProcessingStep(
                 kind=kind,
                 input_channel_id=channel_id,
-                parameters={
-                    "sample_rate_hz": float(sample_rate_hz),
-                    "cutoff_hz": float(self.cutoff_frequency.value()),
-                    "order": int(self.order.value()),
-                },
+                parameters=parameters,
             )
         except ValueError as exc:  # StepValidationError dahil
             raise FilterTabError(str(exc)) from exc
