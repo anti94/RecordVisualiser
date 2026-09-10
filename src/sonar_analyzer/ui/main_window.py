@@ -716,6 +716,7 @@ class MainWindow(QMainWindow):
         span = metadata.time_range
         events = repository.events(span)
         self.bottom_dock.set_events(events, start_ns=span.start_ns)
+        self.playback_dock.set_events(events)
         self.plot_panel.set_event_markers(
             [(event.timestamp_ns, severity_style(event.severity).color) for event in events]
         )
@@ -930,6 +931,7 @@ class MainWindow(QMainWindow):
         self.plot_panel.clear_event_markers()
         self.plot_panel.clear_tx_regions()
         self.transmission_panel.clear()
+        self.playback_dock.timeline.clear()
         self._view_history.clear()
         self.dashboard.statistics.clear()
         self.bottom_dock.clear_events()

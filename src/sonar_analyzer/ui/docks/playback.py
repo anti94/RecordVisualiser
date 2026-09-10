@@ -13,6 +13,8 @@ veri oynatmaz.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QDockWidget,
@@ -21,10 +23,13 @@ from PySide6.QtWidgets import (
     QLabel,
     QPushButton,
     QSlider,
+    QVBoxLayout,
     QWidget,
 )
 
+from sonar_analyzer.domain.event import Event
 from sonar_analyzer.domain.time_range import NS_PER_SECOND, TimeRange
+from sonar_analyzer.ui.docks.timeline_overview import TimelineOverview
 
 DOCK_OBJECT_NAME = "dock_playback"
 DOCK_TITLE = "Playback / Time Control"
@@ -81,9 +86,19 @@ class PlaybackDock(QDockWidget):
 
     def _build_body(self) -> QWidget:
         body = QWidget(self)
-        layout = QHBoxLayout(body)
+        outer = QVBoxLayout(body)
+        outer.setContentsMargins(0, 0, 0, 0)
+        outer.setSpacing(2)
+
+        # F3-054: kayıt geneli overview timeline (uçlar + olay yoğunluğu).
+        self.timeline = TimelineOverview(body)
+        outer.addWidget(self.timeline)
+
+        transport = QWidget(body)
+        layout = QHBoxLayout(transport)
         layout.setContentsMargins(6, 4, 6, 4)
         layout.setSpacing(6)
+        outer.addWidget(transport)
 
         for name, text, tooltip in TRANSPORT_BUTTONS:
             button = QPushButton(text, body)
@@ -157,8 +172,13 @@ class PlaybackDock(QDockWidget):
         self.go_button.setEnabled(enabled)
 
     def set_recording_range(self, time_range: TimeRange) -> None:
-        """Kayıt aralığından süreyi türetir."""
+        """Kayıt aralığından süreyi türetir ve overview timeline'ı besler."""
         self.set_duration(time_range.duration_ns / NS_PER_SECOND)
+        self.timeline.set_recording(time_range)
+
+    def set_events(self, events: Sequence[Event]) -> None:
+        """Overview timeline'ın olay yoğunluğunu günceller — `F3-054`."""
+        self.timeline.set_events(events)
 
     @property
     def duration_s(self) -> float:
