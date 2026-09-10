@@ -551,6 +551,54 @@ class PlotPanel(QWidget):
         if time_range is not None:
             self.time_region_changed.emit(time_range.start_ns, time_range.end_ns)
 
+    def zoom_to_time_region(self, *, clear_region: bool = True) -> bool:
+        """Görünümü seçili zaman bölgesine daraltır — `F3-029`.
+
+        Kabul kriteri: grafik **yalnız** seçilen zaman aralığını gösterir.
+        X ekseni tam olarak bölgeye oturur; Y (ve varsa ikinci Y) o
+        pencereye düşen örneklere sığdırılır. Bölge yoksa `False` döner ve
+        görünüm değişmez. `clear_region=True` (öntanımlı) işi biten bandı
+        kaldırır; `reset_view()` tam görünüme geri döndürür.
+        """
+        span = self.time_region_x()
+        if span is None:
+            return False
+        x_lo, x_hi = span
+        view_box = self.plot.getViewBox()
+        view_box.setRange(xRange=(x_lo, x_hi), padding=0)
+
+        left_bounds = self._windowed_y_bounds(x_lo, x_hi, "left")
+        if left_bounds is not None:
+            view_box.setRange(yRange=left_bounds, padding=0.05)
+        if self._right_vb is not None:
+            right_bounds = self._windowed_y_bounds(x_lo, x_hi, "right")
+            if right_bounds is not None:
+                self._right_vb.setRange(yRange=right_bounds, padding=0.05)
+
+        if clear_region:
+            self.clear_time_region()
+        return True
+
+    def _windowed_y_bounds(self, x_lo: float, x_hi: float, axis: str) -> tuple[float, float] | None:
+        """`[x_lo, x_hi]` penceresine düşen örneklerin Y `(min, max)`'ı; yoksa `None`."""
+        lows: list[float] = []
+        highs: list[float] = []
+        for channel_id, (_channel, _curve) in self._series.items():
+            if self._axis_of.get(channel_id, "left") != axis:
+                continue
+            x_data, y_data = self.curve_data(channel_id)
+            if x_data.size == 0:
+                continue
+            mask = (x_data >= x_lo) & (x_data <= x_hi)
+            windowed = y_data[mask]
+            if windowed.size == 0:
+                continue
+            lows.append(float(windowed.min()))
+            highs.append(float(windowed.max()))
+        if not lows:
+            return None
+        return min(lows), max(highs)
+
     def remove_channel(self, channel_id: str) -> None:
         """Bir seriyi ve legend girdisini kaldırır — `F3-014`.
 

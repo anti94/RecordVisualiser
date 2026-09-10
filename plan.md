@@ -1506,7 +1506,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 | [x] | `F3-026` | `0.128.0` | 20 dk | Crosshair ve cursor okumasını ekle | Cursor zamanı ve en yakın örnek değeri doğru gösterilir | `F3-025` | `feat(plot): F3-026 crosshair ve cursor okumasını ekle` |
 | [x] | `F3-027` | `0.129.0` | 20 dk | İki cursor fark ölçümünü ekle | Delta zaman, değer ve sıfır olmayan süre için frekans doğrudur | `F3-026` | `feat(plot): F3-027 iki cursor fark ölçümünü ekle` |
 | [x] | `F3-028` | `0.130.0` | 15 dk | Zaman bölgesi seçimini ekle | Seçili başlangıç/bitiş repository aralığına dönüşür | `F3-027` | `feat(plot): F3-028 zaman bölgesi seçimini ekle` |
-| [ ] | `F3-029` | `0.131.0` | 15 dk | Seçili bölgeye yakınlaşmayı bağla | Grafik yalnız seçilen zaman aralığını gösterir | `F3-028` | `feat(plot): F3-029 seçili bölgeye yakınlaşmayı bağla` |
+| [x] | `F3-029` | `0.131.0` | 15 dk | Seçili bölgeye yakınlaşmayı bağla | Grafik yalnız seçilen zaman aralığını gösterir | `F3-028` | `feat(plot): F3-029 seçili bölgeye yakınlaşmayı bağla` |
 | [ ] | `F3-030` | `0.132.0` | 20 dk | Legend gizleme ve solo eylemlerini ekle | Seri görünürlüğü ve solo geri dönüşü doğru çalışır | `F3-029` | `feat(plot): F3-030 legend gizleme ve solo eylemlerini ekle` |
 | [ ] | `F3-031` | `0.133.0` | 15 dk | Seri rengi, çizgi ve marker ayarını ekle | Aynı kanal paneller arasında tutarlı varsayılan renkle açılır | `F3-030` | `feat(plot): F3-031 seri rengi, çizgi ve marker ayarını ekle` |
 | [ ] | `F3-032` | `0.134.0` | 20 dk | Paneller arasında X senkronizasyonunu ekle | Bir grafikte gezinme bağlı grafikleri günceller; döngü oluşmaz | `F3-031` | `feat(plot): F3-032 paneller arasında X senkronizasyonunu ekle` |

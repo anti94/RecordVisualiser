@@ -163,8 +163,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-025` | 15 dk | 3 dk 38 sn | `8034ec7` | autoscale ve görünüm sıfırlamayı ekle |
 | `F3-026` | 20 dk | 3 dk 40 sn | `6e07c85` | crosshair ve cursor okumasını ekle |
 | `F3-027` | 20 dk | 3 dk 13 sn | `55937c8` | iki cursor fark ölçümünü ekle |
+| `F3-028` | 15 dk | 4 dk 32 sn | `fdd426e` | zaman bölgesi seçimini ekle |
 
-**145 commit · olculen toplam 2064 dk 31 sn · olculemeyen 1 (ilk commit)**
+**146 commit · olculen toplam 2069 dk 3 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
