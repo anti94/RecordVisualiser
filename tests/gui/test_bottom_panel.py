@@ -123,7 +123,18 @@ def test_opening_a_recording_writes_to_log(window: MainWindow) -> None:
 
 def test_events_table_starts_empty(panel: BottomPanelDock) -> None:
     assert panel.event_row_count() == 0
-    assert panel.events.columnCount() == 5
+    # F3-042: plan Bölüm 5.5'in sekiz sütunu
+    assert panel.events.columnCount() == 8
+    assert list(EVENT_COLUMNS) == [
+        "Time",
+        "Severity",
+        "Category",
+        "Source",
+        "Code",
+        "State",
+        "Message",
+        "Value",
+    ]
 
 
 def test_events_are_listed_with_columns(panel: BottomPanelDock) -> None:
@@ -133,7 +144,8 @@ def test_events_are_listed_with_columns(panel: BottomPanelDock) -> None:
 
     assert panel.event_row_count() == len(events)
     assert panel.event_cell(0, "Source") in {"BIT", "System"}
-    assert panel.event_cell(0, "Time").startswith("00:00:00")
+    # F3-042: göreli + mutlak zaman birlikte
+    assert panel.event_cell(0, "Time").startswith("+0.000 s (00:00:00")
 
 
 def test_known_failure_appears_in_events(panel: BottomPanelDock) -> None:
@@ -149,7 +161,7 @@ def test_known_failure_appears_in_events(panel: BottomPanelDock) -> None:
     assert len(rows) == 1
     row = rows[0]
     assert panel.event_cell(row, "Category") == "Thermal Management"
-    assert panel.event_cell(row, "Time") == "00:00:04.000"
+    assert panel.event_cell(row, "Time") == "+4.000 s (00:00:04.000)"
     assert "basarisiz" in panel.event_cell(row, "Message")
 
 

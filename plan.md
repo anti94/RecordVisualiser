@@ -1529,7 +1529,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `F3-042` | `0.144.0` | 20 dk | Ortak olay tablo modelini ekle | Bölüm 5.5 sütunları doğru domain alanlarını gösterir | `F3-041` | `feat(ui): F3-042 ortak olay tablo modelini ekle` |
+| [x] | `F3-042` | `0.144.0` | 20 dk | Ortak olay tablo modelini ekle | Bölüm 5.5 sütunları doğru domain alanlarını gösterir | `F3-041` | `feat(ui): F3-042 ortak olay tablo modelini ekle` |
 | [ ] | `F3-043` | `0.145.0` | 20 dk | Zaman, severity, kaynak ve metin filtrelerini ekle | Birleşik filtre sonucu beklenen olay kümesidir | `F3-042` | `feat(ui): F3-043 zaman, severity, kaynak ve metin filtrelerini ekle` |
 | [ ] | `F3-044` | `0.146.0` | 15 dk | Olay seçimini Inspector detayına bağla | Kaynak, kod ve ilgili kanallar doğru gösterilir | `F3-043` | `feat(ui): F3-044 olay seçimini Inspector detayına bağla` |
 | [ ] | `F3-045` | `0.147.0` | 20 dk | Olay zaman işaretlerini çiz | Olay zamanı grafik X koordinatıyla eşleşir | `F3-044` | `feat(plot): F3-045 olay zaman işaretlerini çiz` |

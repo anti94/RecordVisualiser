@@ -663,7 +663,7 @@ class MainWindow(QMainWindow):
         self.set_recording(metadata, channels)
 
         span = metadata.time_range
-        self.bottom_dock.set_events(repository.events(span))
+        self.bottom_dock.set_events(repository.events(span), start_ns=span.start_ns)
         self.right_dock.bit_status.set_results(repository.bit_results(span))
         self._refresh_recording_tree()
 

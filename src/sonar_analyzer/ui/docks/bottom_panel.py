@@ -28,6 +28,7 @@ from PySide6.QtWidgets import (
 )
 
 from sonar_analyzer.domain.event import Event, Severity
+from sonar_analyzer.ui.docks.event_table_model import EVENT_COLUMNS, event_cell_text
 from sonar_analyzer.ui.status_icons import make_status_icon, severity_style
 
 DOCK_OBJECT_NAME = "dock_bottom_panel"
@@ -35,8 +36,6 @@ DOCK_TITLE = "Log / Events"
 
 LOG_TAB_TITLE = "Log / Messages"
 EVENTS_TAB_TITLE = "Events"
-
-EVENT_COLUMNS = ("Time", "Source", "Category", "Severity", "Message")
 
 #: Log'da tutulan azami satir sayisi; uzun oturumda bellek sinirsiz buyumez.
 MAX_LOG_LINES = 2000
@@ -105,26 +104,20 @@ class BottomPanelDock(QDockWidget):
 
     # -- olaylar ---------------------------------------------------------
 
-    def set_events(self, events: Sequence[Event]) -> None:
-        """Olay tablosunu doldurur; mevcut satırları değiştirir.
+    def set_events(self, events: Sequence[Event], start_ns: int = 0) -> None:
+        """Olay tablosunu doldurur; mevcut satırları değiştirir — `F3-042`.
 
+        Sütunlar plan Bölüm 5.5'e göre ortak `event_table_model`'den gelir.
         Şiddet sütununda hem ikon hem metin bulunur: durum yalnız renkle
-        anlatılmaz (plan Bölüm 6.4).
+        anlatılmaz (plan Bölüm 6.4). `start_ns` göreli zaman içindir.
         """
         severity_column = EVENT_COLUMNS.index("Severity")
         self.events.setRowCount(len(events))
 
         for row, event in enumerate(events):
             style = severity_style(event.severity)
-            values = (
-                format_timestamp(event.timestamp_ns),
-                event.source,
-                event.category,
-                style.label,
-                event.message,
-            )
-            for column, text in enumerate(values):
-                item = QTableWidgetItem(text)
+            for column, name in enumerate(EVENT_COLUMNS):
+                item = QTableWidgetItem(event_cell_text(event, name, start_ns=start_ns))
                 item.setData(Qt.ItemDataRole.UserRole, event.timestamp_ns)
                 if column == severity_column:
                     item.setIcon(make_status_icon(style))
