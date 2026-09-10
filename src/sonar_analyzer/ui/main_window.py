@@ -43,6 +43,7 @@ from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.event import Event
 from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import TimeRange
+from sonar_analyzer.export.image_export import export_widget_png
 from sonar_analyzer.repository.file_repository import FileRecordingRepository
 from sonar_analyzer.repository.mock_repository import SIMULATION_LABEL, MockRecordingRepository
 from sonar_analyzer.repository.protocol import RecordingRepository
@@ -308,6 +309,19 @@ class MainWindow(QMainWindow):
         half = (x_max - x_min) / 2.0
         self.plot_panel.set_x_range(centre - half, centre + half)
         return True
+
+    def export_plot_png(self, path: str | Path, *, scale: float = 1.0) -> Path:
+        """Seçili (merkez) grafiği bir PNG dosyasına yazar — `F3-062`.
+
+        Çıktı grafiğin o anki çizimidir: başlık, seriler ve eksen birimleri
+        neyse dosyada odur. Grafikte çizili kanal yoksa `ValueError` verir;
+        boş bir görüntü üretmez.
+        """
+        if not self.plot_panel.plotted_channel_ids():
+            raise ValueError("Disa aktarilacak grafik yok: once bir kanal cizin")
+        dest = export_widget_png(self.plot_panel, path, scale=scale)
+        self.bottom_dock.append_log(f"Grafik PNG olarak yazildi: {dest}")
+        return dest
 
     def _on_axis_range_requested(self, axis: str, y_min: float, y_max: float) -> None:
         """Inspector Display'den gelen eksen aralığını seçili grafiğe uygular — `F3-036`.

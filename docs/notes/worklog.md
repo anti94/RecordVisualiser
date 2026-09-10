@@ -196,8 +196,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-058` | 15 dk | 9 dk 20 sn | `22e4fb9` | oynatma hızlarını bağla |
 | `F3-059` | 20 dk | 5 dk 50 sn | `7119e52` | zamana ve önceki/sonraki olaya gitmeyi ekle |
 | `F3-060` | 20 dk | 8 dk 44 sn | `f226c00` | scrubbing sorgularını debounce et |
+| `F3-061` | 15 dk | 6 dk 44 sn | `4bd8868` | UTC, yerel ve geçen süre gösterimini ekle |
 
-**178 commit · olculen toplam 2204 dk 27 sn · olculemeyen 1 (ilk commit)**
+**179 commit · olculen toplam 2211 dk 11 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
