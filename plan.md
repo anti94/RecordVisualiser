@@ -1661,7 +1661,7 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 | [x] | `F4-047` | `1.47.0` | 20 dk | STFT kenar, overlap ve eksen eşlemesini doğrula | Son pencere ve boş seçim tanımlı davranır; eksenler kaymaz | `F4-046` | `test(analysis): F4-047 sTFT kenar, overlap ve eksen eşlemesini doğrula` |
 | [x] | `F4-048` | `1.48.0` | 20 dk | Mockup orta spektrogramını sonuçlara bağla | Hidrofon, zaman, frekans ve dB renk ölçeği veriyi doğru gösterir | `F4-047` | `feat(ui): F4-048 mockup orta spektrogramını sonuçlara bağla` |
 | [x] | `F4-049` | `1.49.0` | 15 dk | Spektrogram renk ölçeği kontrollerini ekle | Algısal düzgün colormap ve dB sınırları okunabilir kalır | `F4-048` | `feat(ui): F4-049 spektrogram renk ölçeği kontrollerini ekle` |
-| [ ] | `F4-050` | `1.50.0` | 20 dk | Waterfall zaman dilimi modelini ekle | Yeni dilim eklenir; geçmiş için belirlenen sınır korunur | `F4-049` | `feat(analysis): F4-050 waterfall zaman dilimi modelini ekle` |
+| [x] | `F4-050` | `1.50.0` | 20 dk | Waterfall zaman dilimi modelini ekle | Yeni dilim eklenir; geçmiş için belirlenen sınır korunur | `F4-049` | `feat(analysis): F4-050 waterfall zaman dilimi modelini ekle` |
 | [ ] | `F4-051` | `1.51.0` | 20 dk | Waterfall görünümünü ekle | Zaman dilimleri doğru sırayla çizilir; birimler açıktır | `F4-050` | `feat(ui): F4-051 waterfall görünümünü ekle` |
 | [ ] | `F4-052` | `1.52.0` | 20 dk | Zaman serisi, STFT, FFT ve istatistiği birlikte bağla | Mockup'ın dört merkez bölgesi aynı seçimle tutarlı güncellenir | `F4-051` | `feat(ui): F4-052 zaman serisi, STFT, FFT ve istatistiği birlikte bağla` |
 
