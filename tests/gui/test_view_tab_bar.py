@@ -48,8 +48,8 @@ def test_time_series_is_selected_by_default(bar: ViewTabBar) -> None:
     assert bar.tabText(bar.currentIndex()) == "Time Series"
 
 
-#: `F3-048` ile Transmission de çalışır; kalanlar hâlâ pasiftir.
-_LIVE_TABS = {"Time Series", "Transmission"}
+#: `F3-048` Transmission, `F4-045` Spectrum; kalanlar hâlâ pasiftir.
+_LIVE_TABS = {"Time Series", "Transmission", "Spectrum"}
 
 
 def test_supported_tabs_are_enabled_the_rest_are_explicitly_passive(bar: ViewTabBar) -> None:

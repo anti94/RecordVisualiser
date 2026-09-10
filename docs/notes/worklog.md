@@ -259,8 +259,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-041` | 20 dk | 3 dk 17 sn | `8be5420` | FFT, dB ve Nyquist doğrulamalarını ekle |
 | `F4-042` | 20 dk | 8 dk 11 sn | `637ad26` | seçili aralık FFT'sini mockup alt grafiğine bağla |
 | `F4-043` | 20 dk | 4 dk 31 sn | `09e47aa` | Welch PSD hesabını ekle |
+| `F4-044` | 15 dk | 3 dk 38 sn | `77058be` | PSD pencere, overlap ve birim sınırlarını doğrula |
 
-**241 commit · olculen toplam 2601 dk 51 sn · olculemeyen 1 (ilk commit)**
+**242 commit · olculen toplam 2605 dk 29 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

@@ -33,8 +33,8 @@ TAB_TITLES: tuple[str, ...] = (
     "Report",
 )
 
-#: Bu fazda calisan sekmeler (`F3-048` ile `Transmission` eklendi).
-ENABLED_TABS: frozenset[str] = frozenset({"Time Series", "Transmission"})
+#: Bu fazda calisan sekmeler (`F3-048` `Transmission`, `F4-045` `Spectrum`).
+ENABLED_TABS: frozenset[str] = frozenset({"Time Series", "Transmission", "Spectrum"})
 
 
 class ViewTabBar(QTabBar):
