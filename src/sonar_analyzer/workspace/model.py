@@ -335,7 +335,10 @@ class WorkspaceModel:
             data = json.loads(text)
         except json.JSONDecodeError as exc:
             raise WorkspaceError(f"Workspace JSON çözümlenemedi: {exc}") from exc
-        return cls.from_dict(data)
+        # Eski şema sürümleri önce güncel şekle taşınır — `F3-071`.
+        from sonar_analyzer.workspace.migrate import migrate_document
+
+        return cls.from_dict(migrate_document(data))
 
     def with_schema_version(self, version: int) -> WorkspaceModel:
         return replace(self, schema_version=version)
