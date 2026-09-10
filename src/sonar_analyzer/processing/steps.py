@@ -42,12 +42,17 @@ class StepKind(str, Enum):
     CLIP = "clip"  # y = min(max(x, lo), hi)
     MOVING_AVERAGE = "moving_average"  # kayan pencere ortalaması (tek boyutlu)
     DETREND = "detrend"  # sabit (DC) ya da doğrusal trend çıkarma — `F4-015`
+    NORMALIZE = "normalize"  # sinyali referans genliğe ölçekle — `F4-019`
 
 
 #: `DETREND` adımının `mode` parametresi için geçerli değerler.
 #: `constant` = örnek ortalamasını çıkar (DC kaldırma);
 #: `linear` = en küçük kareler doğrusunu çıkar.
 DETREND_MODES: tuple[str, ...] = ("constant", "linear")
+
+#: `NORMALIZE` adımının `mode` parametresi için geçerli değerler.
+#: `peak` = |x| tepesini `reference`'a getir; `rms` = RMS'i `reference`'a getir.
+NORMALIZE_MODES: tuple[str, ...] = ("peak", "rms")
 
 
 @dataclass(frozen=True)
@@ -91,6 +96,10 @@ PARAMETER_SPECS: dict[StepKind, tuple[ParamSpec, ...]] = {
     StepKind.CLIP: (ParamSpec("lo", float, 0.0), ParamSpec("hi", float, 1.0)),
     StepKind.MOVING_AVERAGE: (ParamSpec("window", int, 3),),
     StepKind.DETREND: (ParamSpec("mode", str, "constant", choices=DETREND_MODES),),
+    StepKind.NORMALIZE: (
+        ParamSpec("mode", str, "peak", choices=NORMALIZE_MODES),
+        ParamSpec("reference", float, 1.0),
+    ),
 }
 
 
@@ -127,6 +136,8 @@ class ProcessingStep:
                     f"moving_average: window <= {MAX_MOVING_AVERAGE_WINDOW} olmalı "
                     f"(aşırı pencere): {window}"
                 )
+        if self.kind is StepKind.NORMALIZE and cast("float", resolved["reference"]) <= 0.0:
+            raise StepValidationError("normalize: reference > 0 olmalı")
         # frozen dataclass: normalize edilmiş parametreleri geri yaz.
         object.__setattr__(self, "parameters", resolved)
 

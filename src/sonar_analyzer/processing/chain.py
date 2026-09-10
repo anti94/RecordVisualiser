@@ -113,6 +113,36 @@ def _detrend(values: Samples, mode: str) -> Samples:
     raise ChainExecutionError(f"Bilinmeyen detrend modu: {mode!r}")  # pragma: no cover
 
 
+def _normalize(values: Samples, mode: str, reference: float) -> Samples:
+    """Sinyali `reference` genliğe ölçekler — `F4-019`.
+
+    * ``peak`` — ``|x|`` tepesi ``reference`` olacak şekilde ölçekler.
+    * ``rms`` — RMS değeri ``reference`` olacak şekilde ölçekler.
+
+    **Sıfır sinyal bölme hatası üretmez:** norm (tepe ya da RMS) sıfır
+    veya sonlu değilse dizi olduğu gibi (kopya) döndürülür — ``inf`` /
+    ``nan`` üretilmez, uyarı verilmez. NaN'a dayanıklı: norm yalnız sonlu
+    örneklerden hesaplanır, NaN örnekler NaN kalır.
+    """
+    if values.size == 0:
+        return values.copy()
+    finite = np.isfinite(values)
+    if not finite.any():
+        return values.copy()
+
+    good = values[finite]
+    if mode == "peak":
+        norm = float(np.abs(good).max())
+    elif mode == "rms":
+        norm = float(np.sqrt(np.mean(np.square(good))))
+    else:  # pragma: no cover - `ProcessingStep` doğrulaması bunu engeller
+        raise ChainExecutionError(f"Bilinmeyen normalize modu: {mode!r}")
+
+    if norm == 0.0 or not np.isfinite(norm):
+        return values.copy()
+    return values * (reference / norm)
+
+
 def apply_step(values: Samples, step: ProcessingStep) -> Samples:
     """Tek bir adımı uygular; **her zaman yeni** bir `float64` dizi döndürür."""
     data = _as_float64(values)
@@ -129,6 +159,12 @@ def apply_step(values: Samples, step: ProcessingStep) -> Samples:
         return moving_average(data, int(params["window"]))  # type: ignore[arg-type]
     if step.kind is StepKind.DETREND:
         return _detrend(data, str(params["mode"]))
+    if step.kind is StepKind.NORMALIZE:
+        return _normalize(
+            data,
+            str(params["mode"]),
+            float(params["reference"]),  # type: ignore[arg-type]
+        )
     raise ChainExecutionError(f"Uygulanmayan işlem türü: {step.kind}")  # pragma: no cover
 
 

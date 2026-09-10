@@ -233,8 +233,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-015` | 20 dk | 5 dk 45 sn | `8df389a` | detrend ve DC kaldırma hesabını ekle |
 | `F4-016` | 15 dk | 5 dk 5 sn | `763370b` | detrend türü seçimini işlem editörüne bağla |
 | `F4-017` | 20 dk | 6 dk 24 sn | `555b340` | moving average hesabını ekle |
+| `F4-018` | 15 dk | 4 dk 7 sn | `9fe0b3e` | moving average pencere kontrolünü bağla |
 
-**215 commit · olculen toplam 2460 dk 28 sn · olculemeyen 1 (ilk commit)**
+**216 commit · olculen toplam 2464 dk 35 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
