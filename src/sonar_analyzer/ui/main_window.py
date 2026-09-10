@@ -253,6 +253,14 @@ class MainWindow(QMainWindow):
         if isinstance(event, Event):
             self.go_to_time(event.timestamp_ns)
 
+    def _set_event_markers_visible(self, visible: bool) -> None:
+        """`F3-050` — olay işaretlerinin görünürlüğü (veri değişmez)."""
+        self.plot_panel.set_event_markers_visible(visible)
+
+    def _set_tx_regions_visible(self, visible: bool) -> None:
+        """`F3-050` — TX bantlarının görünürlüğü (veri değişmez)."""
+        self.plot_panel.set_tx_regions_visible(visible)
+
     def go_to_time(self, timestamp_ns: int) -> bool:
         """Grafiğin görünür X penceresini `timestamp_ns`'e **ortalar** — `F3-046`.
 
@@ -772,6 +780,8 @@ class MainWindow(QMainWindow):
 
         self.plot_tool_bar = PlotToolBar(container)
         self.plot_tool_bar.channel_selected.connect(self.open_channel)
+        self.plot_tool_bar.markers_visible_toggled.connect(self._set_event_markers_visible)
+        self.plot_tool_bar.tx_visible_toggled.connect(self._set_tx_regions_visible)
         layout.addWidget(self.plot_tool_bar)
 
         self.empty_state = EmptyStatePanel(container)

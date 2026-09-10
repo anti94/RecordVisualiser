@@ -54,6 +54,10 @@ class PlotToolBar(QWidget):
     channel_selected = Signal(str)
     #: Sync onay kutusu degisti.
     sync_toggled = Signal(bool)
+    #: `F3-050` olay işaretleri görünürlüğü değişti.
+    markers_visible_toggled = Signal(bool)
+    #: `F3-050` TX bölgeleri görünürlüğü değişti.
+    tx_visible_toggled = Signal(bool)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -90,6 +94,20 @@ class PlotToolBar(QWidget):
         self.channel_selector.setEnabled(False)
         self.channel_selector.currentIndexChanged.connect(self._on_channel_index_changed)
         layout.addWidget(self.channel_selector)
+
+        self.markers_checkbox = QCheckBox("Markers", self)
+        self.markers_checkbox.setObjectName("check_event_markers")
+        self.markers_checkbox.setChecked(True)
+        self.markers_checkbox.setToolTip("Olay zaman işaretlerini göster/gizle (veriyi etkilemez)")
+        self.markers_checkbox.toggled.connect(self.markers_visible_toggled.emit)
+        layout.addWidget(self.markers_checkbox)
+
+        self.tx_checkbox = QCheckBox("TX", self)
+        self.tx_checkbox.setObjectName("check_tx_regions")
+        self.tx_checkbox.setChecked(True)
+        self.tx_checkbox.setToolTip("TX aralık bantlarını göster/gizle (veriyi etkilemez)")
+        self.tx_checkbox.toggled.connect(self.tx_visible_toggled.emit)
+        layout.addWidget(self.tx_checkbox)
 
         self.sync_checkbox = QCheckBox("Sync", self)
         self.sync_checkbox.setObjectName("check_sync")

@@ -165,12 +165,14 @@ class PlotPanel(QWidget):
         # konumlanan bir dikey çizgiye dönüşür.
         self._event_marks: list[tuple[int, str]] = []
         self._event_lines: list[pg.InfiniteLine] = []
+        self._event_markers_visible = True
 
         # F3-047: TX (transmisyon) aralıkları — (start_ns, end_ns) çiftleri
         # gölgeli bant olarak çizilir; START/STOP sınırları zaman ekseniyle
         # eşleşir.
         self._tx_spans: list[tuple[int, int]] = []
         self._tx_regions: list[pg.LinearRegionItem] = []
+        self._tx_regions_visible = True
 
         #: F3-034: `dispose()` çağrıldı mı — ikinci çağrı sessizce döner.
         self._disposed = False
@@ -710,8 +712,19 @@ class PlotPanel(QWidget):
                 movable=False,
                 pen=pg.mkPen(color, width=1, style=Qt.PenStyle.DashLine),
             )
+            line.setVisible(self._event_markers_visible)
             self.plot.addItem(line, ignoreBounds=True)
             self._event_lines.append(line)
+
+    def set_event_markers_visible(self, visible: bool) -> None:
+        """Olay işaretlerini gösterir/gizler — **veri değişmez** — `F3-050`."""
+        self._event_markers_visible = visible
+        for line in self._event_lines:
+            line.setVisible(visible)
+
+    @property
+    def event_markers_visible(self) -> bool:
+        return self._event_markers_visible
 
     def event_marker_count(self) -> int:
         """Şu an çizili olay işareti sayısı — testler için."""
@@ -756,8 +769,19 @@ class PlotPanel(QWidget):
                 brush=pg.mkBrush(120, 170, 230, 45),
             )
             region.setZValue(-10)
+            region.setVisible(self._tx_regions_visible)
             self.plot.addItem(region, ignoreBounds=True)
             self._tx_regions.append(region)
+
+    def set_tx_regions_visible(self, visible: bool) -> None:
+        """TX bantlarını gösterir/gizler — **veri değişmez** — `F3-050`."""
+        self._tx_regions_visible = visible
+        for region in self._tx_regions:
+            region.setVisible(visible)
+
+    @property
+    def tx_regions_visible(self) -> bool:
+        return self._tx_regions_visible
 
     def tx_region_count(self) -> int:
         """Şu an çizili TX bandı sayısı — testler için."""
