@@ -59,6 +59,7 @@ STEP_KIND_ORDER: tuple[StepKind, ...] = (
     StepKind.CLIP,
     StepKind.MOVING_AVERAGE,
     StepKind.DETREND,
+    StepKind.NORMALIZE,
 )
 
 #: Bir parametre alanı widget'ı. `ParamSpec.choices` dolu str parametreler

@@ -1621,7 +1621,7 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 | [x] | `F4-017` | `1.17.0` | 20 dk | Moving average hesabını ekle | Bilinen kısa dizide pencere ve kenar davranışı tanımlı sonucu verir | `F4-016` | `feat(processing): F4-017 moving average hesabını ekle` |
 | [x] | `F4-018` | `1.18.0` | 15 dk | Moving average pencere kontrolünü bağla | Sıfır veya aşırı pencere işlem başlamadan reddedilir | `F4-017` | `feat(ui): F4-018 moving average pencere kontrolünü bağla` |
 | [x] | `F4-019` | `1.19.0` | 20 dk | Normalize hesabını ekle | Referans genlik doğru ölçeklenir; sıfır sinyal bölme hatası üretmez | `F4-018` | `feat(processing): F4-019 normalize hesabını ekle` |
-| [ ] | `F4-020` | `1.20.0` | 15 dk | Normalize seçimini işlem editörüne bağla | Normalize adımı seçili kanal grafiğine uygulanır | `F4-019` | `feat(ui): F4-020 normalize seçimini işlem editörüne bağla` |
+| [x] | `F4-020` | `1.20.0` | 15 dk | Normalize seçimini işlem editörüne bağla | Normalize adımı seçili kanal grafiğine uygulanır | `F4-019` | `feat(ui): F4-020 normalize seçimini işlem editörüne bağla` |
 | [ ] | `F4-021` | `1.21.0` | 20 dk | Pencereli RMS ve envelope hesabını ekle | Sabit genlikli sinyalde beklenen RMS/envelope oluşur | `F4-020` | `feat(processing): F4-021 pencereli RMS ve envelope hesabını ekle` |
 | [ ] | `F4-022` | `1.22.0` | 15 dk | RMS/envelope pencere kontrollerini bağla | Pencere süresi sample rate üzerinden doğru örnek sayısına dönüşür | `F4-021` | `feat(ui): F4-022 rMS/envelope pencere kontrollerini bağla` |
 | [ ] | `F4-023` | `1.23.0` | 20 dk | Phase unwrap hesabını ekle | Bilinen faz sıçramaları sürekliliğe dönüşür | `F4-022` | `feat(processing): F4-023 phase unwrap hesabını ekle` |
