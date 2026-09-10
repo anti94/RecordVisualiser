@@ -1,19 +1,24 @@
-"""DSP işlerini worker üzerinden çalıştır — `F4-003`.
+"""DSP işlerini worker üzerinden çalıştır, iptal + eski sonuç denetimi —
+`F4-003`, `F4-004`.
 
 Bir `ProcessingChain.run()` büyük bir kanalda milyonlarca örnek üzerinde
 çalışabilir; GUI thread'inde yapılırsa pencere donar. `DspRunner` her
-işi kısa ömürlü bir `QThread`'e taşır ve **yalnız en güncel** işin
-sonucunu yayınlar:
+işi kısa ömürlü bir `QThread`'e taşır ve **yalnız uygulanabilir** işin
+sonucunu yayınlar.
 
-* `submit(chain, values, channel_id)` hemen döner ve artan bir `job_id`
-  verir; bu id o andan itibaren "en güncel"dir.
-* Bir iş bitince sonucu yalnızca `job_id` hâlâ en güncelse
-  `result_ready(job_id, channel_id, ChainResult)` ile yayılır; daha yeni
-  bir iş gönderilmişse eski sonuç **atılır** (`stale` sinyali).
-* Hata `failed(job_id, mesaj)` ile bildirilir.
+Bir sonucun grafiğe **uygulanabilir** olması için üç koşul birden:
+
+1. Daha yeni bir iş gönderilmemiş olmalı (`job_id == latest_job_id`).
+2. İş ait olduğu **seçim anahtarına** hâlâ bağlı olmalı; seçim
+   `set_selection(key)` ile değiştiyse eski işlerin sonucu düşer.
+3. İş **iptal edilmemiş** olmalı (`cancel` / `cancel_all`).
+
+Aksi hâlde sonuç `stale` (eski) ya da `cancelled` (iptal) sinyaliyle
+bildirilir ve `result_ready` **yayılmaz** — çağıran grafiğe uygulamaz.
 
 `ExportRunner` (`F3-066`) ile aynı kalıp: `QThread` alt sınıfı, `run()`
-içinde iş, ayrı olay döngüsü yok.
+içinde iş, ayrı olay döngüsü yok. Zincir tek NumPy geçişi olduğu için
+iptal **kooperatiftir**: iş sonuna kadar koşar ama sonucu bastırılır.
 """
 
 from __future__ import annotations
@@ -55,12 +60,14 @@ class _DspJob(QThread):
 
 
 class DspRunner(QObject):
-    """DSP zincirlerini worker'da çalıştırır; yalnız en güncel sonucu yayınlar."""
+    """DSP zincirlerini worker'da çalıştırır; iptal ve eski sonuçları eler."""
 
-    #: (job_id, channel_id, ChainResult) — yalnız en güncel iş için.
+    #: (job_id, channel_id, ChainResult) — yalnız uygulanabilir iş için.
     result_ready = Signal(int, str, object)
-    #: (job_id, channel_id) — sonuç geldi ama daha yeni bir iş var; atıldı.
+    #: (job_id, channel_id) — sonuç geldi ama daha yeni iş / seçim var; atıldı.
     stale = Signal(int, str)
+    #: (job_id, channel_id) — iş kullanıcı tarafından iptal edildi.
+    cancelled = Signal(int, str)
     #: (job_id, mesaj)
     failed = Signal(int, str)
 
@@ -68,19 +75,49 @@ class DspRunner(QObject):
         super().__init__(parent)
         self._counter = 0
         self._latest_job_id = 0
+        self._selection = ""
         self._jobs: dict[int, _DspJob] = {}
         self._channel_ids: dict[int, str] = {}
+        self._job_selection: dict[int, str] = {}
+        self._cancelled: set[int] = set()
+
+    # -- sorgular ----------------------------------------------
 
     @property
     def latest_job_id(self) -> int:
         return self._latest_job_id
 
+    @property
+    def selection(self) -> str:
+        return self._selection
+
     def is_current(self, job_id: int) -> bool:
-        return job_id == self._latest_job_id
+        """`job_id` sonucu grafiğe uygulanabilir mi (yeni değil, seçim aynı, iptal değil)."""
+        if job_id != self._latest_job_id or job_id in self._cancelled:
+            return False
+        bound = self._job_selection.get(job_id)
+        # İşin bağlandığı seçim kaydı yoksa (hiç görülmemiş id) güncel sayılmaz.
+        return bound is not None and bound == self._selection
 
     @property
     def busy(self) -> bool:
         return any(job.isRunning() for job in self._jobs.values())
+
+    # -- seçim / iptal --------------------------------------
+
+    def set_selection(self, key: str) -> None:
+        """Etkin seçimi değiştirir; farklı seçime bağlı işlerin sonucu düşer — `F4-004`."""
+        self._selection = key
+
+    def cancel(self, job_id: int) -> None:
+        """Tek bir işi iptal eder; sonucu grafiğe uygulanmaz — `F4-004`."""
+        self._cancelled.add(job_id)
+
+    def cancel_all(self) -> None:
+        """Uçuştaki tüm işleri iptal eder."""
+        self._cancelled.update(self._jobs)
+
+    # -- gönderim --------------------------------------------
 
     def submit(
         self,
@@ -93,6 +130,7 @@ class DspRunner(QObject):
         job_id = self._counter
         self._latest_job_id = job_id
         self._channel_ids[job_id] = channel_id
+        self._job_selection[job_id] = self._selection
 
         job = _DspJob(job_id, chain, values)
         job.done.connect(self._on_done)
@@ -115,15 +153,22 @@ class DspRunner(QObject):
         channel_id = self._channel_ids.get(job_id, "")
         if not isinstance(result, ChainResult):
             return
-        if job_id == self._latest_job_id:
+        if job_id in self._cancelled:
+            self.cancelled.emit(job_id, channel_id)
+        elif self.is_current(job_id):
             self.result_ready.emit(job_id, channel_id, result)
         else:
             self.stale.emit(job_id, channel_id)
 
     def _on_error(self, job_id: int, message: str) -> None:
-        if job_id == self._latest_job_id:
+        if job_id in self._cancelled:
+            self.cancelled.emit(job_id, self._channel_ids.get(job_id, ""))
+        elif self.is_current(job_id):
             self.failed.emit(job_id, message)
 
     def _cleanup(self, job_id: int) -> None:
         self._jobs.pop(job_id, None)
         self._channel_ids.pop(job_id, None)
+        self._cancelled.discard(job_id)
+        # `_job_selection` bilerek korunur: iş bittikten sonra da
+        # `is_current(job_id)` seçimin değişip değişmediğini bilebilmeli.

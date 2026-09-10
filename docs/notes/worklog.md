@@ -218,8 +218,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-080` | 15 dk | 6 dk 33 sn | `40a2f7c` | MVP kabulünü kapat ve major sürümü hazırla |
 | `F4-001` | 20 dk | 3 dk 48 sn | `8ac0bdb` | işlem adımı ve parametre modelini ekle |
 | `F4-002` | 20 dk | 3 dk 40 sn | `b070b05` | sıralı işlem zinciri yürütücüsünü ekle |
+| `F4-003` | 20 dk | 3 dk 48 sn | `ee31a2f` | DSP işlerini worker üzerinden çalıştır |
 
-**200 commit · olculen toplam 2370 dk 23 sn · olculemeyen 1 (ilk commit)**
+**201 commit · olculen toplam 2374 dk 11 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
