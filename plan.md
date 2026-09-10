@@ -1550,7 +1550,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 | [x] | `F3-055` | `0.157.0` | 20 dk | Timeline viewport seçimini grafiğe bağla | Bölge taşıma tüm bağlı grafiklerin zaman aralığını değiştirir | `F3-054` | `feat(ui): F3-055 timeline viewport seçimini grafiğe bağla` |
 | [x] | `F3-056` | `0.158.0` | 20 dk | Play, pause ve stop durum makinesini ekle | Geçişler GUI olmadan doğrulanır; stop başlangıca döner | `F3-055` | `feat(playback): F3-056 play, pause ve stop durum makinesini ekle` |
 | [x] | `F3-057` | `0.159.0` | 20 dk | Kayıt zamanına göre ilerleme saatini ekle | 125 ms kayıt sınırları doğru sırayla geçilir | `F3-056` | `feat(playback): F3-057 kayıt zamanına göre ilerleme saatini ekle` |
-| [ ] | `F3-058` | `0.160.0` | 15 dk | Oynatma hızlarını bağla | 0.25x–10x seçenekleri kayıt zamanı ilerlemesini ölçekler | `F3-057` | `feat(playback): F3-058 oynatma hızlarını bağla` |
+| [x] | `F3-058` | `0.160.0` | 15 dk | Oynatma hızlarını bağla | 0.25x–10x seçenekleri kayıt zamanı ilerlemesini ölçekler | `F3-057` | `feat(playback): F3-058 oynatma hızlarını bağla` |
 | [ ] | `F3-059` | `0.161.0` | 20 dk | Zamana ve önceki/sonraki olaya gitmeyi ekle | Sınır dışı zaman güvenli sınırlanır; olay sırası korunur | `F3-058` | `feat(playback): F3-059 zamana ve önceki/sonraki olaya gitmeyi ekle` |
 | [ ] | `F3-060` | `0.162.0` | 20 dk | Scrubbing sorgularını debounce et | Hızlı sürüklemede son konum çizilir; eski sorgu görünümü ezmez | `F3-059` | `perf(ui): F3-060 scrubbing sorgularını debounce et` |
 | [ ] | `F3-061` | `0.163.0` | 15 dk | UTC, yerel ve geçen süre gösterimini ekle | Üç görünüm aynı kanonik anı temsil eder | `F3-060` | `feat(ui): F3-061 uTC, yerel ve geçen süre gösterimini ekle` |

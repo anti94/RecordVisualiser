@@ -17,6 +17,7 @@ from collections.abc import Sequence
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
+    QComboBox,
     QDockWidget,
     QDoubleSpinBox,
     QHBoxLayout,
@@ -35,6 +36,15 @@ from sonar_analyzer.ui.docks.timeline_overview import TimelineOverview
 
 #: Kayıt periyodu saniye cinsinden (125 ms ızgara).
 RECORD_PERIOD_S = RECORD_PERIOD_NS / NS_PER_SECOND
+
+#: `F3-058` oynatma hızı çarpanları (0.25x–10x).
+PLAYBACK_SPEEDS: tuple[float, ...] = (0.25, 0.5, 1.0, 2.0, 5.0, 10.0)
+DEFAULT_PLAYBACK_SPEED = 1.0
+
+
+def _speed_label(multiplier: float) -> str:
+    return f"{multiplier:g}x"
+
 
 DOCK_OBJECT_NAME = "dock_playback"
 DOCK_TITLE = "Playback / Time Control"
@@ -69,6 +79,8 @@ class PlaybackDock(QDockWidget):
     position_changed = Signal(float)
     #: `Go` ile bir aralik istendi.
     range_requested = Signal(float, float)
+    #: `F3-058` oynatma hızı çarpanı değişti.
+    speed_changed = Signal(float)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(DOCK_TITLE, parent)
@@ -122,6 +134,15 @@ class PlaybackDock(QDockWidget):
         self.buttons["button_loop"].setCheckable(True)
         self.buttons["button_skip_start"].clicked.connect(self._on_stop)
         self.buttons["button_skip_end"].clicked.connect(lambda: self.set_position(self._duration_s))
+
+        # F3-058: oynatma hızı seçici (0.25x–10x).
+        self.speed_selector = QComboBox(body)
+        self.speed_selector.setObjectName("combo_playback_speed")
+        for multiplier in PLAYBACK_SPEEDS:
+            self.speed_selector.addItem(_speed_label(multiplier), multiplier)
+        self.speed_selector.setCurrentIndex(PLAYBACK_SPEEDS.index(DEFAULT_PLAYBACK_SPEED))
+        self.speed_selector.currentIndexChanged.connect(self._on_speed_changed)
+        layout.addWidget(self.speed_selector)
 
         self.slider = QSlider(Qt.Orientation.Horizontal, body)
         self.slider.setObjectName("slider_position")
@@ -216,6 +237,11 @@ class PlaybackDock(QDockWidget):
     def is_playing(self) -> bool:
         return self.machine.is_playing
 
+    @property
+    def playback_speed(self) -> float:
+        """Seçili oynatma hızı çarpanı — `F3-058`."""
+        return self.clock.speed
+
     def time_text(self) -> str:
         return self.time_label.text()
 
@@ -255,6 +281,14 @@ class PlaybackDock(QDockWidget):
         if not self.machine.is_playing and self.buttons["button_play"].isChecked():
             self.buttons["button_play"].setChecked(False)
         self._refresh_label()
+
+    def _on_speed_changed(self, index: int) -> None:
+        """Hız seçicisi değişince saati ölçekler ve sinyal yayar — `F3-058`."""
+        if index < 0 or index >= len(PLAYBACK_SPEEDS):
+            return
+        multiplier = PLAYBACK_SPEEDS[index]
+        self.clock.set_speed(multiplier)
+        self.speed_changed.emit(multiplier)
 
     def _on_go(self) -> None:
         start = self.start_input.value()
