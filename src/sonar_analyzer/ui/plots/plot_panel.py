@@ -38,6 +38,7 @@ from __future__ import annotations
 import contextlib
 from collections.abc import Sequence
 from dataclasses import dataclass
+from pathlib import Path
 from typing import cast
 
 import numpy as np
@@ -1073,6 +1074,30 @@ class PlotPanel(QWidget):
     def plotted_channel_ids(self) -> list[str]:
         """Şu an grafikte bulunan kanal kimlikleri, ekleme sırasıyla — testler için."""
         return list(self._series)
+
+    def export_svg(self, path: str | Path) -> Path:
+        """Grafiği **vektörel** SVG olarak yazar — `F3-063`.
+
+        pyqtgraph'ın kendi `SVGExporter`'ı sahne grafiğini dolaşır: seriler
+        `<path>`, eksen ve başlık metinleri `<text>` olarak çıkar, çıktı
+        kayıpsız ölçeklenir. PyQtGraph yalnız bu adaptör katmanında görünür
+        (ADR-002), bu yüzden SVG üretimi de burada durur.
+
+        Grafikte çizili kanal yoksa `ValueError`; disk yazımı başarısızsa
+        `OSError`.
+        """
+        from pyqtgraph.exporters import SVGExporter
+
+        if not self._series:
+            raise ValueError("Cizili kanal yok: SVG disa aktarilamaz")
+
+        dest = Path(path)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        exporter = SVGExporter(self.plot.getPlotItem())
+        exporter.export(str(dest))
+        if not dest.exists() or dest.stat().st_size == 0:
+            raise OSError(f"SVG yazilamadi: {dest}")
+        return dest
 
     # -- seri gorunurlugu / solo (F3-030) -----------------------
 

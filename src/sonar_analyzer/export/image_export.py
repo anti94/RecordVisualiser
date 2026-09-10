@@ -5,7 +5,9 @@ başlık, seriler, legend ve eksen birimleri neyse çıktıya o girer. Bu
 yüzden "başlık ve birimler görünür" kabulü grafiğin kendi çiziminden
 gelir; dışa aktarma yalnız onu bir PNG dosyasına yazar.
 
-Vektörel SVG çıktısı `F3-063`'te ayrı eklenecek.
+Vektörel SVG çıktısı (`F3-063`) pyqtgraph'ın sahne grafiğini dolaşan
+kendi dışa aktarıcısını gerektirir; o yüzden `PlotPanel.export_svg`
+içinde, grafik adaptör katmanında durur (ADR-002).
 """
 
 from __future__ import annotations

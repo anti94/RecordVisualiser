@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 164 tamamlandı · 328 kaldı**
+**Toplam 492 madde · 165 tamamlandı · 327 kaldı**
 
-`[########................]` %33.3
+`[########................]` %33.5
 
 ## Özet
 
@@ -37,12 +37,12 @@ Work in fully autonomous mode.
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
-| Faz 3 — MVP analiz arayüzü | 62 | 18 | 80 |
+| Faz 3 — MVP analiz arayüzü | 63 | 17 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **164** | **328** | **492** |
+| **Toplam** | **165** | **327** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -163,7 +163,7 @@ Work in fully autonomous mode.
 | [x] | `F2-040` | `0.101.0` | 20 dk | Kaynak dosyanın değişmediğini doğrula |
 | [x] | `F2-041` | `0.102.0` | 15 dk | Parser milestone kabulünü kaydet |
 
-### Faz 3 — MVP analiz arayüzü (62/80)
+### Faz 3 — MVP analiz arayüzü (63/80)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -229,7 +229,7 @@ Work in fully autonomous mode.
 | [x] | `F3-060` | `0.162.0` | 20 dk | Scrubbing sorgularını debounce et |
 | [x] | `F3-061` | `0.163.0` | 15 dk | UTC, yerel ve geçen süre gösterimini ekle |
 | [x] | `F3-062` | `0.164.0` | 20 dk | Seçili grafiği PNG olarak dışa aktar |
-| [ ] | `F3-063` | `0.165.0` | 20 dk | Seçili grafiği SVG olarak dışa aktar |
+| [x] | `F3-063` | `0.165.0` | 20 dk | Seçili grafiği SVG olarak dışa aktar |
 | [ ] | `F3-064` | `0.166.0` | 20 dk | Seçili kanal ve aralığı CSV olarak yaz |
 | [ ] | `F3-065` | `0.167.0` | 20 dk | Export hedefi ve üzerine yazma kontrolünü ekle |
 | [ ] | `F3-066` | `0.168.0` | 20 dk | Büyük export için worker ve iptal ekle |

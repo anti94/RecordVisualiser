@@ -323,6 +323,18 @@ class MainWindow(QMainWindow):
         self.bottom_dock.append_log(f"Grafik PNG olarak yazildi: {dest}")
         return dest
 
+    def export_plot_svg(self, path: str | Path) -> Path:
+        """Seçili (merkez) grafiği **vektörel** SVG dosyasına yazar — `F3-063`.
+
+        Seriler ve eksenler vektör olarak çıkar; çıktı kayıpsız ölçeklenir.
+        Grafikte çizili kanal yoksa `ValueError` verir.
+        """
+        if not self.plot_panel.plotted_channel_ids():
+            raise ValueError("Disa aktarilacak grafik yok: once bir kanal cizin")
+        dest = self.plot_panel.export_svg(path)
+        self.bottom_dock.append_log(f"Grafik SVG olarak yazildi: {dest}")
+        return dest
+
     def _on_axis_range_requested(self, axis: str, y_min: float, y_max: float) -> None:
         """Inspector Display'den gelen eksen aralığını seçili grafiğe uygular — `F3-036`.
 
