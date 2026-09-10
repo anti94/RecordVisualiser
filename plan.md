@@ -207,7 +207,7 @@ Yapılacaklar:
 - [ ] `Sensors`, `BIT`, `Transmission`, `Derived` hızlı filtreleri ekle.
 - [ ] Kanal türü, bağlantı durumu ve alarm seviyesi için ikon sistemi belirle.
 - [ ] Kanalı çift tıklama ve sürükle-bırak ile grafiğe ekle.
-- [ ] Çoklu seçim ve “seçilenleri aynı grafikte/yeni grafiklerde aç” komutu ekle.
+- [ ] Çoklu seçim ve “seçilenleri aynı grafikte/yeni grafiklerde aç” komutu ekle. (`F3-016`: “aynı grafikte” kısmı yapıldı; “yeni/ayrı grafiklerde” çoklu-panel/tab altyapısı Bölüm 5.3'te kurulunca eklenecek.)
 - [ ] Favori kanal gruplarını kaydet.
 - [ ] Sağ tık menüsü: Plot, Inspect, Add to Existing Plot, Export, Copy Path.
 
@@ -1488,7 +1488,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 | [x] | `F3-013` | `0.115.0` | 20 dk | Çift tıkla kanalı grafiğe ekle | Gerçek dosyadan seçilen kanal doğru zaman ekseninde görünür | `F3-012` | `feat(plot): F3-013 çift tıkla kanalı grafiğe ekle` |
 | [x] | `F3-014` | `0.116.0` | 15 dk | Grafikten kanal kaldırmayı ekle | Seri ve legend temizlenir; diğer seriler korunur | `F3-013` | `feat(plot): F3-014 grafikten kanal kaldırmayı ekle` |
 | [x] | `F3-015` | `0.117.0` | 20 dk | Kanal sürükle-bırak akışını ekle | Geçerli kanal mevcut veya boş grafiğe bırakılabilir | `F3-014` | `feat(ui): F3-015 kanal sürükle-bırak akışını ekle` |
-| [ ] | `F3-016` | `0.118.0` | 20 dk | Çoklu kanal ekleme eylemlerini ekle | Seçilen kanallar aynı veya ayrı grafiklerde açılır | `F3-015` | `feat(ui): F3-016 çoklu kanal ekleme eylemlerini ekle` |
+| [x] | `F3-016` | `0.118.0` | 20 dk | Çoklu kanal ekleme eylemlerini ekle | Seçilen kanallar aynı veya ayrı grafiklerde açılır | `F3-015` | `feat(ui): F3-016 çoklu kanal ekleme eylemlerini ekle` |
 | [ ] | `F3-017` | `0.119.0` | 20 dk | Favori kanal gruplarını kaydet | Grup tekrar açılır; bulunamayan kanal ayrı raporlanır | `F3-016` | `feat(settings): F3-017 favori kanal gruplarını kaydet` |
 | [ ] | `F3-018` | `0.120.0` | 15 dk | Kanal sağ tık eylemlerini bağla | Plot, Inspect ve Copy Path doğru seçime uygulanır | `F3-017` | `feat(ui): F3-018 kanal sağ tık eylemlerini bağla` |
 

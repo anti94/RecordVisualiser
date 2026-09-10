@@ -145,6 +145,7 @@ class MainWindow(QMainWindow):
 
         self._connect_layout_actions()
         self.left_dock.channel_activated.connect(self.open_channel)
+        self.left_dock.channels_add_requested.connect(self._on_channels_add_requested)
         self.right_dock.bit_status.analysis_requested.connect(self.refresh_bit_analysis)
         self.action("action_load_simulation").triggered.connect(self.load_simulation)
 
@@ -238,26 +239,44 @@ class MainWindow(QMainWindow):
         self.right_dock.show_channel(channel)
         self.bottom_dock.append_log(f"{channel.display_label} cizildi ({len(chunk)} ornek).")
 
-    def _on_channel_dropped(self, channel_id: str) -> None:
-        """Data Explorer'dan grafiğe sürüklenen kanalı ekler — `F3-015`.
+    def _add_channel_to_plot(self, channel_id: str) -> str | None:
+        """Bir kanalı grafiğe **ekler** (SIFIRLAMADAN) — `F3-015`/`F3-016` ortak yolu.
 
-        `open_channel` (çift tık) aksine grafiği SIFIRLAMAZ: `add_channel`
-        var olan diğer serileri korur, boş grafiğe bırakılırsa tek seri
-        olarak başlatır. Kayıt kapalıysa (`_repository is None`) sessizce
-        döner — `open_channel` ile aynı kural.
+        `open_channel` (çift tık) aksine `add_channel` var olan diğer
+        serileri korur, boş grafiğe eklenirse tek seri olarak başlatır.
+        Kayıt kapalıysa veya kanal bilinmiyorsa sessizce `None` döner;
+        eklendiyse kanalın gösterim etiketini döndürür (çağıran log yazar).
         """
         channel = next((c for c in self._channels if c.id == channel_id), None)
         if channel is None or self._repository is None:
-            return
+            return None
 
         chunk = self._repository.query(channel_id, self._repository.metadata().time_range)
         self.plot_panel.add_channel(channel, chunk)
         self.plot_tool_bar.set_current_channel(channel_id)
         self.show_plot()
         self.right_dock.show_channel(channel)
-        self.bottom_dock.append_log(
-            f"{channel.display_label} suruklenerek eklendi ({len(chunk)} ornek)."
-        )
+        return f"{channel.display_label} ({len(chunk)} ornek)"
+
+    def _on_channel_dropped(self, channel_id: str) -> None:
+        """Data Explorer'dan grafiğe sürüklenen kanalı ekler — `F3-015`."""
+        added = self._add_channel_to_plot(channel_id)
+        if added is not None:
+            self.bottom_dock.append_log(f"{added} suruklenerek eklendi.")
+
+    def _on_channels_add_requested(self, channel_ids: list[str]) -> None:
+        """Çoklu seçimden gelen kanalları **aynı** grafiğe ekler — `F3-016`.
+
+        Her kanal ayrı bir seri olarak eklenir (`add_channel`); geçersiz
+        veya kayıt kapalıyken gelen kimlikler sessizce atlanır. "Ayrı
+        grafiklerde açma" çoklu-panel altyapısı kurulunca ele alınacak
+        (plan Bölüm 5.3).
+        """
+        added = [
+            label for cid in channel_ids if (label := self._add_channel_to_plot(cid)) is not None
+        ]
+        if added:
+            self.bottom_dock.append_log(f"{len(added)} kanal grafige eklendi: {', '.join(added)}.")
 
     def refresh_bit_analysis(self) -> None:
         """Kayıtlı BIT verisini yeniden özetler; donanıma komut göndermez."""

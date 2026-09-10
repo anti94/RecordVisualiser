@@ -114,6 +114,20 @@ def _channel_search_haystack(channel: ChannelMetadata) -> str:
     return " ".join(parts).casefold()
 
 
+def selected_channel_ids(tree: QTreeWidget) -> list[str]:
+    """Ağaçtaki seçili **yaprak** kanal kimlikleri, ilk görülme sırasıyla — `F3-016`.
+
+    Grup/kayıt/cihaz düğümleri (`UserRole` boş) atlanır; aynı kimlik iki
+    kez sayılmaz. Toplu "grafiğe ekle" komutunun girdisidir.
+    """
+    ids: list[str] = []
+    for item in tree.selectedItems():
+        channel_id = item.data(0, Qt.ItemDataRole.UserRole)
+        if channel_id and str(channel_id) not in ids:
+            ids.append(str(channel_id))
+    return ids
+
+
 def _all_children_are_leaves(node: RecordingTreeNode) -> bool:
     """Bir düğümün tüm çocukları kanal yaprağı mı — `F3-010` lazy sınırı.
 
@@ -187,6 +201,8 @@ class DataExplorerDock(QDockWidget):
 
     #: Kullanici bir kanali cift tikladi.
     channel_activated = Signal(str)
+    #: `F3-016`: coklu secimden "secilenleri grafige ekle" istendi (kanal kimlikleri).
+    channels_add_requested = Signal(list)
     #: `Open .bin File` tiklandi.
     open_requested = Signal()
 
@@ -319,7 +335,17 @@ class DataExplorerDock(QDockWidget):
         # bir seyi kabul ETMEZ (yalniz kaynak).
         self.tree.setDragEnabled(True)
         self.tree.setDragDropMode(QTreeWidget.DragDropMode.DragOnly)
+        # F3-016: birden fazla kanal secilip tek komutla grafige eklenebilir.
+        self.tree.setSelectionMode(QTreeWidget.SelectionMode.ExtendedSelection)
+        self.tree.itemSelectionChanged.connect(self._refresh_add_selected_enabled)
         layout.addWidget(self.tree, 1)
+
+        self.add_selected_button = QPushButton("Grafige Ekle", page)
+        self.add_selected_button.setObjectName("button_add_selected_channels")
+        self.add_selected_button.setToolTip("Secili kanallari ayni grafige ekle")
+        self.add_selected_button.setEnabled(False)
+        self.add_selected_button.clicked.connect(lambda: self._emit_add_selected(self.tree))
+        layout.addWidget(self.add_selected_button)
 
         self.empty_hint = QLabel(EMPTY_TREE_HINT, page)
         self.empty_hint.setObjectName("label_empty_channels")
@@ -351,7 +377,19 @@ class DataExplorerDock(QDockWidget):
         self.data_tree.itemExpanded.connect(self._on_data_tree_item_expanded)
         self.data_tree.setDragEnabled(True)
         self.data_tree.setDragDropMode(QTreeWidget.DragDropMode.DragOnly)
+        # F3-016: bu sekmede de coklu secim + tek komutla ekleme.
+        self.data_tree.setSelectionMode(QTreeWidget.SelectionMode.ExtendedSelection)
+        self.data_tree.itemSelectionChanged.connect(self._refresh_add_selected_enabled)
         layout.addWidget(self.data_tree, 1)
+
+        self.add_selected_data_tree_button = QPushButton("Grafige Ekle", page)
+        self.add_selected_data_tree_button.setObjectName("button_add_selected_data_tree")
+        self.add_selected_data_tree_button.setToolTip("Secili kanallari ayni grafige ekle")
+        self.add_selected_data_tree_button.setEnabled(False)
+        self.add_selected_data_tree_button.clicked.connect(
+            lambda: self._emit_add_selected(self.data_tree)
+        )
+        layout.addWidget(self.add_selected_data_tree_button)
 
         self.data_tree_empty_hint = QLabel(EMPTY_TREE_HINT, page)
         self.data_tree_empty_hint.setObjectName("label_empty_data_tree")
@@ -373,6 +411,7 @@ class DataExplorerDock(QDockWidget):
         self.empty_hint.setText(EMPTY_TREE_HINT)
         self.empty_hint.setVisible(True)
         self.set_recordings([])
+        self._refresh_add_selected_enabled()
 
     def set_recording(
         self,
@@ -640,6 +679,18 @@ class DataExplorerDock(QDockWidget):
         channel_id = item.data(0, Qt.ItemDataRole.UserRole)
         if channel_id:
             self.channel_activated.emit(str(channel_id))
+
+    # -- coklu secim: secilenleri grafige ekle (F3-016) -----------------
+
+    def _emit_add_selected(self, tree: QTreeWidget) -> None:
+        channel_ids = selected_channel_ids(tree)
+        if channel_ids:
+            self.channels_add_requested.emit(channel_ids)
+
+    def _refresh_add_selected_enabled(self) -> None:
+        """ "Grafige Ekle" düğmeleri yalnız ilgili ağaçta yaprak seçiliyken etkin."""
+        self.add_selected_button.setEnabled(bool(selected_channel_ids(self.tree)))
+        self.add_selected_data_tree_button.setEnabled(bool(selected_channel_ids(self.data_tree)))
 
     # -- kategori filtreleri (F3-012) -------------------------------------
 
