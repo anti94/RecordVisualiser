@@ -207,6 +207,7 @@ def win(qtbot: QtBot) -> MainWindow:
     qtbot.addWidget(window)
     window.set_repository(MockRecordingRepository(duration_s=8.0, sample_rate_hz=200.0))
     window.open_channel("ch0")
+    window.view_tabs.setCurrentIndex(window.view_tabs.tab_titles().index("Spectrum"))
     return window
 
 

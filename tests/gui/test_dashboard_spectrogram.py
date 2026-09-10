@@ -268,7 +268,7 @@ def test_the_roi_narrows_the_spectrogram(win: MainWindow, qtbot: QtBot) -> None:
     assert full is not None
 
     win.plot_panel.set_time_region(0.0, 15.0)
-    qtbot.waitUntil(lambda: "s" in win.dashboard.spectrogram.title(), timeout=5_000)
+    qtbot.waitUntil(lambda: "0–15 s" in win.dashboard.spectrogram.title(), timeout=5_000)
 
     narrowed = win.dashboard.spectrogram.result()
     assert narrowed is not None

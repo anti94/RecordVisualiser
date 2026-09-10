@@ -270,6 +270,7 @@ def win(qtbot: QtBot, repo: MockRecordingRepository) -> MainWindow:
     qtbot.addWidget(window)
     window.set_repository(repo)
     window.open_channel("ch0")
+    window.view_tabs.setCurrentIndex(window.view_tabs.tab_titles().index("Spectrogram"))
     return window
 
 
@@ -294,7 +295,7 @@ def test_the_roi_narrows_the_waterfall(win: MainWindow, qtbot: QtBot) -> None:
     assert before > 0
 
     win.plot_panel.set_time_region(0.0, 15.0)
-    qtbot.waitUntil(lambda: "s" in win.waterfall_view.title(), timeout=5_000)
+    qtbot.waitUntil(lambda: "0–15 s" in win.waterfall_view.title(), timeout=5_000)
 
     assert "15" in win.waterfall_view.title()
     assert 0 < win.waterfall_view.slice_count() < before

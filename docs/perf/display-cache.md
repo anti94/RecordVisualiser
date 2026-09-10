@@ -35,3 +35,15 @@ hesaplanmaz. Aynı dosya yolu ve boyut, içerik değiştiğinde aynı kaynak say
 Açılış/kapanış ayrıca önbelleği temizler. Eski kimliğe ait girdiler yeni sonuçlar için
 kullanılamaz; LRU bütçesine tabi kalır. Veri sağlayıcısı kullandığı kimliği sorgu boyunca
 sabit tutmalı ve işleme/kaynak değişikliklerinde `identity_for` ile yeni kimlik vermelidir.
+
+## Görünür analiz güncellemeleri — F4-061
+
+Merkezde etkin sekme hesaplanır. Gizli Spectrum/Waterfall veya dashboard için ara
+seçimler işlenmez; sekme açılınca en son seçim ilk boyamadan önce uygulanır. Aynı seçimle
+sekme değiştirmek daha önce hesaplanmış sonucu kullanır. Zaman grafiğinin viewport
+sorgusu da başka merkez sekmesi açıkken bekler.
+
+Ardışık analiz güncellemeleri 50 ms aralıkla birleştirilir: ilk seçim hemen, aradaki
+seçimlerden yalnız sonuncusu sonraki güncellemede çizilir. Sekme açılışı bu beklemeyi
+atlar. Son veri değişmez bir kopyada tutulur; kayıt kapatılınca bekleyen iş silinir.
+Bu sınır analiz hesaplama/çizim çağrılarına aittir; ekranın gerçek FPS ölçümü değildir.
