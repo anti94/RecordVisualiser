@@ -14,7 +14,6 @@ pytest.importorskip("pyqtgraph", reason="pyqtgraph kurulu degil")
 from pytestqt.qtbot import QtBot
 
 from sonar_analyzer.repository.mock_repository import MockRecordingRepository
-from sonar_analyzer.ui.actions import NOT_YET_AVAILABLE
 from sonar_analyzer.ui.main_window import MainWindow
 from sonar_analyzer.ui.plots.dashboard import DashboardPanel
 from sonar_analyzer.ui.plots.plot_panel import PlotPanel
@@ -71,12 +70,13 @@ def test_fft_and_statistics_are_side_by_side(dashboard: DashboardPanel) -> None:
     assert fft_x < stats_x
 
 
-def test_spectrogram_is_unavailable_with_reason(dashboard: DashboardPanel) -> None:
-    """Spektrogram motoru henüz yok (`F4-046`+); hücre bunu açıkça söylüyor."""
-    from PySide6.QtWidgets import QLabel
+def test_spectrogram_cell_is_a_real_panel(dashboard: DashboardPanel) -> None:
+    """`F4-048`: spektrogram hücresi artık zaman-frekans haritasını çizer."""
+    from sonar_analyzer.ui.plots.spectrogram_panel import SpectrogramPanel
 
-    spec_label = dashboard.spectrogram.findChild(QLabel, "cell_spectrogram_label")
-    assert spec_label is not None and NOT_YET_AVAILABLE in spec_label.text()
+    assert isinstance(dashboard.spectrogram, SpectrogramPanel)
+    # Veri gelmeden sonuç yok — sahte harita gösterilmiyor.
+    assert not dashboard.spectrogram.has_spectrogram
 
 
 def test_fft_cell_is_a_real_spectrum_panel(dashboard: DashboardPanel) -> None:
@@ -90,13 +90,11 @@ def test_fft_cell_is_a_real_spectrum_panel(dashboard: DashboardPanel) -> None:
 
 
 def test_no_fake_spectral_result_is_shown(dashboard: DashboardPanel) -> None:
-    from PySide6.QtWidgets import QLabel
-
-    for label in dashboard.spectrogram.findChildren(QLabel):
-        assert "dB" not in label.text()
-        assert "Hz" not in label.text()
-    # FFT paneli veri gelmeden yalnız "örnek yok" der; sayısal sonuç vermez.
+    # Veri gelmeden ne FFT ne spektrogram sonuç üretir; ikisi de "örnek yok" der.
     assert not dashboard.fft.has_spectrum
+    assert not dashboard.spectrogram.has_spectrogram
+    assert dashboard.spectrogram.levels() is None
+    assert dashboard.spectrogram.image_data().size == 0
 
 
 # -- istatistik hesaplari ------------------------------------------------

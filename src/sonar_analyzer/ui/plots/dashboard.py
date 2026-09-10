@@ -6,39 +6,27 @@ Mockup satır düzeni (`docs/ui/layout-map.md` §3, plan Bölüm 5.3):
     Satır 2  Spektrogram
     Satır 3  Sol FFT · Sağ İstatistik kartı
 
-Zaman serisi (`PlotPanel`, `F1-031`), istatistik kartı (`StatisticsPanel`,
-`F1-039`) ve FFT hücresi (`SpectrumPanel`, `F4-042`) gerçek veriyle
-çalışır. Spektrogram hücresi, hesaplama motoru gelene kadar (`F4-046`+)
-açıkça pasif gösterilir — mockup'taki yeri hazırdır ama sahte sonuç
-üretmez (plan Bölüm 3.1).
+Dört hücrenin dördü de gerçek veriyle çalışır: zaman serisi
+(`PlotPanel`, `F1-031`), spektrogram (`SpectrogramPanel`, `F4-048`),
+FFT (`SpectrumPanel`, `F4-042`) ve istatistik kartı (`StatisticsPanel`,
+`F1-039`). Hiçbiri veri gelmeden sahte sonuç göstermez (plan Bölüm 3.1).
 """
 
 from __future__ import annotations
 
+import numpy as np
+from numpy.typing import NDArray
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QGroupBox, QLabel, QSplitter, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QSplitter, QVBoxLayout, QWidget
 
-from sonar_analyzer.ui.actions import NOT_YET_AVAILABLE
+from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.ui.plots.plot_panel import PlotPanel
+from sonar_analyzer.ui.plots.spectrogram_panel import SpectrogramPanel
 from sonar_analyzer.ui.plots.spectrum_panel import SpectrumPanel
 from sonar_analyzer.ui.plots.statistics_panel import StatisticsPanel
 
 SPECTROGRAM_TITLE = "Spectrogram"
 FFT_TITLE = "FFT"
-
-
-def _unavailable_cell(title: str, object_name: str) -> QGroupBox:
-    """Henüz hesaplanmayan bir dashboard hücresinin gövdesi."""
-    box = QGroupBox(title)
-    box.setObjectName(object_name)
-    layout = QVBoxLayout(box)
-    note = QLabel(f"{title} — {NOT_YET_AVAILABLE}.", box)
-    note.setObjectName(f"{object_name}_label")
-    note.setAlignment(Qt.AlignmentFlag.AlignCenter)
-    note.setWordWrap(True)
-    note.setMinimumWidth(1)
-    layout.addWidget(note)
-    return box
 
 
 class DashboardPanel(QWidget):
@@ -57,7 +45,8 @@ class DashboardPanel(QWidget):
         self.time_series = PlotPanel(self.rows)
         self.rows.addWidget(self.time_series)
 
-        self.spectrogram = _unavailable_cell(SPECTROGRAM_TITLE, "cell_spectrogram")
+        # F4-048: spektrogram hücresi artık gerçek zaman-frekans haritasını çizer.
+        self.spectrogram = SpectrogramPanel(self.rows)
         self.rows.addWidget(self.spectrogram)
 
         self.bottom = QSplitter(Qt.Orientation.Horizontal, self.rows)
@@ -83,3 +72,20 @@ class DashboardPanel(QWidget):
     def spectrum(self) -> SpectrumPanel:
         """FFT hücresi — `F4-042`'den beri gerçek spektrum paneli."""
         return self.fft
+
+    def set_channel_data(
+        self,
+        channel: ChannelMetadata,
+        values: NDArray[np.float64],
+        region_seconds: tuple[float, float] | None = None,
+    ) -> None:
+        """İstatistik, FFT ve spektrogram hücrelerini birlikte besler — `F4-048`."""
+        self.statistics.set_channel_data(channel, values, region_seconds=region_seconds)
+        self.fft.set_channel_data(channel, values, region_seconds=region_seconds)
+        self.spectrogram.set_channel_data(channel, values, region_seconds=region_seconds)
+
+    def clear_analysis(self) -> None:
+        """İstatistik, FFT ve spektrogram hücrelerini boş duruma alır."""
+        self.statistics.clear()
+        self.fft.clear()
+        self.spectrogram.clear()

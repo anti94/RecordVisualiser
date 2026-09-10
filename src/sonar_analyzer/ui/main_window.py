@@ -1005,9 +1005,8 @@ class MainWindow(QMainWindow):
         if not self._scrub_debouncer.is_current(token):
             return
         span = self.plot_panel.time_region_x()
-        self.dashboard.statistics.set_channel_data(channel, chunk.values, region_seconds=span)
-        # F4-042: ROI değişince FFT hücresi de o pencerenin spektrumunu çizer.
-        self.dashboard.fft.set_channel_data(channel, chunk.values, region_seconds=span)
+        # F4-042/F4-048: ROI değişince FFT ve spektrogram da o pencereyi gösterir.
+        self.dashboard.set_channel_data(channel, chunk.values, region_seconds=span)
         self.spectrum_view.set_channel_data(channel, chunk.values, region_seconds=span)
 
     def open_channel(self, channel_id: str) -> None:
@@ -1030,8 +1029,7 @@ class MainWindow(QMainWindow):
         self.plot_panel.clear_processed_overlay()
         self.right_dock.analysis_tools.step_editor.set_input_channel(channel_id)
         self.right_dock.analysis_tools.step_editor.set_sample_rate(channel.sample_rate_hz or 0.0)
-        self.dashboard.statistics.set_channel_data(channel, chunk.values)
-        self.dashboard.fft.set_channel_data(channel, chunk.values)
+        self.dashboard.set_channel_data(channel, chunk.values)
         self.spectrum_view.set_channel_data(channel, chunk.values)
         self.plot_tool_bar.set_current_channel(channel_id)
         self.show_plot()
@@ -1534,8 +1532,7 @@ class MainWindow(QMainWindow):
         self.right_dock.close_inspector()
         self.right_dock.bit_status.clear()
         self.plot_panel.clear()
-        self.dashboard.statistics.clear()
-        self.dashboard.fft.clear()
+        self.dashboard.clear_analysis()
         self.spectrum_view.clear()
         self.show_empty_state()
         self.playback_dock.set_recording_range(metadata.time_range)
@@ -1625,8 +1622,7 @@ class MainWindow(QMainWindow):
         self._scrub_debouncer.cancel()
         self.status.set_time_origin(None)
         self.status.set_cursor_time(None)
-        self.dashboard.statistics.clear()
-        self.dashboard.fft.clear()
+        self.dashboard.clear_analysis()
         self.spectrum_view.clear()
         self.bottom_dock.clear_events()
         self.show_empty_state()

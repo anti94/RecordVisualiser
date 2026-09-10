@@ -132,14 +132,10 @@ def test_fft_and_spectrogram_menu_actions_are_disabled_with_a_reason(win: MainWi
         assert action.toolTip() == NOT_YET_AVAILABLE
 
 
-def test_dashboard_spectrogram_cell_shows_the_v2_note(win: MainWindow) -> None:
-    # `F4-042`: FFT hücresi artık gerçek panel; yalnız spektrogram yer tutucu.
-    cell = win.dashboard.findChild(QWidget, "cell_spectrogram")
-    assert cell is not None
-    note = cell.findChild(QLabel, "cell_spectrogram_label")
-    assert note is not None
-    assert NOT_YET_AVAILABLE in note.text()
+def test_dashboard_analysis_cells_are_real_panels(win: MainWindow) -> None:
+    # `F4-042` FFT, `F4-048` spektrogram: iki hücre de artık gerçek panel.
     assert win.dashboard.findChild(QWidget, "panel_spectrum") is not None
+    assert win.dashboard.findChild(QWidget, "panel_spectrogram") is not None
 
 
 def test_analysis_tools_v2_tabs_carry_the_note(win: MainWindow) -> None:
