@@ -16,6 +16,14 @@ paylaşır — birden fazla kanal aynı eksende **karşılaştırılabilir** kal
 hedef seriyi ve legend girdisini kaldırır; diğer seriler dokunulmadan kalır.
 `set_channel()` (F1-031'in özgün API'si) geriye dönük uyumluluk için
 korunuyor: tüm serileri temizleyip TEK bu kanalı ekler.
+
+`F3-019`: **ortak zaman ekseni** sözleşmesi açık hâle getirildi. Tüm
+seriler tek bir `t0` ankorunu (grafiğe ilk eklenen serinin başlangıcı)
+paylaşır; her damga kanonik UTC epoch nanosaniyedir (`ADR-003`), bu
+yüzden **aynı mutlak ana denk gelen iki örnek — kanal, kayıt, örnekleme
+hızı ya da parça başlangıcı ne olursa olsun — aynı X koordinatına
+düşer**. `x_for_timestamp_ns()` / `timestamp_ns_for_x()` bu eşlemeyi
+dışarıya verir (cursor, ROI ve pan işleri bunun üstüne kurulur).
 """
 
 from __future__ import annotations
@@ -201,6 +209,35 @@ class PlotPanel(QWidget):
             self.plot.setLabel("left", "")
 
         self.plot.setLabel("bottom", TIME_AXIS_LABEL, units=TIME_AXIS_UNIT)
+
+    # -- ortak zaman ekseni (F3-019) -----------------------------------
+
+    @property
+    def time_anchor_ns(self) -> int | None:
+        """X=0'a denk gelen mutlak UTC epoch nanosaniye; seri yoksa `None`.
+
+        Ankor grafiğe **ilk eklenen** seriden alınır ve tüm seriler
+        paylaşır; sonradan o seri kaldırılsa bile (grafik boşalana dek)
+        değişmez — eksen kayıp gitmesin diye.
+        """
+        return self._t0_ns
+
+    def x_for_timestamp_ns(self, timestamp_ns: int) -> float:
+        """Mutlak epoch-ns bir anı grafiğin X koordinatına (saniye) çevirir — `F3-019`.
+
+        Ortak ankoru kullanır, dolayısıyla **hangi kanala ait olduğu fark
+        etmez**: aynı `timestamp_ns` her seride aynı X'i verir. Henüz seri
+        yoksa (`ankor None`) `RuntimeError`.
+        """
+        if self._t0_ns is None:
+            raise RuntimeError("Zaman ekseni ankoru yok: once bir kanal ekleyin.")
+        return (timestamp_ns - self._t0_ns) / NS_PER_SECOND
+
+    def timestamp_ns_for_x(self, x_seconds: float) -> int:
+        """`x_for_timestamp_ns`'in tersi: X (saniye) -> mutlak epoch-ns — `F3-019`."""
+        if self._t0_ns is None:
+            raise RuntimeError("Zaman ekseni ankoru yok: once bir kanal ekleyin.")
+        return self._t0_ns + round(x_seconds * NS_PER_SECOND)
 
     # -- sorgular --------------------------------------------------------
 

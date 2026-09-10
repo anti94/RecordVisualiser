@@ -1496,7 +1496,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `F3-019` | `0.121.0` | 20 dk | Ortak zaman ekseninde çoklu seri çiz | Farklı kanalların zamanları aynı X koordinatına eşlenir | `F3-018` | `feat(plot): F3-019 ortak zaman ekseninde çoklu seri çiz` |
+| [x] | `F3-019` | `0.121.0` | 20 dk | Ortak zaman ekseninde çoklu seri çiz | Farklı kanalların zamanları aynı X koordinatına eşlenir | `F3-018` | `feat(plot): F3-019 ortak zaman ekseninde çoklu seri çiz` |
 | [ ] | `F3-020` | `0.122.0` | 20 dk | Farklı birimler için ikinci Y ekseni ekle | Seri doğru eksen ve birimle gösterilir | `F3-019` | `feat(plot): F3-020 farklı birimler için ikinci Y ekseni ekle` |
 | [ ] | `F3-021` | `0.123.0` | 15 dk | Pan etkileşimini bağla | Sürükleme görünür aralığı değiştirir; veri değişmez | `F3-020` | `feat(plot): F3-021 pan etkileşimini bağla` |
 | [ ] | `F3-022` | `0.124.0` | 15 dk | Yalnız X zoom modunu ekle | X aralığı değişirken Y aralığı sabit kalır | `F3-021` | `feat(plot): F3-022 yalnız X zoom modunu ekle` |
