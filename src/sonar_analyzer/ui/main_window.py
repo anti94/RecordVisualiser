@@ -71,6 +71,7 @@ from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock, selected_cha
 from sonar_analyzer.ui.docks.event_table_model import related_channels
 from sonar_analyzer.ui.docks.playback import PlaybackDock
 from sonar_analyzer.ui.docks.right_column import RightColumnDock
+from sonar_analyzer.ui.dsp_runner import DspRunner
 from sonar_analyzer.ui.empty_state import EmptyStatePanel
 from sonar_analyzer.ui.error_dialogs import LoadErrorNotifier
 from sonar_analyzer.ui.export_runner import ExportRunner
@@ -197,6 +198,14 @@ class MainWindow(QMainWindow):
         self.right_dock.bit_status.analysis_requested.connect(self.refresh_bit_analysis)
         self.right_dock.inspector.axis_range_requested.connect(self._on_axis_range_requested)
         self.right_dock.data_export.export_requested.connect(self._on_export_requested)
+        # F4-008: Analysis Tools -> işlem zincirini seçili kanala uygula.
+        self._dsp_runner = DspRunner(self)
+        self._dsp_runner.result_ready.connect(self._on_dsp_result)
+        self._dsp_runner.failed.connect(self._on_dsp_failed)
+        self.right_dock.analysis_tools.apply_requested.connect(self._on_apply_processing)
+        self.right_dock.analysis_tools.show_filtered_toggled.connect(
+            self.plot_panel.set_processed_overlay_visible
+        )
         self.bottom_dock.event_selected.connect(self._on_event_selected)
         self.bottom_dock.event_activated.connect(self._on_event_activated)
         self.action("action_load_simulation").triggered.connect(self.load_simulation)
@@ -618,6 +627,54 @@ class MainWindow(QMainWindow):
                 raw=card.selected_variant() is DataVariant.RAW,
             )
 
+    # -- işlem zinciri uygulaması (F4-008) ------------------------
+
+    def _on_apply_processing(self) -> None:
+        """`Apply Filter` — Custom sekmesindeki zinciri seçili kanala uygular."""
+        chain = self.right_dock.analysis_tools.step_editor.chain()
+        if not chain.enabled_steps:
+            self.bottom_dock.append_log("Uygulanacak işlem adımı yok (Custom sekmesi).")
+            return
+        channel = self.plot_panel.channel
+        if channel is None:
+            self.bottom_dock.append_log("Önce bir kanal çizin.")
+            return
+        _x, values = self.plot_panel.curve_data()
+        if values.size == 0:
+            return
+        self._dsp_runner.set_selection(channel.id)
+        self._dsp_runner.submit(chain, values, channel.id)
+        self.bottom_dock.append_log(
+            f"{channel.display_label}: {len(chain.enabled_steps)} adımlı işlem çalıştırıldı."
+        )
+
+    def _on_dsp_result(self, _job_id: int, channel_id: str, result: object) -> None:
+        from sonar_analyzer.processing.chain import ChainResult
+
+        primary = self.plot_panel.channel
+        if not isinstance(result, ChainResult) or primary is None or primary.id != channel_id:
+            return
+        try:
+            self.plot_panel.set_processed_overlay(
+                result.values,
+                visible=self.right_dock.analysis_tools.show_filtered_data.isChecked(),
+            )
+        except (ValueError, RuntimeError) as exc:
+            self.bottom_dock.append_log(f"İşlenmiş veri gösterilemedi: {exc}")
+            return
+        if result.invalid_count:
+            self.bottom_dock.append_log(
+                f"İşlenmiş veride {result.invalid_count} geçersiz örnek işaretli."
+            )
+
+    def _on_dsp_failed(self, _job_id: int, message: str) -> None:
+        self.bottom_dock.append_log(f"İşlem başarısız: {message}")
+
+    @property
+    def dsp_runner(self) -> DspRunner:
+        """Analiz işlem worker'ı — testler ve dış gözlem için."""
+        return self._dsp_runner
+
     # -- workspace (F3-068) ----------------------------------------
 
     def capture_workspace(self) -> WorkspaceModel:
@@ -943,6 +1000,10 @@ class MainWindow(QMainWindow):
         # F3-041: grafik tek seriye sıfırlandı; eski görünüm komutları
         # kaldırılmış serilere atıfta bulunur, geçmişi temizle.
         self._view_history.clear()
+        # F4-008: yeni kanal -> eski işlenmiş overlay geçersiz, işlem editörü
+        # bu kanala bağlanır.
+        self.plot_panel.clear_processed_overlay()
+        self.right_dock.analysis_tools.step_editor.set_input_channel(channel_id)
         self.dashboard.statistics.set_channel_data(channel, chunk.values)
         self.plot_tool_bar.set_current_channel(channel_id)
         self.show_plot()
@@ -1286,6 +1347,9 @@ class MainWindow(QMainWindow):
             self._export_runner.cancel()
             self._export_runner.wait_done()
             self._export_runner = None
+        # F4-008: süren DSP worker'ları da beklenir.
+        self._dsp_runner.cancel_all()
+        self._dsp_runner.wait_all()
         self.file_loader.shutdown()
         self._close_owned_repositories()
         super().closeEvent(event)

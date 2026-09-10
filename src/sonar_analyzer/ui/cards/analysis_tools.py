@@ -11,6 +11,7 @@ gerçek sonuç izlenimi veren sahte çıktı gösterilmez.
 
 from __future__ import annotations
 
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -51,6 +52,11 @@ def _placeholder_tab(parent: QWidget, name: str) -> QWidget:
 
 class AnalysisToolsCard(QGroupBox):
     """Sağ sütunun orta kartı: Filter / FFT / Statistics / Custom."""
+
+    #: `F4-008` — `Apply Filter`'a basıldı; Custom sekmesindeki zincir uygulanır.
+    apply_requested = Signal()
+    #: `F4-008` — `Show filtered data` değişti (işlenmiş overlay görünürlüğü).
+    show_filtered_toggled = Signal(bool)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(CARD_TITLE, parent)
@@ -98,12 +104,17 @@ class AnalysisToolsCard(QGroupBox):
 
         self.show_filtered_data = QCheckBox("Show filtered data", page)
         self.show_filtered_data.setObjectName("check_show_filtered_data")
+        self.show_filtered_data.toggled.connect(self.show_filtered_toggled)
         form.addRow(self.show_filtered_data)
 
+        # F4-008: buton artık Custom sekmesindeki işlem zincirini seçili
+        # kanala uygular (gerçek IIR filtre adımları `F4-015`+ ile gelir).
         self.apply_filter_button = QPushButton("Apply Filter", page)
         self.apply_filter_button.setObjectName("button_apply_filter")
-        self.apply_filter_button.setEnabled(False)
-        self.apply_filter_button.setToolTip(NOT_YET_AVAILABLE)
+        self.apply_filter_button.setToolTip(
+            "Custom sekmesindeki işlem zincirini seçili kanala uygula"
+        )
+        self.apply_filter_button.clicked.connect(self.apply_requested)
         form.addRow(self.apply_filter_button)
 
         return page

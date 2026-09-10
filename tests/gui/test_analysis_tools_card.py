@@ -55,11 +55,20 @@ def test_filter_tab_has_mockup_fields(card: AnalysisToolsCard) -> None:
     assert not card.show_filtered_data.isChecked()
 
 
-def test_apply_filter_is_disabled_with_reason(card: AnalysisToolsCard) -> None:
-    """İşlevi olmayan alan gizlenmiyor, pasif ve nedeni ipucunda (plan Bölüm 3.1)."""
-    assert not card.apply_filter_button.isEnabled()
-    assert card.apply_filter_button.toolTip() == NOT_YET_AVAILABLE
+def test_apply_filter_is_active_and_emits(card: AnalysisToolsCard, qtbot: QtBot) -> None:
+    """`F4-008`: Apply Filter artık Custom zincirini seçili kanala uygular."""
+    assert card.apply_filter_button.isEnabled()
     assert card.apply_filter_button.isVisibleTo(card.tabs)
+    with qtbot.waitSignal(card.apply_requested, timeout=500):
+        card.apply_filter_button.click()
+
+
+def test_show_filtered_data_emits_its_state(card: AnalysisToolsCard) -> None:
+    seen: list[bool] = []
+    card.show_filtered_toggled.connect(seen.append)
+    card.show_filtered_data.setChecked(True)
+    card.show_filtered_data.setChecked(False)
+    assert seen == [True, False]
 
 
 # -- diger sekmeler ------------------------------------------------------

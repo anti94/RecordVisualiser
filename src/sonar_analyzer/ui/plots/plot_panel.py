@@ -140,6 +140,8 @@ class PlotPanel(QWidget):
         #: `channel`/`sample_count`/`curve_data()` (parametresiz) için "birincil" seri.
         self._primary_id: str | None = None
         self._t0_ns: int | None = None
+        #: `F4-008` birincil serinin üzerine konan kesikli işlenmiş-veri eğrisi.
+        self._processed_overlay: pg.PlotDataItem | None = None
 
         # F3-020: iki Y ekseni. Sol eksen ilk serinin birimini sahiplenir;
         # farkli birimli seriler sag eksene (ayri ViewBox) gider.
@@ -847,6 +849,7 @@ class PlotPanel(QWidget):
 
     def clear(self) -> None:
         """Paneli tümüyle boş duruma döndürür — tüm seriler kaldırılır."""
+        self.clear_processed_overlay()
         for channel_id in list(self._series):
             self.remove_channel(channel_id)
 
@@ -1265,6 +1268,55 @@ class PlotPanel(QWidget):
     def legend_labels(self) -> list[str]:
         """Legend'de görünen etiketler, ekleme sırasıyla — testler için."""
         return [channel.display_label for channel, _curve in self._series.values()]
+
+    # -- işlenmiş veri overlay'i (F4-008) -------------------------
+
+    def set_processed_overlay(self, values: NDArray[np.generic], *, visible: bool = True) -> None:
+        """Birincil serinin üzerine kesikli bir **işlenmiş veri** eğrisi koyar.
+
+        `values` birincil serinin örnek sayısıyla aynı uzunlukta olmalı;
+        zaman ekseni birincil seriden alınır. Ham seri değişmez. `F4-008`.
+        """
+        if self._primary_id is None:
+            raise RuntimeError("Grafikte birincil seri yok; overlay konulamaz")
+        x_data, _y = self.curve_data()
+        y_new = np.asarray(values, dtype=np.float64)
+        if y_new.shape != x_data.shape:
+            raise ValueError(
+                f"İşlenmiş dizi birincil seriyle aynı uzunlukta olmalı "
+                f"({y_new.shape} vs {x_data.shape})"
+            )
+        if self._processed_overlay is None:
+            pen = pg.mkPen(DARK.warning, width=1, style=Qt.PenStyle.DashLine)
+            self._processed_overlay = self.plot.plot(x_data, y_new, pen=pen, name="İşlenmiş")
+        else:
+            self._processed_overlay.setData(x_data, y_new)
+        self._processed_overlay.setVisible(visible)
+
+    def set_processed_overlay_visible(self, visible: bool) -> None:
+        """`Show filtered data` — overlay'in görünürlüğü (veri değişmez) — `F4-008`."""
+        if self._processed_overlay is not None:
+            self._processed_overlay.setVisible(visible)
+
+    def clear_processed_overlay(self) -> None:
+        if self._processed_overlay is not None:
+            self.plot.removeItem(self._processed_overlay)
+            self._processed_overlay = None
+
+    @property
+    def has_processed_overlay(self) -> bool:
+        return self._processed_overlay is not None
+
+    @property
+    def processed_overlay_visible(self) -> bool:
+        return self._processed_overlay is not None and bool(self._processed_overlay.isVisible())
+
+    def processed_overlay_values(self) -> NDArray[np.float64]:
+        """Overlay'in y dizisi; overlay yoksa boş — testler için."""
+        if self._processed_overlay is None:
+            return np.empty(0, dtype=np.float64)
+        _x, y = self._processed_overlay.getData()
+        return np.asarray(y, dtype=np.float64) if y is not None else np.empty(0, dtype=np.float64)
 
     def curve_data(
         self, channel_id: str | None = None
