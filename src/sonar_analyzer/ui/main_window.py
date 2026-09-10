@@ -86,8 +86,10 @@ from sonar_analyzer.workspace.model import (
     EventFilterState,
     PanelState,
     ViewState,
+    WorkspaceError,
     WorkspaceModel,
 )
+from sonar_analyzer.workspace.resolve import resolve_sources
 from sonar_analyzer.workspace.store import load_workspace, save_workspace
 
 logger = logging.getLogger("sonar_analyzer")
@@ -139,6 +141,8 @@ class MainWindow(QMainWindow):
         self.export_confirm_overwrite: Callable[[Path], bool] | None = None
         #: `F3-066` süren CSV dışa aktarma worker'ı (yoksa `None`).
         self._export_runner: ExportRunner | None = None
+        #: `F3-070` son workspace geri yüklemesinde bulunamayan kaynak yolları.
+        self.last_missing_sources: list[str] = []
         #: `F3-060` zaman bölgesi sürüklemesinde sorguları coalesce eder.
         self._scrub_debouncer: ScrubDebouncer[tuple[int, int]] = ScrubDebouncer(0.12)
         self._scrub_timer = QTimer(self)
@@ -638,14 +642,42 @@ class MainWindow(QMainWindow):
         self.bottom_dock.append_log(f"Workspace kaydedildi: {dest}")
         return dest
 
-    def restore_workspace(self, path: str | Path) -> WorkspaceModel:
-        """Bir workspace dosyasını okur ve mevcut oturuma uygular — `F3-069`.
+    def restore_workspace(
+        self,
+        path: str | Path,
+        *,
+        on_missing_sources: Callable[[list[str]], None] | None = None,
+    ) -> WorkspaceModel:
+        """Bir workspace dosyasını okur ve mevcut oturuma uygular — `F3-069`, `F3-070`.
 
         Kaynak dosyaların yeniden açılması çağıranın işidir (menü akışı);
         bu metot, **zaten açık** kayda karşı düzeni ve kanal görünümünü
-        yeniden kurar. Belge bozuksa `WorkspaceError` fırlatır.
+        yeniden kurar.
+
+        `F3-070`: belge bozuksa `WorkspaceError` fırlatılır ve **açık oturum
+        hiç değişmez** (uygulama okuma başarısız olunca hiç başlamaz). Eksik
+        kaynak dosyalar sessizce atlanmaz: her biri Log'a yazılır,
+        `on_missing_sources` (verilmişse) çağrılır ve `last_missing_sources`
+        alanında tutulur.
         """
-        model = load_workspace(path)
+        try:
+            model = load_workspace(path)
+        except WorkspaceError:
+            self.bottom_dock.append_log(
+                f"Workspace okunamadi ({Path(path).name}); acik oturum korundu."
+            )
+            raise
+
+        resolution = resolve_sources(
+            model.source_paths, exists=lambda candidate: Path(candidate).exists()
+        )
+        self.last_missing_sources = list(resolution.missing)
+        if resolution.has_missing:
+            for missing in resolution.missing:
+                self.bottom_dock.append_log(f"Workspace kaynagi bulunamadi: {missing}")
+            if on_missing_sources is not None:
+                on_missing_sources(list(resolution.missing))
+
         self.apply_workspace(model)
         self.bottom_dock.append_log(f"Workspace yuklendi: {Path(path)}")
         return model
