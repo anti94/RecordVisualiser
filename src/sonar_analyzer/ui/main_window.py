@@ -61,6 +61,7 @@ from sonar_analyzer.ui.error_dialogs import LoadErrorNotifier
 from sonar_analyzer.ui.file_open import FileOpenController
 from sonar_analyzer.ui.plot_tool_bar import PlotToolBar
 from sonar_analyzer.ui.plots.dashboard import DashboardPanel
+from sonar_analyzer.ui.plots.transmission_panel import TransmissionPanel
 from sonar_analyzer.ui.status_bar import CANCELLED_TEXT, READY_TEXT, AppStatusBar
 from sonar_analyzer.ui.status_icons import severity_style
 from sonar_analyzer.ui.theme import apply_theme
@@ -704,9 +705,9 @@ class MainWindow(QMainWindow):
         self.plot_panel.set_event_markers(
             [(event.timestamp_ns, severity_style(event.severity).color) for event in events]
         )
-        self.plot_panel.set_tx_regions(
-            [(tx.start_ns, tx.end_ns) for tx in repository.transmissions(span)]
-        )
+        transmissions = repository.transmissions(span)
+        self.plot_panel.set_tx_regions([(tx.start_ns, tx.end_ns) for tx in transmissions])
+        self.transmission_panel.set_intervals(transmissions, start_ns=span.start_ns)
         self.right_dock.bit_status.set_results(repository.bit_results(span))
         self._refresh_recording_tree()
 
@@ -783,14 +784,29 @@ class MainWindow(QMainWindow):
         self.plot_panel.time_region_changed.connect(self._on_stats_region_changed)
         self.plot_panel.cursor_moved.connect(self._on_cursor_moved)
 
+        self.transmission_panel = TransmissionPanel(container)
+
         self.center_stack = QStackedWidget(container)
         self.center_stack.setObjectName("center_stack")
         self.center_stack.addWidget(self.empty_state)
         self.center_stack.addWidget(self.dashboard)
+        self.center_stack.addWidget(self.transmission_panel)
         self.center_stack.setCurrentWidget(self.empty_state)
+
+        self.view_tabs.currentChanged.connect(self._on_view_tab_changed)
 
         layout.addWidget(self.center_stack, 1)
         return container
+
+    def _on_view_tab_changed(self, index: int) -> None:
+        """`F3-048` — "Transmission" sekmesi TX tablosunu, ötekiler grafiği gösterir."""
+        title = self.view_tabs.tabText(index)
+        if title == "Transmission":
+            self.center_stack.setCurrentWidget(self.transmission_panel)
+        elif self._repository is not None:
+            self.show_plot()
+        else:
+            self.show_empty_state()
 
     def show_empty_state(self) -> None:
         """Merkez alanı yönlendirme ekranına döndürür."""
@@ -897,6 +913,7 @@ class MainWindow(QMainWindow):
         self.plot_panel.clear()
         self.plot_panel.clear_event_markers()
         self.plot_panel.clear_tx_regions()
+        self.transmission_panel.clear()
         self._view_history.clear()
         self.dashboard.statistics.clear()
         self.bottom_dock.clear_events()

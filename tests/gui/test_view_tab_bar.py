@@ -48,11 +48,15 @@ def test_time_series_is_selected_by_default(bar: ViewTabBar) -> None:
     assert bar.tabText(bar.currentIndex()) == "Time Series"
 
 
-def test_only_time_series_is_enabled_in_this_phase(bar: ViewTabBar) -> None:
+#: `F3-048` ile Transmission de çalışır; kalanlar hâlâ pasiftir.
+_LIVE_TABS = {"Time Series", "Transmission"}
+
+
+def test_supported_tabs_are_enabled_the_rest_are_explicitly_passive(bar: ViewTabBar) -> None:
     """Kabul kriteri: desteklenmeyen sekmeler açıkça pasiftir."""
-    assert bar.enabled_tabs() == ["Time Series"]
+    assert set(bar.enabled_tabs()) == _LIVE_TABS
     for index, title in enumerate(EXPECTED_ORDER):
-        if title == "Time Series":
+        if title in _LIVE_TABS:
             assert bar.isTabEnabled(index)
         else:
             assert not bar.isTabEnabled(index), f"{title} henuz pasif olmali"
@@ -60,7 +64,7 @@ def test_only_time_series_is_enabled_in_this_phase(bar: ViewTabBar) -> None:
 
 def test_disabled_tabs_explain_why(bar: ViewTabBar) -> None:
     for index, title in enumerate(EXPECTED_ORDER):
-        if title == "Time Series":
+        if title in _LIVE_TABS:
             continue
         assert bar.tabToolTip(index) == NOT_YET_AVAILABLE
 
