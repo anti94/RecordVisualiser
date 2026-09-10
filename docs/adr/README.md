@@ -27,7 +27,7 @@ tetikleyici işten önce cevap bekliyor)
 | ADR-007 | Downsampling algoritması | **YAZILDI** | `F4-056` (çok seviyeli özet `F4-057`) | `1.56.0` | Faz 4 | [ADR-007-downsampling.md](ADR-007-downsampling.md) |
 | ADR-008 | Workspace JSON şeması ve migration | PLANLANDI | `F3` workspace işleri | Faz 3 sonu | Faz 3 | — |
 | ADR-009 | Live-source / backpressure politikası | PLANLANDI | `F5-016` | `2.16.0` | Faz 5 | — |
-| ADR-010 | Native hızlandırmaya geçiş ölçütleri | PLANLANDI | `F4-067` | `1.67.0` | Faz 4 | — |
+| ADR-010 | Native hızlandırmaya geçiş ölçütleri | **YAZILDI** | `F4-067` | `1.67.0` | Faz 4 | [`ADR-010-native-acceleration.md`](ADR-010-native-acceleration.md) |
 | ADR-011 | CRC destekleyen format sürümü | **YAZILDI** | `F0-008` | `0.8.0` | Faz 0 | [`ADR-011-crc.md`](ADR-011-crc.md) |
 | ADR-012 | Paketleme aracı ve dağıtım biçimi | PLANLANDI | `F6-001` | `3.1.0` | Faz 6 | — |
 
@@ -44,7 +44,7 @@ tetikleyici işten önce cevap bekliyor)
 | ADR-007 | Hangi downsample algoritması; dar impuls nasıl korunur? | `F4-056` min/max envelope karşılaştırması; P-07 bütçesi |
 | ADR-008 | Workspace dosyası hangi alanları taşır, sürüm değişince nasıl göç eder? | Şema sürümü ve geriye uyumluluk testleri |
 | ADR-009 | Canlı veri yetişmezse ne düşer, kullanıcı bunu nasıl görür? | `F5-016` kuyruk sınırı, `F5-037` burst sonuçları |
-| ADR-010 | Native modüle ne zaman geçilir? Eşik nedir? | `F4-067` profil sonuçları; ölçülmüş darboğaz olmadan geçilmez |
+| ADR-010 | Native modüle ne zaman geçilir? Eşik nedir? | `F4-064`/`F4-065` ölçüm ve kararı; darboğaz algoritmik çıktı, geçilmedi — **yazıldı** |
 | ADR-011 | CRC algoritması, kapsamı, alan konumu ve sürümü | Referans vektörler — **yazıldı** |
 | ADR-012 | PyInstaller mı Nuitka mı; imzalı mı imzasız mı? | `F6-001` spike kanıtı; D-16/D-17 cevapları |
 

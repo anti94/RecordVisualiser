@@ -1683,7 +1683,7 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 | [x] | `F4-064` | `1.64.0` | 20 dk | Büyük dosya benchmark koşusunu hazırla | Metadata, sorgu, FPS ve bellek sonuçları makine bilgisiyle üretilir | `F4-063` | `perf(bench): F4-064 büyük dosya benchmark koşusunu hazırla` |
 | [x] | `F4-065` | `1.65.0` | 20 dk | Büyük dosya koşusunun sonuçlarını değerlendir | Bölüm 11.1 hedeflerinin geçtiği veya saptığı kanıtlanır | `F4-064` | `docs(perf): F4-065 büyük dosya koşusunun sonuçlarını değerlendir` |
 | [x] | `F4-066` | `1.66.0` | 20 dk | İndeks kesintisi ve cache kurtarmayı doğrula | Yarım indeks kullanılmaz; yeniden üretim kaynak veriyi değiştirmez | `F4-065` | `test(index): F4-066 indeks kesintisi ve cache kurtarmayı doğrula` |
-| [ ] | `F4-067` | `1.67.0` | 15 dk | Profil sonucuyla native hızlandırma ADR'sini yaz | Ölçülen darboğaza göre gerekçe vardır; zorunlu native kapsamı ayrıca bölünür | `F4-066` | `docs(architecture): F4-067 profil sonucuyla native hızlandırma ADR'sini yaz` |
+| [x] | `F4-067` | `1.67.0` | 15 dk | Profil sonucuyla native hızlandırma ADR'sini yaz | Ölçülen darboğaza göre gerekçe vardır; zorunlu native kapsamı ayrıca bölünür | `F4-066` | `docs(architecture): F4-067 profil sonucuyla native hızlandırma ADR'sini yaz` |
 
 ##### Türetilmiş kanallar ve analiz oturumu
 
@@ -2012,7 +2012,7 @@ Aşağıdaki kararlar kısa ADR belgeleriyle kaydedilmelidir:
 - ADR-007: Downsampling algoritması.
 - ADR-008: Workspace JSON şeması ve migration.
 - ADR-009: Live-source/backpressure politikası.
-- ADR-010: Native hızlandırmaya geçiş ölçütleri.
+- ADR-010: Native hızlandırmaya geçiş ölçütleri (`docs/adr/ADR-010-native-acceleration.md`, `F4-067`).
 - ADR-011: CRC destekleyen format sürümü (`docs/adr/ADR-011-crc.md`, `F0-008`).
 - ADR-012: Paketleme aracı ve dağıtım biçimi (`F6-001`).
 

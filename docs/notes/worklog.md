@@ -285,8 +285,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-060` | 20 dk | 24 dk 28 sn | `49bee2f` | –F4-063 paralel hattını main ile birleştir |
 | `F4-064` | 20 dk | 20 dk 18 sn | `3ce9ff3` | büyük dosya benchmark koşusunu hazırla |
 | `F4-065` | 20 dk | 14 dk 39 sn | `a214d49` | büyük dosya koşusunun sonuçlarını değerlendir |
+| `F4-066` | 20 dk | 6 dk 5 sn | `ff71532` | indeks kesintisi ve cache kurtarmayı doğrula |
 
-**267 commit · olculen toplam 2919 dk 2 sn · olculemeyen 1 (ilk commit)**
+**268 commit · olculen toplam 2925 dk 7 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
