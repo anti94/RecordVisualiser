@@ -411,6 +411,21 @@ class PlotPanel(QWidget):
         if self._right_vb is not None and sy != 1.0:
             self._right_vb.scaleBy(y=sy)
 
+    def zoom_to_region(self, x_min: float, x_max: float, y_min: float, y_max: float) -> None:
+        """Görünümü seçilen `(x, y)` dikdörtgenine yakınlaştırır — `F3-024`.
+
+        Kullanıcının sürükleyerek seçtiği bölgenin programatik karşılığı:
+        **iki eksen birden** verilen sınırlara oturur (kip fark etmez —
+        bölge seçimi tanımı gereği iki eksenlidir). Kenarlar artan sırada
+        olmalı; değilse `ValueError`. Görünüm değişir, **veri değişmez**.
+        """
+        if x_min >= x_max or y_min >= y_max:
+            raise ValueError(
+                f"Gecersiz bolge: x=({x_min}, {x_max}), y=({y_min}, {y_max}) "
+                "— kenarlar artan sirada olmali."
+            )
+        self.plot.getViewBox().setRange(xRange=(x_min, x_max), yRange=(y_min, y_max), padding=0)
+
     # -- sorgular --------------------------------------------------------
 
     @property
