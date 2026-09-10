@@ -24,7 +24,16 @@ import numpy as np
 import pyqtgraph as pg
 from numpy.typing import NDArray
 from PySide6.QtCore import QRectF
-from PySide6.QtWidgets import QGroupBox, QLabel, QStackedWidget, QVBoxLayout, QWidget
+from PySide6.QtWidgets import (
+    QComboBox,
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QSpinBox,
+    QStackedWidget,
+    QVBoxLayout,
+    QWidget,
+)
 
 from sonar_analyzer.analysis.spectrum import amplitude_to_db
 from sonar_analyzer.analysis.stft import StftError, StftResult, stft
@@ -41,11 +50,21 @@ COLOR_BAR_LABEL = "dB"
 
 #: Renk ölçeğinin tepe değerinden aşağı doğru kapsadığı aralık (dB).
 DEFAULT_DYNAMIC_RANGE_DB = 80.0
-#: pyqtgraph renk haritası adı.
+#: pyqtgraph renk haritası adı (öntanımlı).
 COLOR_MAP_NAME = "viridis"
+
+#: `F4-049` — yalnız **algısal düzgün** (parlaklığı tekdüze artan) haritalar
+#: sunulur. Jet/rainbow gibi haritalar sahte kenar üretir; listeye alınmaz.
+PERCEPTUAL_COLORMAPS: tuple[str, ...] = ("viridis", "magma", "inferno", "plasma", "cividis")
+
+#: dB aralığı denetiminin sınırları — çok dar okunmaz, çok geniş gürültüyü boğar.
+MIN_DYNAMIC_RANGE_DB = 10
+MAX_DYNAMIC_RANGE_DB = 160
 
 NO_RATE_MESSAGE = "Spectrogram — kanalin sample rate'i bilinmiyor; eksenler kurulamaz."
 NO_DATA_MESSAGE = "Spectrogram — secili aralikta yeterli ornek yok."
+#: Renk sınırları yokken gösterilen metin.
+EMPTY_LEVELS_TEXT = "—"
 
 
 class SpectrogramPanel(QGroupBox):
@@ -57,6 +76,36 @@ class SpectrogramPanel(QGroupBox):
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(4, 4, 4, 4)
+        layout.setSpacing(4)
+
+        # F4-049: renk haritası + dB aralığı denetimleri ve okunan sınırlar.
+        header = QHBoxLayout()
+        header.setContentsMargins(0, 0, 0, 0)
+
+        self.colormap_selector = QComboBox(self)
+        self.colormap_selector.setObjectName("combo_spectrogram_colormap")
+        self.colormap_selector.addItems(PERCEPTUAL_COLORMAPS)
+        self.colormap_selector.setToolTip(
+            "Algısal düzgün renk haritaları (parlaklık tekdüze artar)"
+        )
+        self.colormap_selector.currentTextChanged.connect(self._on_colormap_changed)
+        header.addWidget(self.colormap_selector)
+
+        self.dynamic_range_spin = QSpinBox(self)
+        self.dynamic_range_spin.setObjectName("spin_spectrogram_dynamic_range")
+        self.dynamic_range_spin.setRange(MIN_DYNAMIC_RANGE_DB, MAX_DYNAMIC_RANGE_DB)
+        self.dynamic_range_spin.setValue(int(DEFAULT_DYNAMIC_RANGE_DB))
+        self.dynamic_range_spin.setSuffix(" dB")
+        self.dynamic_range_spin.setToolTip("Renk ölçeğinin tepeden aşağı kapsadığı aralık")
+        self.dynamic_range_spin.valueChanged.connect(self._on_dynamic_range_changed)
+        header.addWidget(self.dynamic_range_spin)
+
+        self.levels_label = QLabel(EMPTY_LEVELS_TEXT, self)
+        self.levels_label.setObjectName("label_spectrogram_levels")
+        self.levels_label.setMinimumWidth(1)
+        header.addWidget(self.levels_label)
+        header.addStretch(1)
+        layout.addLayout(header)
 
         self.stack = QStackedWidget(self)
         self.stack.setObjectName("stack_spectrogram")
@@ -90,6 +139,7 @@ class SpectrogramPanel(QGroupBox):
         self._window = WindowKind.HANN
         self._dynamic_range_db = DEFAULT_DYNAMIC_RANGE_DB
         self._levels: tuple[float, float] | None = None
+        self._colormap_name = COLOR_MAP_NAME
         self.clear()
 
     # -- eksen etiketleri --------------------------------------------------
@@ -120,10 +170,72 @@ class SpectrogramPanel(QGroupBox):
         return self._dynamic_range_db
 
     def set_dynamic_range_db(self, value: float) -> None:
-        """Renk ölçeğinin kapsadığı dB aralığı (tepe değerinden aşağı)."""
+        """Renk ölçeğinin kapsadığı dB aralığı (tepe değerinden aşağı).
+
+        Denetim kutusunu da taşır ve görünen harita varsa sınırları
+        yeniden uygular (STFT yeniden hesaplanmaz) — `F4-049`.
+        """
         if not np.isfinite(value) or value <= 0:
             raise ValueError(f"dinamik aralık pozitif olmalı: {value}")
         self._dynamic_range_db = float(value)
+        clamped = min(max(round(value), MIN_DYNAMIC_RANGE_DB), MAX_DYNAMIC_RANGE_DB)
+        if self.dynamic_range_spin.value() != clamped:
+            self.dynamic_range_spin.blockSignals(True)
+            self.dynamic_range_spin.setValue(clamped)
+            self.dynamic_range_spin.blockSignals(False)
+        self._reapply_levels()
+
+    def _on_dynamic_range_changed(self, value: int) -> None:
+        self._dynamic_range_db = float(value)
+        self._reapply_levels()
+
+    @property
+    def colormap_name(self) -> str:
+        return self._colormap_name
+
+    def set_colormap(self, name: str) -> None:
+        """Renk haritasını değiştirir; yalnız algısal düzgün haritalar kabul edilir."""
+        if name not in PERCEPTUAL_COLORMAPS:
+            raise ValueError(
+                f"algısal düzgün olmayan renk haritası: {name!r} "
+                f"(geçerli: {list(PERCEPTUAL_COLORMAPS)})"
+            )
+        index = self.colormap_selector.findText(name)
+        if index >= 0 and self.colormap_selector.currentIndex() != index:
+            self.colormap_selector.setCurrentIndex(index)  # sinyal işleyiciyi çağırır
+            return
+        self._apply_colormap(name)
+
+    def _on_colormap_changed(self, name: str) -> None:
+        if name in PERCEPTUAL_COLORMAPS:
+            self._apply_colormap(name)
+
+    def _apply_colormap(self, name: str) -> None:
+        self._colormap_name = name
+        self.color_bar.setColorMap(pg.colormap.get(name))
+        if self._levels is not None:
+            self.color_bar.setLevels(self._levels)
+
+    def _reapply_levels(self) -> None:
+        """Görünen haritanın dB sınırlarını yeniden hesaplar (STFT'yi değil)."""
+        if self._result is None:
+            self._show_levels(None)
+            return
+        peak = float(np.max(amplitude_to_db(self._result.magnitudes)))
+        levels = (peak - self._dynamic_range_db, peak)
+        self._levels = levels
+        self.image.setLevels(levels)
+        self.color_bar.setLevels(levels)
+        self._show_levels(levels)
+
+    def _show_levels(self, levels: tuple[float, float] | None) -> None:
+        self.levels_label.setText(
+            EMPTY_LEVELS_TEXT if levels is None else f"{levels[0]:.1f} … {levels[1]:.1f} dB"
+        )
+
+    def levels_text(self) -> str:
+        """Ekranda okunan dB sınırları — kabul kontrolü için."""
+        return self.levels_label.text()
 
     # -- veri --------------------------------------------------------------
 
@@ -165,6 +277,7 @@ class SpectrogramPanel(QGroupBox):
         self.image.setImage(decibels.T, levels=levels, autoLevels=False)
         self.image.setRect(_image_rect(result))
         self.color_bar.setLevels(levels)
+        self._show_levels(levels)
         self.plot.setXRange(result.times_s[0], result.times_s[-1], padding=0.0)
         self.plot.setYRange(0.0, result.nyquist_hz, padding=0.0)
         self.stack.setCurrentWidget(self.plot)
@@ -172,6 +285,7 @@ class SpectrogramPanel(QGroupBox):
     def _show_message(self, text: str, title: str) -> None:
         self._result = None
         self._levels = None
+        self._show_levels(None)
         self.setTitle(title)
         self.message.setText(text)
         self.stack.setCurrentWidget(self.message)
@@ -180,6 +294,7 @@ class SpectrogramPanel(QGroupBox):
         """Paneli boş duruma alır."""
         self._result = None
         self._levels = None
+        self._show_levels(None)
         self.image.clear()
         self.setTitle(EMPTY_TITLE)
         self.message.setText(NO_DATA_MESSAGE)
@@ -208,6 +323,20 @@ class SpectrogramPanel(QGroupBox):
 
     def message_text(self) -> str:
         return self.message.text()
+
+
+def colormap_luminance(name: str, steps: int = 64) -> NDArray[np.float64]:
+    """`name` haritasının BT.709 göreli parlaklık dizisi — `F4-049`.
+
+    "Algısal düzgün" bir iddia değil ölçülebilir bir özelliktir: bu dizi
+    **tekdüze artmalıdır**. `PERCEPTUAL_COLORMAPS`'teki her harita bunu
+    sağlar; test bunu doğrudan denetler.
+    """
+    lookup = pg.colormap.get(name).getLookupTable(nPts=steps, alpha=False)  # pyright: ignore[reportOptionalMemberAccess, reportUnknownMemberType, reportUnknownVariableType]
+    table = np.asarray(lookup, dtype=np.float64)
+    return np.asarray(
+        0.2126 * table[:, 0] + 0.7152 * table[:, 1] + 0.0722 * table[:, 2], dtype=np.float64
+    )
 
 
 def _image_rect(result: StftResult) -> QRectF:

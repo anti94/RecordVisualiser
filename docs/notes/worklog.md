@@ -263,8 +263,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-045` | 20 dk | 9 dk 46 sn | `f3e6734` | spectrum sekmesinde PSD görünümünü ekle |
 | `F4-046` | 20 dk | 4 dk 24 sn | `f2ac165` | STFT ve spektrogram matrisini hesapla |
 | `F4-047` | 20 dk | 3 dk 41 sn | `33a84cd` | STFT kenar, overlap ve eksen eşlemesini doğrula |
+| `F4-048` | 20 dk | 10 dk 48 sn | `034eebc` | mockup orta spektrogramını sonuçlara bağla |
 
-**245 commit · olculen toplam 2623 dk 20 sn · olculemeyen 1 (ilk commit)**
+**246 commit · olculen toplam 2634 dk 8 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
