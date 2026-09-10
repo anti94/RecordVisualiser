@@ -1616,7 +1616,7 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `F4-015` | `1.15.0` | 20 dk | Detrend ve DC kaldırma hesabını ekle | Sabit ofset ve doğrusal trend referans sonucu üretir | `F4-014` | `feat(processing): F4-015 detrend ve DC kaldırma hesabını ekle` |
+| [x] | `F4-015` | `1.15.0` | 20 dk | Detrend ve DC kaldırma hesabını ekle | Sabit ofset ve doğrusal trend referans sonucu üretir | `F4-014` | `feat(processing): F4-015 detrend ve DC kaldırma hesabını ekle` |
 | [ ] | `F4-016` | `1.16.0` | 15 dk | Detrend türü seçimini işlem editörüne bağla | Seçili tür tekrar açılan zincirde korunur | `F4-015` | `feat(ui): F4-016 detrend türü seçimini işlem editörüne bağla` |
 | [ ] | `F4-017` | `1.17.0` | 20 dk | Moving average hesabını ekle | Bilinen kısa dizide pencere ve kenar davranışı tanımlı sonucu verir | `F4-016` | `feat(processing): F4-017 moving average hesabını ekle` |
 | [ ] | `F4-018` | `1.18.0` | 15 dk | Moving average pencere kontrolünü bağla | Sıfır veya aşırı pencere işlem başlamadan reddedilir | `F4-017` | `feat(ui): F4-018 moving average pencere kontrolünü bağla` |

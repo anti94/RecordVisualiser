@@ -69,6 +69,49 @@ def _as_float64(values: NDArray[np.generic]) -> Samples:
     return array
 
 
+def _detrend(values: Samples, mode: str) -> Samples:
+    """Sabit (DC) ya da doğrusal trendi çıkarır — `F4-015`.
+
+    * ``constant`` — sonlu örneklerin ortalamasını çıkarır (DC kaldırma).
+    * ``linear`` — sonlu örneklere en küçük kareler doğrusu
+      (``slope * i + intercept``, ``i`` = örnek indeksi) uydurur ve
+      çıkarır. Katsayılar normal denklemlerin kapalı formuyla hesaplanır;
+      bağımsız referans ``numpy.polyfit(i, x, 1)``.
+
+    NaN yayılımı yerine **NaN'a dayanıklıdır**: geçersiz örnekler taban
+    çizgisi kestiriminden dışlanır, kendileri NaN kalır. Detrend küresel
+    bir işlemdir; tek bir bozuk örnek tüm diziyi bozmamalıdır (yerel olan
+    `moving_average`'dan farkı budur). İki sonlu örnekten azsa doğrusal
+    uydurma tekildir; sabit çıkarmaya düşülür.
+    """
+    if values.size == 0:
+        return values.copy()
+    finite = np.isfinite(values)
+    finite_count = int(np.count_nonzero(finite))
+    if finite_count == 0:
+        return values.copy()
+
+    baseline_mean = float(values[finite].mean())
+    if mode == "constant" or finite_count < 2:
+        return values - baseline_mean
+
+    if mode == "linear":
+        index = np.arange(values.size, dtype=np.float64)
+        t = index[finite]
+        x = values[finite]
+        n = float(finite_count)
+        sum_t = float(t.sum())
+        sum_x = float(x.sum())
+        sum_tt = float((t * t).sum())
+        sum_tx = float((t * x).sum())
+        denominator = n * sum_tt - sum_t * sum_t
+        slope = (n * sum_tx - sum_t * sum_x) / denominator
+        intercept = (sum_x - slope * sum_t) / n
+        return values - (slope * index + intercept)
+
+    raise ChainExecutionError(f"Bilinmeyen detrend modu: {mode!r}")  # pragma: no cover
+
+
 def _moving_average(values: Samples, window: int) -> Samples:
     """Merkezli kayan pencere ortalaması; çıktı uzunluğu girdiyle aynı.
 
@@ -97,6 +140,8 @@ def apply_step(values: Samples, step: ProcessingStep) -> Samples:
         return np.clip(data, float(params["lo"]), float(params["hi"]))  # type: ignore[arg-type]
     if step.kind is StepKind.MOVING_AVERAGE:
         return _moving_average(data, int(params["window"]))  # type: ignore[arg-type]
+    if step.kind is StepKind.DETREND:
+        return _detrend(data, str(params["mode"]))
     raise ChainExecutionError(f"Uygulanmayan işlem türü: {step.kind}")  # pragma: no cover
 
 

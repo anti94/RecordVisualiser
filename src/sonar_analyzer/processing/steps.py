@@ -39,6 +39,13 @@ class StepKind(str, Enum):
     ABS = "abs"  # y = |x|
     CLIP = "clip"  # y = min(max(x, lo), hi)
     MOVING_AVERAGE = "moving_average"  # kayan pencere ortalaması (tek boyutlu)
+    DETREND = "detrend"  # sabit (DC) ya da doğrusal trend çıkarma — `F4-015`
+
+
+#: `DETREND` adımının `mode` parametresi için geçerli değerler.
+#: `constant` = örnek ortalamasını çıkar (DC kaldırma);
+#: `linear` = en küçük kareler doğrusunu çıkar.
+DETREND_MODES: tuple[str, ...] = ("constant", "linear")
 
 
 @dataclass(frozen=True)
@@ -48,9 +55,19 @@ class ParamSpec:
     name: str
     kind: type
     default: object
+    #: Boş değilse `value` bu kümede olmalı (örn. `DETREND` mode seçenekleri).
+    choices: tuple[object, ...] = ()
 
     def coerce(self, value: object) -> object:
-        """`value`'yu bu parametrenin tipine getirir; uyuşmazsa hata."""
+        """`value`'yu bu parametrenin tipine getirir; uyuşmaz ya da seçenek dışıysa hata."""
+        coerced = self._coerce_type(value)
+        if self.choices and coerced not in self.choices:
+            raise StepValidationError(
+                f"'{self.name}' şunlardan biri olmalı: {list(self.choices)}; {coerced!r} geldi"
+            )
+        return coerced
+
+    def _coerce_type(self, value: object) -> object:
         if self.kind is float and isinstance(value, int) and not isinstance(value, bool):
             return float(value)
         if isinstance(value, self.kind) and not (self.kind is not bool and isinstance(value, bool)):
@@ -71,6 +88,7 @@ PARAMETER_SPECS: dict[StepKind, tuple[ParamSpec, ...]] = {
     StepKind.ABS: (),
     StepKind.CLIP: (ParamSpec("lo", float, 0.0), ParamSpec("hi", float, 1.0)),
     StepKind.MOVING_AVERAGE: (ParamSpec("window", int, 3),),
+    StepKind.DETREND: (ParamSpec("mode", str, "constant", choices=DETREND_MODES),),
 }
 
 
