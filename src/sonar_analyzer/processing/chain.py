@@ -25,7 +25,11 @@ from numpy.typing import NDArray
 
 from sonar_analyzer.domain.data_chunk import Quality
 from sonar_analyzer.processing.steps import ProcessingStep, StepKind
-from sonar_analyzer.processing.windowing import moving_average
+from sonar_analyzer.processing.windowing import (
+    moving_average,
+    windowed_envelope,
+    windowed_rms,
+)
 
 Samples = NDArray[np.float64]
 InvalidMask = NDArray[np.bool_]
@@ -157,6 +161,10 @@ def apply_step(values: Samples, step: ProcessingStep) -> Samples:
         return np.clip(data, float(params["lo"]), float(params["hi"]))  # type: ignore[arg-type]
     if step.kind is StepKind.MOVING_AVERAGE:
         return moving_average(data, int(params["window"]))  # type: ignore[arg-type]
+    if step.kind is StepKind.WINDOWED_RMS:
+        return windowed_rms(data, int(params["window"]))  # type: ignore[arg-type]
+    if step.kind is StepKind.ENVELOPE:
+        return windowed_envelope(data, int(params["window"]))  # type: ignore[arg-type]
     if step.kind is StepKind.DETREND:
         return _detrend(data, str(params["mode"]))
     if step.kind is StepKind.NORMALIZE:

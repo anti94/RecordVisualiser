@@ -1,8 +1,16 @@
-"""Kayan pencere hesapları — `F4-017` (moving average), `F4-021`+ (RMS/envelope).
+"""Kayan pencere hesapları — `F4-017` (moving average), `F4-021` (RMS/zarf).
 
 `moving_average` **merkezli** bir kayan pencere ortalamasıdır ve çıktı
-uzunluğu girdiyle birebir aynıdır. Pencere ve kenar davranışı tam olarak
-tanımlıdır:
+uzunluğu girdiyle birebir aynıdır. `windowed_rms` ve `windowed_envelope`
+aynı merkezleme, kenar ve NaN sözleşmesini paylaşır:
+
+* ``windowed_rms(x, w)`` = ``sqrt(moving_average(x**2, w))`` — pencere
+  içindeki karesel ortalamanın kökü. Sabit genlikli sinyalde (DC ya da
+  kare dalga) sonuç genliğin kendisidir; genlik ``A`` sinüste ``A/√2``.
+* ``windowed_envelope(x, w)`` = kayan pencerede ``|x|`` **tepesi**
+  (peak-hold zarf). Sabit genlikli sinyalde sonuç genliğin kendisidir.
+
+Pencere ve kenar davranışı tam olarak tanımlıdır:
 
 Pencere yerleşimi
     ``i``. örneğin penceresi ``[i - window // 2, i + (window - 1) // 2]``
@@ -103,4 +111,78 @@ def moving_average(
 
     if edges == EDGE_NAN:
         result = np.where(counts < window, np.nan, result)
+    return np.asarray(result, dtype=np.float64)
+
+
+def _full_window_mask(size: int, window: int) -> NDArray[np.bool_]:
+    """Tam pencerenin sığdığı konumlar için `True` (kenar `nan` modu)."""
+    mask = np.zeros(size, dtype=np.bool_)
+    left = window // 2
+    right = window - 1 - left
+    if left + right < size:
+        mask[left : size - right] = True
+    return mask
+
+
+def windowed_rms(
+    values: NDArray[np.generic] | Samples,
+    window: int,
+    *,
+    edges: str = EDGE_SHRINK,
+) -> Samples:
+    """Merkezli kayan pencere RMS'i: ``sqrt(mean(x**2))`` pencere içinde.
+
+    Sabit genlikli sinyalde (DC / kare dalga) sonuç genliğin kendisidir.
+    Kenar ve NaN davranışı `moving_average` ile aynıdır (kare alınmış
+    diziye uygulanır). **Her zaman yeni** bir dizi döndürür.
+    """
+    data = _as_1d_float64(values)
+    mean_square = moving_average(np.square(data), window, edges=edges)
+    # Kare ortalaması negatif olamaz; kayan-nokta gürültüsüne karşı kırp.
+    return np.sqrt(np.maximum(mean_square, 0.0))
+
+
+def windowed_envelope(
+    values: NDArray[np.generic] | Samples,
+    window: int,
+    *,
+    edges: str = EDGE_SHRINK,
+) -> Samples:
+    """Merkezli kayan pencere tepe-tutma zarfı: pencere içinde ``max(|x|)``.
+
+    Sabit genlikli sinyalde sonuç genliğin kendisidir; genlik ``A``
+    sinüste, pencere en az yarım periyot ise ``A``'ya yakınsar.
+
+    Kenar davranışı `moving_average` ile aynı: ``"shrink"`` uçlarda
+    pencereyi mevcut örneklere daraltır, ``"nan"`` tam pencerenin
+    sığmadığı konumları ``NaN`` yapar. Bir girdi ``NaN``'ı yalnız
+    penceresi onu içeren konumlara yayılır (yerel). **Her zaman yeni**
+    bir dizi döndürür.
+    """
+    data = _as_1d_float64(values)
+    validate_window(window)
+    if edges not in EDGE_MODES:
+        raise WindowingError(f"bilinmeyen kenar modu: {edges!r} (geçerli: {list(EDGE_MODES)})")
+
+    if window == 1 or data.size == 0:
+        return np.abs(data)
+
+    magnitude = np.abs(data)
+    left = window // 2
+    right = window - 1 - left
+    # Kenarları -inf ile doldur: kısmi pencerelerde yalnız gerçek örnekler
+    # tepeyi belirler (-inf asla kazanmaz). NaN pencerede kalırsa `max`
+    # onu yayar (yerel kontaminasyon).
+    padded = np.concatenate(
+        [
+            np.full(left, -np.inf, dtype=np.float64),
+            magnitude,
+            np.full(right, -np.inf, dtype=np.float64),
+        ]
+    )
+    windows = np.lib.stride_tricks.sliding_window_view(padded, window)
+    result = np.asarray(windows.max(axis=-1), dtype=np.float64)
+
+    if edges == EDGE_NAN:
+        result = np.where(_full_window_mask(data.size, window), result, np.nan)
     return np.asarray(result, dtype=np.float64)

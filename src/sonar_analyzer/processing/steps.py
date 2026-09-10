@@ -43,6 +43,15 @@ class StepKind(str, Enum):
     MOVING_AVERAGE = "moving_average"  # kayan pencere ortalaması (tek boyutlu)
     DETREND = "detrend"  # sabit (DC) ya da doğrusal trend çıkarma — `F4-015`
     NORMALIZE = "normalize"  # sinyali referans genliğe ölçekle — `F4-019`
+    WINDOWED_RMS = "windowed_rms"  # kayan pencere RMS'i — `F4-021`
+    ENVELOPE = "envelope"  # kayan pencere tepe-tutma zarfı — `F4-021`
+
+
+#: `window` parametresi taşıyan ve `1 <= window <= MAX_MOVING_AVERAGE_WINDOW`
+#: sınırına tabi işlem türleri.
+WINDOWED_KINDS: frozenset[StepKind] = frozenset(
+    {StepKind.MOVING_AVERAGE, StepKind.WINDOWED_RMS, StepKind.ENVELOPE}
+)
 
 
 #: `DETREND` adımının `mode` parametresi için geçerli değerler.
@@ -100,6 +109,8 @@ PARAMETER_SPECS: dict[StepKind, tuple[ParamSpec, ...]] = {
         ParamSpec("mode", str, "peak", choices=NORMALIZE_MODES),
         ParamSpec("reference", float, 1.0),
     ),
+    StepKind.WINDOWED_RMS: (ParamSpec("window", int, 5),),
+    StepKind.ENVELOPE: (ParamSpec("window", int, 5),),
 }
 
 
@@ -127,13 +138,13 @@ class ProcessingStep:
             resolved[spec.name] = spec.coerce(self.parameters[spec.name])
         if self.kind is StepKind.CLIP and resolved["lo"] > resolved["hi"]:  # type: ignore[operator]
             raise StepValidationError("clip: lo, hi'den büyük olamaz")
-        if self.kind is StepKind.MOVING_AVERAGE:
+        if self.kind in WINDOWED_KINDS:
             window = cast("int", resolved["window"])
             if window < 1:
-                raise StepValidationError("moving_average: window >= 1 olmalı")
+                raise StepValidationError(f"{self.kind.value}: window >= 1 olmalı")
             if window > MAX_MOVING_AVERAGE_WINDOW:
                 raise StepValidationError(
-                    f"moving_average: window <= {MAX_MOVING_AVERAGE_WINDOW} olmalı "
+                    f"{self.kind.value}: window <= {MAX_MOVING_AVERAGE_WINDOW} olmalı "
                     f"(aşırı pencere): {window}"
                 )
         if self.kind is StepKind.NORMALIZE and cast("float", resolved["reference"]) <= 0.0:
