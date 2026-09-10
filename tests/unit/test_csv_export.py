@@ -156,6 +156,52 @@ def test_missing_parent_directories_are_created(tmp_path: Path) -> None:
     assert result.path.exists()
 
 
+def test_raw_variant_inverts_the_calibration(tmp_path: Path) -> None:
+    # to_physical: raw*gain + offset  ->  ters: (v - offset) / gain
+    channel = ChannelMetadata(
+        id="ch0",
+        path="Sensors/Pressure",
+        name="Pressure",
+        dtype="float32",
+        source=ChannelSource.SENSORS,
+        unit="bar",
+        gain=2.0,
+        offset=10.0,
+    )
+    processed = DataChunk(
+        channel_id="ch0",
+        timestamps_ns=np.array([T0, T0 + PERIOD], dtype=np.int64),
+        values=np.array([30.0, 50.0], dtype=np.float64),  # ham 10, 20
+    )
+
+    result = write_channel_csv(processed, channel, tmp_path / "raw.csv", raw=True)
+
+    _meta, rows = _read_lines(result.path)
+    assert [float(r[2]) for r in rows[1:]] == [10.0, 20.0]
+    assert "variant=raw" in result.metadata_lines
+    assert "unit=raw" in result.metadata_lines
+    assert "calibration=value*2+10" in result.metadata_lines
+
+
+def test_raw_variant_needs_a_non_zero_gain(tmp_path: Path) -> None:
+    channel = ChannelMetadata(
+        id="ch0",
+        path="Sensors/Pressure",
+        name="Pressure",
+        dtype="float32",
+        source=ChannelSource.SENSORS,
+        unit="bar",
+        gain=0.0,
+    )
+    with pytest.raises(ValueError, match="ters cevrilemez"):
+        write_channel_csv(_chunk(2), channel, tmp_path / "x.csv", raw=True)
+
+
+def test_processed_variant_is_recorded_in_metadata(tmp_path: Path) -> None:
+    result = write_channel_csv(_chunk(2), _channel(), tmp_path / "p.csv")
+    assert "variant=processed" in result.metadata_lines
+
+
 def test_empty_chunk_writes_only_header_and_metadata(tmp_path: Path) -> None:
     empty = DataChunk(
         channel_id="ch0",

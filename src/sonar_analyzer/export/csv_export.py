@@ -61,16 +61,20 @@ def build_metadata_lines(
     *,
     recording: RecordingMetadata | None = None,
     exported_range: TimeRange | None = None,
+    raw: bool = False,
 ) -> list[str]:
     """Dosya başına yazılacak `anahtar=değer` metadata satırlarını üretir."""
     lines = [
         f"channel_id={channel.id}",
         f"channel_name={channel.name}",
         f"channel_path={channel.path}",
-        f"unit={channel.unit or ''}",
+        f"unit={'raw' if raw else (channel.unit or '')}",
+        f"variant={'raw' if raw else 'processed'}",
         f"source={channel.source.value}",
         f"dtype={channel.dtype}",
     ]
+    if raw:
+        lines.append(f"calibration=value*{channel.gain:g}+{channel.offset:g}")
     if channel.sample_rate_hz is not None:
         lines.append(f"sample_rate_hz={channel.sample_rate_hz:g}")
     if recording is not None:
@@ -92,10 +96,16 @@ def write_channel_csv(
     recording: RecordingMetadata | None = None,
     exported_range: TimeRange | None = None,
     include_metadata: bool = True,
+    raw: bool = False,
 ) -> CsvExportResult:
     """`chunk`'ı `path`'e CSV olarak yazar; özet döndürür.
 
-    * `ValueError` — `chunk` başka bir kanala ait (`channel_id` uyuşmuyor).
+    `raw=True` ise değerler ters kalibrasyonla (`(v - offset) / gain`) ham
+    (kalibrasyonsuz) hâline döndürülür ve metadata `variant=raw` olur;
+    aksi hâlde repository'den gelen işlenmiş (ölçekli) değerler yazılır.
+
+    * `ValueError` — `chunk` başka bir kanala ait (`channel_id` uyuşmuyor)
+      ya da `raw` istendi ama `channel.gain == 0` (ters çevrilemez).
     * `OSError` — dosya açılamadı / yazılamadı.
 
     Var olan dosyanın üzerine yazılır; üzerine yazma onayı `F3-065`'in
@@ -103,12 +113,16 @@ def write_channel_csv(
     """
     if chunk.channel_id != channel.id:
         raise ValueError(f"Parça kanalı ({chunk.channel_id}) hedef kanaldan ({channel.id}) farklı")
+    if raw and channel.gain == 0:
+        raise ValueError(f"{channel.id}: gain 0, ham degere ters cevrilemez")
 
     dest = Path(path)
     dest.parent.mkdir(parents=True, exist_ok=True)
 
     metadata_lines = (
-        build_metadata_lines(channel, chunk, recording=recording, exported_range=exported_range)
+        build_metadata_lines(
+            channel, chunk, recording=recording, exported_range=exported_range, raw=raw
+        )
         if include_metadata
         else []
     )
@@ -116,6 +130,8 @@ def write_channel_csv(
     timestamps = chunk.timestamps_ns.tolist()
     values = chunk.values.tolist()
     assert len(timestamps) == len(values)  # DataChunk kurucusu garanti eder
+    if raw:
+        values = [(value - channel.offset) / channel.gain for value in values]
 
     with dest.open("w", encoding="utf-8", newline="") as handle:
         for line in metadata_lines:

@@ -11,7 +11,7 @@ pytest.importorskip("PySide6", reason="PySide6 kurulu degil")
 
 from pytestqt.qtbot import QtBot
 
-from sonar_analyzer.ui.actions import NOT_YET_AVAILABLE
+from sonar_analyzer.application.export_controller import DataVariant
 from sonar_analyzer.ui.cards.data_export import EXPORT_FORMATS, DataExportCard
 from sonar_analyzer.ui.main_window import MainWindow
 
@@ -41,10 +41,20 @@ def test_defaults_match_safe_choices(card: DataExportCard) -> None:
     assert card.export_format.currentText() == "CSV"
 
 
-def test_export_button_is_disabled_with_reason(card: DataExportCard) -> None:
-    """Dışa aktarma motoru henüz yok; buton pasif ve nedeni açık."""
-    assert not card.export_button.isEnabled()
-    assert card.export_button.toolTip() == NOT_YET_AVAILABLE
+def test_export_button_is_active_and_emits(card: DataExportCard, qtbot: QtBot) -> None:
+    """`F3-065`: dışa aktarma motoru artık var; buton etkin ve sinyal yayar."""
+    assert card.export_button.isEnabled()
+    with qtbot.waitSignal(card.export_requested, timeout=500):
+        card.export_button.click()
+
+
+def test_data_variant_choice_is_exposed(card: DataExportCard) -> None:
+    """Ham / işlenmiş seçimi açık bir alandır — `F3-065`."""
+    labels = [card.data_variant.itemText(i) for i in range(card.data_variant.count())]
+    assert labels == ["Processed (scaled)", "Raw (uncalibrated)"]
+    assert card.selected_variant() is DataVariant.PROCESSED
+    card.data_variant.setCurrentIndex(1)
+    assert card.selected_variant() is DataVariant.RAW
 
 
 def test_card_is_used_in_the_right_column(qtbot: QtBot) -> None:

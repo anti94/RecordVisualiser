@@ -13,7 +13,7 @@ hâle gelmez.
 from __future__ import annotations
 
 import logging
-from collections.abc import Iterable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import replace
 from pathlib import Path
 from time import perf_counter
@@ -21,9 +21,11 @@ from time import perf_counter
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QAction, QCloseEvent
 from PySide6.QtWidgets import (
+    QFileDialog,
     QFrame,
     QMainWindow,
     QMenu,
+    QMessageBox,
     QStackedWidget,
     QToolBar,
     QVBoxLayout,
@@ -31,6 +33,13 @@ from PySide6.QtWidgets import (
 )
 
 from sonar_analyzer.application import favorite_groups, recent_files
+from sonar_analyzer.application.export_controller import (
+    KIND_FILE_FILTER,
+    DataVariant,
+    ExportKind,
+    kind_for_format,
+    resolve_target,
+)
 from sonar_analyzer.application.file_loader import (
     FileLoadResult,
     FileLoadService,
@@ -55,6 +64,7 @@ from sonar_analyzer.ui.actions import (
     TOOLBAR_ACTION_NAMES,
     build_action,
 )
+from sonar_analyzer.ui.cards.data_export import DataExportCard
 from sonar_analyzer.ui.docks.bottom_panel import BottomPanelDock
 from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock, selected_channel_ids
 from sonar_analyzer.ui.docks.event_table_model import related_channels
@@ -115,6 +125,9 @@ class MainWindow(QMainWindow):
         self._repository: RecordingRepository | None = None
         #: `F3-041` görünüm ayarları (renk, eksen) undo/redo geçmişi.
         self._view_history = ViewHistory()
+        #: `F3-065` dışa aktarma diyalog seam'leri (testler enjekte eder).
+        self.export_save_dialog: Callable[[str, str], str] | None = None
+        self.export_confirm_overwrite: Callable[[Path], bool] | None = None
         #: `F3-060` zaman bölgesi sürüklemesinde sorguları coalesce eder.
         self._scrub_debouncer: ScrubDebouncer[tuple[int, int]] = ScrubDebouncer(0.12)
         self._scrub_timer = QTimer(self)
@@ -167,6 +180,7 @@ class MainWindow(QMainWindow):
         self.left_dock.channel_path_copied.connect(self._on_channel_path_copied)
         self.right_dock.bit_status.analysis_requested.connect(self.refresh_bit_analysis)
         self.right_dock.inspector.axis_range_requested.connect(self._on_axis_range_requested)
+        self.right_dock.data_export.export_requested.connect(self._on_export_requested)
         self.bottom_dock.event_selected.connect(self._on_event_selected)
         self.bottom_dock.event_activated.connect(self._on_event_activated)
         self.action("action_load_simulation").triggered.connect(self.load_simulation)
@@ -343,13 +357,15 @@ class MainWindow(QMainWindow):
         channel_id: str | None = None,
         selected_range_only: bool = False,
         include_metadata: bool = True,
+        raw: bool = False,
     ) -> CsvExportResult:
         """Seçili kanal (ve isteğe bağlı seçili aralığı) CSV olarak yazar — `F3-064`.
 
         `channel_id` verilmezse grafiğin birincil kanalı kullanılır.
         `selected_range_only` ise ve grafikte bir zaman bölgesi seçiliyse
         yalnız o aralık; aksi hâlde kaydın tamamı yazılır. Metadata
-        yorum satırları `include_metadata` ile açılıp kapanır.
+        yorum satırları `include_metadata` ile açılıp kapanır. `raw` ise
+        değerler kalibrasyonsuz (ham) yazılır — `F3-065`.
 
         Açık kayıt ya da hedef kanal yoksa `ValueError` verir.
         """
@@ -378,11 +394,74 @@ class MainWindow(QMainWindow):
             recording=metadata,
             exported_range=exported_range,
             include_metadata=include_metadata,
+            raw=raw,
         )
         self.bottom_dock.append_log(
             f"Kanal CSV olarak yazildi: {result.path} ({result.row_count} satir)"
         )
         return result
+
+    # -- dışa aktarma akışı (F3-065) ---------------------------------
+
+    def _default_export_save_dialog(self, caption: str, name_filter: str) -> str:
+        start_dir = self._settings.last_directory or str(Path.home())
+        path, _selected = QFileDialog.getSaveFileName(self, caption, start_dir, name_filter)
+        return path
+
+    def _default_confirm_overwrite(self, path: Path) -> bool:
+        answer = QMessageBox.question(
+            self,
+            "Üzerine yaz",
+            f"{path.name} zaten var. Üzerine yazılsın mı?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        return answer == QMessageBox.StandardButton.Yes
+
+    def _on_export_requested(self) -> None:
+        """Data Export kartındaki `Export Data`'yı işler — `F3-065`.
+
+        Biçim ve ham/işlenmiş seçimi karttan okunur, hedef dosya adı
+        sorulur, dosya varsa üzerine yazma onayı istenir. Onay yoksa
+        **hiçbir şey yazılmaz** (var olan dosya dokunulmaz).
+        """
+        card = self.right_dock.data_export
+        try:
+            kind = kind_for_format(card.selected_format())
+        except KeyError:
+            self.bottom_dock.append_log(
+                f"{card.selected_format()} disa aktarimi henuz desteklenmiyor."
+            )
+            return
+
+        dialog = self.export_save_dialog or self._default_export_save_dialog
+        chosen = dialog(f"{kind.value.upper()} olarak disa aktar", KIND_FILE_FILTER[kind])
+        if not chosen:
+            return  # kullanıcı diyaloğu iptal etti
+
+        confirm = self.export_confirm_overwrite or self._default_confirm_overwrite
+        target = resolve_target(chosen, kind, exists=Path.exists, confirm_overwrite=confirm)
+        if target is None:
+            self.bottom_dock.append_log("Disa aktarma iptal edildi: dosyanin uzerine yazilmadi.")
+            return
+
+        try:
+            self._dispatch_export(kind, target, card)
+        except (ValueError, OSError) as exc:
+            self.bottom_dock.append_log(f"Disa aktarma basarisiz: {exc}")
+
+    def _dispatch_export(self, kind: ExportKind, target: Path, card: DataExportCard) -> None:
+        if kind is ExportKind.PNG:
+            self.export_plot_png(target)
+        elif kind is ExportKind.SVG:
+            self.export_plot_svg(target)
+        else:
+            self.export_channel_csv(
+                target,
+                selected_range_only=card.wants_selected_range(),
+                include_metadata=card.wants_metadata(),
+                raw=card.selected_variant() is DataVariant.RAW,
+            )
 
     def _on_axis_range_requested(self, axis: str, y_min: float, y_max: float) -> None:
         """Inspector Display'den gelen eksen aralığını seçili grafiğe uygular — `F3-036`.
