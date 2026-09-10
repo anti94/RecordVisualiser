@@ -210,8 +210,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-072` | 20 dk | 5 dk 18 sn | `706ab7d` | bölüm 16 klavye kısayollarını bağla |
 | `F3-073` | 20 dk | 6 dk 17 sn | `47591d3` | klavye odak sırasını ve açıklamaları düzenle |
 | `F3-074` | 20 dk | 3 dk 53 sn | `540271c` | windows ölçekleme ve kontrast kontrolünü kaydet |
+| `F3-075` | 20 dk | 3 dk 28 sn | `d3bc38e` | dosyadan olay gezinmesine entegrasyon senaryosu ekle |
 
-**192 commit · olculen toplam 2335 dk 16 sn · olculemeyen 1 (ilk commit)**
+**193 commit · olculen toplam 2338 dk 44 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

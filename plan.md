@@ -1578,7 +1578,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F3-075` | `0.177.0` | 20 dk | Dosyadan olay gezinmesine entegrasyon senaryosu ekle | BIN → repository → grafik → olay zamanı zinciri geçer | `F3-074` | `test(ui): F3-075 dosyadan olay gezinmesine entegrasyon senaryosu ekle` |
-| [ ] | `F3-076` | `0.178.0` | 20 dk | Kritik plot ve workspace GUI kontrollerini ekle | Zoom, ROI ve workspace round-trip davranışları doğrulanır | `F3-075` | `test(ui): F3-076 kritik plot ve workspace GUI kontrollerini ekle` |
+| [x] | `F3-076` | `0.178.0` | 20 dk | Kritik plot ve workspace GUI kontrollerini ekle | Zoom, ROI ve workspace round-trip davranışları doğrulanır | `F3-075` | `test(ui): F3-076 kritik plot ve workspace GUI kontrollerini ekle` |
 | [ ] | `F3-077` | `0.179.0` | 20 dk | MVP etkileşim bütçesini ölç | Cursor, play/pause, olay gezinmesi ve ağaç sonuçları hedeflerle karşılaştırılır | `F3-076` | `perf(ui): F3-077 mVP etkileşim bütçesini ölç` |
 | [ ] | `F3-078` | `0.180.0` | 20 dk | Operatör ve mühendis MVP senaryolarını kaydet | Bölüm 17.5'in MVP senaryoları ve Bölüm 23 için kanıt bağlantıları vardır | `F3-077` | `test(acceptance): F3-078 operatör ve mühendis MVP senaryolarını kaydet` |
 | [ ] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır | Dokuz bölge ve yerleşim eşleşir; FFT/spektrogram işlevleri v2 olarak pasiftir | `F3-078` | `test(ui): F3-079 mVP ekran görüntüsünü ana mockup ile karşılaştır` |
