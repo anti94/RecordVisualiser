@@ -15,7 +15,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from datetime import datetime, timezone
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QComboBox,
@@ -72,6 +72,10 @@ def format_timestamp(timestamp_ns: int) -> str:
 class BottomPanelDock(QDockWidget):
     """Merkez grafiklerin altındaki log ve olay alanı."""
 
+    #: `F3-044` Events tablosunda bir satır seçildi (`Event`); seçim
+    #: kalkınca `None` yayılır.
+    event_selected = Signal(object)
+
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(DOCK_TITLE, parent)
         self.setObjectName(DOCK_OBJECT_NAME)
@@ -113,13 +117,27 @@ class BottomPanelDock(QDockWidget):
         self.events.horizontalHeader().setSectionResizeMode(
             len(EVENT_COLUMNS) - 1, QHeaderView.ResizeMode.Stretch
         )
+        self.events.itemSelectionChanged.connect(self._on_event_row_selected)
         layout.addWidget(self.events, 1)
 
         # F3-043: filtre öncesi ham olaylar ve göreli-zaman ankoru.
         self._all_events: tuple[Event, ...] = ()
+        self._visible_events: tuple[Event, ...] = ()
         self._events_start_ns = 0
         self._suppress_filter_refresh = False
         return page
+
+    def _on_event_row_selected(self) -> None:
+        row = self.events.currentRow()
+        event = self._visible_events[row] if 0 <= row < len(self._visible_events) else None
+        self.event_selected.emit(event)
+
+    def selected_event(self) -> Event | None:
+        """Şu an seçili olay; seçim yoksa `None` — `F3-044`."""
+        row = self.events.currentRow()
+        if 0 <= row < len(self._visible_events):
+            return self._visible_events[row]
+        return None
 
     def _build_event_filters(self, parent: QWidget) -> QWidget:
         """`F3-043` zaman + severity + kaynak + metin filtre çubuğu."""
@@ -233,6 +251,7 @@ class BottomPanelDock(QDockWidget):
         self._render_events(visible)
 
     def _render_events(self, events: Sequence[Event]) -> None:
+        self._visible_events = tuple(events)
         severity_column = EVENT_COLUMNS.index("Severity")
         self.events.setRowCount(len(events))
         for row, event in enumerate(events):
@@ -267,6 +286,7 @@ class BottomPanelDock(QDockWidget):
 
     def clear_events(self) -> None:
         self._all_events = ()
+        self._visible_events = ()
         self._suppress_filter_refresh = True
         try:
             self._populate_source_filter()

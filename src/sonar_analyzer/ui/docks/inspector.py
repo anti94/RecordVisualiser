@@ -10,6 +10,8 @@ Bu sınıf yalnız içeriktir; sekme olarak açılıp kapanması
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QComboBox,
@@ -23,12 +25,24 @@ from PySide6.QtWidgets import (
 )
 
 from sonar_analyzer.domain.channel import ChannelMetadata
+from sonar_analyzer.domain.event import Event
 from sonar_analyzer.domain.raw_record import SampleInspection
 
 PANEL_OBJECT_NAME = "panel_inspector"
 
 #: `F3-040` geliştirici ham görünümü alanları.
 RAW_FIELDS: tuple[str, ...] = ("Source offset", "Raw value", "Scaled value", "Sample time")
+
+#: `F3-044` olay seçildiğinde gösterilen alanlar.
+EVENT_FIELDS: tuple[str, ...] = (
+    "Source",
+    "Code",
+    "Category",
+    "Severity",
+    "State",
+    "Message",
+    "Related channels",
+)
 
 #: `F3-036` Display sekmesindeki eksen seçenekleri (etiket -> PlotPanel ekseni).
 AXIS_CHOICES: tuple[tuple[str, str], ...] = (("Left axis", "left"), ("Right axis", "right"))
@@ -89,9 +103,26 @@ class InspectorPanel(QWidget):
             form.addRow(f"{field}:", value)
         layout.addWidget(self.detail)
 
+        layout.addWidget(self._build_event_group(body))
         layout.addWidget(self._build_display_group(body))
         layout.addWidget(self._build_raw_group(body))
         layout.addStretch(1)
+
+    def _build_event_group(self, parent: QWidget) -> QWidget:
+        """`F3-044` Event: seçilen olayın kaynağı, kodu ve ilgili kanalları."""
+        self.event_detail = QGroupBox("Event", parent)
+        self.event_detail.setObjectName("group_inspector_event")
+        form = QFormLayout(self.event_detail)
+        form.setContentsMargins(6, 4, 6, 4)
+        self._event_fields: dict[str, QLabel] = {}
+        for field in EVENT_FIELDS:
+            value = QLabel(EMPTY_VALUE, self.event_detail)
+            value.setObjectName(f"label_inspector_event_{field.lower().replace(' ', '_')}")
+            value.setWordWrap(True)
+            value.setMinimumWidth(1)
+            self._event_fields[field] = value
+            form.addRow(f"{field}:", value)
+        return self.event_detail
 
     def _build_raw_group(self, parent: QWidget) -> QWidget:
         """`F3-040` Raw: seçilen örneğin kaynak offseti + ham/ölçeklenmiş değeri."""
@@ -174,8 +205,11 @@ class InspectorPanel(QWidget):
         """Seçim yokken boş duruma döner."""
         for label in self._fields.values():
             label.setText(EMPTY_VALUE)
+        for label in self._event_fields.values():
+            label.setText(EMPTY_VALUE)
         self.clear_raw_sample()
         self.detail.setVisible(False)
+        self.event_detail.setVisible(False)
         self.hint.setVisible(True)
 
     def show_channel(self, channel: ChannelMetadata) -> None:
@@ -197,11 +231,38 @@ class InspectorPanel(QWidget):
             self._fields[field].setText(text)
 
         self.hint.setVisible(False)
+        self.event_detail.setVisible(False)
         self.detail.setVisible(True)
 
+    def show_event(self, event: Event, related: Sequence[ChannelMetadata]) -> None:
+        """Seçilen olayın kaynağını, kodunu ve ilgili kanallarını gösterir — `F3-044`."""
+        channels = ", ".join(channel.name for channel in related) or EMPTY_VALUE
+        values = {
+            "Source": event.source,
+            "Code": event.code,
+            "Category": event.category,
+            "Severity": event.severity.value.capitalize(),
+            "State": event.state or EMPTY_VALUE,
+            "Message": event.message,
+            "Related channels": channels,
+        }
+        for field, text in values.items():
+            self._event_fields[field].setText(text)
+
+        self.hint.setVisible(False)
+        self.detail.setVisible(False)
+        self.event_detail.setVisible(True)
+
     def field_value(self, field: str) -> str:
-        """Alanın gösterilen değeri — testler ve kabul için."""
+        """Kanal alanının gösterilen değeri — testler ve kabul için."""
         try:
             return self._fields[field].text()
         except KeyError as exc:
             raise KeyError(f"Tanimsiz Inspector alani: {field}") from exc
+
+    def event_field_value(self, field: str) -> str:
+        """Olay alanının gösterilen değeri — `F3-044`."""
+        try:
+            return self._event_fields[field].text()
+        except KeyError as exc:
+            raise KeyError(f"Tanimsiz Inspector olay alani: {field}") from exc

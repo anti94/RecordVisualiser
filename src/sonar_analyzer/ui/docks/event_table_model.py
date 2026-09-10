@@ -13,6 +13,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from datetime import datetime, timezone
 
+from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.event import Event, Severity
 from sonar_analyzer.repository.protocol import EventFilter
 
@@ -117,3 +118,27 @@ def distinct_sources(events: Sequence[Event]) -> list[str]:
         if event.source not in seen:
             seen.append(event.source)
     return seen
+
+
+def related_channels(event: Event, channels: Sequence[ChannelMetadata]) -> list[ChannelMetadata]:
+    """Olayla **ilişkili** kanalları döndürür — `F3-044`.
+
+    Bir kanal ilişkilidir eğer:
+
+    * kaynağı (`ChannelSource`) olayın kategorisiyle eşleşiyorsa
+      (örn. kategori `"navigation"` -> `NAVIGATION` kanalları), **ya da**
+    * adı ya da kimliği olayın mesajı veya kaynağında (büyük/küçük harf
+      duyarsız, alt dize) geçiyorsa.
+
+    Kanal listesi sırası korunur; bir kanal iki ölçütü de sağlasa bir kez
+    döner.
+    """
+    category = event.category.strip().casefold()
+    haystack = f"{event.message} {event.source}".casefold()
+    result: list[ChannelMetadata] = []
+    for channel in channels:
+        by_category = channel.source.value.casefold() == category
+        by_name = channel.name.casefold() in haystack or channel.id.casefold() in haystack
+        if by_category or by_name:
+            result.append(channel)
+    return result

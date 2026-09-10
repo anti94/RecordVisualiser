@@ -20,6 +20,8 @@ güvenilir biçimde yanıtlanamıyordu.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 from PySide6.QtWidgets import (
     QDockWidget,
     QGroupBox,
@@ -30,6 +32,7 @@ from PySide6.QtWidgets import (
 )
 
 from sonar_analyzer.domain.channel import ChannelMetadata
+from sonar_analyzer.domain.event import Event
 from sonar_analyzer.ui.cards.analysis_tools import AnalysisToolsCard
 from sonar_analyzer.ui.cards.bit_status import BitStatusCard
 from sonar_analyzer.ui.cards.data_export import DataExportCard
@@ -138,6 +141,14 @@ class RightColumnDock(QDockWidget):
     def show_channel(self, channel: ChannelMetadata) -> None:
         """Inspector sekmesini açar (yoksa ekler) ve kanalı gösterir."""
         self.inspector.show_channel(channel)
+        self._open_inspector_tab()
+
+    def show_event(self, event: Event, related: Sequence[ChannelMetadata]) -> None:
+        """Inspector sekmesini açar ve seçili olayın ayrıntısını gösterir — `F3-044`."""
+        self.inspector.show_event(event, related)
+        self._open_inspector_tab()
+
+    def _open_inspector_tab(self) -> None:
         index = self.tabs.indexOf(self.inspector)
         if index < 0:
             index = self.tabs.addTab(self.inspector, INSPECTOR_TAB_TITLE)

@@ -38,6 +38,7 @@ from sonar_analyzer.application.file_loader import (
 from sonar_analyzer.application.load_errors import describe_load_error
 from sonar_analyzer.application.view_history import ViewCommand, ViewHistory
 from sonar_analyzer.domain.channel import ChannelMetadata
+from sonar_analyzer.domain.event import Event
 from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.repository.file_repository import FileRecordingRepository
@@ -52,6 +53,7 @@ from sonar_analyzer.ui.actions import (
 )
 from sonar_analyzer.ui.docks.bottom_panel import BottomPanelDock
 from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock, selected_channel_ids
+from sonar_analyzer.ui.docks.event_table_model import related_channels
 from sonar_analyzer.ui.docks.playback import PlaybackDock
 from sonar_analyzer.ui.docks.right_column import RightColumnDock
 from sonar_analyzer.ui.empty_state import EmptyStatePanel
@@ -154,6 +156,7 @@ class MainWindow(QMainWindow):
         self.left_dock.channel_path_copied.connect(self._on_channel_path_copied)
         self.right_dock.bit_status.analysis_requested.connect(self.refresh_bit_analysis)
         self.right_dock.inspector.axis_range_requested.connect(self._on_axis_range_requested)
+        self.bottom_dock.event_selected.connect(self._on_event_selected)
         self.action("action_load_simulation").triggered.connect(self.load_simulation)
 
         # Dosya secici yalniz talep uretir; okuma worker thread'inde yapilir.
@@ -231,6 +234,16 @@ class MainWindow(QMainWindow):
     def _on_channel_path_copied(self, path: str) -> None:
         """Sağ tık > Copy Path sonrası kullanıcıya geri bildirim — `F3-018`."""
         self.bottom_dock.append_log(f"Yol panoya kopyalandi: {path}")
+
+    def _on_event_selected(self, event: object) -> None:
+        """Events tablosunda seçilen olayın ayrıntısını Inspector'a bağlar — `F3-044`.
+
+        Kaynak, kod ve olayla ilişkili kanallar gösterilir. Seçim
+        kalkarsa (`event is None`) bir şey yapılmaz.
+        """
+        if not isinstance(event, Event):
+            return
+        self.right_dock.show_event(event, related_channels(event, self._channels))
 
     def _on_axis_range_requested(self, axis: str, y_min: float, y_max: float) -> None:
         """Inspector Display'den gelen eksen aralığını seçili grafiğe uygular — `F3-036`.
