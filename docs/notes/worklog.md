@@ -289,8 +289,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-067` | 15 dk | 7 dk 59 sn | `f0bacb2` | profil sonucuyla native hızlandırma ADR'sini yaz |
 | `F4-068` | 20 dk | 7 dk 5 sn | `d990af8` | derivedChannelDefinition modelini ekle |
 | `F4-069` | 20 dk | 6 dk 28 sn | `72d4001` | türetilmiş kanalları repository'ye ekle |
+| `F4-070` | 20 dk | 7 dk 13 sn | `903cff9` | sınırlı aritmetik formül ayrıştırıcısını ekle |
 
-**271 commit · olculen toplam 2946 dk 39 sn · olculemeyen 1 (ilk commit)**
+**272 commit · olculen toplam 2953 dk 52 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
