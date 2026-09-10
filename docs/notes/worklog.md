@@ -257,8 +257,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-039` | 20 dk | 4 dk 3 sn | `ac1c6cc` | window üretimi ve normalizasyonunu ekle |
 | `F4-040` | 20 dk | 3 dk 53 sn | `4e44bc6` | tek taraflı FFT hesabını ekle |
 | `F4-041` | 20 dk | 3 dk 17 sn | `8be5420` | FFT, dB ve Nyquist doğrulamalarını ekle |
+| `F4-042` | 20 dk | 8 dk 11 sn | `637ad26` | seçili aralık FFT'sini mockup alt grafiğine bağla |
 
-**239 commit · olculen toplam 2589 dk 9 sn · olculemeyen 1 (ilk commit)**
+**240 commit · olculen toplam 2597 dk 20 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
