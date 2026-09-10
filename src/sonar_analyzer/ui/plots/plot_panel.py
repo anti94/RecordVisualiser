@@ -36,6 +36,7 @@ grafik tek birime dönerse yine gizlenir.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import cast
 
 import numpy as np
 import pyqtgraph as pg
@@ -46,7 +47,7 @@ from PySide6.QtWidgets import QVBoxLayout, QWidget
 
 from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.data_chunk import DataChunk
-from sonar_analyzer.domain.time_range import NS_PER_SECOND
+from sonar_analyzer.domain.time_range import NS_PER_SECOND, TimeRange
 from sonar_analyzer.ui.drag_drop import CHANNEL_MIME_TYPE, decode_channel_id
 from sonar_analyzer.ui.status_icons import channel_color
 from sonar_analyzer.ui.theme import DARK
@@ -91,6 +92,11 @@ class PlotPanel(QWidget):
     #: F3-026: crosshair hareket etti — (cursor zamanı [s], birincil seride
     #: en yakın örnek değeri). Yakında örnek yoksa yayılmaz.
     cursor_moved = Signal(float, float)
+    #: F3-028: zaman bölgesi seçildi/değişti — (start_ns, end_ns) mutlak
+    #: UTC epoch nanosaniye; `MainWindow` bunu repository sorgusuna verir.
+    #: `object`: epoch-ns değerleri C++ 32-bit `int`'e sığmaz, Python int
+    #: olarak taşınır.
+    time_region_changed = Signal(object, object)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -163,6 +169,15 @@ class PlotPanel(QWidget):
             line.setVisible(False)
             self.plot.addItem(line, ignoreBounds=True)
         self._delta_text = ""
+
+        # F3-028: zaman bölgesi (ROI) seçimi — sürüklenebilir bant;
+        # seçili [x0, x1] mutlak epoch-ns TimeRange'e dönüşür.
+        self._region = pg.LinearRegionItem(orientation="vertical")
+        self._region.setVisible(False)
+        self._region.setZValue(-5)
+        self.plot.addItem(self._region, ignoreBounds=True)
+        self._region_active = False
+        self._region.sigRegionChangeFinished.connect(self._emit_time_region)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -492,6 +507,50 @@ class PlotPanel(QWidget):
             parts.append(f"f={reading.frequency_hz:.4g} Hz")
         self._delta_text = "  |  ".join(parts)
 
+    # -- zaman bolgesi secimi (F3-028) ---------------------------
+
+    def set_time_region(self, x_start: float, x_end: float) -> None:
+        """Zaman bölgesini `[min, max]` saniye aralığına kurar/gösterir — `F3-028`.
+
+        Kenarlar herhangi bir sırada verilebilir; normalize edilir.
+        Grafikte seri yoksa (zaman ankoru yok) etkisizdir.
+        """
+        if self._t0_ns is None:
+            return
+        lo, hi = sorted((x_start, x_end))
+        self._region_active = True
+        self._region.setVisible(True)
+        self._region.setRegion((lo, hi))  # sigRegionChangeFinished -> _emit_time_region
+
+    def clear_time_region(self) -> None:
+        """Zaman bölgesi seçimini kaldırır — `F3-028`."""
+        self._region_active = False
+        self._region.setVisible(False)
+
+    def time_region_x(self) -> tuple[float, float] | None:
+        """Seçili bölgenin `(x_min, x_max)` saniye sınırları; seçim yoksa `None`."""
+        if not self._region_active:
+            return None
+        lo, hi = cast("tuple[float, float]", self._region.getRegion())
+        return float(lo), float(hi)
+
+    def time_region_range(self) -> TimeRange | None:
+        """Seçili bölgeyi **mutlak epoch-ns** `TimeRange`'e dönüştürür — `F3-028`.
+
+        Kabul kriteri: seçili başlangıç/bitiş repository aralığına dönüşür.
+        Seçim yoksa ya da zaman ankoru yoksa `None`.
+        """
+        span = self.time_region_x()
+        if span is None or self._t0_ns is None:
+            return None
+        lo, hi = span
+        return TimeRange(self.timestamp_ns_for_x(lo), self.timestamp_ns_for_x(hi))
+
+    def _emit_time_region(self) -> None:
+        time_range = self.time_region_range()
+        if time_range is not None:
+            self.time_region_changed.emit(time_range.start_ns, time_range.end_ns)
+
     def remove_channel(self, channel_id: str) -> None:
         """Bir seriyi ve legend girdisini kaldırır — `F3-014`.
 
@@ -520,6 +579,7 @@ class PlotPanel(QWidget):
             self._home_right_y = None
             self.clear_cursor()
             self.clear_delta_cursors()
+            self.clear_time_region()
         else:
             self._capture_home_range()
 
