@@ -65,6 +65,7 @@ from sonar_analyzer.ui.actions import (
     TOOLBAR_ACTION_NAMES,
     build_action,
 )
+from sonar_analyzer.ui.cards.analysis_tools import FilterTabError
 from sonar_analyzer.ui.cards.data_export import DataExportCard
 from sonar_analyzer.ui.docks.bottom_panel import BottomPanelDock
 from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock, selected_channel_ids
@@ -630,14 +631,24 @@ class MainWindow(QMainWindow):
     # -- işlem zinciri uygulaması (F4-008) ------------------------
 
     def _on_apply_processing(self) -> None:
-        """`Apply Filter` — Custom sekmesindeki zinciri seçili kanala uygular."""
-        chain = self.right_dock.analysis_tools.step_editor.chain()
-        if not chain.enabled_steps:
-            self.bottom_dock.append_log("Uygulanacak işlem adımı yok (Custom sekmesi).")
-            return
+        """`Apply Filter` — aktif sekmeye göre Filter ya da Custom zincirini uygular."""
         channel = self.plot_panel.channel
         if channel is None:
             self.bottom_dock.append_log("Önce bir kanal çizin.")
+            return
+
+        tools = self.right_dock.analysis_tools
+        if tools.active_tab_title() == "Filter":
+            try:
+                chain = tools.build_filter_chain(channel.id, channel.sample_rate_hz or 0.0)
+            except FilterTabError as exc:
+                self.bottom_dock.append_log(f"Filtre parametresi geçersiz: {exc}")
+                return
+        else:
+            chain = tools.step_editor.chain()
+
+        if not chain.enabled_steps:
+            self.bottom_dock.append_log("Uygulanacak işlem adımı yok (Custom sekmesi).")
             return
         _x, values = self.plot_panel.curve_data()
         if values.size == 0:

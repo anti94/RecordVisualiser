@@ -30,7 +30,13 @@ def win(qtbot: QtBot) -> MainWindow:
     return window
 
 
+def _select_custom_tab(win: MainWindow) -> None:
+    tools = win.right_dock.analysis_tools
+    tools.tabs.setCurrentWidget(tools.step_editor)
+
+
 def _add_scale_step(win: MainWindow, factor: float) -> None:
+    _select_custom_tab(win)
     editor = win.right_dock.analysis_tools.step_editor
     editor.kind_selector.setCurrentIndex(editor.kind_selector.findData(StepKind.SCALE))
     editor.add_button.click()
@@ -73,6 +79,7 @@ def test_show_filtered_data_toggles_overlay_visibility(win: MainWindow, qtbot: Q
 
 def test_apply_without_steps_is_a_no_op(win: MainWindow) -> None:
     # Editörde adım yok.
+    _select_custom_tab(win)
     win.right_dock.analysis_tools.apply_requested.emit()
     assert not win.plot_panel.has_processed_overlay
     assert any("işlem adımı yok" in line for line in win.bottom_dock.log_lines())

@@ -243,8 +243,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-025` | 20 dk | 5 dk 11 sn | `1db9f61` | resample/decimate işlemini ekle |
 | `F4-026` | 15 dk | 6 dk 12 sn | `0c72609` | resample hedef frekans kontrolünü bağla |
 | `F4-027` | 20 dk | 5 dk 29 sn | `5503651` | low-pass filtre hesabını ekle |
+| `F4-028` | 15 dk | 2 dk 59 sn | `4d1828e` | low-pass cutoff ve order sınırlarını doğrula |
 
-**225 commit · olculen toplam 2511 dk 17 sn · olculemeyen 1 (ilk commit)**
+**226 commit · olculen toplam 2514 dk 16 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

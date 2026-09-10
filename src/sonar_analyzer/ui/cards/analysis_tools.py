@@ -25,6 +25,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from sonar_analyzer.processing.chain import ProcessingChain
+from sonar_analyzer.processing.steps import ProcessingStep, StepKind
 from sonar_analyzer.ui.actions import NOT_YET_AVAILABLE
 from sonar_analyzer.ui.cards.step_list_editor import StepListEditor
 
@@ -34,7 +36,19 @@ CARD_TITLE = "Analysis Tools"
 #: Mockup sirasi.
 TAB_TITLES: tuple[str, ...] = ("Filter", "FFT", "Statistics", "Custom")
 
+#: Yaklaşım ailesi (mockup). Şu an yalnız Butterworth uygulanır.
 FILTER_TYPES: tuple[str, ...] = ("Butterworth", "Chebyshev", "Bessel")
+
+#: Filtre yanıt türü. `F4-029` low-pass ile başlar; `F4-032`/`F4-035`/
+#: `F4-038` sırayla high-pass / band-pass / notch ekler.
+FILTER_RESPONSES: tuple[str, ...] = ("Low-pass",)
+
+#: `filter_response` etiketi -> `StepKind` eşlemesi.
+FILTER_RESPONSE_KINDS: dict[str, StepKind] = {"Low-pass": StepKind.LOW_PASS}
+
+
+class FilterTabError(ValueError):
+    """Filter sekmesi alanlarından geçerli bir işlem zinciri kurulamadı."""
 
 
 def _placeholder_tab(parent: QWidget, name: str) -> QWidget:
@@ -84,6 +98,11 @@ class AnalysisToolsCard(QGroupBox):
         self.filter_type.addItems(FILTER_TYPES)
         form.addRow("Filter Type", self.filter_type)
 
+        self.filter_response = QComboBox(page)
+        self.filter_response.setObjectName("combo_filter_response")
+        self.filter_response.addItems(FILTER_RESPONSES)
+        form.addRow("Response", self.filter_response)
+
         self.cutoff_frequency = QSpinBox(page)
         self.cutoff_frequency.setObjectName("spin_cutoff_frequency")
         self.cutoff_frequency.setRange(1, 1_000_000)
@@ -123,3 +142,38 @@ class AnalysisToolsCard(QGroupBox):
 
     def tab_titles(self) -> list[str]:
         return [self.tabs.tabText(index) for index in range(self.tabs.count())]
+
+    def active_tab_title(self) -> str:
+        return self.tabs.tabText(self.tabs.currentIndex())
+
+    def build_filter_chain(self, channel_id: str, sample_rate_hz: float) -> ProcessingChain:
+        """Filter sekmesi alanlarından tek adımlı bir `ProcessingChain` kurar — `F4-029`.
+
+        Geçersiz parametre (Nyquist dışı cutoff, aralık dışı order,
+        desteklenmeyen aile) `FilterTabError` yükseltir — çağıran bunu
+        kullanıcıya gösterir, işlem başlatmaz.
+        """
+        family = self.filter_type.currentText()
+        if family != "Butterworth":
+            raise FilterTabError(f"{family} ailesi henüz uygulanmadı; Butterworth seçin.")
+        if sample_rate_hz <= 0:
+            raise FilterTabError("Kanal sample rate bilinmiyor; filtre uygulanamaz.")
+
+        response = self.filter_response.currentText()
+        kind = FILTER_RESPONSE_KINDS.get(response)
+        if kind is None:  # pragma: no cover - combo yalnız bilinen değerleri taşır
+            raise FilterTabError(f"Bilinmeyen yanıt türü: {response}")
+
+        try:
+            step = ProcessingStep(
+                kind=kind,
+                input_channel_id=channel_id,
+                parameters={
+                    "sample_rate_hz": float(sample_rate_hz),
+                    "cutoff_hz": float(self.cutoff_frequency.value()),
+                    "order": int(self.order.value()),
+                },
+            )
+        except ValueError as exc:  # StepValidationError dahil
+            raise FilterTabError(str(exc)) from exc
+        return ProcessingChain([step])

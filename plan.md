@@ -1635,7 +1635,7 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F4-027` | `1.27.0` | 20 dk | Low-pass filtre hesabını ekle | Düşük frekans korunur; yüksek frekans referansa uygun bastırılır | `F4-026` | `feat(processing): F4-027 low-pass filtre hesabını ekle` |
 | [x] | `F4-028` | `1.28.0` | 15 dk | Low-pass cutoff ve order sınırlarını doğrula | Nyquist dışındaki cutoff ve geçersiz order reddedilir | `F4-027` | `test(processing): F4-028 low-pass cutoff ve order sınırlarını doğrula` |
-| [ ] | `F4-029` | `1.29.0` | 15 dk | Low-pass araç alanlarını bağla | Mockup Filter kartından geçerli parametreyle sonuç çizilir | `F4-028` | `feat(ui): F4-029 low-pass araç alanlarını bağla` |
+| [x] | `F4-029` | `1.29.0` | 15 dk | Low-pass araç alanlarını bağla | Mockup Filter kartından geçerli parametreyle sonuç çizilir | `F4-028` | `feat(ui): F4-029 low-pass araç alanlarını bağla` |
 | [ ] | `F4-030` | `1.30.0` | 20 dk | High-pass filtre hesabını ekle | DC ve düşük frekans referansa uygun bastırılır | `F4-029` | `feat(processing): F4-030 high-pass filtre hesabını ekle` |
 | [ ] | `F4-031` | `1.31.0` | 15 dk | High-pass sınır ve transient davranışını doğrula | Kısa dizi ve sınır parametreleri kontrollü sonuç verir | `F4-030` | `test(processing): F4-031 high-pass sınır ve transient davranışını doğrula` |
 | [ ] | `F4-032` | `1.32.0` | 15 dk | High-pass seçimini araç kartına bağla | Tür değişimi doğru parametrelerle zincire kaydedilir | `F4-031` | `feat(ui): F4-032 high-pass seçimini araç kartına bağla` |

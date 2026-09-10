@@ -33,7 +33,9 @@ def win(qtbot: QtBot) -> MainWindow:
 
 
 def _add_normalize_step(win: MainWindow, mode: str, reference: float) -> None:
-    editor = win.right_dock.analysis_tools.step_editor
+    tools = win.right_dock.analysis_tools
+    tools.tabs.setCurrentWidget(tools.step_editor)
+    editor = tools.step_editor
     editor.kind_selector.setCurrentIndex(editor.kind_selector.findData(StepKind.NORMALIZE))
     editor.add_button.click()
     editor.list.setCurrentRow(editor.step_count() - 1)

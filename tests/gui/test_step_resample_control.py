@@ -108,11 +108,13 @@ def test_apply_logs_the_derived_channel(qtbot: QtBot) -> None:
     window.set_repository(MockRecordingRepository(duration_s=4.0))
     window.open_channel("ch0")
 
-    editor = window.right_dock.analysis_tools.step_editor
+    tools = window.right_dock.analysis_tools
+    editor = tools.step_editor
     _add_resample(editor)
     editor.set_param_field("target_rate_hz", 4.0)  # 8 Hz -> 4 Hz
 
-    window.right_dock.analysis_tools.apply_requested.emit()
+    tools.tabs.setCurrentWidget(editor)
+    tools.apply_requested.emit()
 
     log = "\n".join(window.bottom_dock.log_lines())
     assert "Türetilmiş kanal" in log
