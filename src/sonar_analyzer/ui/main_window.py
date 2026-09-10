@@ -158,6 +158,7 @@ class MainWindow(QMainWindow):
         self.right_dock.bit_status.analysis_requested.connect(self.refresh_bit_analysis)
         self.right_dock.inspector.axis_range_requested.connect(self._on_axis_range_requested)
         self.bottom_dock.event_selected.connect(self._on_event_selected)
+        self.bottom_dock.event_activated.connect(self._on_event_activated)
         self.action("action_load_simulation").triggered.connect(self.load_simulation)
 
         # Dosya secici yalniz talep uretir; okuma worker thread'inde yapilir.
@@ -245,6 +246,27 @@ class MainWindow(QMainWindow):
         if not isinstance(event, Event):
             return
         self.right_dock.show_event(event, related_channels(event, self._channels))
+
+    def _on_event_activated(self, event: object) -> None:
+        """Olay satırına çift tıklama grafiği o zamana götürür — `F3-046`."""
+        if isinstance(event, Event):
+            self.go_to_time(event.timestamp_ns)
+
+    def go_to_time(self, timestamp_ns: int) -> bool:
+        """Grafiğin görünür X penceresini `timestamp_ns`'e **ortalar** — `F3-046`.
+
+        Görünür süre korunur; yalnız merkez kayar. `set_x_range` üzerinden
+        gittiği için X-senkronlu bağlı grafikler de aynı zamana gider
+        (`F3-032`). Grafikte seri (zaman ankoru) yoksa `False` döner.
+        """
+        try:
+            centre = self.plot_panel.x_for_timestamp_ns(timestamp_ns)
+        except RuntimeError:
+            return False
+        x_min, x_max = self.plot_panel.visible_x_range()
+        half = (x_max - x_min) / 2.0
+        self.plot_panel.set_x_range(centre - half, centre + half)
+        return True
 
     def _on_axis_range_requested(self, axis: str, y_min: float, y_max: float) -> None:
         """Inspector Display'den gelen eksen aralığını seçili grafiğe uygular — `F3-036`.

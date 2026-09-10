@@ -75,6 +75,9 @@ class BottomPanelDock(QDockWidget):
     #: `F3-044` Events tablosunda bir satır seçildi (`Event`); seçim
     #: kalkınca `None` yayılır.
     event_selected = Signal(object)
+    #: `F3-046` Events tablosunda bir satıra çift tıklandı (`Event`) —
+    #: senkronize grafikler bu olayın zamanına gider.
+    event_activated = Signal(object)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(DOCK_TITLE, parent)
@@ -118,6 +121,7 @@ class BottomPanelDock(QDockWidget):
             len(EVENT_COLUMNS) - 1, QHeaderView.ResizeMode.Stretch
         )
         self.events.itemSelectionChanged.connect(self._on_event_row_selected)
+        self.events.itemDoubleClicked.connect(self._on_event_row_activated)
         layout.addWidget(self.events, 1)
 
         # F3-043: filtre öncesi ham olaylar ve göreli-zaman ankoru.
@@ -131,6 +135,12 @@ class BottomPanelDock(QDockWidget):
         row = self.events.currentRow()
         event = self._visible_events[row] if 0 <= row < len(self._visible_events) else None
         self.event_selected.emit(event)
+
+    def _on_event_row_activated(self, item: object) -> None:
+        del item
+        row = self.events.currentRow()
+        if 0 <= row < len(self._visible_events):
+            self.event_activated.emit(self._visible_events[row])
 
     def selected_event(self) -> Event | None:
         """Şu an seçili olay; seçim yoksa `None` — `F3-044`."""

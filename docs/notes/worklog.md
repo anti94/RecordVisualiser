@@ -180,8 +180,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-042` | 20 dk | 4 dk 29 sn | `f41c2d2` | ortak olay tablo modelini ekle |
 | `F3-043` | 20 dk | 4 dk 21 sn | `579445c` | zaman, severity, kaynak ve metin filtrelerini ekle |
 | `F3-044` | 15 dk | 5 dk 22 sn | `23198a4` | olay seçimini Inspector detayına bağla |
+| `F3-045` | 20 dk | 4 dk 46 sn | `0f4003f` | olay zaman işaretlerini çiz |
 
-**162 commit · olculen toplam 2128 dk 32 sn · olculemeyen 1 (ilk commit)**
+**163 commit · olculen toplam 2133 dk 18 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
