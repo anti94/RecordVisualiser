@@ -88,7 +88,7 @@ from sonar_analyzer.workspace.model import (
     ViewState,
     WorkspaceModel,
 )
-from sonar_analyzer.workspace.store import save_workspace
+from sonar_analyzer.workspace.store import load_workspace, save_workspace
 
 logger = logging.getLogger("sonar_analyzer")
 
@@ -637,6 +637,58 @@ class MainWindow(QMainWindow):
         dest = save_workspace(self.capture_workspace(), path)
         self.bottom_dock.append_log(f"Workspace kaydedildi: {dest}")
         return dest
+
+    def restore_workspace(self, path: str | Path) -> WorkspaceModel:
+        """Bir workspace dosyasını okur ve mevcut oturuma uygular — `F3-069`.
+
+        Kaynak dosyaların yeniden açılması çağıranın işidir (menü akışı);
+        bu metot, **zaten açık** kayda karşı düzeni ve kanal görünümünü
+        yeniden kurar. Belge bozuksa `WorkspaceError` fırlatır.
+        """
+        model = load_workspace(path)
+        self.apply_workspace(model)
+        self.bottom_dock.append_log(f"Workspace yuklendi: {Path(path)}")
+        return model
+
+    def apply_workspace(self, model: WorkspaceModel) -> None:
+        """`model`'deki düzen + görünüm durumunu açık kayda uygular — `F3-069`."""
+        # 1) Paneldeki kanallar (ilki grafiği sıfırlar, kalanlar eklenir).
+        panel = model.panels[0] if model.panels else PanelState()
+        if panel.channel_ids and self._repository is not None:
+            self.open_channel(panel.channel_ids[0])
+            for channel_id in panel.channel_ids[1:]:
+                self._add_channel_to_plot(channel_id)
+
+        # 2) Zoom kipi + eksen aralıkları (yalnız seri varsa anlamlı).
+        self.plot_panel.set_zoom_mode(panel.zoom_mode)
+        if panel.channel_ids:
+            if panel.x_range is not None:
+                self.plot_panel.set_x_range(*panel.x_range)
+            if panel.y_range is not None:
+                self.plot_panel.set_axis_range("left", *panel.y_range)
+
+        # 3) Açık görünüm sekmesi.
+        titles = self.view_tabs.tab_titles()
+        if model.active_view_tab in titles:
+            self.view_tabs.setCurrentIndex(titles.index(model.active_view_tab))
+
+        # 4) Toolbar görünürlükleri + X senkronizasyonu.
+        self.plot_tool_bar.markers_checkbox.setChecked(model.view.markers_visible)
+        self.plot_tool_bar.tx_checkbox.setChecked(model.view.tx_visible)
+        self.plot_tool_bar.sync_checkbox.setChecked(model.view.sync_x)
+
+        # 5) İmleç zamanı gösterim kipi.
+        self.status.set_cursor_time_mode(model.view.time_display_mode)
+
+        # 6) Olay filtresi.
+        self.bottom_dock.apply_event_filter_state(model.event_filter.to_dict())
+
+        # 7) Dock yerleşimi (opak Qt state).
+        if model.dock_state:
+            try:
+                self.restoreState(base64.b64decode(model.dock_state))
+            except (ValueError, TypeError):
+                self.bottom_dock.append_log("Workspace dock yerlesimi okunamadi; atlandi.")
 
     def _on_axis_range_requested(self, axis: str, y_min: float, y_max: float) -> None:
         """Inspector Display'den gelen eksen aralığını seçili grafiğe uygular — `F3-036`.

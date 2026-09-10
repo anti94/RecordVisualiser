@@ -250,6 +250,15 @@ class AppStatusBar(QStatusBar):
         self.cursor_time_mode_changed.emit(self._cursor_mode)
         return self._cursor_mode
 
+    def set_cursor_time_mode(self, mode: TimeDisplayMode | str) -> None:
+        """İmleç zamanı görünümünü doğrudan ayarlar (workspace geri yükleme — `F3-069`)."""
+        resolved = mode if isinstance(mode, TimeDisplayMode) else TimeDisplayMode(mode)
+        if resolved is self._cursor_mode:
+            return
+        self._cursor_mode = resolved
+        self._render_cursor()
+        self.cursor_time_mode_changed.emit(self._cursor_mode)
+
     def _render_cursor(self) -> None:
         """`cursor` alanını mevcut kip ve ana göre yeniden çizer — `F3-061`."""
         seconds = self._cursor_seconds

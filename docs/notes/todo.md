@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 170 tamamlandı · 322 kaldı**
+**Toplam 492 madde · 171 tamamlandı · 321 kaldı**
 
-`[########................]` %34.6
+`[########................]` %34.8
 
 ## Özet
 
@@ -37,12 +37,12 @@ Work in fully autonomous mode.
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
-| Faz 3 — MVP analiz arayüzü | 68 | 12 | 80 |
+| Faz 3 — MVP analiz arayüzü | 69 | 11 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **170** | **322** | **492** |
+| **Toplam** | **171** | **321** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -163,7 +163,7 @@ Work in fully autonomous mode.
 | [x] | `F2-040` | `0.101.0` | 20 dk | Kaynak dosyanın değişmediğini doğrula |
 | [x] | `F2-041` | `0.102.0` | 15 dk | Parser milestone kabulünü kaydet |
 
-### Faz 3 — MVP analiz arayüzü (68/80)
+### Faz 3 — MVP analiz arayüzü (69/80)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -235,7 +235,7 @@ Work in fully autonomous mode.
 | [x] | `F3-066` | `0.168.0` | 20 dk | Büyük export için worker ve iptal ekle |
 | [x] | `F3-067` | `0.169.0` | 20 dk | Sürümlü workspace JSON modelini ekle |
 | [x] | `F3-068` | `0.170.0` | 20 dk | Dock ve grafik düzenini kaydet |
-| [ ] | `F3-069` | `0.171.0` | 20 dk | Workspace dosyasını geri yükle |
+| [x] | `F3-069` | `0.171.0` | 20 dk | Workspace dosyasını geri yükle |
 | [ ] | `F3-070` | `0.172.0` | 20 dk | Eksik kaynak ve bozuk workspace davranışını ekle |
 | [ ] | `F3-071` | `0.173.0` | 20 dk | Workspace sürüm geçiş yolunu ekle |
 | [ ] | `F3-072` | `0.174.0` | 20 dk | Bölüm 16 klavye kısayollarını bağla |
