@@ -8,7 +8,7 @@ yeniden decode edilmez; bütçe aşılınca en az kullanılan pencere çıkar ve
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Hashable
 
 import numpy as np
 
@@ -100,10 +100,13 @@ class DisplayQuery:
         read: Callable[[str, TimeRange], DataChunk],
         *,
         max_bytes: int = DEFAULT_MAX_BYTES,
+        identity_for: Callable[[str], Hashable] | None = None,
     ) -> None:
         self._read = read
-        self._cache: MemoryBoundedCache[tuple[str, int, int], ViewportSummary] = MemoryBoundedCache(
-            max_bytes
+        self._identity_for = identity_for
+        self._source_token = object()
+        self._cache: MemoryBoundedCache[tuple[str, Hashable, int, int], ViewportSummary] = (
+            MemoryBoundedCache(max_bytes)
         )
 
     def clear(self) -> None:
@@ -113,13 +116,20 @@ class DisplayQuery:
         """Önbelleğin ölçülen kullanımı ve sayaçları — `F4-059`."""
         return self._cache.stats()
 
-    def _covering(self, channel_id: str, span: TimeRange) -> ViewportSummary | None:
+    def _covering(
+        self, channel_id: str, identity: Hashable, span: TimeRange
+    ) -> ViewportSummary | None:
         """`span`'i **kapsayan** saklı bir pencere varsa onu döndürür."""
         for key in reversed(self._cache.keys()):  # en yeniden en eskiye
-            cached_channel, start_ns, end_ns = key
-            if cached_channel == channel_id and start_ns <= span.start_ns and end_ns >= span.end_ns:
+            cached_channel, cached_identity, start_ns, end_ns = key
+            if (
+                cached_channel == channel_id
+                and cached_identity == identity
+                and start_ns <= span.start_ns
+                and end_ns >= span.end_ns
+            ):
                 return self._cache.get(key)
-        self._cache.get((channel_id, span.start_ns, span.end_ns))  # ıska sayılsın
+        self._cache.get((channel_id, identity, span.start_ns, span.end_ns))  # ıska sayılsın
         return None
 
     def query(self, channel_id: str, span: TimeRange, max_points: int | None) -> DataChunk:
@@ -127,8 +137,11 @@ class DisplayQuery:
             return self._read(channel_id, span)
         # Boş/saklanmış sorgularda da aynı bütçe doğrulaması uygulanır.
         downsample_chunk(DataChunk.empty(channel_id), max_points)
-        summary = self._covering(channel_id, span)
+        identity = (
+            self._source_token if self._identity_for is None else self._identity_for(channel_id)
+        )
+        summary = self._covering(channel_id, identity, span)
         if summary is None:
             summary = ViewportSummary(self._read(channel_id, span))
-            self._cache.put((channel_id, span.start_ns, span.end_ns), summary)
+            self._cache.put((channel_id, identity, span.start_ns, span.end_ns), summary)
         return summary.query(span, max_points)

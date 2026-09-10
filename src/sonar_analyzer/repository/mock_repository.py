@@ -23,6 +23,7 @@ from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import RECORD_PERIOD_NS, TimeRange
 from sonar_analyzer.domain.transmission import TransmissionInterval, TxState
 from sonar_analyzer.processing.signals import NS_PER_SECOND, noise, sine
+from sonar_analyzer.repository.cache_identity import CacheIdentity
 from sonar_analyzer.repository.display_query import DisplayQuery
 from sonar_analyzer.repository.protocol import EventFilter
 
@@ -149,7 +150,8 @@ class MockRecordingRepository:
         self._seed = seed
         self._schedule = schedule
         self._closed = False
-        self._display_query = DisplayQuery(self._query_raw)
+        self._display_query = DisplayQuery(self._query_raw, identity_for=self._cache_identity)
+        self._source_identity = (duration_s, start_ns, sample_rate_hz, self._specs, seed)
         self._cache: dict[str, DataChunk] = {}
 
         self._channels = tuple(
@@ -192,6 +194,12 @@ class MockRecordingRepository:
         if self._closed:
             raise RuntimeError("Repository kapatildi")
         return self._display_query.query(channel_id, time_range, max_points)
+
+    def _cache_identity(self, channel_id: str) -> CacheIdentity:
+        channel = next((channel for channel in self._channels if channel.id == channel_id), None)
+        if channel is None:
+            raise KeyError(f"Bilinmeyen kanal: {channel_id}")
+        return CacheIdentity(self._source_identity, channel)
 
     def _query_raw(self, channel_id: str, time_range: TimeRange) -> DataChunk:
         full = self._channel_data(channel_id)

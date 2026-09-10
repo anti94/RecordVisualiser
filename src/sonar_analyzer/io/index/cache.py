@@ -21,6 +21,7 @@ INDEX_SCHEMA_VERSION = 1
 class CachedRecordIndex:
     entries: tuple[RecordIndexEntry, ...]
     reused: bool
+    fingerprint: SourceFingerprint
 
 
 def _records_digest(records: object) -> str:
@@ -88,7 +89,7 @@ def load_or_build_record_index(
         except (ValueError, TypeError, OverflowError, RecursionError):
             entries = None
         if entries is not None:
-            return CachedRecordIndex(entries, reused=True)
+            return CachedRecordIndex(entries, reused=True, fingerprint=fingerprint)
 
     entries = tuple(build_record_index(data, header))
     records = [[entry.sequence_no, entry.byte_offset, entry.timestamp_ns] for entry in entries]
@@ -103,4 +104,4 @@ def load_or_build_record_index(
             "records_sha256": _records_digest(records),
         },
     )
-    return CachedRecordIndex(entries, reused=False)
+    return CachedRecordIndex(entries, reused=False, fingerprint=fingerprint)
