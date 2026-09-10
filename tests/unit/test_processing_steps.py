@@ -10,6 +10,7 @@ import json
 import pytest
 
 from sonar_analyzer.processing.steps import (
+    MAX_MOVING_AVERAGE_WINDOW,
     PARAMETER_SPECS,
     ProcessingStep,
     StepKind,
@@ -82,6 +83,20 @@ def test_moving_average_window_must_be_positive() -> None:
             kind=StepKind.MOVING_AVERAGE,
             input_channel_id="ch0",
             parameters={"window": 0},
+        )
+
+
+def test_moving_average_window_boundary_is_accepted() -> None:
+    step = ProcessingStep(StepKind.MOVING_AVERAGE, "ch0", {"window": MAX_MOVING_AVERAGE_WINDOW})
+    assert step.parameters["window"] == MAX_MOVING_AVERAGE_WINDOW
+
+
+def test_moving_average_rejects_excessive_window() -> None:
+    with pytest.raises(StepValidationError, match="aşırı"):
+        ProcessingStep(
+            kind=StepKind.MOVING_AVERAGE,
+            input_channel_id="ch0",
+            parameters={"window": MAX_MOVING_AVERAGE_WINDOW + 1},
         )
 
 

@@ -31,6 +31,7 @@ from PySide6.QtWidgets import (
 
 from sonar_analyzer.processing.chain import ProcessingChain
 from sonar_analyzer.processing.steps import (
+    MAX_MOVING_AVERAGE_WINDOW,
     PARAMETER_SPECS,
     ProcessingStep,
     StepKind,
@@ -41,6 +42,14 @@ from sonar_analyzer.processing.steps import (
 #: **açıklanabilsin** diye (`F4-007`).
 _FLOAT_RANGE = (-1.0e9, 1.0e9)
 _INT_RANGE = (-1000, 1_000_000)
+
+#: Bazı tam sayı parametreleri kendi aralığını ister. `window` için üst
+#: sınır, "aşırı pencere"nin girilip **açıklanabilmesi** için modelin
+#: kabul ettiği en büyük değerin biraz üstündedir (`F4-018`); alt sınır
+#: sıfır ve negatifin de girilip reddedilebilmesi için negatiftir.
+_INT_RANGE_BY_PARAM: dict[str, tuple[int, int]] = {
+    "window": (-1000, MAX_MOVING_AVERAGE_WINDOW + 1000),
+}
 
 #: Combobox'ta gösterilen sıra.
 STEP_KIND_ORDER: tuple[StepKind, ...] = (
@@ -282,7 +291,7 @@ class StepListEditor(QWidget):
                 field.currentIndexChanged.connect(self._on_param_edit)
             elif spec.kind is int:
                 field = QSpinBox(self.param_panel)
-                field.setRange(*_INT_RANGE)
+                field.setRange(*_INT_RANGE_BY_PARAM.get(spec.name, _INT_RANGE))
                 field.setValue(int(value) if isinstance(value, (int, float)) else 0)
                 field.valueChanged.connect(self._on_param_edit)
             else:

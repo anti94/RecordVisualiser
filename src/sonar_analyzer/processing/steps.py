@@ -26,6 +26,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import cast
 
+from sonar_analyzer.processing.windowing import MAX_WINDOW as MAX_MOVING_AVERAGE_WINDOW
+
 
 class StepValidationError(ValueError):
     """İşlem adımı bozuk: eksik/fazla/yanlış tipli parametre ya da boş kanal."""
@@ -116,8 +118,15 @@ class ProcessingStep:
             resolved[spec.name] = spec.coerce(self.parameters[spec.name])
         if self.kind is StepKind.CLIP and resolved["lo"] > resolved["hi"]:  # type: ignore[operator]
             raise StepValidationError("clip: lo, hi'den büyük olamaz")
-        if self.kind is StepKind.MOVING_AVERAGE and cast("int", resolved["window"]) < 1:
-            raise StepValidationError("moving_average: window >= 1 olmalı")
+        if self.kind is StepKind.MOVING_AVERAGE:
+            window = cast("int", resolved["window"])
+            if window < 1:
+                raise StepValidationError("moving_average: window >= 1 olmalı")
+            if window > MAX_MOVING_AVERAGE_WINDOW:
+                raise StepValidationError(
+                    f"moving_average: window <= {MAX_MOVING_AVERAGE_WINDOW} olmalı "
+                    f"(aşırı pencere): {window}"
+                )
         # frozen dataclass: normalize edilmiş parametreleri geri yaz.
         object.__setattr__(self, "parameters", resolved)
 

@@ -232,8 +232,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-014` | 20 dk | 12 dk 50 sn | `73c091e` | akustik boyut ve sample rate sınırlarını doğrula |
 | `F4-015` | 20 dk | 5 dk 45 sn | `8df389a` | detrend ve DC kaldırma hesabını ekle |
 | `F4-016` | 15 dk | 5 dk 5 sn | `763370b` | detrend türü seçimini işlem editörüne bağla |
+| `F4-017` | 20 dk | 6 dk 24 sn | `555b340` | moving average hesabını ekle |
 
-**214 commit · olculen toplam 2454 dk 4 sn · olculemeyen 1 (ilk commit)**
+**215 commit · olculen toplam 2460 dk 28 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

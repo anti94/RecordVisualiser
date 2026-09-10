@@ -1619,7 +1619,7 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 | [x] | `F4-015` | `1.15.0` | 20 dk | Detrend ve DC kaldırma hesabını ekle | Sabit ofset ve doğrusal trend referans sonucu üretir | `F4-014` | `feat(processing): F4-015 detrend ve DC kaldırma hesabını ekle` |
 | [x] | `F4-016` | `1.16.0` | 15 dk | Detrend türü seçimini işlem editörüne bağla | Seçili tür tekrar açılan zincirde korunur | `F4-015` | `feat(ui): F4-016 detrend türü seçimini işlem editörüne bağla` |
 | [x] | `F4-017` | `1.17.0` | 20 dk | Moving average hesabını ekle | Bilinen kısa dizide pencere ve kenar davranışı tanımlı sonucu verir | `F4-016` | `feat(processing): F4-017 moving average hesabını ekle` |
-| [ ] | `F4-018` | `1.18.0` | 15 dk | Moving average pencere kontrolünü bağla | Sıfır veya aşırı pencere işlem başlamadan reddedilir | `F4-017` | `feat(ui): F4-018 moving average pencere kontrolünü bağla` |
+| [x] | `F4-018` | `1.18.0` | 15 dk | Moving average pencere kontrolünü bağla | Sıfır veya aşırı pencere işlem başlamadan reddedilir | `F4-017` | `feat(ui): F4-018 moving average pencere kontrolünü bağla` |
 | [ ] | `F4-019` | `1.19.0` | 20 dk | Normalize hesabını ekle | Referans genlik doğru ölçeklenir; sıfır sinyal bölme hatası üretmez | `F4-018` | `feat(processing): F4-019 normalize hesabını ekle` |
 | [ ] | `F4-020` | `1.20.0` | 15 dk | Normalize seçimini işlem editörüne bağla | Normalize adımı seçili kanal grafiğine uygulanır | `F4-019` | `feat(ui): F4-020 normalize seçimini işlem editörüne bağla` |
 | [ ] | `F4-021` | `1.21.0` | 20 dk | Pencereli RMS ve envelope hesabını ekle | Sabit genlikli sinyalde beklenen RMS/envelope oluşur | `F4-020` | `feat(processing): F4-021 pencereli RMS ve envelope hesabını ekle` |
