@@ -1690,7 +1690,7 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F4-068` | `1.68.0` | 20 dk | DerivedChannelDefinition modelini ekle | Giriş kimlikleri ve işlem zinciri yeniden üretilebilir tanım oluşturur | `F4-067` | `feat(domain): F4-068 derivedChannelDefinition modelini ekle` |
-| [ ] | `F4-069` | `1.69.0` | 20 dk | Türetilmiş kanalları repository'ye ekle | Derived ağacında yeni kanal sorgulanır; ham kaynak korunur | `F4-068` | `feat(repository): F4-069 türetilmiş kanalları repository'ye ekle` |
+| [x] | `F4-069` | `1.69.0` | 20 dk | Türetilmiş kanalları repository'ye ekle | Derived ağacında yeni kanal sorgulanır; ham kaynak korunur | `F4-068` | `feat(repository): F4-069 türetilmiş kanalları repository'ye ekle` |
 | [ ] | `F4-070` | `1.70.0` | 20 dk | Sınırlı aritmetik formül ayrıştırıcısını ekle | Yalnız izinli kanal, sabit ve aritmetik düğümleri kabul edilir | `F4-069` | `feat(analysis): F4-070 sınırlı aritmetik formül ayrıştırıcısını ekle` |
 | [ ] | `F4-071` | `1.71.0` | 20 dk | Formül değerlendirmesini kanal dizilerine bağla | Basit kanal toplamı referansla eşleşir; zaman hizası uyuşmazlığı açıklanır | `F4-070` | `feat(analysis): F4-071 formül değerlendirmesini kanal dizilerine bağla` |
 | [ ] | `F4-072` | `1.72.0` | 20 dk | Formül ifade ve kaynak sınırlarını doğrula | Dosya erişimi, keyfi çağrı ve aşırı ifade reddedilir; eval kullanılmaz | `F4-071` | `test(analysis): F4-072 formül ifade ve kaynak sınırlarını doğrula` |
