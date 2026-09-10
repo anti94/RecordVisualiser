@@ -1517,7 +1517,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `F3-035` | `0.137.0` | 15 dk | Seçili kanal metadata'sını Inspector'a bağla | Kanal değişince ID, birim, dtype ve kaynak güncellenir | `F3-034` | `feat(ui): F3-035 seçili kanal metadata'sını Inspector'a bağla` |
+| [x] | `F3-035` | `0.137.0` | 15 dk | Seçili kanal metadata'sını Inspector'a bağla | Kanal değişince ID, birim, dtype ve kaynak güncellenir | `F3-034` | `feat(ui): F3-035 seçili kanal metadata'sını Inspector'a bağla` |
 | [ ] | `F3-036` | `0.138.0` | 20 dk | Inspector görünüm ayarlarını grafiğe bağla | Eksen ve min/max değişikliği seçilen grafiğe uygulanır | `F3-035` | `feat(ui): F3-036 ınspector görünüm ayarlarını grafiğe bağla` |
 | [ ] | `F3-037` | `0.139.0` | 20 dk | Count, min, max ve mean hesabını ekle | Bilinen kısa dizi beklenen istatistikleri üretir | `F3-036` | `feat(analysis): F3-037 count, min, max ve mean hesabını ekle` |
 | [ ] | `F3-038` | `0.140.0` | 20 dk | Median, RMS, std ve peak-to-peak ekle | Referans dizi sonuçlarıyla eşleşir; boş aralık tanımlı gösterilir | `F3-037` | `feat(analysis): F3-038 median, RMS, std ve peak-to-peak ekle` |

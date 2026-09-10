@@ -25,8 +25,17 @@ PANEL_OBJECT_NAME = "panel_inspector"
 EMPTY_VALUE = "—"
 EMPTY_HINT = "Ayrinti icin bir kanal veya olay secin."
 
-#: Kanal secildiginde gosterilen alanlar.
-CHANNEL_FIELDS = ("Channel", "Path", "Unit", "Sample rate", "Data type", "Source", "Time base")
+#: Kanal secildiginde gosterilen alanlar (`F3-035`: `ID` eklendi).
+CHANNEL_FIELDS = (
+    "ID",
+    "Channel",
+    "Path",
+    "Unit",
+    "Sample rate",
+    "Data type",
+    "Source",
+    "Time base",
+)
 
 
 class InspectorPanel(QWidget):
@@ -79,6 +88,7 @@ class InspectorPanel(QWidget):
             f"{channel.sample_rate_hz:g} Hz" if channel.sample_rate_hz is not None else EMPTY_VALUE
         )
         values = {
+            "ID": channel.id,
             "Channel": channel.name,
             "Path": channel.path,
             "Unit": channel.unit or EMPTY_VALUE,
