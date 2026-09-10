@@ -142,5 +142,5 @@ def test_dashboard_fft_and_spectrogram_cells_show_the_v2_note(win: MainWindow) -
 def test_analysis_tools_v2_tabs_carry_the_note(win: MainWindow) -> None:
     card = win.right_dock.cards["card_analysis_tools"]
     notes = [lbl.text() for lbl in card.findChildren(QLabel) if NOT_YET_AVAILABLE in lbl.text()]
-    # FFT, Statistics, Custom sekmelerinin her biri bir not taşır.
-    assert len(notes) >= 3
+    # FFT ve Statistics sekmeleri v2 notu taşır (Custom `F4-006` ile aktif).
+    assert len(notes) >= 2

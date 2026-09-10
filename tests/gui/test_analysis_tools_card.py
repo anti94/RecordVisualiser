@@ -68,7 +68,7 @@ def test_apply_filter_is_disabled_with_reason(card: AnalysisToolsCard) -> None:
 def test_placeholder_labels_have_stable_object_names(card: AnalysisToolsCard) -> None:
     from PySide6.QtWidgets import QLabel
 
-    for index, title in enumerate(("FFT", "Statistics", "Custom")):
+    for index, title in enumerate(("FFT", "Statistics")):
         page = card.tabs.widget(index + 1)
         assert page is not None
         label = page.findChild(QLabel, f"label_{title.lower()}_placeholder")
@@ -78,12 +78,21 @@ def test_placeholder_labels_have_stable_object_names(card: AnalysisToolsCard) ->
 def test_placeholder_text_mentions_availability(card: AnalysisToolsCard) -> None:
     from PySide6.QtWidgets import QLabel
 
-    for index, title in enumerate(("FFT", "Statistics", "Custom")):
+    for index, title in enumerate(("FFT", "Statistics")):
         page = card.tabs.widget(index + 1)
         assert page is not None
         labels = page.findChildren(QLabel)
         assert labels, f"{title} sekmesinde etiket yok"
         assert any(NOT_YET_AVAILABLE in label.text() for label in labels)
+
+
+def test_custom_tab_hosts_the_step_list_editor(card: AnalysisToolsCard) -> None:
+    """`F4-006`: Custom sekmesi artık gerçek işlem listesi editörüdür."""
+    from sonar_analyzer.ui.cards.step_list_editor import StepListEditor
+
+    custom_index = card.tab_titles().index("Custom")
+    assert isinstance(card.tabs.widget(custom_index), StepListEditor)
+    assert card.step_editor is card.tabs.widget(custom_index)
 
 
 def test_no_fake_computed_result_is_shown(card: AnalysisToolsCard) -> None:

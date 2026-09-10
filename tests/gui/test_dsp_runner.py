@@ -84,11 +84,12 @@ def test_only_the_latest_job_publishes_a_result(qtbot: QtBot) -> None:
     assert ids == (1, 2, 3)
     assert runner.latest_job_id == 3
 
-    qtbot.waitUntil(lambda: not runner.busy, timeout=20_000)
-    runner.wait_all()
+    runner.wait_all(20_000)
+    # Worker biter; sonuç sinyalleri main thread kuyruğundadır — boşalt.
+    qtbot.waitUntil(lambda: len(fresh) + len(stale) == 3, timeout=5_000)
 
     assert fresh == [3]  # yalnız en güncel iş yayınladı
-    assert set(stale) <= {1, 2}  # eskiler atıldı
+    assert set(stale) == {1, 2}  # eskiler atıldı
 
 
 def test_is_current_tracks_the_latest_submission(qtbot: QtBot) -> None:

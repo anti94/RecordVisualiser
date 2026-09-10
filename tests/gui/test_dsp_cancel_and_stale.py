@@ -60,11 +60,9 @@ def test_cancelled_job_result_is_not_applied(qtbot: QtBot) -> None:
     job_id = runner.submit(_chain(2.0), _values(), "ch0")
     runner.cancel(job_id)
 
-    qtbot.waitUntil(lambda: not runner.busy, timeout=20_000)
-    runner.wait_all()
-
+    runner.wait_all(20_000)
+    qtbot.waitUntil(lambda: seen.cancelled == [job_id], timeout=5_000)
     assert seen.ready == []  # grafiğe uygulanmadı
-    assert seen.cancelled == [job_id]
 
 
 def test_cancel_all_suppresses_every_in_flight_result(qtbot: QtBot) -> None:
@@ -74,11 +72,9 @@ def test_cancel_all_suppresses_every_in_flight_result(qtbot: QtBot) -> None:
     ids = [runner.submit(_chain(float(k)), _values(), "ch0") for k in (1, 2, 3)]
     runner.cancel_all()
 
-    qtbot.waitUntil(lambda: not runner.busy, timeout=20_000)
-    runner.wait_all()
-
+    runner.wait_all(20_000)
+    qtbot.waitUntil(lambda: sorted(seen.cancelled) == sorted(ids), timeout=5_000)
     assert seen.ready == []
-    assert sorted(seen.cancelled) == sorted(ids)
 
 
 def test_result_for_a_stale_selection_is_not_applied(qtbot: QtBot) -> None:
@@ -91,11 +87,9 @@ def test_result_for_a_stale_selection_is_not_applied(qtbot: QtBot) -> None:
     # Kullanıcı seçimi değiştirdi; iş hâlâ eski seçime bağlı.
     runner.set_selection("ch0@[10,20]")
 
-    qtbot.waitUntil(lambda: not runner.busy, timeout=20_000)
-    runner.wait_all()
-
+    runner.wait_all(20_000)
+    qtbot.waitUntil(lambda: seen.stale == [job_id], timeout=5_000)
     assert seen.ready == []  # eski seçime ait sonuç uygulanmadı
-    assert seen.stale == [job_id]
     assert not runner.is_current(job_id)
 
 

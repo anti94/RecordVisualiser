@@ -25,6 +25,7 @@ from PySide6.QtWidgets import (
 )
 
 from sonar_analyzer.ui.actions import NOT_YET_AVAILABLE
+from sonar_analyzer.ui.cards.step_list_editor import StepListEditor
 
 CARD_OBJECT_NAME = "card_analysis_tools"
 CARD_TITLE = "Analysis Tools"
@@ -63,7 +64,9 @@ class AnalysisToolsCard(QGroupBox):
         self.tabs.addTab(self._build_filter_tab(), "Filter")
         self.tabs.addTab(_placeholder_tab(self, "FFT"), "FFT")
         self.tabs.addTab(_placeholder_tab(self, "Statistics"), "Statistics")
-        self.tabs.addTab(_placeholder_tab(self, "Custom"), "Custom")
+        # F4-006: "Custom" sekmesi artık gerçek işlem listesi editörünü barındırır.
+        self.step_editor = StepListEditor(self)
+        self.tabs.addTab(self.step_editor, "Custom")
         layout.addWidget(self.tabs)
 
     def _build_filter_tab(self) -> QWidget:
