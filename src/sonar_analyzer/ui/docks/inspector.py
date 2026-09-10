@@ -10,10 +10,14 @@ Bu sınıf yalnız içeriktir; sekme olarak açılıp kapanması
 
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
+    QComboBox,
+    QDoubleSpinBox,
     QFormLayout,
+    QGroupBox,
     QLabel,
+    QPushButton,
     QVBoxLayout,
     QWidget,
 )
@@ -21,6 +25,10 @@ from PySide6.QtWidgets import (
 from sonar_analyzer.domain.channel import ChannelMetadata
 
 PANEL_OBJECT_NAME = "panel_inspector"
+
+#: `F3-036` Display sekmesindeki eksen seçenekleri (etiket -> PlotPanel ekseni).
+AXIS_CHOICES: tuple[tuple[str, str], ...] = (("Left axis", "left"), ("Right axis", "right"))
+_AXIS_LIMIT = 1_000_000_000.0
 
 EMPTY_VALUE = "—"
 EMPTY_HINT = "Ayrinti icin bir kanal veya olay secin."
@@ -40,6 +48,10 @@ CHANNEL_FIELDS = (
 
 class InspectorPanel(QWidget):
     """Seçili kanalın ayrıntısını gösteren bağlamsal panel."""
+
+    #: `F3-036` Display: bir eksenin min/max aralığı elle istendi
+    #: (`"left"`/`"right"`, y_min, y_max). MainWindow bunu seçili grafiğe uygular.
+    axis_range_requested = Signal(str, float, float)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -73,7 +85,49 @@ class InspectorPanel(QWidget):
             form.addRow(f"{field}:", value)
         layout.addWidget(self.detail)
 
+        layout.addWidget(self._build_display_group(body))
         layout.addStretch(1)
+
+    def _build_display_group(self, parent: QWidget) -> QWidget:
+        """`F3-036` Display: eksen seçimi + Y min/max, seçili grafiğe uygulanır."""
+        group = QGroupBox("Display", parent)
+        group.setObjectName("group_inspector_display")
+        form = QFormLayout(group)
+        form.setContentsMargins(6, 4, 6, 4)
+
+        self.axis_combo = QComboBox(group)
+        self.axis_combo.setObjectName("combo_inspector_axis")
+        for label, value in AXIS_CHOICES:
+            self.axis_combo.addItem(label, value)
+        form.addRow("Axis:", self.axis_combo)
+
+        self.y_min_spin = self._make_spin(group, "spin_inspector_y_min", -1.0)
+        self.y_max_spin = self._make_spin(group, "spin_inspector_y_max", 1.0)
+        form.addRow("Y min:", self.y_min_spin)
+        form.addRow("Y max:", self.y_max_spin)
+
+        self.apply_button = QPushButton("Apply", group)
+        self.apply_button.setObjectName("button_inspector_apply_display")
+        self.apply_button.clicked.connect(self._emit_axis_range)
+        form.addRow(self.apply_button)
+        return group
+
+    @staticmethod
+    def _make_spin(parent: QWidget, name: str, value: float) -> QDoubleSpinBox:
+        spin = QDoubleSpinBox(parent)
+        spin.setObjectName(name)
+        spin.setRange(-_AXIS_LIMIT, _AXIS_LIMIT)
+        spin.setDecimals(4)
+        spin.setValue(value)
+        return spin
+
+    def _emit_axis_range(self) -> None:
+        y_min = self.y_min_spin.value()
+        y_max = self.y_max_spin.value()
+        if y_min >= y_max:
+            return  # gecersiz aralik sessizce yok sayilir
+        axis = str(self.axis_combo.currentData())
+        self.axis_range_requested.emit(axis, y_min, y_max)
 
     def clear(self) -> None:
         """Seçim yokken boş duruma döner."""

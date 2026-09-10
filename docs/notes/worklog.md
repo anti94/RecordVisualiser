@@ -170,8 +170,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-032` | 20 dk | 3 dk 40 sn | `237ee33` | paneller arasında X senkronizasyonunu ekle |
 | `F3-033` | 20 dk | 3 dk 25 sn | `55a3d63` | grafik tabı ve bölünmüş görünüm ekle |
 | `F3-034` | 15 dk | 3 dk 45 sn | `c95570c` | panel kaynak sınırını ve kapatma temizliğini ekle |
+| `F3-035` | 15 dk | 2 dk 25 sn | `6cbb983` | seçili kanal metadata'sını Inspector'a bağla |
 
-**152 commit · olculen toplam 2089 dk 58 sn · olculemeyen 1 (ilk commit)**
+**153 commit · olculen toplam 2092 dk 23 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

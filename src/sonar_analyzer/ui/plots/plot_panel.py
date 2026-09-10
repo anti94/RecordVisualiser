@@ -847,6 +847,22 @@ class PlotPanel(QWidget):
         (_x0, _x1), (y_min, y_max) = self._right_vb.viewRange()
         return float(y_min), float(y_max)
 
+    def set_axis_range(self, axis: str, y_min: float, y_max: float) -> None:
+        """Bir Y ekseninin görünür aralığını elle sabitler — `F3-036`.
+
+        `axis`: `"left"` ya da `"right"`. `"right"` yalnız ikinci eksen
+        varken bir şey yapar. Kenarlar artan sırada olmalı; değilse
+        `ValueError`.
+        """
+        if axis not in ("left", "right"):
+            raise ValueError(f"Tanimsiz eksen: {axis!r}")
+        if y_min >= y_max:
+            raise ValueError(f"Gecersiz aralik: ({y_min}, {y_max}) — artan sirada olmali.")
+        if axis == "left":
+            self.plot.getViewBox().setYRange(y_min, y_max, padding=0)
+        elif self._right_vb is not None:
+            self._right_vb.setYRange(y_min, y_max, padding=0)
+
     # -- yakinlastirma kipi (F3-022 / F3-023 / F3-024) ---------------
 
     @property

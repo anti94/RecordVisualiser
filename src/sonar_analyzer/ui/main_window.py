@@ -149,6 +149,7 @@ class MainWindow(QMainWindow):
         self.left_dock.channel_inspect_requested.connect(self.show_channel_in_inspector)
         self.left_dock.channel_path_copied.connect(self._on_channel_path_copied)
         self.right_dock.bit_status.analysis_requested.connect(self.refresh_bit_analysis)
+        self.right_dock.inspector.axis_range_requested.connect(self._on_axis_range_requested)
         self.action("action_load_simulation").triggered.connect(self.load_simulation)
 
         # Dosya secici yalniz talep uretir; okuma worker thread'inde yapilir.
@@ -226,6 +227,13 @@ class MainWindow(QMainWindow):
     def _on_channel_path_copied(self, path: str) -> None:
         """Sağ tık > Copy Path sonrası kullanıcıya geri bildirim — `F3-018`."""
         self.bottom_dock.append_log(f"Yol panoya kopyalandi: {path}")
+
+    def _on_axis_range_requested(self, axis: str, y_min: float, y_max: float) -> None:
+        """Inspector Display'den gelen eksen aralığını seçili grafiğe uygular — `F3-036`."""
+        try:
+            self.plot_panel.set_axis_range(axis, y_min, y_max)
+        except ValueError as exc:
+            self.bottom_dock.append_log(f"Eksen araligi uygulanamadi: {exc}")
 
     def open_channel(self, channel_id: str) -> None:
         """Seçilen kanalı çizer ve ayrıntısını gösterir.
