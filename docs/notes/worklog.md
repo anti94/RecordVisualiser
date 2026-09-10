@@ -254,8 +254,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-036` | 20 dk | 4 dk 41 sn | `30c576e` | notch filtre hesabını ekle |
 | `F4-037` | 15 dk | 2 dk 39 sn | `d4db9c1` | notch frekans ve Q sınırlarını doğrula |
 | `F4-038` | 15 dk | 6 dk 30 sn | `a50d093` | notch frekans ve Q kontrollerini bağla |
+| `F4-039` | 20 dk | 4 dk 3 sn | `ac1c6cc` | window üretimi ve normalizasyonunu ekle |
 
-**236 commit · olculen toplam 2577 dk 56 sn · olculemeyen 1 (ilk commit)**
+**237 commit · olculen toplam 2581 dk 59 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
