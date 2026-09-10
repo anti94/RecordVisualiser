@@ -269,3 +269,36 @@ def test_reset_stats_keeps_the_contents() -> None:
     assert stats.misses == 0
     assert stats.entries == 1
     assert stats.used_bytes == 100
+
+
+def test_zero_byte_entries_cannot_accumulate_without_limit() -> None:
+    cache = MemoryBoundedCache[str, _Blob](1000, max_entries=3)
+    for index in range(100):
+        cache.put(str(index), _Blob(0))
+    assert cache.keys() == ["97", "98", "99"]
+    assert cache.stats().evictions == 97
+    assert cache.used_bytes == 0
+
+
+def test_numpy_payload_measurement_matches_retained_arrays() -> None:
+    import gc
+    import tracemalloc
+
+    import numpy as np
+    from numpy.typing import NDArray
+
+    budget = 256 * 1024
+    cache: MemoryBoundedCache[int, NDArray[np.float64]] = MemoryBoundedCache(budget)
+    tracemalloc.start()
+    try:
+        for index in range(50):
+            cache.put(index, np.ones(8192, dtype=np.float64))
+        gc.collect()
+        retained, _peak = tracemalloc.get_traced_memory()
+        assert cache.used_bytes == budget
+        assert cache.stats().entries == 4
+        assert cache.stats().evictions == 46
+        # NumPy payload'una ek olarak Python anahtar/nesne giderleri bulunur.
+        assert retained < budget + 32 * 1024
+    finally:
+        tracemalloc.stop()

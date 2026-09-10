@@ -28,6 +28,7 @@ V = TypeVar("V")
 
 #: Öntanımlı bütçe: 64 MiB.
 DEFAULT_MAX_BYTES = 64 * 1024 * 1024
+DEFAULT_MAX_ENTRIES = 256
 
 
 class MemoryCacheError(ValueError):
@@ -45,6 +46,7 @@ class CacheStats:
     misses: int
     evictions: int
     rejections: int
+    max_entries: int
 
     @property
     def free_bytes(self) -> int:
@@ -71,12 +73,18 @@ class CacheStats:
         )
 
 
+def _checked_size(value: object, *, minimum: int = 0) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
+        raise MemoryCacheError(f"bütçe/boyut negatif olamaz ve tam sayı olmalı: {value!r}")
+    return value
+
+
 def _default_sizer(value: object) -> int:
     """Değerin kendi bildirdiği bayt boyutu (`nbytes`)."""
     size = getattr(value, "nbytes", None)
     if size is None:
         raise MemoryCacheError(f"{type(value).__name__} `nbytes` taşımıyor; `sizer` verin")
-    return int(size)
+    return _checked_size(size)
 
 
 class MemoryBoundedCache(Generic[K, V]):
@@ -87,10 +95,10 @@ class MemoryBoundedCache(Generic[K, V]):
         max_bytes: int = DEFAULT_MAX_BYTES,
         *,
         sizer: Callable[[V], int] | None = None,
+        max_entries: int = DEFAULT_MAX_ENTRIES,
     ) -> None:
-        if max_bytes <= 0:
-            raise MemoryCacheError(f"bellek bütçesi pozitif olmalı: {max_bytes}")
-        self._max_bytes = int(max_bytes)
+        self._max_bytes = _checked_size(max_bytes, minimum=1)
+        self._max_entries = _checked_size(max_entries, minimum=1)
         self._sizer: Callable[[V], int] = sizer or _default_sizer
         self._entries: OrderedDict[K, V] = OrderedDict()
         self._sizes: dict[K, int] = {}
@@ -131,6 +139,7 @@ class MemoryBoundedCache(Generic[K, V]):
             misses=self._misses,
             evictions=self._evictions,
             rejections=self._rejections,
+            max_entries=self._max_entries,
         )
 
     # -- kullanım ----------------------------------------------------------
@@ -150,16 +159,16 @@ class MemoryBoundedCache(Generic[K, V]):
         Değer tek başına bütçeden büyükse **saklanmaz** ve `False` döner —
         bütçe hiçbir zaman aşılmaz.
         """
-        size = int(self._sizer(value))
-        if size < 0:
-            raise MemoryCacheError(f"ölçülen boyut negatif olamaz: {size}")
+        size = _checked_size(self._sizer(value))
 
         self.discard(key)  # aynı anahtarın eski sürümü yerini bırakır
         if size > self._max_bytes:
             self._rejections += 1
             return False
 
-        while self._used + size > self._max_bytes and self._entries:
+        while self._entries and (
+            self._used + size > self._max_bytes or len(self._entries) >= self._max_entries
+        ):
             self._evict_oldest()
 
         self._entries[key] = value

@@ -1,0 +1,20 @@
+{
+  "python": "3.9.13",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "windows_visited": 64,
+  "samples_per_window": 4000,
+  "elapsed_seconds": 0.49446389999999996,
+  "cache": {
+    "entries": 7,
+    "used_bytes": 476504,
+    "max_bytes": 524288,
+    "hits": 64,
+    "misses": 64,
+    "evictions": 57,
+    "rejections": 0,
+    "max_entries": 256
+  },
+  "tracemalloc_retained_bytes": 525468,
+  "tracemalloc_peak_bytes": 693683,
+  "scope": "Cache budget covers NumPy payload; Python overhead and temporary arrays are separate."
+}
