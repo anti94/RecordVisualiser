@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 245 tamamlandı · 247 kaldı**
+**Toplam 492 madde · 246 tamamlandı · 246 kaldı**
 
-`[############............]` %49.8
+`[############............]` %50.0
 
 ## Özet
 
@@ -38,11 +38,11 @@ Work in fully autonomous mode.
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
-| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 45 | 45 | 90 |
+| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 46 | 44 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **245** | **247** | **492** |
+| **Toplam** | **246** | **246** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -248,7 +248,7 @@ Work in fully autonomous mode.
 | [x] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır |
 | [x] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla |
 
-### Faz 4 — Mockup analiz panosu ve büyük veri performansı (45/90)
+### Faz 4 — Mockup analiz panosu ve büyük veri performansı (46/90)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -297,7 +297,7 @@ Work in fully autonomous mode.
 | [x] | `F4-043` | `1.43.0` | 20 dk | Welch PSD hesabını ekle |
 | [x] | `F4-044` | `1.44.0` | 15 dk | PSD pencere, overlap ve birim sınırlarını doğrula |
 | [x] | `F4-045` | `1.45.0` | 20 dk | Spectrum sekmesinde PSD görünümünü ekle |
-| [ ] | `F4-046` | `1.46.0` | 20 dk | STFT ve spektrogram matrisini hesapla |
+| [x] | `F4-046` | `1.46.0` | 20 dk | STFT ve spektrogram matrisini hesapla |
 | [ ] | `F4-047` | `1.47.0` | 20 dk | STFT kenar, overlap ve eksen eşlemesini doğrula |
 | [ ] | `F4-048` | `1.48.0` | 20 dk | Mockup orta spektrogramını sonuçlara bağla |
 | [ ] | `F4-049` | `1.49.0` | 15 dk | Spektrogram renk ölçeği kontrollerini ekle |

@@ -260,8 +260,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-042` | 20 dk | 8 dk 11 sn | `637ad26` | seçili aralık FFT'sini mockup alt grafiğine bağla |
 | `F4-043` | 20 dk | 4 dk 31 sn | `09e47aa` | Welch PSD hesabını ekle |
 | `F4-044` | 15 dk | 3 dk 38 sn | `77058be` | PSD pencere, overlap ve birim sınırlarını doğrula |
+| `F4-045` | 20 dk | 9 dk 46 sn | `f3e6734` | spectrum sekmesinde PSD görünümünü ekle |
 
-**242 commit · olculen toplam 2605 dk 29 sn · olculemeyen 1 (ilk commit)**
+**243 commit · olculen toplam 2615 dk 15 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
