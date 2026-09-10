@@ -1540,7 +1540,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 | [x] | `F3-050` | `0.152.0` | 15 dk | Marker ve TX görünürlüğü kontrollerini ekle | Görünürlük değişimi olay verisini etkilemez | `F3-049` | `feat(ui): F3-050 marker ve TX görünürlüğü kontrollerini ekle` |
 | [x] | `F3-051` | `0.153.0` | 20 dk | Sağ BIT kartını alt sistem durumlarına bağla | Genel özet en yüksek severity'yi yansıtır; Warning varken tümü normal yazmaz | `F3-050` | `feat(ui): F3-051 sağ BIT kartını alt sistem durumlarına bağla` |
 | [x] | `F3-052` | `0.154.0` | 15 dk | Run BIT Analysis eylemini kayıt analizine bağla | Seçili kaydın BIT özeti yenilenir; cihaz komutu gönderilmez | `F3-051` | `feat(ui): F3-052 run BIT Analysis eylemini kayıt analizine bağla` |
-| [ ] | `F3-053` | `0.155.0` | 15 dk | Yükleme ve analiz mesajlarını alt loga bağla | Zaman damgalı durum mesajları görünür; ham payload loga düşmez | `F3-052` | `feat(ui): F3-053 yükleme ve analiz mesajlarını alt loga bağla` |
+| [x] | `F3-053` | `0.155.0` | 15 dk | Yükleme ve analiz mesajlarını alt loga bağla | Zaman damgalı durum mesajları görünür; ham payload loga düşmez | `F3-052` | `feat(ui): F3-053 yükleme ve analiz mesajlarını alt loga bağla` |
 
 ##### Timeline ve playback
 

@@ -64,6 +64,28 @@ EVENTS_TAB_TITLE = "Events"
 #: Log'da tutulan azami satir sayisi; uzun oturumda bellek sinirsiz buyumez.
 MAX_LOG_LINES = 2000
 
+#: `F3-053` bir log satirinin azami uzunlugu. Log **durum mesajlari**
+#: icindir; ham payload / uzun döküntü buraya düşerse kesilir.
+MAX_LOG_MESSAGE_LEN = 500
+_LOG_TRUNCATION_SUFFIX = "… (kesildi)"
+
+
+def sanitize_log_message(message: str) -> str:
+    """Log satırını tek satıra indirger ve `MAX_LOG_MESSAGE_LEN`'e kırpar — `F3-053`.
+
+    Satır sonları/sekmeler boşluğa çevrilir, diğer kontrol karakterleri
+    atılır (ham ikili payload log widget'ını bozmasın). Uzun metin
+    kesilir: log serbest metin değil, **durum mesajı** alanıdır.
+    """
+    flattened = "".join(
+        " " if char in "\r\n\t" else char for char in message if char >= " " or char in "\r\n\t"
+    )
+    collapsed = " ".join(flattened.split())
+    if len(collapsed) > MAX_LOG_MESSAGE_LEN:
+        keep = MAX_LOG_MESSAGE_LEN - len(_LOG_TRUNCATION_SUFFIX)
+        return collapsed[:keep] + _LOG_TRUNCATION_SUFFIX
+    return collapsed
+
 
 def format_timestamp(timestamp_ns: int) -> str:
     """Nanosaniye zamanı `HH:MM:SS.mmm` biçiminde gösterir."""
@@ -218,9 +240,13 @@ class BottomPanelDock(QDockWidget):
     # -- log -------------------------------------------------------------
 
     def append_log(self, message: str, timestamp: datetime | None = None) -> None:
-        """Log'a zaman damgalı bir satır ekler."""
+        """Log'a **zaman damgalı** bir durum satırı ekler — `F3-053`.
+
+        Mesaj tek satıra indirgenip kırpılır: log durum mesajı içindir,
+        ham payload buraya düşmez.
+        """
         moment = timestamp or datetime.now()
-        self.log.appendPlainText(f"[{moment.strftime('%H:%M:%S')}] {message}")
+        self.log.appendPlainText(f"[{moment.strftime('%H:%M:%S')}] {sanitize_log_message(message)}")
 
     def log_lines(self) -> list[str]:
         text = self.log.toPlainText()
