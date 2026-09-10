@@ -411,8 +411,14 @@ class MainWindow(QMainWindow):
             self.bottom_dock.append_log(f"{len(added)} kanal grafige eklendi: {', '.join(added)}.")
 
     def refresh_bit_analysis(self) -> None:
-        """Kayıtlı BIT verisini yeniden özetler; donanıma komut göndermez."""
+        """`Run BIT Analysis` — seçili kaydın BIT özetini yeniler — `F3-052`.
+
+        Kayıtlı veriyi yeniden **sorgular**; donanıma / cihaza hiçbir
+        komut gönderilmez (yalnız repository okuması). Açık kayıt yoksa
+        kullanıcıya bildirir.
+        """
         if self._repository is None:
+            self.bottom_dock.append_log("BIT ozeti icin acik kayit yok.")
             return
         span = self._repository.metadata().time_range
         self.right_dock.bit_status.set_results(self._repository.bit_results(span))
