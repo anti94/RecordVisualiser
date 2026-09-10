@@ -286,8 +286,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-064` | 20 dk | 20 dk 18 sn | `3ce9ff3` | büyük dosya benchmark koşusunu hazırla |
 | `F4-065` | 20 dk | 14 dk 39 sn | `a214d49` | büyük dosya koşusunun sonuçlarını değerlendir |
 | `F4-066` | 20 dk | 6 dk 5 sn | `ff71532` | indeks kesintisi ve cache kurtarmayı doğrula |
+| `F4-067` | 15 dk | 7 dk 59 sn | `f0bacb2` | profil sonucuyla native hızlandırma ADR'sini yaz |
 
-**268 commit · olculen toplam 2925 dk 7 sn · olculemeyen 1 (ilk commit)**
+**269 commit · olculen toplam 2933 dk 6 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

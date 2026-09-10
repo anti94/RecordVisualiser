@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 267 tamamlandı · 225 kaldı**
+**Toplam 492 madde · 268 tamamlandı · 224 kaldı**
 
-`[#############...........]` %54.3
+`[#############...........]` %54.5
 
 ## Özet
 
@@ -38,11 +38,11 @@ Work in fully autonomous mode.
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
-| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 67 | 23 | 90 |
+| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 68 | 22 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **267** | **225** | **492** |
+| **Toplam** | **268** | **224** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -248,7 +248,7 @@ Work in fully autonomous mode.
 | [x] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır |
 | [x] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla |
 
-### Faz 4 — Mockup analiz panosu ve büyük veri performansı (67/90)
+### Faz 4 — Mockup analiz panosu ve büyük veri performansı (68/90)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -319,7 +319,7 @@ Work in fully autonomous mode.
 | [x] | `F4-065` | `1.65.0` | 20 dk | Büyük dosya koşusunun sonuçlarını değerlendir |
 | [x] | `F4-066` | `1.66.0` | 20 dk | İndeks kesintisi ve cache kurtarmayı doğrula |
 | [x] | `F4-067` | `1.67.0` | 15 dk | Profil sonucuyla native hızlandırma ADR'sini yaz |
-| [ ] | `F4-068` | `1.68.0` | 20 dk | DerivedChannelDefinition modelini ekle |
+| [x] | `F4-068` | `1.68.0` | 20 dk | DerivedChannelDefinition modelini ekle |
 | [ ] | `F4-069` | `1.69.0` | 20 dk | Türetilmiş kanalları repository'ye ekle |
 | [ ] | `F4-070` | `1.70.0` | 20 dk | Sınırlı aritmetik formül ayrıştırıcısını ekle |
 | [ ] | `F4-071` | `1.71.0` | 20 dk | Formül değerlendirmesini kanal dizilerine bağla |
