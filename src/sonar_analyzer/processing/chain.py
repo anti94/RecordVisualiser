@@ -25,6 +25,7 @@ from numpy.typing import NDArray
 
 from sonar_analyzer.domain.data_chunk import Quality
 from sonar_analyzer.processing.steps import ProcessingStep, StepKind
+from sonar_analyzer.processing.windowing import moving_average
 
 Samples = NDArray[np.float64]
 InvalidMask = NDArray[np.bool_]
@@ -112,20 +113,6 @@ def _detrend(values: Samples, mode: str) -> Samples:
     raise ChainExecutionError(f"Bilinmeyen detrend modu: {mode!r}")  # pragma: no cover
 
 
-def _moving_average(values: Samples, window: int) -> Samples:
-    """Merkezli kayan pencere ortalaması; çıktı uzunluğu girdiyle aynı.
-
-    Uçlarda pencere kısalır (kısmi ortalama) — böylece dizi uzunluğu ve
-    zaman hizası korunur.
-    """
-    if window <= 1 or values.size == 0:
-        return values.copy()
-    kernel = np.ones(window, dtype=np.float64)
-    padded = np.convolve(values, kernel, mode="same")
-    counts = np.convolve(np.ones_like(values), kernel, mode="same")
-    return padded / counts
-
-
 def apply_step(values: Samples, step: ProcessingStep) -> Samples:
     """Tek bir adımı uygular; **her zaman yeni** bir `float64` dizi döndürür."""
     data = _as_float64(values)
@@ -139,7 +126,7 @@ def apply_step(values: Samples, step: ProcessingStep) -> Samples:
     if step.kind is StepKind.CLIP:
         return np.clip(data, float(params["lo"]), float(params["hi"]))  # type: ignore[arg-type]
     if step.kind is StepKind.MOVING_AVERAGE:
-        return _moving_average(data, int(params["window"]))  # type: ignore[arg-type]
+        return moving_average(data, int(params["window"]))  # type: ignore[arg-type]
     if step.kind is StepKind.DETREND:
         return _detrend(data, str(params["mode"]))
     raise ChainExecutionError(f"Uygulanmayan işlem türü: {step.kind}")  # pragma: no cover
