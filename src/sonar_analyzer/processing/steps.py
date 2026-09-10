@@ -27,6 +27,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import cast
 
+from sonar_analyzer.processing.filters import FilterError, validate_cutoff, validate_order
 from sonar_analyzer.processing.windowing import MAX_WINDOW as MAX_MOVING_AVERAGE_WINDOW
 
 
@@ -48,6 +49,7 @@ class StepKind(str, Enum):
     ENVELOPE = "envelope"  # kayan pencere tepe-tutma zarfı — `F4-021`
     PHASE_UNWRAP = "phase_unwrap"  # faz sıçramalarını sürekliliğe çevir — `F4-023`
     RESAMPLE = "resample"  # Fourier yöntemiyle yeniden örnekle / desime et — `F4-025`
+    LOW_PASS = "low_pass"  # sıfır-fazlı Butterworth alçak geçiren — `F4-027`
 
 
 #: `window` parametresi taşıyan ve `1 <= window <= MAX_MOVING_AVERAGE_WINDOW`
@@ -131,6 +133,11 @@ PARAMETER_SPECS: dict[StepKind, tuple[ParamSpec, ...]] = {
         ParamSpec("source_rate_hz", float, 48_000.0),
         ParamSpec("target_rate_hz", float, 24_000.0),
     ),
+    StepKind.LOW_PASS: (
+        ParamSpec("sample_rate_hz", float, 48_000.0),
+        ParamSpec("cutoff_hz", float, 8_000.0),
+        ParamSpec("order", int, 4),
+    ),
 }
 
 
@@ -185,6 +192,15 @@ class ProcessingStep:
                 rate = cast("float", resolved[name])
                 if rate <= 0.0 or not math.isfinite(rate):
                     raise StepValidationError(f"resample: {name} pozitif olmalı; verilen {rate}")
+        if self.kind is StepKind.LOW_PASS:
+            try:
+                validate_cutoff(
+                    cast("float", resolved["cutoff_hz"]),
+                    cast("float", resolved["sample_rate_hz"]),
+                )
+                validate_order(cast("int", resolved["order"]))
+            except FilterError as exc:
+                raise StepValidationError(f"low_pass: {exc}") from exc
         # frozen dataclass: normalize edilmiş parametreleri geri yaz.
         object.__setattr__(self, "parameters", resolved)
 
