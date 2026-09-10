@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 132 tamamlandı · 360 kaldı**
+**Toplam 492 madde · 133 tamamlandı · 359 kaldı**
 
-`[######..................]` %26.8
+`[######..................]` %27.0
 
 ## Özet
 
@@ -37,12 +37,12 @@ Work in fully autonomous mode.
 | Faz 0 — Keşif ve format sözleşmesi | 17 | 0 | 17 |
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
-| Faz 3 — MVP analiz arayüzü | 30 | 50 | 80 |
+| Faz 3 — MVP analiz arayüzü | 31 | 49 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 0 | 90 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 0 | 145 | 145 |
-| **Toplam** | **132** | **360** | **492** |
+| **Toplam** | **133** | **359** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -163,7 +163,7 @@ Work in fully autonomous mode.
 | [x] | `F2-040` | `0.101.0` | 20 dk | Kaynak dosyanın değişmediğini doğrula |
 | [x] | `F2-041` | `0.102.0` | 15 dk | Parser milestone kabulünü kaydet |
 
-### Faz 3 — MVP analiz arayüzü (30/80)
+### Faz 3 — MVP analiz arayüzü (31/80)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -197,7 +197,7 @@ Work in fully autonomous mode.
 | [x] | `F3-028` | `0.130.0` | 15 dk | Zaman bölgesi seçimini ekle |
 | [x] | `F3-029` | `0.131.0` | 15 dk | Seçili bölgeye yakınlaşmayı bağla |
 | [x] | `F3-030` | `0.132.0` | 20 dk | Legend gizleme ve solo eylemlerini ekle |
-| [ ] | `F3-031` | `0.133.0` | 15 dk | Seri rengi, çizgi ve marker ayarını ekle |
+| [x] | `F3-031` | `0.133.0` | 15 dk | Seri rengi, çizgi ve marker ayarını ekle |
 | [ ] | `F3-032` | `0.134.0` | 20 dk | Paneller arasında X senkronizasyonunu ekle |
 | [ ] | `F3-033` | `0.135.0` | 20 dk | Grafik tabı ve bölünmüş görünüm ekle |
 | [ ] | `F3-034` | `0.136.0` | 15 dk | Panel kaynak sınırını ve kapatma temizliğini ekle |

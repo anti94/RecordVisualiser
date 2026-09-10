@@ -64,6 +64,32 @@ DEFAULT_ZOOM_MODE = "xy"
 GRID_ALPHA = 0.15
 
 
+#: `F3-031` çizgi biçimleri -> Qt kalem stili.
+LINE_STYLES: dict[str, Qt.PenStyle] = {
+    "solid": Qt.PenStyle.SolidLine,
+    "dash": Qt.PenStyle.DashLine,
+    "dot": Qt.PenStyle.DotLine,
+    "none": Qt.PenStyle.NoPen,
+}
+#: `F3-031` desteklenen pyqtgraph marker sembolleri (`None` = marker yok).
+SERIES_SYMBOLS: tuple[str, ...] = ("o", "s", "t", "d", "+", "x")
+
+
+@dataclass(frozen=True)
+class SeriesStyle:
+    """Bir serinin çizim biçimi — `F3-031`.
+
+    `color`: `#rrggbb`. `width`: çizgi kalınlığı (px). `line_style`:
+    `LINE_STYLES` anahtarı. `symbol`: `SERIES_SYMBOLS`'tan biri ya da
+    `None`.
+    """
+
+    color: str
+    width: int = 1
+    line_style: str = "solid"
+    symbol: str | None = None
+
+
 @dataclass(frozen=True)
 class DeltaReading:
     """İki ölçüm cursoru (A→B) arasındaki fark — `F3-027`.
@@ -115,6 +141,8 @@ class PlotPanel(QWidget):
         self._right_vb: pg.ViewBox | None = None
         #: kanal kimliği -> "left" | "right".
         self._axis_of: dict[str, str] = {}
+        #: F3-031: kanal kimliği -> çizim biçimi (varsayılan ya da geçersiz kılma).
+        self._styles: dict[str, SeriesStyle] = {}
 
         # F3-030: legend'den seri gizleme + solo. `solo` etkinken yalnız
         # bir seri görünür; kapatınca solo ÖNCESİ görünürlükler geri gelir.
@@ -239,17 +267,23 @@ class PlotPanel(QWidget):
 
         seconds = to_seconds(chunk.timestamps_ns, self._t0_ns)
         values = np.asarray(chunk.values, dtype=np.float64)
-        color = channel_color(channel.id)
-        pen = pg.mkPen(color, width=1)
 
         existing = self._series.get(channel.id)
         if existing is not None:
             _previous_channel, curve = existing
-            curve.setPen(pen)
             curve.setData(seconds, values)
         else:
+            # F3-031: yeni seri kanal kimliğinden türeyen KALICI varsayılan
+            # renkle başlar — aynı kanal her panelde aynı renkte açılır.
+            self._styles[channel.id] = SeriesStyle(color=channel_color(channel.id))
             axis = self._axis_for_unit(channel.unit or "")
-            curve = self._new_curve(seconds, values, pen, channel.display_label, axis)
+            curve = self._new_curve(
+                seconds,
+                values,
+                pg.mkPen(self._styles[channel.id].color, width=1),
+                channel.display_label,
+                axis,
+            )
             self._axis_of[channel.id] = axis
             # F3-030: solo etkinken eklenen yeni seri gizli başlar; solo
             # kapanınca görünür olması için ön-görünürlüğe kaydedilir.
@@ -259,6 +293,9 @@ class PlotPanel(QWidget):
                     self._pre_solo_visibility[channel.id] = True
 
         self._series[channel.id] = (channel, curve)
+        # F3-031: saklanan stil (varsayılan ya da kullanıcı geçersiz kılması)
+        # her ekleme/güncellemede yeniden uygulanır.
+        self._apply_style(channel.id)
         if self._primary_id is None:
             self._primary_id = channel.id
 
@@ -621,6 +658,7 @@ class PlotPanel(QWidget):
         if entry is None:
             return
         _channel, curve = entry
+        self._styles.pop(channel_id, None)
         if self._axis_of.pop(channel_id, "left") == "right" and self._right_vb is not None:
             self._right_vb.removeItem(curve)
         else:
@@ -882,6 +920,72 @@ class PlotPanel(QWidget):
             self.clear_solo()
         else:
             self.solo_series(channel_id)
+
+    # -- seri bicimi: renk / cizgi / marker (F3-031) ------------
+
+    @staticmethod
+    def default_series_color(channel_id: str) -> str:
+        """Kanalın **kalıcı** varsayılan rengi — panelden bağımsız — `F3-031`.
+
+        Kabul kriteri: aynı kanal her panelde bu renkle açılır.
+        """
+        return channel_color(channel_id)
+
+    def series_style(self, channel_id: str) -> SeriesStyle:
+        """Serinin etkin çizim biçimi — `F3-031`. Bilinmeyen kanal `KeyError`."""
+        if channel_id not in self._styles:
+            raise KeyError(f"Grafikte yok: {channel_id}")
+        return self._styles[channel_id]
+
+    def series_color(self, channel_id: str) -> str:
+        """Serinin etkin rengi (`#rrggbb`) — kısayol."""
+        return self.series_style(channel_id).color
+
+    _UNSET = object()
+
+    def set_series_style(
+        self,
+        channel_id: str,
+        *,
+        color: str | None = None,
+        width: int | None = None,
+        line_style: str | None = None,
+        symbol: object = _UNSET,
+    ) -> None:
+        """Bir serinin rengini/çizgisini/marker'ını değiştirir — `F3-031`.
+
+        Yalnız verilen alanlar güncellenir. `symbol` açıkça `None`
+        verilerek marker kaldırılabilir (bu yüzden ayrı sentinel).
+        Geçersiz `line_style`/`symbol` `ValueError`, bilinmeyen kanal
+        `KeyError`.
+        """
+        current = self.series_style(channel_id)
+        if line_style is not None and line_style not in LINE_STYLES:
+            raise ValueError(f"Bilinmeyen cizgi bicimi: {line_style!r}")
+        new_symbol = current.symbol if symbol is self._UNSET else symbol
+        if new_symbol is not None and new_symbol not in SERIES_SYMBOLS:
+            raise ValueError(f"Bilinmeyen marker: {new_symbol!r}")
+
+        self._styles[channel_id] = SeriesStyle(
+            color=color if color is not None else current.color,
+            width=width if width is not None else current.width,
+            line_style=line_style if line_style is not None else current.line_style,
+            symbol=new_symbol if new_symbol is None else str(new_symbol),
+        )
+        self._apply_style(channel_id)
+
+    def _apply_style(self, channel_id: str) -> None:
+        entry = self._series.get(channel_id)
+        style = self._styles.get(channel_id)
+        if entry is None or style is None:
+            return
+        curve = entry[1]
+        curve.setPen(pg.mkPen(style.color, width=style.width, style=LINE_STYLES[style.line_style]))
+        curve.setSymbol(style.symbol)
+        if style.symbol is not None:
+            curve.setSymbolBrush(style.color)
+            curve.setSymbolPen(style.color)
+            curve.setSymbolSize(6)
 
     def title_text(self) -> str:
         item = self.plot.getPlotItem().titleLabel
