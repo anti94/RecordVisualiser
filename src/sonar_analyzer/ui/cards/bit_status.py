@@ -57,6 +57,8 @@ class BitStatusCard(QGroupBox):
         self.setObjectName(CARD_OBJECT_NAME)
 
         self._results: tuple[BitResult, ...] = ()
+        #: `F3-051` alt sistem -> o alt sistemin en kötü BIT sonucu.
+        self._worst_by_subsystem: dict[str, BitResult] = {}
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(6, 6, 6, 6)
@@ -104,15 +106,10 @@ class BitStatusCard(QGroupBox):
         aynı bileşendeki başarısız testi gizlememelidir.
         """
         self._results = tuple(results)
+        self._worst_by_subsystem = self._compute_worst_by_subsystem()
 
-        worst: dict[str, BitResult] = {}
-        for result in self._results:
-            current = worst.get(result.component)
-            if current is None or _severity_rank(result.state) > _severity_rank(current.state):
-                worst[result.component] = result
-
-        self.table.setRowCount(len(worst))
-        for row, (component, result) in enumerate(sorted(worst.items())):
+        self.table.setRowCount(len(self._worst_by_subsystem))
+        for row, (component, result) in enumerate(sorted(self._worst_by_subsystem.items())):
             style = bit_style(result.state)
 
             name_item = QTableWidgetItem(component)
@@ -129,9 +126,31 @@ class BitStatusCard(QGroupBox):
 
     def clear(self) -> None:
         self._results = ()
+        self._worst_by_subsystem = {}
         self.table.setRowCount(0)
         self.badge.setText(NO_DATA_TEXT)
         self.last_update.setText(f"Last Update: {EMPTY_VALUE}")
+
+    def _compute_worst_by_subsystem(self) -> dict[str, BitResult]:
+        worst: dict[str, BitResult] = {}
+        for result in self._results:
+            current = worst.get(result.component)
+            if current is None or _severity_rank(result.state) > _severity_rank(current.state):
+                worst[result.component] = result
+        return worst
+
+    def overall_state(self) -> BitState | None:
+        """Tüm alt sistemler arasındaki **en yüksek severity** durum — `F3-051`.
+
+        Genel özet (rozet) bunu yansıtır: bir alt sistemde Warning varken
+        genel özet "normal" olamaz. BIT verisi yoksa `None`.
+        """
+        if not self._worst_by_subsystem:
+            return None
+        return max(
+            (result.state for result in self._worst_by_subsystem.values()),
+            key=_severity_rank,
+        )
 
     # -- sorgular --------------------------------------------------------
 
@@ -160,16 +179,15 @@ class BitStatusCard(QGroupBox):
     # -- ic yardimcilar --------------------------------------------------
 
     def _refresh_badge(self) -> None:
-        states = [result.state for result in self._results]
-        if not states:
+        """Rozet, alt sistem durumlarının **en kötüsünü** yansıtır — `F3-051`."""
+        overall = self.overall_state()
+        if overall is None:
             self.badge.setText(NO_DATA_TEXT)
-            return
-
-        if BitState.FAIL in states:
+        elif overall is BitState.FAIL:
             self.badge.setText(FAILURE_TEXT)
-        elif BitState.WARN in states:
+        elif overall is BitState.WARN:
             self.badge.setText(WARNING_TEXT)
-        elif BitState.UNKNOWN in states or BitState.NOT_RUN in states:
+        elif overall in (BitState.UNKNOWN, BitState.NOT_RUN):
             self.badge.setText(UNKNOWN_TEXT)
         else:
             self.badge.setText(NOMINAL_TEXT)
