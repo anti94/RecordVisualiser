@@ -10,7 +10,7 @@ import math
 import numpy as np
 from numpy.typing import NDArray
 
-from sonar_analyzer.analysis.statistics import SampleStatistics, summarize
+from sonar_analyzer.analysis.statistics import summarize
 
 
 def _arr(values: list[float]) -> NDArray[np.float64]:
@@ -20,7 +20,10 @@ def _arr(values: list[float]) -> NDArray[np.float64]:
 def test_known_short_array_produces_expected_stats() -> None:
     result = summarize(_arr([1.0, 2.0, 3.0, 4.0]))
 
-    assert result == SampleStatistics(count=4, minimum=1.0, maximum=4.0, mean=2.5)
+    assert result.count == 4
+    assert result.minimum == 1.0
+    assert result.maximum == 4.0
+    assert result.mean == 2.5
 
 
 def test_negative_and_positive_values() -> None:
@@ -35,7 +38,10 @@ def test_negative_and_positive_values() -> None:
 def test_single_element_array() -> None:
     result = summarize(_arr([5.0]))
 
-    assert result == SampleStatistics(count=1, minimum=5.0, maximum=5.0, mean=5.0)
+    assert result.count == 1
+    assert result.minimum == result.maximum == result.mean == result.median == 5.0
+    assert result.std == 0.0
+    assert result.rms == 5.0
 
 
 def test_constant_array_has_zero_spread() -> None:
@@ -59,9 +65,16 @@ def test_empty_array_is_defined_not_an_error() -> None:
 
     assert result.count == 0
     assert result.is_empty
-    assert math.isnan(result.minimum)
-    assert math.isnan(result.maximum)
-    assert math.isnan(result.mean)
+    for value in (
+        result.minimum,
+        result.maximum,
+        result.mean,
+        result.median,
+        result.rms,
+        result.std,
+        result.peak_to_peak,
+    ):
+        assert math.isnan(value)
 
 
 def test_summarize_accepts_a_plain_list_like_input() -> None:
