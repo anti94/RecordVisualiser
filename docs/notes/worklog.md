@@ -208,8 +208,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-070` | 20 dk | 4 dk 17 sn | `f429765` | eksik kaynak ve bozuk workspace davranışını ekle |
 | `F3-071` | 20 dk | 3 dk 16 sn | `b0d8fd2` | workspace sürüm geçiş yolunu ekle |
 | `F3-072` | 20 dk | 5 dk 18 sn | `706ab7d` | bölüm 16 klavye kısayollarını bağla |
+| `F3-073` | 20 dk | 6 dk 17 sn | `47591d3` | klavye odak sırasını ve açıklamaları düzenle |
 
-**190 commit · olculen toplam 2325 dk 6 sn · olculemeyen 1 (ilk commit)**
+**191 commit · olculen toplam 2331 dk 23 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

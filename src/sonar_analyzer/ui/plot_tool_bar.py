@@ -62,7 +62,6 @@ class PlotToolBar(QWidget):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.setObjectName("plot_tool_bar")
-        self.setFixedHeight(TOOL_BAR_HEIGHT)
 
         layout = QHBoxLayout(self)
         layout.setContentsMargins(4, 2, 4, 2)
@@ -114,6 +113,10 @@ class PlotToolBar(QWidget):
         self.sync_checkbox.setChecked(True)
         self.sync_checkbox.toggled.connect(self.sync_toggled.emit)
         layout.addWidget(self.sync_checkbox)
+
+        # `F3-074`: yükseklik font/DPI ile ölçeklenir; 200% ölçekte kutular
+        # kesilmesin diye sabit 32 px yerine içerik yüksekliğine bir taban.
+        self.setFixedHeight(max(TOOL_BAR_HEIGHT, self.sizeHint().height()))
 
         self._channel_ids: list[str] = []
 
