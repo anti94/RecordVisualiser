@@ -67,6 +67,7 @@ STEP_KIND_ORDER: tuple[StepKind, ...] = (
     StepKind.NORMALIZE,
     StepKind.WINDOWED_RMS,
     StepKind.ENVELOPE,
+    StepKind.PHASE_UNWRAP,
 )
 
 #: `window` parametresi bir **süre** (saniye) olarak sunulan ve kanalın
