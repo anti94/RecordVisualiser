@@ -271,8 +271,10 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-053` | 20 dk | 5 dk 45 sn | `30c9032` | memory mapping üzerinden blok okuma ekle |
 | `F4-054` | 20 dk | 23 dk 38 sn | `e107020` | yalnız görünür zaman bloklarını yükle |
 | `F4-055` | 20 dk | 22 dk 55 sn | `2957e2d` | piksel bütçesini analiz verisinden ayır |
+| `F4-056` | 20 dk | 2 dk 50 sn | `2d10f87` | dar darbeleri koruyan min/max azaltımı ekle |
+| `F4-056` | 20 dk | 1 dk 42 sn | `c99e482` | bütçe doğrulaması ve kalite tiplerini netleştir |
 
-**253 commit · olculen toplam 2714 dk 56 sn · olculemeyen 1 (ilk commit)**
+**255 commit · olculen toplam 2719 dk 28 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
