@@ -25,7 +25,14 @@ class CachedRecordIndex:
     fingerprint: SourceFingerprint
 
 
-def _records_digest(records: object) -> str:
+def records_digest(records: object) -> str:
+    """`records_sha256` alanının değeri — indeks biçiminin bir parçasıdır.
+
+    Geçerli JSON içindeki kazara değişimi yakalar. Biçim sözleşmesi olduğu
+    için `F4-066` kurtarma testleri de bu işlevi kullanır: zarfı tutarlı ama
+    içeriği yanlış bir indeksin yine reddedildiği ancak aynı özetle kurulan
+    bir örnekle gösterilebilir.
+    """
     encoded = json.dumps(records, separators=(",", ":"), allow_nan=False).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
 
@@ -52,7 +59,7 @@ def _restore(
     expected_count = (fingerprint.file_size - header.header_size) // header.record_size
     if len(records) != expected_count:
         return None
-    if payload.get("records_sha256") != _records_digest(records):
+    if payload.get("records_sha256") != records_digest(records):
         return None
     result: list[RecordIndexEntry] = []
     for index, item in enumerate(records):
@@ -112,7 +119,7 @@ def _load_or_build_record_index(
             "file_size": fingerprint.file_size,
             "source_sha256": fingerprint.content_sha256,
             "records": records,
-            "records_sha256": _records_digest(records),
+            "records_sha256": records_digest(records),
         },
     )
     return CachedRecordIndex(entries, reused=False, fingerprint=fingerprint)
