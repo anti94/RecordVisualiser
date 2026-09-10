@@ -1547,7 +1547,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F3-054` | `0.156.0` | 20 dk | Kayıt geneli Timeline özetini çiz | Başlangıç, bitiş ve olay yoğunluğu doğru konumlanır | `F3-053` | `feat(ui): F3-054 kayıt geneli Timeline özetini çiz` |
-| [ ] | `F3-055` | `0.157.0` | 20 dk | Timeline viewport seçimini grafiğe bağla | Bölge taşıma tüm bağlı grafiklerin zaman aralığını değiştirir | `F3-054` | `feat(ui): F3-055 timeline viewport seçimini grafiğe bağla` |
+| [x] | `F3-055` | `0.157.0` | 20 dk | Timeline viewport seçimini grafiğe bağla | Bölge taşıma tüm bağlı grafiklerin zaman aralığını değiştirir | `F3-054` | `feat(ui): F3-055 timeline viewport seçimini grafiğe bağla` |
 | [ ] | `F3-056` | `0.158.0` | 20 dk | Play, pause ve stop durum makinesini ekle | Geçişler GUI olmadan doğrulanır; stop başlangıca döner | `F3-055` | `feat(playback): F3-056 play, pause ve stop durum makinesini ekle` |
 | [ ] | `F3-057` | `0.159.0` | 20 dk | Kayıt zamanına göre ilerleme saatini ekle | 125 ms kayıt sınırları doğru sırayla geçilir | `F3-056` | `feat(playback): F3-057 kayıt zamanına göre ilerleme saatini ekle` |
 | [ ] | `F3-058` | `0.160.0` | 15 dk | Oynatma hızlarını bağla | 0.25x–10x seçenekleri kayıt zamanı ilerlemesini ölçekler | `F3-057` | `feat(playback): F3-058 oynatma hızlarını bağla` |

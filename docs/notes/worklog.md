@@ -189,8 +189,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F3-051` | 20 dk | 3 dk 42 sn | `df44b14` | sağ BIT kartını alt sistem durumlarına bağla |
 | `F3-052` | 15 dk | 2 dk 38 sn | `d18ff15` | Run BIT Analysis eylemini kayıt analizine bağla |
 | `F3-053` | 15 dk | 2 dk 51 sn | `315578f` | yükleme ve analiz mesajlarını alt loga bağla |
+| `F3-054` | 20 dk | 4 dk 5 sn | `9e9e65b` | kayıt geneli Timeline özetini çiz |
 
-**171 commit · olculen toplam 2162 dk 50 sn · olculemeyen 1 (ilk commit)**
+**172 commit · olculen toplam 2166 dk 55 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

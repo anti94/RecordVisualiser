@@ -181,6 +181,7 @@ class MainWindow(QMainWindow):
         self.status.cancel_requested.connect(self.cancel_active_load)
 
         self.playback_dock.position_changed.connect(self.status.set_cursor_time)
+        self.playback_dock.timeline.viewport_changed.connect(self._on_timeline_viewport_changed)
 
     # -- eylemler --------------------------------------------------------
 
@@ -260,6 +261,26 @@ class MainWindow(QMainWindow):
     def _set_tx_regions_visible(self, visible: bool) -> None:
         """`F3-050` — TX bantlarının görünürlüğü (veri değişmez)."""
         self.plot_panel.set_tx_regions_visible(visible)
+
+    def _sync_timeline_viewport(self, x_min_s: float, x_max_s: float) -> None:
+        """`F3-055` — grafik X aralığını overview timeline viewport'una yansıtır."""
+        try:
+            start_ns = self.plot_panel.timestamp_ns_for_x(x_min_s)
+            end_ns = self.plot_panel.timestamp_ns_for_x(x_max_s)
+        except RuntimeError:
+            return
+        self.playback_dock.timeline.set_viewport_ns(start_ns, end_ns)
+
+    def _on_timeline_viewport_changed(self, start_ns: object, end_ns: object) -> None:
+        """`F3-055` — timeline viewport'u sürüklenince grafik(ler) o aralığa gider."""
+        if not (isinstance(start_ns, int) and isinstance(end_ns, int)):
+            return
+        try:
+            x0 = self.plot_panel.x_for_timestamp_ns(start_ns)
+            x1 = self.plot_panel.x_for_timestamp_ns(end_ns)
+        except RuntimeError:
+            return
+        self.plot_panel.set_x_range(x0, x1)
 
     def go_to_time(self, timestamp_ns: int) -> bool:
         """Grafiğin görünür X penceresini `timestamp_ns`'e **ortalar** — `F3-046`.
@@ -800,6 +821,7 @@ class MainWindow(QMainWindow):
         self.plot_panel.channel_dropped.connect(self._on_channel_dropped)
         self.plot_panel.time_region_changed.connect(self._on_stats_region_changed)
         self.plot_panel.cursor_moved.connect(self._on_cursor_moved)
+        self.plot_panel.x_range_changed.connect(self._sync_timeline_viewport)
 
         self.transmission_panel = TransmissionPanel(container)
 
