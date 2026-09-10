@@ -250,6 +250,8 @@ class DataExplorerDock(QDockWidget):
 
         self.open_button = QPushButton("Open .bin File", body)
         self.open_button.setObjectName("button_open_bin")
+        self.open_button.setAccessibleName("Kayıt dosyası aç")  # F3-073
+        self.open_button.setToolTip("Bir .bin kaydı aç (Ctrl+O)")
         self.open_button.clicked.connect(self.open_requested.emit)
         layout.addWidget(self.open_button)
 
@@ -333,6 +335,7 @@ class DataExplorerDock(QDockWidget):
         self.search.setObjectName("input_channel_search")
         self.search.setPlaceholderText("Search...")
         self.search.setClearButtonEnabled(True)
+        self.search.setAccessibleName("Kanal ara")  # F3-073
         self.search.textChanged.connect(self._apply_filter)
         layout.addWidget(self.search)
 
@@ -340,9 +343,15 @@ class DataExplorerDock(QDockWidget):
         self.tree.setObjectName("tree_channels")
         self.tree.setHeaderHidden(True)
         self.tree.setColumnCount(1)
+        self.tree.setAccessibleName("Kanal ağacı")  # F3-073
+        self.tree.setAccessibleDescription(
+            "Enter: kanalı grafiğe çiz. Ok tuşları: gezin. F2 çevresi: bağlam menüsü."
+        )
         header = self.tree.header()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        # F3-073: çift tık VE Enter kanalı etkinleştirir (yalnız klavye akışı).
         self.tree.itemDoubleClicked.connect(self._on_item_double_clicked)
+        self.tree.itemActivated.connect(self._on_item_double_clicked)
         # F3-015: kanal yapraklari PlotPanel'e suruklenebilir; agac disari
         # bir seyi kabul ETMEZ (yalniz kaynak).
         self.tree.setDragEnabled(True)

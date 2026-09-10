@@ -230,6 +230,40 @@ class MainWindow(QMainWindow):
         #: Testler enjekte eder; `str | ""` döndürür.
         self.workspace_save_dialog: Callable[[], str] | None = None
         self.shortcuts = install_shortcuts(self)
+        # F3-073: yalnız klavyeyle tamamlanabilen ana akış için odak sırası.
+        self._configure_keyboard_navigation()
+
+    def _configure_keyboard_navigation(self) -> None:
+        """Ana akışın Tab sırasını ve erişilebilir adları düzenler — `F3-073`.
+
+        Akış: kayıt aç -> kanal ara -> kanal ağacı -> grafik -> oynatma ->
+        olay filtresi. Tab bu sırayı izler; her durak ekran okuyucuya
+        adıyla tanıtılır.
+        """
+        # Grafik Tab ile durulabilir olmalı: hem odak sırasında görünür,
+        # hem de X/Y/B/C/R kısayolları için güvenilir odak taşır.
+        self.plot_panel.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.plot_panel.setAccessibleName("Zaman serisi grafiği")
+        self.plot_panel.setAccessibleDescription(
+            "X/Y/B: zoom modu. Home: görünümü sıfırla. C: cursor. R: bölge. "
+            "F4 / Shift+F4: sonraki / önceki olay."
+        )
+        play_button = self.playback_dock.buttons["button_play"]
+        play_button.setAccessibleName("Oynat / duraklat")
+        self.bottom_dock.events.setAccessibleName("Olaylar tablosu")
+
+        chain = [
+            self.left_dock.open_button,
+            self.left_dock.search,
+            self.left_dock.tree,
+            self.plot_panel,
+            play_button,
+            self.playback_dock.slider,
+            self.bottom_dock.event_source_filter,
+            self.bottom_dock.events,
+        ]
+        for earlier, later in zip(chain, chain[1:]):
+            self.setTabOrder(earlier, later)
 
     # -- eylemler --------------------------------------------------------
 

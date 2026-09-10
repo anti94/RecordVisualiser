@@ -1570,7 +1570,7 @@ Kabul: Bölüm 3.1 kapsamı ve Bölüm 23'ün bütün MVP kabul koşulları kan�
 | [x] | `F3-070` | `0.172.0` | 20 dk | Eksik kaynak ve bozuk workspace davranışını ekle | Eksik dosya bildirilir; açık oturum kontrolsüz silinmez | `F3-069` | `fix(workspace): F3-070 eksik kaynak ve bozuk workspace davranışını ekle` |
 | [x] | `F3-071` | `0.173.0` | 20 dk | Workspace sürüm geçiş yolunu ekle | Eski örnek sürüm dönüştürülür; bilinmeyen yeni sürüm anlaşılır reddedilir | `F3-070` | `feat(workspace): F3-071 workspace sürüm geçiş yolunu ekle` |
 | [x] | `F3-072` | `0.174.0` | 20 dk | Bölüm 16 klavye kısayollarını bağla | Odak grafikteyken temel dosya, oynatma ve zoom kısayolları çalışır | `F3-071` | `feat(ui): F3-072 bölüm 16 klavye kısayollarını bağla` |
-| [ ] | `F3-073` | `0.175.0` | 20 dk | Klavye odak sırasını ve açıklamaları düzenle | Ana akış yalnız klavyeyle tamamlanabilir | `F3-072` | `fix(ui): F3-073 klavye odak sırasını ve açıklamaları düzenle` |
+| [x] | `F3-073` | `0.175.0` | 20 dk | Klavye odak sırasını ve açıklamaları düzenle | Ana akış yalnız klavyeyle tamamlanabilir | `F3-072` | `fix(ui): F3-073 klavye odak sırasını ve açıklamaları düzenle` |
 | [ ] | `F3-074` | `0.176.0` | 20 dk | Windows ölçekleme ve kontrast kontrolünü kaydet | 100/125/150/200 yüzde ölçeklerde kritik metin ve kontroller kesilmez | `F3-073` | `test(ui): F3-074 windows ölçekleme ve kontrast kontrolünü kaydet` |
 
 ##### MVP doğrulaması
