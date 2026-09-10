@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 211 tamamlandı · 281 kaldı**
+**Toplam 492 madde · 212 tamamlandı · 280 kaldı**
 
-`[##########..............]` %42.9
+`[##########..............]` %43.1
 
 ## Özet
 
@@ -38,11 +38,11 @@ Work in fully autonomous mode.
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
-| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 11 | 79 | 90 |
+| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 12 | 78 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **211** | **281** | **492** |
+| **Toplam** | **212** | **280** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -248,7 +248,7 @@ Work in fully autonomous mode.
 | [x] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır |
 | [x] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla |
 
-### Faz 4 — Mockup analiz panosu ve büyük veri performansı (11/90)
+### Faz 4 — Mockup analiz panosu ve büyük veri performansı (12/90)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -263,7 +263,7 @@ Work in fully autonomous mode.
 | [x] | `F4-009` | `1.9.0` | 20 dk | Ham akustik blok formatının ayrı sürümünü tanımla |
 | [x] | `F4-010` | `1.10.0` | 20 dk | 48 kHz akustik blok fixture üretecini ekle |
 | [x] | `F4-011` | `1.11.0` | 20 dk | Akustik blok payload decoder'ını ekle |
-| [ ] | `F4-012` | `1.12.0` | 20 dk | Blok içi örnek zamanlarını üret |
+| [x] | `F4-012` | `1.12.0` | 20 dk | Blok içi örnek zamanlarını üret |
 | [ ] | `F4-013` | `1.13.0` | 20 dk | Akustik blokları zaman sorgusuna bağla |
 | [ ] | `F4-014` | `1.14.0` | 20 dk | Akustik boyut ve sample rate sınırlarını doğrula |
 | [ ] | `F4-015` | `1.15.0` | 20 dk | Detrend ve DC kaldırma hesabını ekle |
