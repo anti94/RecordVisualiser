@@ -94,6 +94,54 @@ jobs:
           python -m pip install pip-audit
           python tools/dependency_scan.py
 
+  package-smoke:
+    name: Windows paketi uretilip aciliyor mu
+    runs-on: windows-latest
+    # Paketleme dakikalar surer; kalite kapisiyla PARALEL kosar ki
+    # geri bildirim dongusu uzamasin.
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+          cache: pip
+
+      - name: Bagimliliklari kur
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[gui,dsp,package]"
+
+      - name: Paketi uret (F6-004)
+        run: python tools/build_package.py
+
+      - name: Paketli acilisi dogrula (F6-005)
+        env:
+          QT_QPA_PLATFORM: offscreen
+        # Temiz ortam kontrolu paketi Python'suz bir PATH ile calistirir;
+        # paketin kendi kendine yettigini ancak bu gosterir.
+        run: python tools/clean_env_check.py
+
+      - name: Surum manifesti ve checksum (F6-009)
+        run: python tools/release_manifest.py
+
+      - name: Sonuclari artefakt olarak yukle
+        # Basarisiz kosuda da yuklenir: "neden bozuldu" sorusu ancak
+        # build logu ve raporlarla cevaplanabilir.
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-smoke-${{ github.run_number }}
+          path: |
+            dist/build.log
+            dist/build-manifest.json
+            dist/release-manifest.json
+            docs/packaging/results/clean-env-check.json
+          if-no-files-found: warn
+          retention-days: 14
+
   todo-sync:
     name: todo.md plan.md ile guncel mi
     runs-on: windows-latest
