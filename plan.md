@@ -1839,7 +1839,7 @@ Kabul: Kurulabilir Windows paketi, dokümantasyon, sürüm artefaktları ve dağ
 | [x] | `F6-020` | `3.20.0` | 20 dk | Tanılama önizleme ve dışa aktarımını ekle | Kullanıcı içeriği görür; yalnız seçili öğeler pakete girer | `F6-019` | `feat(diagnostics): F6-020 tanılama önizleme ve dışa aktarımını ekle` |
 | [x] | `F6-021` | `3.21.0` | 20 dk | Son geçerli workspace kurtarmasını ekle | Kesinti sonrası sağlam oturum önerilir; bozuk dosya etkin oturumu ezmez | `F6-020` | `feat(workspace): F6-021 son geçerli workspace kurtarmasını ekle` |
 | [x] | `F6-022` | `3.22.0` | 20 dk | Tekrarlı aç/kapat ve playback koşusunu hazırla | Otomatik döngü bellek, handle ve kapanış hatalarını kaydeder | `F6-021` | `test(app): F6-022 tekrarlı aç/kapat ve playback koşusunu hazırla` |
-| [ ] | `F6-023` | `3.23.0` | 20 dk | Aç/kapat dayanıklılık sonuçlarını değerlendir | Kalıcı kaynak artışı yoktur veya engelleyici hata işi açılmıştır | `F6-022` | `docs(quality): F6-023 aç/kapat dayanıklılık sonuçlarını değerlendir` |
+| [x] | `F6-023` | `3.23.0` | 20 dk | Aç/kapat dayanıklılık sonuçlarını değerlendir | Kalıcı kaynak artışı yoktur veya engelleyici hata işi açılmıştır | `F6-022` | `docs(quality): F6-023 aç/kapat dayanıklılık sonuçlarını değerlendir` |
 
 ##### Kılavuzlar ve son kabul
 

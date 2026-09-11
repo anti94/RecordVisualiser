@@ -379,8 +379,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F6-019` | 20 dk | 9 dk 39 sn | `74d523b` | tanılama paketi içerik listesini üret |
 | `F6-020` | 20 dk | 9 dk 17 sn | `8bdaa32` | tanılama önizleme ve dışa aktarımını ekle |
 | `F6-021` | 20 dk | 9 dk 47 sn | `2a169c0` | son geçerli workspace kurtarmasını ekle |
+| `F6-022` | 20 dk | 14 dk 6 sn | `07ced64` | tekrarlı aç/kapat ve playback koşusunu hazırla |
 
-**361 commit · olculen toplam 4361 dk 38 sn · olculemeyen 1 (ilk commit)**
+**362 commit · olculen toplam 4375 dk 44 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

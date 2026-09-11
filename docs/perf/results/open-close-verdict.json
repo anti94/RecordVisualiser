@@ -1,0 +1,23 @@
+[
+  {
+    "name": "bellek",
+    "status": "gecti",
+    "measured": "6.39 bayt/tur",
+    "criterion": "tur basina uygulama bellegi <= 50.0 bayt",
+    "note": ""
+  },
+  {
+    "name": "handle",
+    "status": "gecti",
+    "measured": "0 adet",
+    "criterion": "handle artisi <= 2",
+    "note": ""
+  },
+  {
+    "name": "kapanis",
+    "status": "gecti",
+    "measured": "0 hata",
+    "criterion": "kapanis hatasi = 0",
+    "note": ""
+  }
+]
