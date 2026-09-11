@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 498 madde · 315 tamamlandı · 183 kaldı**
+**Toplam 498 madde · 316 tamamlandı · 182 kaldı**
 
-`[###############.........]` %63.3
+`[###############.........]` %63.5
 
 ## Özet
 
@@ -39,10 +39,10 @@ Work in fully autonomous mode.
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
-| Faz 5 — Canlı veri, bağlantı ve kayıt | 19 | 22 | 41 |
+| Faz 5 — Canlı veri, bağlantı ve kayıt | 20 | 21 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **315** | **183** | **498** |
+| **Toplam** | **316** | **182** | **498** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -349,7 +349,7 @@ Work in fully autonomous mode.
 | [x] | `F4-096` | `1.95.0` | 20 dk | Özet ve akış düzeltmeleri sonrası performansı doğrula |
 | [x] | `F4-090` | `2.0.0` | 15 dk | Analiz milestone kabulünü kapat ve major sürümü hazırla |
 
-### Faz 5 — Canlı veri, bağlantı ve kayıt (19/41)
+### Faz 5 — Canlı veri, bağlantı ve kayıt (20/41)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -372,7 +372,7 @@ Work in fully autonomous mode.
 | [x] | `F5-017` | `2.17.0` | 20 dk | Sınırlı otomatik yeniden bağlanma ekle |
 | [x] | `F5-018` | `2.18.0` | 20 dk | Bağlantı ve buffer ayarlarını kaydet |
 | [x] | `F5-019` | `2.19.0` | 20 dk | Connect ve Disconnect eylemlerini bağla |
-| [ ] | `F5-020` | `2.20.0` | 20 dk | Paket kaybı, kuyruk ve buffer durumunu göster |
+| [x] | `F5-020` | `2.20.0` | 20 dk | Paket kaybı, kuyruk ve buffer durumunu göster |
 | [ ] | `F5-021` | `2.21.0` | 20 dk | Canlı akışı ortak repository'ye bağla |
 | [ ] | `F5-022` | `2.22.0` | 20 dk | Canlı veriyi mevcut grafik panellerine bağla |
 | [ ] | `F5-023` | `2.23.0` | 15 dk | Canlı sona takip etme ve sabit aralık seçimini ekle |

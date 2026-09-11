@@ -79,7 +79,10 @@ from sonar_analyzer.export.pdf_export import (
     export_widget_pdf,
 )
 from sonar_analyzer.export.text_format import Delimiter
+from sonar_analyzer.io.live.packet_queue import BoundedPacketQueue
 from sonar_analyzer.io.live.protocol import ConnectionState, LiveSource
+from sonar_analyzer.io.live.ring_buffer import LiveRingBuffer
+from sonar_analyzer.io.live.sequence_tracker import SequenceStats
 from sonar_analyzer.logging.performance import measure
 from sonar_analyzer.processing.chain import ProcessingChain
 from sonar_analyzer.processing.steps import StepValidationError
@@ -99,6 +102,7 @@ from sonar_analyzer.ui.actions import (
 )
 from sonar_analyzer.ui.cards.analysis_tools import FilterTabError
 from sonar_analyzer.ui.cards.data_export import DataExportCard
+from sonar_analyzer.ui.cards.live_status import LiveHealth
 from sonar_analyzer.ui.docks.bottom_panel import BottomPanelDock
 from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock, selected_channel_ids
 from sonar_analyzer.ui.docks.event_table_model import related_channels
@@ -570,6 +574,34 @@ class MainWindow(QMainWindow):
         source = self._live_source
         return ConnectionState.DISCONNECTED if source is None else source.state
 
+    def update_live_health(self, health: LiveHealth) -> None:
+        """Canlı akış sayaçlarını sağ sütundaki `Live` sekmesine yazar — `F5-020`.
+
+        Sayılar burada **türetilmez**; üretildikleri yerden (kuyruk, tampon,
+        sıra izleyici, `LiveStats`) geldikleri gibi gösterilir.
+        """
+        self.right_dock.live_status.update_health(health)
+
+    def refresh_live_health(
+        self,
+        *,
+        sequence: SequenceStats | None = None,
+        queue: BoundedPacketQueue | None = None,
+        buffer: LiveRingBuffer | None = None,
+        buffer_channel: str = "",
+    ) -> None:
+        """Bağlı kaynağın `stats()`'ını okuyup sağlık kartını tazeler."""
+        source = self._live_source
+        self.update_live_health(
+            LiveHealth(
+                stats=None if source is None else source.stats(),
+                sequence=sequence,
+                queue=queue,
+                buffer=buffer,
+                buffer_channel=buffer_channel,
+            )
+        )
+
     def _refresh_connection_state(self) -> None:
         """Toolbar ve durum çubuğunu **aynı** kaynaktan tazeler — `F5-019`.
 
@@ -585,6 +617,11 @@ class MainWindow(QMainWindow):
         self.action("action_connect").setEnabled(attached and not connected)
         self.action("action_disconnect").setEnabled(attached and connected)
         self.status.set_field("connection", CONNECTION_LABELS[state] if attached else "")
+        # F5-020: canli sayaclar yalniz bir kaynak takiliyken anlamli.
+        if attached:
+            self.right_dock.open_live_tab()
+        else:
+            self.right_dock.close_live_tab()
 
     # -- duzenleme gecmisi (F4-079) ----------------------------------------
 

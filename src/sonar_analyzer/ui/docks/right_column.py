@@ -36,6 +36,7 @@ from sonar_analyzer.domain.event import Event
 from sonar_analyzer.ui.cards.analysis_tools import AnalysisToolsCard
 from sonar_analyzer.ui.cards.bit_status import BitStatusCard
 from sonar_analyzer.ui.cards.data_export import DataExportCard
+from sonar_analyzer.ui.cards.live_status import LiveStatusCard
 from sonar_analyzer.ui.docks.inspector import InspectorPanel
 
 DOCK_OBJECT_NAME = "dock_right_column"
@@ -43,6 +44,9 @@ DOCK_TITLE = "BIT / Analysis / Export"
 
 OVERVIEW_TAB_TITLE = "Overview"
 INSPECTOR_TAB_TITLE = "Inspector"
+#: `F5-020` canlı akış sağlığı. Ayrı sekmededir: mockup'ın dokuz bölgesi ve
+#: Overview kart sırası (bölge 4/5/9) böylece hiç değişmez.
+LIVE_TAB_TITLE = "Live"
 
 #: (kart adi, baslik, aciklama) — mockup sirasiyla.
 CARD_SPECS: tuple[tuple[str, str, str], ...] = (
@@ -81,6 +85,8 @@ class RightColumnDock(QDockWidget):
         self.analysis_tools = AnalysisToolsCard()
         self.data_export = DataExportCard()
         self.inspector = InspectorPanel()
+        #: `F5-020` canlı akış sağlığı; kendi sekmesinde durur.
+        self.live_status = LiveStatusCard()
 
         self.tabs = QTabWidget(self)
         self.tabs.setObjectName("tabs_right_column")
@@ -153,6 +159,33 @@ class RightColumnDock(QDockWidget):
         if index < 0:
             index = self.tabs.addTab(self.inspector, INSPECTOR_TAB_TITLE)
         self.tabs.setCurrentIndex(index)
+
+    # -- canli sekmesi (F5-020) ------------------------------------------
+
+    @property
+    def live_tab_is_open(self) -> bool:
+        return self.tabs.indexOf(self.live_status) >= 0
+
+    def open_live_tab(self) -> None:
+        """`Live` sekmesini ekler (zaten varsa etkisiz).
+
+        Inspector'la **aynı** desen: sekme varsayılan düzende yoktur, bir
+        canlı kaynak takılınca belirir. Böylece mockup'ın açılış görünümü
+        (`docs/ui/layout-map.md`) hiç değişmez.
+        """
+        if not self.live_tab_is_open:
+            self.live_status.setParent(self.tabs)
+            self.tabs.addTab(self.live_status, LIVE_TAB_TITLE)
+
+    def close_live_tab(self) -> None:
+        """`Live` sekmesini kaldırır ve sayaçları temizler."""
+        index = self.tabs.indexOf(self.live_status)
+        if index >= 0:
+            self.tabs.removeTab(index)
+            # Sekme kaldirilinca Qt widget'in ebeveynini birakiyor; nesne
+            # korunsun diye yeniden sahiplenilir (close_inspector ile ayni).
+            self.live_status.setParent(self)
+            self.live_status.clear()
 
     def close_inspector(self) -> None:
         """Inspector sekmesini kaldırır; kartlar yerinde kalır."""
