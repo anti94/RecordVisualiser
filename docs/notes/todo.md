@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 498 madde · 327 tamamlandı · 171 kaldı**
+**Toplam 498 madde · 328 tamamlandı · 170 kaldı**
 
-`[################........]` %65.7
+`[################........]` %65.9
 
 ## Özet
 
@@ -39,10 +39,10 @@ Work in fully autonomous mode.
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
-| Faz 5 — Canlı veri, bağlantı ve kayıt | 31 | 10 | 41 |
+| Faz 5 — Canlı veri, bağlantı ve kayıt | 32 | 9 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **327** | **171** | **498** |
+| **Toplam** | **328** | **170** | **498** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -349,7 +349,7 @@ Work in fully autonomous mode.
 | [x] | `F4-096` | `1.95.0` | 20 dk | Özet ve akış düzeltmeleri sonrası performansı doğrula |
 | [x] | `F4-090` | `2.0.0` | 15 dk | Analiz milestone kabulünü kapat ve major sürümü hazırla |
 
-### Faz 5 — Canlı veri, bağlantı ve kayıt (31/41)
+### Faz 5 — Canlı veri, bağlantı ve kayıt (32/41)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -384,7 +384,7 @@ Work in fully autonomous mode.
 | [x] | `F5-029` | `2.29.0` | 20 dk | Flush ve güvenli dosya kapatmayı ekle |
 | [x] | `F5-030` | `2.30.0` | 20 dk | Disk dolması ve yazma hatasını işle |
 | [x] | `F5-031` | `2.31.0` | 20 dk | Boyut ve isim sınırında yeni dosyaya geç |
-| [ ] | `F5-032` | `2.32.0` | 20 dk | Record ve Stop durumunu ana ekrana bağla |
+| [x] | `F5-032` | `2.32.0` | 20 dk | Record ve Stop durumunu ana ekrana bağla |
 | [ ] | `F5-033` | `2.33.0` | 20 dk | Bağlantı kesilmesinde kayıt davranışını uygula |
 | [ ] | `F5-034` | `2.34.0` | 20 dk | Canlı BIT ve TX olaylarını panoya bağla |
 | [ ] | `F5-035` | `2.35.0` | 20 dk | Canlı kayıt dosyasını tekrar açarak karşılaştır |

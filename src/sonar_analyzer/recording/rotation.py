@@ -118,6 +118,10 @@ class RotatingRecorder:
         self._file_index = 0
         self._paths: list[Path] = []
         self._outcomes: list[RecordingOutcome] = []
+        self._total_submitted = 0
+        self._first_anchor_ns: int | None = None
+        self._last_record_ns: int | None = None
+        self._stopped = False
 
     # ----------------------------------------------------------------- #
     # gozlem
@@ -153,14 +157,52 @@ class RotatingRecorder:
         return self._submitted
 
     @property
+    def total_record_count(self) -> int:
+        """Bütün dosyalara gönderilen toplam kayıt sayısı."""
+        return self._total_submitted
+
+    @property
+    def total_dropped_records(self) -> int:
+        """Bütün dosyalarda disk yetişemediği için düşen kayıt sayısı."""
+        closed = sum(outcome.dropped_records for outcome in self._outcomes)
+        session = self._session
+        return closed + (0 if session is None else session.dropped_records)
+
+    @property
+    def recorded_span_ns(self) -> int:
+        """Kaydın kapsadığı süre: ilk kaydın penceresinden sonuncusuna.
+
+        Süre **veriden** türetilir, duvar saatinden değil: akış dursa bile
+        "kayıt süresi" ilerlemeye devam etseydi, kullanıcı elinde olmayan
+        saniyelerin kaydedildiğini sanırdı.
+        """
+        first, last = self._first_anchor_ns, self._last_record_ns
+        if first is None or last is None:
+            return 0
+        return last - first
+
+    @property
     def rotation_count(self) -> int:
         """Kaç kez yeni dosyaya geçildiği (ilk dosya sayılmaz)."""
         return max(0, len(self._paths) - 1)
 
     @property
     def state(self) -> RecordingState:
+        """Kaydın durumu — henüz dosya açılmamış olsa bile doğru.
+
+        Yazıcı ilk **veri taşıyan** pakete kadar dosya açmaz; o aralıkta
+        durumu `IDLE` göstermek, kullanıcı Record'a bastığı hâlde "kayıt
+        yok" demek olurdu. Durdurulduktan sonra ise dosyalardan biri hata
+        aldıysa `FAILED` kalır (`F5-030`: başarılı denmez).
+        """
         session = self._session
-        return RecordingState.IDLE if session is None else session.poll()
+        if session is not None:
+            return session.poll()
+        if not self._stopped:
+            return RecordingState.RECORDING
+        if any(not outcome.succeeded for outcome in self._outcomes):
+            return RecordingState.FAILED
+        return RecordingState.STOPPED
 
     # ----------------------------------------------------------------- #
     # yazma
@@ -172,6 +214,8 @@ class RotatingRecorder:
         Örnek taşımayan paket kayıt üretmez ve dosya açtırmaz — boş bir
         pakete dosya açmak, hiç veri gelmemiş bir kaydı başlatırdı.
         """
+        if self._stopped:
+            raise RuntimeError("Kayit durduruldu; yeni bir RotatingRecorder gerekli")
         first_ns = _first_sample_ns(packet)
         if first_ns is None:
             return None
@@ -190,11 +234,14 @@ class RotatingRecorder:
 
         self._require_session().write(record.payload)
         self._submitted += 1
+        self._total_submitted += 1
+        self._last_record_ns = first_ns
         return record
 
     def stop(self) -> list[RecordingOutcome]:
         """Açık dosyayı kapatır ve **bütün** dosyaların sonuçlarını döndürür."""
         self._close_current()
+        self._stopped = True
         return list(self._outcomes)
 
     # ----------------------------------------------------------------- #
@@ -224,6 +271,8 @@ class RotatingRecorder:
         self._session = session
         self._submitted = 0
         self._paths.append(path)
+        if self._first_anchor_ns is None:
+            self._first_anchor_ns = anchor_ns
 
     def _close_current(self) -> None:
         session = self._session

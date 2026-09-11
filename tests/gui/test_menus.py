@@ -84,13 +84,15 @@ def test_actions_requiring_recording_are_disabled_at_start(window: MainWindow) -
 
 
 def test_toolbar_contains_quick_actions(window: MainWindow) -> None:
-    """Şerit sırası sabittir; `F5-019` canlı bağlantı ikilisini araya ekledi."""
+    """Şerit sırası sabittir; `F5-019` bağlantı, `F5-032` kayıt ikilisini ekledi."""
     names = [a.objectName() for a in window.toolbar.actions()]
     assert names == [
         "action_open",
         "action_export",
         "action_connect",
         "action_disconnect",
+        "action_record",
+        "action_stop_recording",
         "action_reset_layout",
         "action_settings",
     ]

@@ -21,10 +21,12 @@ testler zamanlayıcı beklemeden `drain_into()`'yu doğrudan çağırabilir.
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from PySide6.QtCore import QThread, Signal
 
 from sonar_analyzer.io.live.packet_queue import BoundedPacketQueue, DropPolicy
-from sonar_analyzer.io.live.protocol import LiveSource
+from sonar_analyzer.io.live.protocol import LivePacket, LiveSource
 from sonar_analyzer.repository.live_repository import LiveRepository
 
 DEFAULT_QUEUE_SIZE = 256
@@ -93,12 +95,24 @@ class LiveRunner:
             reader.wait(wait_ms)
         self._reader = None
 
-    def drain_into(self, repository: LiveRepository, *, limit: int | None = None) -> int:
+    def drain_into(
+        self,
+        repository: LiveRepository,
+        *,
+        limit: int | None = None,
+        on_packet: Callable[[LivePacket], None] | None = None,
+    ) -> int:
         """Kuyruktaki paketleri repository'ye yazar; **yazılan paket** sayısını döner.
 
         UI thread bu çağrıda **beklemez**: kuyruk boşsa hemen `0` döner.
         `limit` verilirse tek karede en çok o kadar paket işlenir — çok
         büyük bir birikim tek karede arayüzü meşgul etmesin diye.
+
+        `on_packet` verilirse her paket repository'ye yazıldıktan **sonra**
+        ona da verilir; kayıt (`F5-032`) bu yolla beslenir. Kuyruğu ikinci
+        kez ayrı bir döngüde okumak, ekranda görünen veri ile diske yazılan
+        verinin ayrışabilmesi demek olurdu — tek döngü ikisini yapısal
+        olarak aynı tutar.
         """
         written = 0
         while limit is None or written < limit:
@@ -106,5 +120,7 @@ class LiveRunner:
             if packet is None:
                 break
             repository.ingest(packet)
+            if on_packet is not None:
+                on_packet(packet)
             written += 1
         return written

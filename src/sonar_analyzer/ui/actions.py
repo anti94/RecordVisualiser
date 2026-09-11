@@ -98,6 +98,12 @@ MENU_SPECS: tuple[MenuSpec, ...] = (
             # baglanti durumundan turetilir.
             ActionSpec("action_connect", "Connect Live Source", "Ctrl+Shift+C"),
             ActionSpec("action_disconnect", "Disconnect", "Ctrl+Shift+D", enabled=False),
+            # F5-032: kayit. Ikisi de baslangicta pasiftir — canli akis
+            # yokken kaydedilecek bir sey, kayit yokken durdurulacak bir sey
+            # yoktur. Etkinlikleri tek yerden (MainWindow._refresh_recording_state)
+            # kayit durumundan turetilir.
+            ActionSpec("action_record", "Record", "Ctrl+R", enabled=False),
+            ActionSpec("action_stop_recording", "Stop Recording", "Ctrl+Shift+R", enabled=False),
             ActionSpec("action_settings", "Settings...", "Ctrl+,"),
             ActionSpec("action_diagnostics", "Diagnostics", enabled=False),
         ),
@@ -118,6 +124,8 @@ TOOLBAR_ACTION_NAMES: tuple[str, ...] = (
     "action_export",
     "action_connect",
     "action_disconnect",
+    "action_record",
+    "action_stop_recording",
     "action_reset_layout",
     "action_settings",
 )

@@ -26,7 +26,7 @@ from sonar_analyzer.ui.status_bar import (
 
 pytestmark = pytest.mark.gui
 
-EXPECTED_FIELDS = ["status", "file", "connection", "cursor", "memory"]
+EXPECTED_FIELDS = ["status", "file", "connection", "recording", "cursor", "memory"]
 
 
 @pytest.fixture()

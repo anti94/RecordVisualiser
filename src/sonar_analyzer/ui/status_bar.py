@@ -43,6 +43,9 @@ FIELD_SPECS: tuple[tuple[str, str], ...] = (
     ("status", READY_TEXT),
     ("file", EMPTY_VALUE),
     ("connection", EMPTY_VALUE),
+    # F5-032: kayit durumu baglantinin yaninda durur — ikisi birlikte
+    # "veri geliyor mu / diske yaziliyor mu" sorusunu cevaplar.
+    ("recording", EMPTY_VALUE),
     ("cursor", EMPTY_VALUE),
 )
 

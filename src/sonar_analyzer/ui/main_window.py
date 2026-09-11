@@ -81,12 +81,14 @@ from sonar_analyzer.export.pdf_export import (
 )
 from sonar_analyzer.export.text_format import Delimiter
 from sonar_analyzer.io.live.packet_queue import BoundedPacketQueue
-from sonar_analyzer.io.live.protocol import ConnectionState, LiveSource
+from sonar_analyzer.io.live.protocol import ConnectionState, LivePacket, LiveSource
 from sonar_analyzer.io.live.ring_buffer import LiveRingBuffer
 from sonar_analyzer.io.live.sequence_tracker import SequenceStats
 from sonar_analyzer.logging.performance import measure
 from sonar_analyzer.processing.chain import ProcessingChain
 from sonar_analyzer.processing.steps import StepValidationError
+from sonar_analyzer.recording.rotation import RotatingRecorder, RotationPolicy
+from sonar_analyzer.recording.session import RecordingOutcome, RecordingState
 from sonar_analyzer.repository.derived_repository import (
     DerivedChannelError,
     DerivedChannelRepository,
@@ -105,6 +107,7 @@ from sonar_analyzer.ui.actions import (
 from sonar_analyzer.ui.cards.analysis_tools import FilterTabError
 from sonar_analyzer.ui.cards.data_export import DataExportCard
 from sonar_analyzer.ui.cards.live_status import LiveHealth
+from sonar_analyzer.ui.cards.recording_status import RecordingStatus
 from sonar_analyzer.ui.docks.bottom_panel import BottomPanelDock
 from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock, selected_channel_ids
 from sonar_analyzer.ui.docks.event_table_model import related_channels
@@ -219,6 +222,14 @@ class MainWindow(QMainWindow):
         #: Canlı çizim kendi viewport'unu güncellerken `True` — o sırada
         #: gelen `x_range_changed` kullanıcı gezinmesi sayılmaz.
         self._live_plot_updating = False
+        #: `F5-032` süren kayıt; yoksa Record eylemi pasiftir.
+        self._recorder: RotatingRecorder | None = None
+        self._recording_outcomes: list[RecordingOutcome] = []
+        #: Kayıt klasörü diyaloğu; testler gerçek diyalog açmadan
+        #: değiştirebilsin diye enjekte edilebilir. `None` iken öntanımlı
+        #: diyalog kullanılır — bağlı metodu burada tutmak pencereye kendi
+        #: üzerinden bir döngü kurar ve Qt nesnesi beklenenden geç yıkılır.
+        self.recording_directory_dialog: Callable[[], str] | None = None
         #: `F4-074` kullanıcı işaretleri; `F4-076` çalışma alanına yazar.
         self._annotations = AnnotationSet()
         #: `F4-079` zincir + işaret düzenlemelerinin undo/redo geçmişi.
@@ -424,6 +435,8 @@ class MainWindow(QMainWindow):
         # F5-019: canli baglanti eylemleri.
         self.action("action_connect").triggered.connect(self.connect_live_source)
         self.action("action_disconnect").triggered.connect(self.disconnect_live_source)
+        self.action("action_record").triggered.connect(self.prompt_start_recording)
+        self.action("action_stop_recording").triggered.connect(self.stop_recording)
 
         pairs = (
             ("action_toggle_data_explorer", self.left_dock),
@@ -667,7 +680,7 @@ class MainWindow(QMainWindow):
         runner, repository = self._live_runner, self._live_repository
         if runner is None or repository is None:
             return 0
-        written = runner.drain_into(repository, limit=limit)
+        written = runner.drain_into(repository, limit=limit, on_packet=self._record_live_packet)
         if written:
             self.refresh_live_health(
                 queue=runner.queue,
@@ -675,6 +688,9 @@ class MainWindow(QMainWindow):
                 buffer_channel=self._live_plot_channel,
             )
             self._refresh_live_plot(repository)
+            # F5-032: kayit sayaclari da ayni karede tazelenir; ekrandaki
+            # sure ile diske yazilan veri birbirini takip eder.
+            self._refresh_recording_state()
         return written
 
     def _refresh_live_plot(self, repository: LiveRepository) -> None:
@@ -827,6 +843,150 @@ class MainWindow(QMainWindow):
             self.right_dock.open_live_tab()
         else:
             self.right_dock.close_live_tab()
+        # F5-032: kayit baslatilabilirligi baglantiya bagli; ayni anda tazelenir.
+        self._refresh_recording_state()
+
+    # -- kayit (F5-032) ----------------------------------------------------
+
+    @property
+    def recording_active(self) -> bool:
+        """Kayıt sürüyor mu?"""
+        recorder = self._recorder
+        return recorder is not None and recorder.state is RecordingState.RECORDING
+
+    @property
+    def recording_outcomes(self) -> list[RecordingOutcome]:
+        """Son kaydın dosya sonuçları — `F5-030`'un sonuç nesneleri."""
+        return list(self._recording_outcomes)
+
+    def recording_status(self) -> RecordingStatus:
+        """Kartın ve durum çubuğunun **tek** veri kaynağı.
+
+        Değerlerin hepsi `RotatingRecorder`'dan okunur; arayüz hiçbirini
+        kendi saymaz, yoksa ekrandaki sayı ile dosyadaki kayıt sayısı
+        ayrışabilirdi.
+        """
+        recorder = self._recorder
+        if recorder is None:
+            return RecordingStatus()
+        return RecordingStatus(
+            state=recorder.state,
+            path=recorder.current_path or (recorder.paths[-1] if recorder.paths else None),
+            elapsed_ns=recorder.recorded_span_ns,
+            record_count=recorder.total_record_count,
+            dropped_records=recorder.total_dropped_records,
+            file_count=len(recorder.paths),
+            error=self._recording_error(recorder),
+        )
+
+    def _recording_error(self, recorder: RotatingRecorder) -> str | None:
+        for outcome in reversed(recorder.outcomes):
+            if outcome.error is not None:
+                return outcome.error
+        return None
+
+    def _default_recording_directory_dialog(self) -> str:
+        return QFileDialog.getExistingDirectory(
+            self, "Kayit klasoru sec", self._settings.last_directory or str(Path.home())
+        )
+
+    def prompt_start_recording(self) -> RotatingRecorder | None:
+        """`Record` eylemi: klasörü sorar ve kaydı başlatır — `F5-032`.
+
+        Klasör seçilmezse kayıt **başlamaz**; iptal edilen bir diyalogdan
+        sonra "kayıt başladı" demek yanlış olurdu.
+        """
+        dialog = self.recording_directory_dialog or self._default_recording_directory_dialog
+        directory = dialog()
+        if not directory:
+            return None
+        return self.start_recording(Path(directory))
+
+    def start_recording(
+        self,
+        directory: Path,
+        *,
+        base_name: str = "Data",
+        policy: RotationPolicy | None = None,
+    ) -> RotatingRecorder:
+        """`Record` eylemi: canlı akışı diske yazmaya başlar — `F5-032`.
+
+        Kayıt canlı akışa bağlıdır: kaydedilecek veri `pump_live_stream()`
+        ile aynı döngüden gelir (`LiveRunner.drain_into`'nun `on_packet`
+        kancası), bu yüzden ekranda görünen ile diske yazılan ayrışamaz.
+        """
+        if self.recording_active:
+            raise RuntimeError("Kayit zaten suruyor")
+        source = self._live_source
+        if source is None:
+            raise RuntimeError("Kayit icin once bir canli kaynak takilmali")
+
+        channel_ids = [channel.id for channel in source.channels()]
+        recorder = RotatingRecorder(directory, base_name, channel_ids, policy=policy)
+        self._recorder = recorder
+        self._recording_outcomes = []
+        self.bottom_dock.append_log(f"Kayit basladi: {directory}")
+        self._refresh_recording_state()
+        return recorder
+
+    def stop_recording(self) -> list[RecordingOutcome]:
+        """`Stop` eylemi: kaydı kapatır ve **sonucu olduğu gibi** bildirir.
+
+        `F5-030`: hata olmuşsa "başarılı" denmez; kaç dosya ve kaç kayıt
+        kurtulduğu log'a yazılır.
+        """
+        recorder = self._recorder
+        if recorder is None or not self.recording_active:
+            return []
+        outcomes = recorder.stop()
+        # Yazici BIRAKILMAZ: durdurulmus kayit da gorunur kalmali ("Durduruldu",
+        # son dosya, sure). Birakilsaydi Stop'tan hemen sonra ekran "kayit yok"
+        # derdi ve kullanicinin az once aldigi kayittan iz kalmazdi.
+        self._recording_outcomes = outcomes
+        for outcome in outcomes:
+            self.bottom_dock.append_log(outcome.message)
+        self._refresh_recording_state()
+        return outcomes
+
+    def _record_live_packet(self, packet: LivePacket) -> None:
+        """Canlı paketi süren kayda yazar; kayıt yoksa hiçbir şey yapmaz."""
+        recorder = self._recorder
+        if recorder is None or not self.recording_active:
+            return
+        try:
+            recorder.accept(packet)
+        except (OSError, ValueError) as exc:
+            # Kayit hatasi canli akisi durdurmaz; akis surerken kayit
+            # basarisiz olur ve bu ACIKCA gorunur (F5-030).
+            self.bottom_dock.append_log(f"Kayit hatasi: {exc}")
+            self.stop_recording()
+
+    def _refresh_recording_state(self) -> None:
+        """Eylemler, kart ve durum çubuğunu **aynı** kaynaktan tazeler — `F5-032`.
+
+        Kabul kriteri ("aktif dosya, geçen süre ve kayıt durumu görünür")
+        üç yüzeyde birden sağlanır ve üçü de tek bir `RecordingStatus`
+        değerinden türetilir; ayrı ayrı güncelleyen bir kod er geç
+        ayrışırdı (`_refresh_connection_state` ile aynı ilke).
+        """
+        status = self.recording_status()
+        recording = self.recording_active
+        can_start = self._live_source is not None and not recording
+
+        self.action("action_record").setEnabled(can_start)
+        self.action("action_stop_recording").setEnabled(recording)
+        self.right_dock.recording_status.update_status(status)
+        self.status.set_field("recording", self._recording_field_text(status, recording))
+
+    def _recording_field_text(self, status: RecordingStatus, recording: bool) -> str:
+        """Durum çubuğunun kısa metni; kart ile **aynı** değerlerden kurulur."""
+        if status.state is RecordingState.IDLE:
+            return ""
+        if status.state is RecordingState.FAILED:
+            return "REC HATA"
+        name = status.path.name if status.path is not None else "?"
+        prefix = "REC" if recording else "Kayit durdu"
+        return f"{prefix} {name} ({status.record_count})"
 
     # -- duzenleme gecmisi (F4-079) ----------------------------------------
 

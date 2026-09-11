@@ -37,6 +37,7 @@ from sonar_analyzer.ui.cards.analysis_tools import AnalysisToolsCard
 from sonar_analyzer.ui.cards.bit_status import BitStatusCard
 from sonar_analyzer.ui.cards.data_export import DataExportCard
 from sonar_analyzer.ui.cards.live_status import LiveStatusCard
+from sonar_analyzer.ui.cards.recording_status import RecordingStatusCard
 from sonar_analyzer.ui.docks.inspector import InspectorPanel
 
 DOCK_OBJECT_NAME = "dock_right_column"
@@ -87,6 +88,9 @@ class RightColumnDock(QDockWidget):
         self.inspector = InspectorPanel()
         #: `F5-020` canlı akış sağlığı; kendi sekmesinde durur.
         self.live_status = LiveStatusCard()
+        #: `F5-032` kayıt durumu; canlı sekmesinde sağlığın üstünde durur.
+        self.recording_status = RecordingStatusCard()
+        self.live_page = self._build_live_page()
 
         self.tabs = QTabWidget(self)
         self.tabs.setObjectName("tabs_right_column")
@@ -138,6 +142,30 @@ class RightColumnDock(QDockWidget):
         layout.addStretch(1)
         return page
 
+    def _build_live_page(self) -> QWidget:
+        """`Live` sekmesinin içeriği: kayıt durumu + akış sağlığı — `F5-032`.
+
+        İkisi aynı sekmede durur çünkü aynı soruyu tamamlar: veri geliyor
+        mu (sağlık) ve diske yazılıyor mu (kayıt).
+
+        Sayfa **ebeveynsiz** kurulur ve ebeveynini ancak sekme açılınca
+        (`open_live_tab`) alır. `QDockWidget`'a bağlanıp düzenine hiç
+        girmeyen bir alt widget, dock'un kendi düzeniyle çakışıp Qt
+        tarafında çökmeye yol açıyordu; sekme açılana kadar sahipsiz
+        durması `F5-020`'deki kart ile aynı, denenmiş ömür döngüsüdür.
+        """
+        page = QWidget()
+        page.setObjectName("page_right_live")
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(6, 6, 6, 6)
+        layout.setSpacing(8)
+        self.recording_status.setParent(page)
+        layout.addWidget(self.recording_status)
+        self.live_status.setParent(page)
+        layout.addWidget(self.live_status)
+        layout.addStretch(1)
+        return page
+
     # -- bagalamsal sekme ------------------------------------------------
 
     @property
@@ -164,7 +192,7 @@ class RightColumnDock(QDockWidget):
 
     @property
     def live_tab_is_open(self) -> bool:
-        return self.tabs.indexOf(self.live_status) >= 0
+        return self.tabs.indexOf(self.live_page) >= 0
 
     def open_live_tab(self) -> None:
         """`Live` sekmesini ekler (zaten varsa etkisiz).
@@ -174,18 +202,19 @@ class RightColumnDock(QDockWidget):
         (`docs/ui/layout-map.md`) hiç değişmez.
         """
         if not self.live_tab_is_open:
-            self.live_status.setParent(self.tabs)
-            self.tabs.addTab(self.live_status, LIVE_TAB_TITLE)
+            self.live_page.setParent(self.tabs)
+            self.tabs.addTab(self.live_page, LIVE_TAB_TITLE)
 
     def close_live_tab(self) -> None:
         """`Live` sekmesini kaldırır ve sayaçları temizler."""
-        index = self.tabs.indexOf(self.live_status)
+        index = self.tabs.indexOf(self.live_page)
         if index >= 0:
             self.tabs.removeTab(index)
             # Sekme kaldirilinca Qt widget'in ebeveynini birakiyor; nesne
             # korunsun diye yeniden sahiplenilir (close_inspector ile ayni).
-            self.live_status.setParent(self)
+            self.live_page.setParent(self)
             self.live_status.clear()
+            self.recording_status.clear()
 
     def close_inspector(self) -> None:
         """Inspector sekmesini kaldırır; kartlar yerinde kalır."""
