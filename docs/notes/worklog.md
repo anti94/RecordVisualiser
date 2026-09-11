@@ -298,8 +298,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-076` | 20 dk | 10 dk 28 sn | `d776853` | analiz oturumuna zincir ve annotation kaydını ekle |
 | `F4-077` | 20 dk | 11 dk 4 sn | `b905a06` | analiz oturumunu ve türetilmiş kanalları yükle |
 | `F4-078` | 20 dk | 12 dk 26 sn | `878ac98` | taşınmış kaynaklar için yeniden konumlandırma ekle |
+| `F4-079` | 20 dk | 12 dk 2 sn | `41ebcb1` | işlem zinciri ve annotation undo/redo ekle |
 
-**280 commit · olculen toplam 3207 dk 26 sn · olculemeyen 1 (ilk commit)**
+**281 commit · olculen toplam 3219 dk 28 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
