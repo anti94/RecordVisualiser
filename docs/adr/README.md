@@ -29,7 +29,7 @@ tetikleyici işten önce cevap bekliyor)
 | ADR-009 | Live-source / backpressure politikası | PLANLANDI | `F5-016` | `2.16.0` | Faz 5 | — |
 | ADR-010 | Native hızlandırmaya geçiş ölçütleri | **YAZILDI** | `F4-067` | `1.67.0` | Faz 4 | [`ADR-010-native-acceleration.md`](ADR-010-native-acceleration.md) |
 | ADR-011 | CRC destekleyen format sürümü | **YAZILDI** | `F0-008` | `0.8.0` | Faz 0 | [`ADR-011-crc.md`](ADR-011-crc.md) |
-| ADR-012 | Paketleme aracı ve dağıtım biçimi | PLANLANDI | `F6-001` | `3.1.0` | Faz 6 | — |
+| ADR-012 | Paketleme aracı ve dağıtım biçimi | **YAZILDI** | `F6-001` | `3.1.0` | Faz 6 | [`ADR-012-packaging.md`](ADR-012-packaging.md) |
 
 ## Her ADR'nin cevaplaması gereken soru
 

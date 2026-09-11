@@ -1812,7 +1812,7 @@ Kabul: Kurulabilir Windows paketi, dokümantasyon, sürüm artefaktları ve dağ
 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `F6-001` | `3.1.0` | 20 dk | Paketleme aracı ve dağıtım biçimi ADR'sini tamamla | PyInstaller/Nuitka seçimi spike kanıtına ve hedef Windows ortamına dayanır | `F5-041` | `docs(build): F6-001 paketleme aracı ve dağıtım biçimi ADR'sini tamamla` |
+| [x] | `F6-001` | `3.1.0` | 20 dk | Paketleme aracı ve dağıtım biçimi ADR'sini tamamla | PyInstaller/Nuitka seçimi spike kanıtına ve hedef Windows ortamına dayanır | `F5-041` | `docs(build): F6-001 paketleme aracı ve dağıtım biçimi ADR'sini tamamla` |
 | [ ] | `F6-002` | `3.2.0` | 20 dk | Windows paketleme yapılandırmasını ekle | Giriş noktası, VERSION ve gerekli kaynaklar yapılandırmada tanımlıdır | `F6-001` | `build(package): F6-002 windows paketleme yapılandırmasını ekle` |
 | [ ] | `F6-003` | `3.3.0` | 20 dk | Qt plugin, tema ve ikon kaynaklarını pakete ekle | Paketli açılışta tema, ikon ve platform plugin'i yüklenir | `F6-002` | `build(package): F6-003 qt plugin, tema ve ikon kaynaklarını pakete ekle` |
 | [ ] | `F6-004` | `3.4.0` | 20 dk | Tek komutluk paket üretim akışını ekle | Komut sürümlü çıktı klasörü ve build logu üretir | `F6-003` | `build(package): F6-004 tek komutluk paket üretim akışını ekle` |
@@ -2035,7 +2035,7 @@ Aşağıdaki kararlar kısa ADR belgeleriyle kaydedilmelidir:
 - ADR-009: Live-source/backpressure politikası.
 - ADR-010: Native hızlandırmaya geçiş ölçütleri (`docs/adr/ADR-010-native-acceleration.md`, `F4-067`).
 - ADR-011: CRC destekleyen format sürümü (`docs/adr/ADR-011-crc.md`, `F0-008`).
-- ADR-012: Paketleme aracı ve dağıtım biçimi (`F6-001`).
+- ADR-012: Paketleme aracı ve dağıtım biçimi (`docs/adr/ADR-012-packaging.md`, `F6-001`).
 
 ADR'lerin iş, sürüm ve faz eşlemesi: `docs/adr/README.md` (`F0-016`).
 
