@@ -1747,7 +1747,7 @@ Kabul: UDP/TCP/serial akışı, bağlantı durumu, canlı grafik, kayıt ve tekr
 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `F5-001` | `2.1.0` | 20 dk | Canlı paket ve bağlantı sözleşmesini tamamla | Paket sınırı, endian, zaman kaynağı ve kayıp politikası her protokol için tanımlıdır | `F4-090` | `docs(live): F5-001 canlı paket ve bağlantı sözleşmesini tamamla` |
+| [x] | `F5-001` | `2.1.0` | 20 dk | Canlı paket ve bağlantı sözleşmesini tamamla | Paket sınırı, endian, zaman kaynağı ve kayıp politikası her protokol için tanımlıdır | `F4-090` | `docs(live): F5-001 canlı paket ve bağlantı sözleşmesini tamamla` |
 | [ ] | `F5-002` | `2.2.0` | 20 dk | Bağlantı durum makinesini ekle | Disconnected, connecting, connected, degraded ve error geçişleri doğrulanır | `F5-001` | `feat(live): F5-002 bağlantı durum makinesini ekle` |
 | [ ] | `F5-003` | `2.3.0` | 20 dk | Dosyadan LiveSource replay adaptörünü ekle | 125 ms kayıtlar seçilen hızla aynı domain akışını üretir | `F5-002` | `feat(live): F5-003 dosyadan LiveSource replay adaptörünü ekle` |
 | [ ] | `F5-004` | `2.4.0` | 20 dk | Replay zamanlama ve durdurmayı doğrula | Pause/stop sonrası beklenmeyen paket yayınlanmaz | `F5-003` | `test(live): F5-004 replay zamanlama ve durdurmayı doğrula` |
