@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 498 madde · 312 tamamlandı · 186 kaldı**
+**Toplam 498 madde · 313 tamamlandı · 185 kaldı**
 
-`[###############.........]` %62.7
+`[###############.........]` %62.9
 
 ## Özet
 
@@ -39,10 +39,10 @@ Work in fully autonomous mode.
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
-| Faz 5 — Canlı veri, bağlantı ve kayıt | 16 | 25 | 41 |
+| Faz 5 — Canlı veri, bağlantı ve kayıt | 17 | 24 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **312** | **186** | **498** |
+| **Toplam** | **313** | **185** | **498** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -349,7 +349,7 @@ Work in fully autonomous mode.
 | [x] | `F4-096` | `1.95.0` | 20 dk | Özet ve akış düzeltmeleri sonrası performansı doğrula |
 | [x] | `F4-090` | `2.0.0` | 15 dk | Analiz milestone kabulünü kapat ve major sürümü hazırla |
 
-### Faz 5 — Canlı veri, bağlantı ve kayıt (16/41)
+### Faz 5 — Canlı veri, bağlantı ve kayıt (17/41)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -369,7 +369,7 @@ Work in fully autonomous mode.
 | [x] | `F5-014` | `2.14.0` | 20 dk | Sabit kapasiteli ring buffer ekle |
 | [x] | `F5-015` | `2.15.0` | 20 dk | Zaman penceresine göre buffer sorgula |
 | [x] | `F5-016` | `2.16.0` | 20 dk | Kuyruk sınırı ve drop politikasını uygula |
-| [ ] | `F5-017` | `2.17.0` | 20 dk | Sınırlı otomatik yeniden bağlanma ekle |
+| [x] | `F5-017` | `2.17.0` | 20 dk | Sınırlı otomatik yeniden bağlanma ekle |
 | [ ] | `F5-018` | `2.18.0` | 20 dk | Bağlantı ve buffer ayarlarını kaydet |
 | [ ] | `F5-019` | `2.19.0` | 20 dk | Connect ve Disconnect eylemlerini bağla |
 | [ ] | `F5-020` | `2.20.0` | 20 dk | Paket kaybı, kuyruk ve buffer durumunu göster |

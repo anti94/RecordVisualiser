@@ -331,8 +331,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F5-013` | 20 dk | 12 dk 30 sn | `d6a1f5e` | canlı cihaz zamanını kanonik zamana bağla |
 | `F5-014` | 20 dk | 7 dk 49 sn | `2419608` | sabit kapasiteli ring buffer ekle |
 | `F5-015` | 20 dk | 7 dk 17 sn | `211f407` | zaman penceresine göre buffer sorgula |
+| `F5-016` | 20 dk | 8 dk 9 sn | `b083765` | kuyruk sınırı ve drop politikasını uygula |
 
-**313 commit · olculen toplam 3607 dk 51 sn · olculemeyen 1 (ilk commit)**
+**314 commit · olculen toplam 3616 dk 0 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
