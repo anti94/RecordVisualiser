@@ -335,8 +335,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F5-017` | 20 dk | 6 dk 56 sn | `953a1ab` | sınırlı otomatik yeniden bağlanma ekle |
 | `F5-018` | 20 dk | 13 dk 15 sn | `3928614` | bağlantı ve buffer ayarlarını kaydet |
 | `F5-019` | 20 dk | 13 dk 42 sn | `5f09d0d` | connect ve Disconnect eylemlerini bağla |
+| `F5-020` | 20 dk | 37 dk 49 sn | `f56d4f9` | paket kaybı, kuyruk ve buffer durumunu göster |
 
-**317 commit · olculen toplam 3649 dk 53 sn · olculemeyen 1 (ilk commit)**
+**318 commit · olculen toplam 3687 dk 42 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
