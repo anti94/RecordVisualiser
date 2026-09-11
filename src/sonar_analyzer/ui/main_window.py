@@ -346,6 +346,8 @@ class MainWindow(QMainWindow):
         self._refresh_connection_state()
 
         self.playback_dock.position_changed.connect(self.status.set_cursor_time)
+        # F5-024: playback baslarsa canli akis durur (karsi yon).
+        self.playback_dock.play_toggled.connect(self._on_play_toggled_for_live)
         self.playback_dock.timeline.viewport_changed.connect(self._on_timeline_viewport_changed)
         # F3-059: önceki/sonraki olaya atlayınca grafiği o zamana götür ve
         # olayı Inspector'da göster.
@@ -591,6 +593,36 @@ class MainWindow(QMainWindow):
         source = self._live_source
         return ConnectionState.DISCONNECTED if source is None else source.state
 
+    # -- canli / playback mod denetimi (F5-024) ----------------------------
+
+    @property
+    def live_mode(self) -> bool:
+        """Canlı akış sürüyor mu? Sürüyorsa playback saati ilerlemez."""
+        return self._live_runner is not None
+
+    def _stop_playback_for_live(self) -> None:
+        """Canlı akış başlarken playback saatini durdurur — `F5-024`.
+
+        İki saatin aynı grafiği eşzamanlı ilerletmesi, kullanıcının
+        gördüğü zamanın hangi kaynaktan geldiğini belirsizleştirir; bu
+        yüzden geçiş **sessizce** değil, biri durdurularak yapılır.
+        """
+        button = self.playback_dock.buttons["button_play"]
+        if button.isChecked():
+            button.setChecked(False)  # playback duraklatilir
+            self.bottom_dock.append_log("Canli akis basladi: playback duraklatildi.")
+        button.setEnabled(False)
+
+    def _release_playback_after_live(self) -> None:
+        """Canlı akış bitince playback kontrolünü geri verir."""
+        self.playback_dock.buttons["button_play"].setEnabled(True)
+
+    def _on_play_toggled_for_live(self, playing: bool) -> None:
+        """Playback başlarsa canlı akış durdurulur — `F5-024`'ün diğer yönü."""
+        if playing and self.live_mode:
+            self.stop_live_stream()
+            self.bottom_dock.append_log("Playback basladi: canli akis durduruldu.")
+
     def start_live_stream(
         self,
         *,
@@ -610,6 +642,9 @@ class MainWindow(QMainWindow):
         self._live_repository = LiveRepository(
             LiveRingBuffer(capacity_samples=buffer_capacity), channels=source.channels()
         )
+        # F5-024: canli akis baslarken playback saati durdurulur; iki saat
+        # ayni grafigi es zamanli ilerletemez.
+        self._stop_playback_for_live()
         self._live_runner = LiveRunner(queue_maxsize=queue_maxsize)
         reader = self._live_runner.start(source)
         reader.failed.connect(self._on_live_read_failed)
@@ -620,6 +655,7 @@ class MainWindow(QMainWindow):
         if self._live_runner is not None:
             self._live_runner.stop()
             self._live_runner = None
+        self._release_playback_after_live()
 
     def pump_live_stream(self, *, limit: int | None = 64) -> int:
         """Kuyruğu boşaltıp grafiği tazeler; **yazılan paket** sayısını döner.

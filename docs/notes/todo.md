@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 498 madde · 319 tamamlandı · 179 kaldı**
+**Toplam 498 madde · 320 tamamlandı · 178 kaldı**
 
-`[###############.........]` %64.1
+`[###############.........]` %64.3
 
 ## Özet
 
@@ -39,10 +39,10 @@ Work in fully autonomous mode.
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
-| Faz 5 — Canlı veri, bağlantı ve kayıt | 23 | 18 | 41 |
+| Faz 5 — Canlı veri, bağlantı ve kayıt | 24 | 17 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **319** | **179** | **498** |
+| **Toplam** | **320** | **178** | **498** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -349,7 +349,7 @@ Work in fully autonomous mode.
 | [x] | `F4-096` | `1.95.0` | 20 dk | Özet ve akış düzeltmeleri sonrası performansı doğrula |
 | [x] | `F4-090` | `2.0.0` | 15 dk | Analiz milestone kabulünü kapat ve major sürümü hazırla |
 
-### Faz 5 — Canlı veri, bağlantı ve kayıt (23/41)
+### Faz 5 — Canlı veri, bağlantı ve kayıt (24/41)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -376,7 +376,7 @@ Work in fully autonomous mode.
 | [x] | `F5-021` | `2.21.0` | 20 dk | Canlı akışı ortak repository'ye bağla |
 | [x] | `F5-022` | `2.22.0` | 20 dk | Canlı veriyi mevcut grafik panellerine bağla |
 | [x] | `F5-023` | `2.23.0` | 15 dk | Canlı sona takip etme ve sabit aralık seçimini ekle |
-| [ ] | `F5-024` | `2.24.0` | 20 dk | Canlı ve playback mod geçişlerini denetle |
+| [x] | `F5-024` | `2.24.0` | 20 dk | Canlı ve playback mod geçişlerini denetle |
 | [ ] | `F5-025` | `2.25.0` | 20 dk | Sürümlü dosya header yazıcısını ekle |
 | [ ] | `F5-026` | `2.26.0` | 20 dk | Data kayıt serileştirmesini ekle |
 | [ ] | `F5-027` | `2.27.0` | 20 dk | 125 ms kayıt biriktirme sınırlarını ekle |
