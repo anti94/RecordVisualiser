@@ -339,8 +339,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F5-021` | 20 dk | 6 dk 47 sn | `b9acdac` | canlı akışı ortak repository'ye bağla |
 | `F5-022` | 20 dk | 14 dk 57 sn | `f038866` | canlı veriyi mevcut grafik panellerine bağla |
 | `F5-023` | 15 dk | 9 dk 57 sn | `ed3af4f` | canlı sona takip etme ve sabit aralık seçimini ekle |
+| `F5-024` | 20 dk | 6 dk 34 sn | `735858f` | canlı ve playback mod geçişlerini denetle |
 
-**321 commit · olculen toplam 3719 dk 23 sn · olculemeyen 1 (ilk commit)**
+**322 commit · olculen toplam 3725 dk 57 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
