@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 495 madde · 291 tamamlandı · 204 kaldı**
+**Toplam 498 madde · 292 tamamlandı · 206 kaldı**
 
-`[##############..........]` %58.8
+`[##############..........]` %58.6
 
 ## Özet
 
@@ -38,11 +38,11 @@ Work in fully autonomous mode.
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
-| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 91 | 2 | 93 |
+| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 92 | 4 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **291** | **204** | **495** |
+| **Toplam** | **292** | **206** | **498** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -248,7 +248,7 @@ Work in fully autonomous mode.
 | [x] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır |
 | [x] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla |
 
-### Faz 4 — Mockup analiz panosu ve büyük veri performansı (91/93)
+### Faz 4 — Mockup analiz panosu ve büyük veri performansı (92/96)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -343,7 +343,10 @@ Work in fully autonomous mode.
 | [x] | `F4-089` | `1.89.0` | 20 dk | Çalışan analiz panosunu mockup ile karşılaştır |
 | [x] | `F4-091` | `1.90.0` | 20 dk | Profil B kayıt indeksini kur |
 | [x] | `F4-092` | `1.91.0` | 20 dk | Profil B zaman sorgusunu indeksle sınırla |
-| [ ] | `F4-093` | `1.92.0` | 20 dk | Büyük dosya koşusunu tekrarla ve kararı güncelle |
+| [x] | `F4-093` | `1.92.0` | 20 dk | Büyük dosya koşusunu tekrarla ve kararı güncelle |
+| [ ] | `F4-094` | `1.93.0` | 20 dk | Özet piramidini NumPy blok işlemleriyle hızlandır |
+| [ ] | `F4-095` | `1.94.0` | 20 dk | Büyük çizim aralıklarını sınırlı bellekle indirgeme |
+| [ ] | `F4-096` | `1.95.0` | 20 dk | Özet ve akış düzeltmeleri sonrası performansı doğrula |
 | [ ] | `F4-090` | `2.0.0` | 15 dk | Analiz milestone kabulünü kapat ve major sürümü hazırla |
 
 ### Faz 5 — Canlı veri, bağlantı ve kayıt (0/41)
@@ -594,38 +597,38 @@ Work in fully autonomous mode.
 
 ### 23. MVP “Definition of Done”
 
-- [x] Ana ekran referans mockup'ın dokuz bölgesini, üç sütunlu düzenini ve panel hiyerarşisini karşılıyor.  <sub>plan.md:1914</sub>
-- [x] Sağ BIT genel özeti alt sistem durumlarıyla tutarlı; gerçek veri ile simülasyon ayırt ediliyor.  <sub>plan.md:1915</sub>
-- [x] FFT/spektrogram gibi v2 işlevleri MVP'de açıklamalı pasif durumda; tamamlanmamış işlev başarılı sonuç göstermez.  <sub>plan.md:1916</sub>
-- [x] Desteklenen `.bin` dosyası salt okunur biçimde güvenilir açılıyor.  <sub>plan.md:1917</sub>
-- [x] Parser sonuçları referans kayıtlarla doğrulanmış.  <sub>plan.md:1918</sub>
-- [x] Kanal ağacı binlerce öğede kullanılabilir hızda çalışıyor.  <sub>plan.md:1919</sub>
-- [x] Kullanıcı kanalları grafiğe ekleyip kaldırabiliyor.  <sub>plan.md:1920</sub>
-- [x] Birden fazla grafik ortak X zaman ekseninde senkronize olabiliyor.  <sub>plan.md:1921</sub>
-- [x] X, Y ve XY zoom davranışları tutarlı.  <sub>plan.md:1922</sub>
-- [x] Cursor ve region ölçümleri doğru.  <sub>plan.md:1923</sub>
-- [x] BIT/event satırından grafikte aynı zamana gidiliyor.  <sub>plan.md:1924</sub>
-- [x] TX aralıkları ve kritik olaylar grafik üzerinde gösteriliyor.  <sub>plan.md:1925</sub>
-- [x] Uzun işler UI’ı dondurmuyor ve iptal edilebiliyor.  <sub>plan.md:1926</sub>
-- [x] PNG ve CSV dışa aktarma metadata ile çalışıyor.  <sub>plan.md:1927</sub>
-- [x] Workspace kaydet/aç işlevi temel düzeni koruyor.  <sub>plan.md:1928</sub>
-- [x] Kritik unit/integration/GUI testleri CI’da geçiyor.  <sub>plan.md:1929</sub>
-- [x] Desteklenen Windows ölçeklemelerinde arayüz bozulmuyor.  <sub>plan.md:1930</sub>
-- [x] Bilinen kritik hata bulunmuyor; diğer bilinen sorunlar release notes’ta yer alıyor.  <sub>plan.md:1931</sub>
+- [x] Ana ekran referans mockup'ın dokuz bölgesini, üç sütunlu düzenini ve panel hiyerarşisini karşılıyor.  <sub>plan.md:1917</sub>
+- [x] Sağ BIT genel özeti alt sistem durumlarıyla tutarlı; gerçek veri ile simülasyon ayırt ediliyor.  <sub>plan.md:1918</sub>
+- [x] FFT/spektrogram gibi v2 işlevleri MVP'de açıklamalı pasif durumda; tamamlanmamış işlev başarılı sonuç göstermez.  <sub>plan.md:1919</sub>
+- [x] Desteklenen `.bin` dosyası salt okunur biçimde güvenilir açılıyor.  <sub>plan.md:1920</sub>
+- [x] Parser sonuçları referans kayıtlarla doğrulanmış.  <sub>plan.md:1921</sub>
+- [x] Kanal ağacı binlerce öğede kullanılabilir hızda çalışıyor.  <sub>plan.md:1922</sub>
+- [x] Kullanıcı kanalları grafiğe ekleyip kaldırabiliyor.  <sub>plan.md:1923</sub>
+- [x] Birden fazla grafik ortak X zaman ekseninde senkronize olabiliyor.  <sub>plan.md:1924</sub>
+- [x] X, Y ve XY zoom davranışları tutarlı.  <sub>plan.md:1925</sub>
+- [x] Cursor ve region ölçümleri doğru.  <sub>plan.md:1926</sub>
+- [x] BIT/event satırından grafikte aynı zamana gidiliyor.  <sub>plan.md:1927</sub>
+- [x] TX aralıkları ve kritik olaylar grafik üzerinde gösteriliyor.  <sub>plan.md:1928</sub>
+- [x] Uzun işler UI’ı dondurmuyor ve iptal edilebiliyor.  <sub>plan.md:1929</sub>
+- [x] PNG ve CSV dışa aktarma metadata ile çalışıyor.  <sub>plan.md:1930</sub>
+- [x] Workspace kaydet/aç işlevi temel düzeni koruyor.  <sub>plan.md:1931</sub>
+- [x] Kritik unit/integration/GUI testleri CI’da geçiyor.  <sub>plan.md:1932</sub>
+- [x] Desteklenen Windows ölçeklemelerinde arayüz bozulmuyor.  <sub>plan.md:1933</sub>
+- [x] Bilinen kritik hata bulunmuyor; diğer bilinen sorunlar release notes’ta yer alıyor.  <sub>plan.md:1934</sub>
 
 ### 25. Açık kararlar
 
-- [ ] `.bin` format dokümanı ve örnek dosyalar mevcut mu?  <sub>plan.md:1952</sub>
-- [ ] En büyük tipik dosya boyutu ve kayıt süresi nedir?  <sub>plan.md:1953</sub>
-- [ ] Maksimum kanal sayısı ve kanal başına en yüksek sample rate nedir?  <sub>plan.md:1954</sub>
-- [ ] Timestamp tek kaynaktan mı geliyor; cihazlar arasında clock drift var mı?  <sub>plan.md:1955</sub>
-- [ ] BIT sonuçları anlık event mi, periyodik status mü, ikisi birden mi?  <sub>plan.md:1956</sub>
-- [ ] Transmisyon verisinin alanları ve START/STOP ilişkilendirmesi nedir?  <sub>plan.md:1957</sub>
-- [ ] Canlı veri hangi protokol ve bant genişliğiyle gelecek?  <sub>plan.md:1958</sub>
-- [ ] Hedef bilgisayar CPU, RAM, GPU ve monitör çözünürlüğü nedir?  <sub>plan.md:1959</sub>
-- [ ] Uygulamanın offline/air-gapped ortamda çalışması gerekiyor mu?  <sub>plan.md:1960</sub>
-- [ ] Verinin güvenlik sınıfı ve log/export kısıtları var mı?  <sub>plan.md:1961</sub>
-- [ ] Birden fazla kayıt zaman hizalı olarak karşılaştırılacak mı?  <sub>plan.md:1962</sub>
-- [ ] MATLAB’daki hangi analiz/etkileşim davranışları birebir bekleniyor?  <sub>plan.md:1963</sub>
-- [ ] Rapor çıktısı resmi test kanıtı sayılacak mı?  <sub>plan.md:1964</sub>
-- [ ] Arayüz yalnız İngilizce mi, Türkçe/İngilizce mi olacak?  <sub>plan.md:1965</sub>
+- [ ] `.bin` format dokümanı ve örnek dosyalar mevcut mu?  <sub>plan.md:1955</sub>
+- [ ] En büyük tipik dosya boyutu ve kayıt süresi nedir?  <sub>plan.md:1956</sub>
+- [ ] Maksimum kanal sayısı ve kanal başına en yüksek sample rate nedir?  <sub>plan.md:1957</sub>
+- [ ] Timestamp tek kaynaktan mı geliyor; cihazlar arasında clock drift var mı?  <sub>plan.md:1958</sub>
+- [ ] BIT sonuçları anlık event mi, periyodik status mü, ikisi birden mi?  <sub>plan.md:1959</sub>
+- [ ] Transmisyon verisinin alanları ve START/STOP ilişkilendirmesi nedir?  <sub>plan.md:1960</sub>
+- [ ] Canlı veri hangi protokol ve bant genişliğiyle gelecek?  <sub>plan.md:1961</sub>
+- [ ] Hedef bilgisayar CPU, RAM, GPU ve monitör çözünürlüğü nedir?  <sub>plan.md:1962</sub>
+- [ ] Uygulamanın offline/air-gapped ortamda çalışması gerekiyor mu?  <sub>plan.md:1963</sub>
+- [ ] Verinin güvenlik sınıfı ve log/export kısıtları var mı?  <sub>plan.md:1964</sub>
+- [ ] Birden fazla kayıt zaman hizalı olarak karşılaştırılacak mı?  <sub>plan.md:1965</sub>
+- [ ] MATLAB’daki hangi analiz/etkileşim davranışları birebir bekleniyor?  <sub>plan.md:1966</sub>
+- [ ] Rapor çıktısı resmi test kanıtı sayılacak mı?  <sub>plan.md:1967</sub>
+- [ ] Arayüz yalnız İngilizce mi, Türkçe/İngilizce mi olacak?  <sub>plan.md:1968</sub>

@@ -285,10 +285,11 @@ def test_the_markdown_has_one_row_per_target() -> None:
 # --------------------------------------------------------------------------- #
 
 
-def test_the_recorded_verdict_matches_the_recorded_run() -> None:
+@pytest.mark.parametrize("stem", ["large-file", "large-file-indexed"])
+def test_the_recorded_verdict_matches_the_recorded_run(stem: str) -> None:
     """Depodaki karar, depodaki ölçümden **yeniden üretilebilir**."""
-    run = json.loads(RUN_PATH.read_text(encoding="utf-8"))
-    recorded = json.loads(VERDICT_PATH.read_text(encoding="utf-8"))
+    run = json.loads((RESULTS / f"{stem}.json").read_text(encoding="utf-8"))
+    recorded = json.loads((RESULTS / f"{stem}-verdict.json").read_text(encoding="utf-8"))
     assert evaluate(run) == recorded
 
 

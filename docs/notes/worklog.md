@@ -310,8 +310,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-088` | 20 dk | 10 dk 54 sn | `35a2eb4` | kaydet/aç sonrası analiz tekrarını doğrula |
 | `F4-089` | 20 dk | 14 dk 53 sn | `374b0a1` | çalışan analiz panosunu mockup ile karşılaştır |
 | `F4-091` | 20 dk | 21 dk 30 sn | `c6f084e` | profil B kayıt indeksini kur |
+| `F4-092` | 20 dk | 9 dk 45 sn | `c3f559e` | profil B zaman sorgusunu indeksle sınırla |
 
-**292 commit · olculen toplam 3390 dk 59 sn · olculemeyen 1 (ilk commit)**
+**293 commit · olculen toplam 3400 dk 44 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

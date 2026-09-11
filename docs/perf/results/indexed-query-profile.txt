@@ -1,0 +1,23 @@
+         427040 function calls in 0.236 seconds
+
+   Ordered by: cumulative time
+   List reduced from 120 to 15 due to restriction <15>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        5    0.000    0.000    0.242    0.048 display_query.py:136(query)
+        5    0.001    0.000    0.242    0.048 display_query.py:147(_query)
+        5    0.001    0.000    0.221    0.044 display_query.py:30(__init__)
+        5    0.007    0.001    0.219    0.044 summary_pyramid.py:59(build_summary_pyramid)
+    10010    0.065    0.000    0.189    0.000 downsampling.py:11(extrema_indices)
+        5    0.016    0.003    0.158    0.032 summary_pyramid.py:74(<listcomp>)
+    20020    0.020    0.000    0.067    0.000 numeric.py:658(flatnonzero)
+    40085    0.016    0.000    0.048    0.000 fromnumeric.py:51(_wrapfunc)
+    20020    0.006    0.000    0.025    0.000 fromnumeric.py:1959(nonzero)
+    10010    0.006    0.000    0.021    0.000 fromnumeric.py:1208(argmax)
+    10010    0.006    0.000    0.019    0.000 fromnumeric.py:1305(argmin)
+    20020    0.010    0.000    0.019    0.000 fromnumeric.py:1846(ravel)
+    20020    0.010    0.000    0.010    0.000 {method 'nonzero' of 'numpy.ndarray' objects}
+    10010    0.010    0.000    0.010    0.000 {method 'argmax' of 'numpy.ndarray' objects}
+    10015    0.008    0.000    0.008    0.000 {built-in method numpy.array}
+
+
