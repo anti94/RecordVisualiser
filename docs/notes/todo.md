@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 277 tamamlandı · 215 kaldı**
+**Toplam 492 madde · 278 tamamlandı · 214 kaldı**
 
-`[##############..........]` %56.3
+`[##############..........]` %56.5
 
 ## Özet
 
@@ -38,11 +38,11 @@ Work in fully autonomous mode.
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
-| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 77 | 13 | 90 |
+| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 78 | 12 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **277** | **215** | **492** |
+| **Toplam** | **278** | **214** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -248,7 +248,7 @@ Work in fully autonomous mode.
 | [x] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır |
 | [x] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla |
 
-### Faz 4 — Mockup analiz panosu ve büyük veri performansı (77/90)
+### Faz 4 — Mockup analiz panosu ve büyük veri performansı (78/90)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -329,7 +329,7 @@ Work in fully autonomous mode.
 | [x] | `F4-075` | `1.75.0` | 20 dk | Bookmark ekleme, düzenleme ve silmeyi bağla |
 | [x] | `F4-076` | `1.76.0` | 20 dk | Analiz oturumuna zincir ve annotation kaydını ekle |
 | [x] | `F4-077` | `1.77.0` | 20 dk | Analiz oturumunu ve türetilmiş kanalları yükle |
-| [ ] | `F4-078` | `1.78.0` | 20 dk | Taşınmış kaynaklar için yeniden konumlandırma ekle |
+| [x] | `F4-078` | `1.78.0` | 20 dk | Taşınmış kaynaklar için yeniden konumlandırma ekle |
 | [ ] | `F4-079` | `1.79.0` | 20 dk | İşlem zinciri ve annotation undo/redo ekle |
 | [ ] | `F4-080` | `1.80.0` | 20 dk | BIT durum süresi ve değişim trendini hesapla |
 | [ ] | `F4-081` | `1.81.0` | 20 dk | BIT/Status trend görünümünü ekle |

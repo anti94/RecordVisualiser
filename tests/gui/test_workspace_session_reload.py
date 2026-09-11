@@ -105,8 +105,9 @@ def _derived_values(win: MainWindow, name: str) -> NDArray[Any]:
 # --------------------------------------------------------------------------- #
 
 
-def test_the_schema_version_moved_to_three() -> None:
-    assert WORKSPACE_SCHEMA_VERSION == 3
+def test_the_processing_chain_arrived_in_schema_version_three() -> None:
+    """Zincir v3 ile geldi; sonraki sürümler üstüne ekler."""
+    assert WORKSPACE_SCHEMA_VERSION >= 3
 
 
 def test_the_document_carries_the_processing_chain() -> None:
@@ -124,7 +125,7 @@ def test_a_version_two_document_migrates_without_losing_anything() -> None:
         "series_styles": {},
     }
     migrated = migrate_document(legacy)
-    assert migrated["schema_version"] == 3
+    assert migrated["schema_version"] == WORKSPACE_SCHEMA_VERSION
     assert migrated["processing_chain"] == []
     assert migrated["source_paths"] == ["kayit.bin"]
 
@@ -132,7 +133,7 @@ def test_a_version_two_document_migrates_without_losing_anything() -> None:
 def test_a_v0_document_still_reaches_the_current_version() -> None:
     legacy: dict[str, object] = {"schema_version": 0, "open_files": ["a.bin"], "panels": []}
     model = WorkspaceModel.from_dict(migrate_document(legacy))
-    assert model.schema_version == 3
+    assert model.schema_version == WORKSPACE_SCHEMA_VERSION
     assert model.processing_chain == []
 
 

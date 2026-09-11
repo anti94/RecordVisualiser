@@ -118,6 +118,12 @@ from sonar_analyzer.workspace.model import (
     WorkspaceModel,
 )
 from sonar_analyzer.workspace.resolve import resolve_sources
+from sonar_analyzer.workspace.source_identity import (
+    RelocationError,
+    SourceIdentity,
+    identity_for_path,
+    verify_relocation,
+)
 from sonar_analyzer.workspace.store import load_workspace, save_workspace
 
 logger = logging.getLogger("sonar_analyzer")
@@ -919,7 +925,23 @@ class MainWindow(QMainWindow):
             annotations=self._annotations.to_list(),
             series_styles=self._captured_series_styles(),
             processing_chain=self.right_dock.analysis_tools.step_editor.chain().to_list(),
+            source_identities=self._captured_source_identities(source_paths),
         )
+
+    def _captured_source_identities(self, source_paths: list[str]) -> dict[str, dict[str, object]]:
+        """Her kaynağın ucuz kimliği — `F4-078` yeniden konumlandırma için.
+
+        Okunamayan bir kaynak (silinmiş, kilitli) kimliksiz kalır; bu
+        kaydı engellemez ama o kaynak sonradan doğrulanamaz ve
+        `relocate_source` bunu açıkça söyler.
+        """
+        identities: dict[str, dict[str, object]] = {}
+        for path in source_paths:
+            try:
+                identities[path] = identity_for_path(path).to_dict()
+            except RelocationError as exc:
+                self.bottom_dock.append_log(f"Kaynak kimliği alınamadı: {exc}")
+        return identities
 
     def _captured_derived_channels(self) -> list[dict[str, object]]:
         """Türetilmiş kanal tarifleri — `F4-076` ("işlemler")."""
@@ -1053,6 +1075,42 @@ class MainWindow(QMainWindow):
         self.apply_workspace(model)
         self.bottom_dock.append_log(f"Workspace yuklendi: {Path(path)}")
         return model
+
+    def relocate_source(
+        self, model: WorkspaceModel, missing_path: str, new_path: str | Path
+    ) -> WorkspaceModel:
+        """Taşınmış bir kaynağı yeni konumuna bağlar — `F4-078`.
+
+        Yeni dosya kaydedilmiş **kaynak kimliğiyle** doğrulanır; eşleşmezse
+        `RelocationError` nedeni söyleyerek yükselir ve model değişmez —
+        yanlış dosya sessizce bağlanmaz (kabul kriteri).
+
+        Kaydedilmiş kimlik yoksa (v3 ve öncesi belgeler) bağlama
+        **reddedilir**: doğrulanamayan bir eşleşmeyi sessizce kabul etmek
+        tam da bu işin engellemek istediği şeydir.
+        """
+        if missing_path not in model.source_paths:
+            raise RelocationError(f"Bu çalışma alanında böyle bir kaynak yok: {missing_path}")
+        record = model.source_identities.get(missing_path)
+        if record is None:
+            raise RelocationError(
+                f"{Path(missing_path).name} için kayıtlı kimlik yok (eski çalışma alanı); "
+                f"doğrulanamayan dosya bağlanmaz. Kaydı yeniden açıp oturumu kaydedin."
+            )
+        expected = SourceIdentity.from_dict(record)
+        verify_relocation(expected, new_path)
+
+        target = str(Path(new_path))
+        paths = [target if item == missing_path else item for item in model.source_paths]
+        identities = {
+            (target if key == missing_path else key): value
+            for key, value in model.source_identities.items()
+        }
+        self.bottom_dock.append_log(f"Kaynak yeniden konumlandırıldı: {missing_path} -> {target}")
+        self.last_missing_sources = [
+            item for item in self.last_missing_sources if item != missing_path
+        ]
+        return replace(model, source_paths=paths, source_identities=identities)
 
     def apply_workspace(self, model: WorkspaceModel) -> None:
         """`model`'deki düzen + görünüm durumunu açık kayda uygular — `F3-069`."""

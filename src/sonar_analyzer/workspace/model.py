@@ -23,7 +23,7 @@ from dataclasses import dataclass, field, replace
 from typing import cast
 
 #: Bu kod tabanının yazdığı workspace şema sürümü.
-WORKSPACE_SCHEMA_VERSION = 3
+WORKSPACE_SCHEMA_VERSION = 4
 
 #: Grafik çalışma alanı yerleşimi (bkz. `ui/plots/plot_workspace.py`).
 LAYOUT_MODES: tuple[str, ...] = ("tabs", "split")
@@ -352,6 +352,19 @@ def _empty_records() -> list[dict[str, object]]:
     return []
 
 
+def _empty_identities() -> dict[str, dict[str, object]]:
+    return {}
+
+
+def _identity_map(value: object) -> dict[str, dict[str, object]]:
+    """`{kaynak_yolu: kimlik}` eşlemesi — `F4-078`; içerik sahibi domain."""
+    data = _as_dict(value, "WorkspaceModel.source_identities")
+    return {
+        str(path): _as_dict(record, "WorkspaceModel.source_identities")
+        for path, record in data.items()
+    }
+
+
 def _record_list(value: object, where: str) -> list[dict[str, object]]:
     """Opak kayıt listesi: her öğe bir nesne olmalı, içeriği sahibi doğrular."""
     if not isinstance(value, list):
@@ -391,6 +404,9 @@ class WorkspaceModel:
     #: `F4-077` — Custom sekmesindeki işlem zinciri (`ProcessingChain.to_list()`).
     #: Oturum yeniden açıldığında **aynı sonucu** üretmesi için saklanır.
     processing_chain: list[dict[str, object]] = field(default_factory=_empty_records)
+    #: `F4-078` — kaynak yolundan kimliğine eşleme (`SourceIdentity.to_dict()`).
+    #: Taşınmış bir dosyanın yerine gösterilen dosya bununla doğrulanır.
+    source_identities: dict[str, dict[str, object]] = field(default_factory=_empty_identities)
     schema_version: int = WORKSPACE_SCHEMA_VERSION
 
     def __post_init__(self) -> None:
@@ -428,6 +444,9 @@ class WorkspaceModel:
                 channel_id: style.to_dict() for channel_id, style in self.series_styles.items()
             },
             "processing_chain": [dict(record) for record in self.processing_chain],
+            "source_identities": {
+                path: dict(record) for path, record in self.source_identities.items()
+            },
         }
 
     def dumps(self, *, indent: int | None = 2) -> str:
@@ -480,6 +499,7 @@ class WorkspaceModel:
             processing_chain=_record_list(
                 data.get("processing_chain", []), "WorkspaceModel.processing_chain"
             ),
+            source_identities=_identity_map(data.get("source_identities", {})),
             schema_version=version,
         )
 

@@ -97,11 +97,26 @@ def _migrate_2_to_3(doc: dict[str, object]) -> dict[str, object]:
     return migrated
 
 
+def _migrate_3_to_4(doc: dict[str, object]) -> dict[str, object]:
+    """v3'ü v4'e taşır — `F4-078`.
+
+    v4 tek alan ekler: `source_identities` (taşınmış kaynakların
+    doğrulanması için yol -> kimlik eşlemesi). v3 belgelerinde yoktur;
+    boş eşlemeyle doldurulur. Kimliği olmayan bir kaynak yeniden
+    konumlandırılırken doğrulanamaz ve bu açıkça söylenir.
+    """
+    migrated = dict(doc)
+    migrated["schema_version"] = 4
+    migrated.setdefault("source_identities", {})
+    return migrated
+
+
 #: `v -> (v+1)` dönüştürücüleri. Her adım `schema_version`'ı da yükseltir.
 _MIGRATIONS: dict[int, Callable[[dict[str, object]], dict[str, object]]] = {
     0: _migrate_0_to_1,
     1: _migrate_1_to_2,
     2: _migrate_2_to_3,
+    3: _migrate_3_to_4,
 }
 
 
