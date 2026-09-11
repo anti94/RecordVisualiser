@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 from bisect import bisect_left, bisect_right
+from collections.abc import Generator
 from dataclasses import dataclass
 
 import numpy as np
-from numpy.typing import NDArray
 
+from sonar_analyzer.analysis.downsampling import downsample_chunk
+from sonar_analyzer.analysis.streaming_envelope import streaming_envelope
 from sonar_analyzer.domain.data_chunk import DataChunk, Quality
 from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.io.decoders.crc import crc32
@@ -127,53 +129,83 @@ class AcousticQuery:
         self._crc.put(record.byte_offset, valid)
         return valid
 
-    def query(self, channel_id: int, window: TimeRange) -> DataChunk:
-        self.last_records_read = 0
+    def _selections(
+        self, channel_id: int, window: TimeRange
+    ) -> Generator[tuple[_BlockSpan, int, int], None, None]:
         channel = self._channels.get(channel_id)
         if channel is None or window.start_ns == window.end_ns:
-            return DataChunk.empty(str(channel_id))
+            return
         first = bisect_right(channel.prefix_ends, window.start_ns)
         last = bisect_left(channel.starts, window.end_ns)
-        values: list[NDArray[np.float64]] = []
-        times: list[NDArray[np.int64]] = []
-        quality: list[tuple[int, int]] = []
-        touched: set[int] = set()
-        for entry in channel.blocks[first:last]:
+        for position in range(first, last):
+            entry = channel.blocks[position]
             if entry.end_ns <= window.start_ns:
                 continue
-            block = entry.block
             lo = max(
                 0, -(-(window.start_ns - entry.start_ns) * self.sample_rate_hz // NS_PER_SECOND)
             )
             hi = min(
-                block.sample_count,
+                entry.block.sample_count,
                 -(-(window.end_ns - entry.start_ns) * self.sample_rate_hz // NS_PER_SECOND),
             )
-            if hi <= lo:
-                continue
-            touched.add(entry.record.byte_offset)
-            data = np.frombuffer(
-                self._buffer,
-                dtype=NUMPY_DTYPE[block.dtype_code],
-                count=hi - lo,
-                offset=block.payload_offset + lo * DTYPE_SIZE[block.dtype_code],
-            ).astype(np.float64)
-            flags = 0
-            if not self._valid_crc(entry.record):
-                data[:] = np.nan
-                flags = int(Quality.CRC_ERROR)
-            values.append(data)
-            indices = np.arange(lo, hi, dtype=np.int64)
-            times.append(entry.start_ns + indices * NS_PER_SECOND // self.sample_rate_hz)
-            quality.append((flags, hi - lo))
-        self.last_records_read = len(touched)
-        if not values:
+            if hi > lo:
+                yield entry, lo, hi
+
+    def iter_chunks(self, channel_id: int, window: TimeRange) -> Generator[DataChunk, None, None]:
+        """En çok 65.536 örneklik parçalar; tüm kaydı biriktirmez.
+
+        Her parça sıralıdır; örtüşen kayıtlar arasında zaman sırası garanti
+        edilmez. Tam sorgu ve akış indirgeme bunu kendi sınırında sıralar.
+        """
+        self.last_records_read = 0
+        for entry, lo, hi in self._selections(channel_id, window):
+            self.last_records_read += 1
+            valid = self._valid_crc(entry.record)
+            block = entry.block
+            for start in range(lo, hi, 65_536):
+                stop = min(start + 65_536, hi)
+                data = np.frombuffer(
+                    self._buffer,
+                    dtype=NUMPY_DTYPE[block.dtype_code],
+                    count=stop - start,
+                    offset=block.payload_offset + start * DTYPE_SIZE[block.dtype_code],
+                ).astype(np.float64)
+                flags = None
+                if not valid:
+                    data[:] = np.nan
+                    flags = np.full(stop - start, int(Quality.CRC_ERROR), dtype=np.uint8)
+                indices = np.arange(start, stop, dtype=np.int64)
+                times = entry.start_ns + indices * NS_PER_SECOND // self.sample_rate_hz
+                yield DataChunk(str(channel_id), times, data, flags)
+
+    def query_display(
+        self, channel_id: int, window: TimeRange, max_points: int
+    ) -> DataChunk | None:
+        """Büyük çizim penceresini akışla indirger; küçükse normal cache yolunu seçer."""
+        downsample_chunk(DataChunk.empty(str(channel_id)), max_points)
+        count = 0
+        for _entry, lo, hi in self._selections(channel_id, window):
+            count += hi - lo
+            if count > max(262_144, max_points):
+                return streaming_envelope(
+                    self.iter_chunks(channel_id, window), str(channel_id), window, max_points
+                )
+        return None
+
+    def query(self, channel_id: int, window: TimeRange) -> DataChunk:
+        chunks = list(self.iter_chunks(channel_id, window))
+        if not chunks:
             return DataChunk.empty(str(channel_id))
-        timestamps = np.concatenate(times)
-        result = np.concatenate(values)
+        timestamps = np.concatenate([chunk.timestamps_ns for chunk in chunks])
+        result = np.concatenate([chunk.values for chunk in chunks])
         flags_array = (
-            np.concatenate([np.full(size, flag, dtype=np.uint8) for flag, size in quality])
-            if any(flag for flag, _ in quality)
+            np.concatenate(
+                [
+                    np.zeros(len(chunk), dtype=np.uint8) if chunk.quality is None else chunk.quality
+                    for chunk in chunks
+                ]
+            )
+            if any(chunk.quality is not None for chunk in chunks)
             else None
         )
         if np.any(timestamps[1:] < timestamps[:-1]):

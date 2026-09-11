@@ -102,13 +102,15 @@ class DisplayQuery:
         *,
         max_bytes: int = DEFAULT_MAX_BYTES,
         identity_for: Callable[[str], Hashable] | None = None,
+        read_large: Callable[[str, TimeRange, int], DataChunk | None] | None = None,
     ) -> None:
         self._read = read
         self._identity_for = identity_for
+        self._read_large = read_large
         self._source_token = object()
-        self._cache: MemoryBoundedCache[tuple[str, Hashable, int, int], ViewportSummary] = (
-            MemoryBoundedCache(max_bytes)
-        )
+        self._cache: MemoryBoundedCache[
+            tuple[str, Hashable, int, int, int | None], ViewportSummary
+        ] = MemoryBoundedCache(max_bytes)
 
     def clear(self) -> None:
         self._cache.clear()
@@ -118,19 +120,25 @@ class DisplayQuery:
         return self._cache.stats()
 
     def _covering(
-        self, channel_id: str, identity: Hashable, span: TimeRange
+        self, channel_id: str, identity: Hashable, span: TimeRange, max_points: int
     ) -> ViewportSummary | None:
         """`span`'i **kapsayan** saklı bir pencere varsa onu döndürür."""
         for key in reversed(self._cache.keys()):  # en yeniden en eskiye
-            cached_channel, cached_identity, start_ns, end_ns = key
+            cached_channel, cached_identity, start_ns, end_ns, budget = key
             if (
                 cached_channel == channel_id
                 and cached_identity == identity
                 and start_ns <= span.start_ns
                 and end_ns >= span.end_ns
+                and (
+                    budget is None
+                    or (
+                        budget == max_points and start_ns == span.start_ns and end_ns == span.end_ns
+                    )
+                )
             ):
                 return self._cache.get(key)
-        self._cache.get((channel_id, identity, span.start_ns, span.end_ns))  # ıska sayılsın
+        self._cache.get((channel_id, identity, span.start_ns, span.end_ns, None))  # ıska sayılsın
         return None
 
     def query(self, channel_id: str, span: TimeRange, max_points: int | None) -> DataChunk:
@@ -152,8 +160,22 @@ class DisplayQuery:
         identity = (
             self._source_token if self._identity_for is None else self._identity_for(channel_id)
         )
-        summary = self._covering(channel_id, identity, span)
+        summary = self._covering(channel_id, identity, span, max_points)
         if summary is None:
-            summary = ViewportSummary(self._read(channel_id, span))
-            self._cache.put((channel_id, identity, span.start_ns, span.end_ns), summary)
+            bounded = (
+                None if self._read_large is None else self._read_large(channel_id, span, max_points)
+            )
+            summary = ViewportSummary(self._read(channel_id, span) if bounded is None else bounded)
+            # İndirgenmiş veri yalnız aynı pencere/bütçe için kullanılabilir;
+            # daha dar zoom ham kaynağa dönerek ayrıntıları yeniden okur.
+            self._cache.put(
+                (
+                    channel_id,
+                    identity,
+                    span.start_ns,
+                    span.end_ns,
+                    None if bounded is None else max_points,
+                ),
+                summary,
+            )
         return summary.query(span, max_points)

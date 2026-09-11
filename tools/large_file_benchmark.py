@@ -412,7 +412,13 @@ def benchmark_file(
             def read(_channel_id: str, window: TimeRange) -> DataChunk:
                 return reader.query(channel, window)
 
-            query = DisplayQuery(read, max_bytes=cache_bytes)
+            query = DisplayQuery(
+                read,
+                max_bytes=cache_bytes,
+                read_large=lambda _key, window, budget: reader.query_display(
+                    channel, window, budget
+                ),
+            )
             queries = measure_queries(
                 query,
                 str(channel),
