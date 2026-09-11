@@ -1,0 +1,23 @@
+[
+  {
+    "name": "bellek butcesi",
+    "status": "gecti",
+    "measured": "oran 1.0034",
+    "criterion": "son ceyrek / ilk ceyrek <= 1.1",
+    "note": ""
+  },
+  {
+    "name": "beklenen kayip",
+    "status": "gecti",
+    "measured": "0.0107 (617/57600)",
+    "criterion": "uretilen = kaydedilen + dusen VE gozlenen oran 0.01 degerinden en cok %25 sapar",
+    "note": ""
+  },
+  {
+    "name": "kayit butunlugu",
+    "status": "gecti",
+    "measured": "56983 kayit",
+    "criterion": "her kayit geri okunur, CRC tutar, sira artar, artik bayt yok",
+    "note": ""
+  }
+]

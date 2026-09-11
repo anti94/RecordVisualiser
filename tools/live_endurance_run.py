@@ -34,6 +34,7 @@ import json
 import platform
 import sys
 import tracemalloc
+import zlib
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from time import perf_counter
@@ -59,6 +60,9 @@ from sonar_analyzer.io.live.protocol import (  # noqa: E402
 )
 from sonar_analyzer.io.live.ring_buffer import LiveRingBuffer  # noqa: E402
 from sonar_analyzer.io.live.sequence_tracker import SequenceTracker  # noqa: E402
+from sonar_analyzer.io.profile_a_format import DATA_RECORD_V1  # noqa: E402
+from sonar_analyzer.io.readers.binary_reader import read_data_record_v2  # noqa: E402
+from sonar_analyzer.io.readers.recording_reader import read_validated_header  # noqa: E402
 from sonar_analyzer.recording.header_writer import (  # noqa: E402
     header_size_for,
     record_size_for,
@@ -133,6 +137,33 @@ class FileSizes:
 
 
 @dataclass
+class IntegrityCheck:
+    """Yazılan dosyaların **geri okunarak** doğrulanması — `F5-039` kanıtı.
+
+    Kayıt bütünlüğü, yazıcının sayacına bakarak iddia edilemez: dosyanın
+    gerçekten okunabildiği ancak okunarak bilinir. Bu yüzden koşu bittikten
+    sonra her dosya baştan sona çözülür.
+    """
+
+    files_checked: int = 0
+    records_read: int = 0
+    crc_mismatches: int = 0
+    header_failures: int = 0
+    trailing_bytes: int = 0
+    non_monotonic_records: int = 0
+
+    @property
+    def is_intact(self) -> bool:
+        """Tek bir kusur bile bütünlüğü bozar."""
+        return (
+            self.crc_mismatches == 0
+            and self.header_failures == 0
+            and self.trailing_bytes == 0
+            and self.non_monotonic_records == 0
+        )
+
+
+@dataclass
 class EnduranceResult:
     """Bir koşunun bütün sonucu.
 
@@ -149,6 +180,7 @@ class EnduranceResult:
     memory: MemoryTrend
     loss: LossBreakdown
     files: FileSizes
+    integrity: IntegrityCheck
     machine: dict[str, str]
 
     def to_json_dict(self) -> dict[str, object]:
@@ -166,6 +198,10 @@ class EnduranceResult:
             "files": {
                 **asdict(self.files),
                 "matches_expected": self.files.matches_expected,
+            },
+            "integrity": {
+                **asdict(self.integrity),
+                "is_intact": self.integrity.is_intact,
             },
             "machine": self.machine,
         }
@@ -276,6 +312,9 @@ def run_endurance(
         recorded_windows=recorder.total_record_count,
     )
     files = _summarise_files(recorder.paths, recorder.total_record_count)
+    # Butunluk KOSUDAN SONRA, dosyalar kapaninca olculur (F5-029 garantisi
+    # ancak kapanmis dosya icin gecerlidir).
+    integrity = verify_recording(recorder.paths)
 
     return EnduranceResult(
         hours=hours,
@@ -290,6 +329,7 @@ def run_endurance(
         memory=trend,
         loss=loss,
         files=files,
+        integrity=integrity,
         machine={
             "platform": platform.platform(),
             "python": platform.python_version(),
@@ -311,6 +351,48 @@ def _summarise_memory(samples: list[int], peak: int) -> MemoryTrend:
         last_quarter_bytes=sum(last) / len(last),
         peak_bytes=peak,
     )
+
+
+def verify_recording(paths: list[Path]) -> IntegrityCheck:
+    """Yazılan her dosyayı **geri okuyarak** doğrular — `F5-039`.
+
+    Üç şey aranır ve üçü de bağımsız kanıttır:
+
+    * başlık üretim doğrulayıcısından geçiyor mu (`read_validated_header`),
+    * her kaydın CRC'si tutuyor mu — ADR-011 §2.2'ye göre kendi alanı
+      hariç, `zlib.crc32` ile **yeniden hesaplanarak**,
+    * dosya tam bir kayıt sınırında bitiyor ve sıra numaraları artıyor mu.
+    """
+    check = IntegrityCheck()
+    header_bytes = header_size_for(2)
+    record_bytes = record_size_for(2)
+
+    for path in paths:
+        if not path.exists():
+            continue
+        check.files_checked += 1
+        raw = path.read_bytes()
+        try:
+            read_validated_header(raw)
+        except Exception:
+            check.header_failures += 1
+            continue
+
+        body = len(raw) - header_bytes
+        check.trailing_bytes += body % record_bytes
+        previous = -1
+        for index in range(body // record_bytes):
+            offset = header_bytes + index * record_bytes
+            record = read_data_record_v2(raw, offset)
+            expected = zlib.crc32(raw[offset : offset + DATA_RECORD_V1.size]) & 0xFFFF_FFFF
+            if record.record_crc32 != expected:
+                check.crc_mismatches += 1
+            if record.sequence_no <= previous:
+                check.non_monotonic_records += 1
+            previous = record.sequence_no
+            check.records_read += 1
+
+    return check
 
 
 def _summarise_files(paths: list[Path], records: int) -> FileSizes:
@@ -349,6 +431,10 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Kosu tamamlandi: {result.windows} pencere, {result.wall_seconds} s")
     print(f"Bellek buyume orani: {result.memory.growth_ratio:.4f}")
     print(f"Dosya: {result.files.files} adet, {result.files.total_bytes} bayt")
+    print(
+        f"Butunluk: {result.integrity.records_read} kayit okundu, "
+        f"saglam={result.integrity.is_intact}"
+    )
     print(f"Rapor: {args.json}")
     return 0
 

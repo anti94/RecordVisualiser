@@ -7,12 +7,12 @@
     "reorder_ratio": 0.0,
     "duplicate_ratio": 0.0
   },
-  "wall_seconds": 14.61,
+  "wall_seconds": 15.181,
   "memory": {
     "samples": 114,
-    "first_quarter_bytes": 32982506.42857143,
-    "last_quarter_bytes": 33093835.285714287,
-    "peak_bytes": 33145571,
+    "first_quarter_bytes": 32983563.75,
+    "last_quarter_bytes": 33094565.35714286,
+    "peak_bytes": 33146467,
     "growth_ratio": 1.0034
   },
   "loss": {
@@ -31,6 +31,15 @@
       3874880
     ],
     "matches_expected": true
+  },
+  "integrity": {
+    "files_checked": 1,
+    "records_read": 56983,
+    "crc_mismatches": 0,
+    "header_failures": 0,
+    "trailing_bytes": 0,
+    "non_monotonic_records": 0,
+    "is_intact": true
   },
   "machine": {
     "platform": "Windows-10-10.0.26200-SP0",
