@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 498 madde · 357 tamamlandı · 141 kaldı**
+**Toplam 498 madde · 358 tamamlandı · 140 kaldı**
 
-`[#################.......]` %71.7
+`[#################.......]` %71.9
 
 ## Özet
 
@@ -40,9 +40,9 @@ Work in fully autonomous mode.
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 41 | 0 | 41 |
-| Faz 6 — Windows dağıtımı ve ürünleştirme | 20 | 14 | 34 |
+| Faz 6 — Windows dağıtımı ve ürünleştirme | 21 | 13 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **357** | **141** | **498** |
+| **Toplam** | **358** | **140** | **498** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -395,7 +395,7 @@ Work in fully autonomous mode.
 | [x] | `F5-040` | `2.40.0` | 20 dk | Canlı modda mockup pano davranışını kontrol et |
 | [x] | `F5-041` | `3.0.0` | 15 dk | Canlı veri milestone kabulünü kapat ve major sürümü hazırla |
 
-### Faz 6 — Windows dağıtımı ve ürünleştirme (20/34)
+### Faz 6 — Windows dağıtımı ve ürünleştirme (21/34)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -419,7 +419,7 @@ Work in fully autonomous mode.
 | [x] | `F6-018` | `3.18.0` | 15 dk | Merge ve release kalite kapılarını belgeye bağla |
 | [x] | `F6-019` | `3.19.0` | 20 dk | Tanılama paketi içerik listesini üret |
 | [x] | `F6-020` | `3.20.0` | 20 dk | Tanılama önizleme ve dışa aktarımını ekle |
-| [ ] | `F6-021` | `3.21.0` | 20 dk | Son geçerli workspace kurtarmasını ekle |
+| [x] | `F6-021` | `3.21.0` | 20 dk | Son geçerli workspace kurtarmasını ekle |
 | [ ] | `F6-022` | `3.22.0` | 20 dk | Tekrarlı aç/kapat ve playback koşusunu hazırla |
 | [ ] | `F6-023` | `3.23.0` | 20 dk | Aç/kapat dayanıklılık sonuçlarını değerlendir |
 | [ ] | `F6-024` | `3.24.0` | 20 dk | Mockup üzerinden ana ekran kullanım kılavuzunu yaz |

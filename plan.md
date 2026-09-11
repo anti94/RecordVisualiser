@@ -1837,7 +1837,7 @@ Kabul: Kurulabilir Windows paketi, dokümantasyon, sürüm artefaktları ve dağ
 | [x] | `F6-018` | `3.18.0` | 15 dk | Merge ve release kalite kapılarını belgeye bağla | Remote varsa gerekli kontroller uygulanır; yoksa yerel eşdeğer komutlar kayıtlıdır | `F6-017` | `docs(ci): F6-018 merge ve release kalite kapılarını belgeye bağla` |
 | [x] | `F6-019` | `3.19.0` | 20 dk | Tanılama paketi içerik listesini üret | Session, sürüm ve hata logları listelenir; ham sensör veri varsayılan değildir | `F6-018` | `feat(diagnostics): F6-019 tanılama paketi içerik listesini üret` |
 | [x] | `F6-020` | `3.20.0` | 20 dk | Tanılama önizleme ve dışa aktarımını ekle | Kullanıcı içeriği görür; yalnız seçili öğeler pakete girer | `F6-019` | `feat(diagnostics): F6-020 tanılama önizleme ve dışa aktarımını ekle` |
-| [ ] | `F6-021` | `3.21.0` | 20 dk | Son geçerli workspace kurtarmasını ekle | Kesinti sonrası sağlam oturum önerilir; bozuk dosya etkin oturumu ezmez | `F6-020` | `feat(workspace): F6-021 son geçerli workspace kurtarmasını ekle` |
+| [x] | `F6-021` | `3.21.0` | 20 dk | Son geçerli workspace kurtarmasını ekle | Kesinti sonrası sağlam oturum önerilir; bozuk dosya etkin oturumu ezmez | `F6-020` | `feat(workspace): F6-021 son geçerli workspace kurtarmasını ekle` |
 | [ ] | `F6-022` | `3.22.0` | 20 dk | Tekrarlı aç/kapat ve playback koşusunu hazırla | Otomatik döngü bellek, handle ve kapanış hatalarını kaydeder | `F6-021` | `test(app): F6-022 tekrarlı aç/kapat ve playback koşusunu hazırla` |
 | [ ] | `F6-023` | `3.23.0` | 20 dk | Aç/kapat dayanıklılık sonuçlarını değerlendir | Kalıcı kaynak artışı yoktur veya engelleyici hata işi açılmıştır | `F6-022` | `docs(quality): F6-023 aç/kapat dayanıklılık sonuçlarını değerlendir` |
 
