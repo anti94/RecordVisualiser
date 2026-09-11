@@ -19,8 +19,29 @@ from __future__ import annotations
 import numpy as np
 from numpy.typing import NDArray
 
+from sonar_analyzer.analysis.downsampling import downsample_chunk
 from sonar_analyzer.domain.data_chunk import DataChunk
+from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.io.live.protocol import LivePacket
+
+
+def _in_time_order(chunk: DataChunk) -> DataChunk:
+    """Zaman sırasına sokar; zaten sıralıysa **kopyalamaz**.
+
+    Geç gelen paketler (`F5-012`'nin `out_of_order` sınıfı) tampona yazılma
+    sırasıyla girer; sorgu sonucunun sırası yazılma sırasına değil **zamana**
+    bağlı olmalıdır. Kararlı (`stable`) sıralama, eşit zaman damgalı
+    örneklerin göreli sırasını korur.
+    """
+    if chunk.is_monotonic:
+        return chunk
+    order = np.argsort(chunk.timestamps_ns, kind="stable")
+    return DataChunk(
+        channel_id=chunk.channel_id,
+        timestamps_ns=chunk.timestamps_ns[order],
+        values=chunk.values[order],
+        quality=None if chunk.quality is None else chunk.quality[order],
+    )
 
 
 class ChannelRing:
@@ -177,6 +198,51 @@ class LiveRingBuffer:
         if ring is None:
             return DataChunk.empty(channel_id, dtype="float64")
         return ring.snapshot()
+
+    def query(
+        self,
+        channel_id: str,
+        time_range: TimeRange,
+        max_points: int | None = None,
+    ) -> DataChunk:
+        """Seçili aralıktaki örnekler, **her zaman zaman sırasında** — `F5-015`.
+
+        İmza `RecordingRepository.query()` ile birebir aynıdır: canlı tampon
+        da kayıtlı dosyayla aynı gösterim boru hattını besleyebilsin diye
+        (plan Bölüm 7.4: "Kayıtlı dosya ve canlı akış aynı sözleşmeyi
+        karşılar").
+
+        Aralık yarı-açıktır (`[start_ns, end_ns)`, `TimeRange` sözleşmesi).
+        Halka sarılmış olsa da, araya geç gelen (`F5-012` `out_of_order`)
+        örnekler yazılmış olsa da sonuç zamana göre sıralıdır. Aralıkta veri
+        yoksa **boş ama geçerli** bir `DataChunk` döner.
+        """
+        snapshot = self.snapshot(channel_id)
+        if len(snapshot) == 0:
+            return snapshot
+
+        ordered = _in_time_order(snapshot)
+        start = int(np.searchsorted(ordered.timestamps_ns, time_range.start_ns, side="left"))
+        stop = int(np.searchsorted(ordered.timestamps_ns, time_range.end_ns, side="left"))
+        flags = ordered.quality
+        selected = DataChunk(
+            channel_id=ordered.channel_id,
+            timestamps_ns=np.ascontiguousarray(ordered.timestamps_ns[start:stop]),
+            values=np.ascontiguousarray(ordered.values[start:stop]),
+            quality=None if flags is None else np.ascontiguousarray(flags[start:stop]),
+        )
+        return downsample_chunk(selected, max_points)
+
+    def time_span(self, channel_id: str) -> TimeRange | None:
+        """Tamponun şu an kapsadığı aralık; boşsa `None`.
+
+        Bitiş, son örnekten **bir ns sonrasıdır**: `TimeRange` yarı-açık
+        olduğu için `query(time_span(...))` son örneği de kapsar.
+        """
+        ordered = _in_time_order(self.snapshot(channel_id))
+        if len(ordered) == 0:
+            return None
+        return TimeRange(int(ordered.timestamps_ns[0]), int(ordered.timestamps_ns[-1]) + 1)
 
     def clear(self) -> None:
         for ring in self._rings.values():

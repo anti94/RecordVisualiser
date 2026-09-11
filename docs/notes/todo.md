@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 498 madde · 310 tamamlandı · 188 kaldı**
+**Toplam 498 madde · 311 tamamlandı · 187 kaldı**
 
-`[###############.........]` %62.2
+`[###############.........]` %62.4
 
 ## Özet
 
@@ -39,10 +39,10 @@ Work in fully autonomous mode.
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
-| Faz 5 — Canlı veri, bağlantı ve kayıt | 14 | 27 | 41 |
+| Faz 5 — Canlı veri, bağlantı ve kayıt | 15 | 26 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **310** | **188** | **498** |
+| **Toplam** | **311** | **187** | **498** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -349,7 +349,7 @@ Work in fully autonomous mode.
 | [x] | `F4-096` | `1.95.0` | 20 dk | Özet ve akış düzeltmeleri sonrası performansı doğrula |
 | [x] | `F4-090` | `2.0.0` | 15 dk | Analiz milestone kabulünü kapat ve major sürümü hazırla |
 
-### Faz 5 — Canlı veri, bağlantı ve kayıt (14/41)
+### Faz 5 — Canlı veri, bağlantı ve kayıt (15/41)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -367,7 +367,7 @@ Work in fully autonomous mode.
 | [x] | `F5-012` | `2.12.0` | 20 dk | Sıra numarasından paket kaybını hesapla |
 | [x] | `F5-013` | `2.13.0` | 20 dk | Canlı cihaz zamanını kanonik zamana bağla |
 | [x] | `F5-014` | `2.14.0` | 20 dk | Sabit kapasiteli ring buffer ekle |
-| [ ] | `F5-015` | `2.15.0` | 20 dk | Zaman penceresine göre buffer sorgula |
+| [x] | `F5-015` | `2.15.0` | 20 dk | Zaman penceresine göre buffer sorgula |
 | [ ] | `F5-016` | `2.16.0` | 20 dk | Kuyruk sınırı ve drop politikasını uygula |
 | [ ] | `F5-017` | `2.17.0` | 20 dk | Sınırlı otomatik yeniden bağlanma ekle |
 | [ ] | `F5-018` | `2.18.0` | 20 dk | Bağlantı ve buffer ayarlarını kaydet |
