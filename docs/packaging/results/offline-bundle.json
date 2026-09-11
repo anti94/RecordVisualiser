@@ -1,0 +1,49 @@
+{
+  "succeeded": true,
+  "exit_code": 0,
+  "output_dir": "D:\\Code\\SignalProcessing\\dist\\offline-wheels",
+  "wheel_count": 17,
+  "total_bytes": 308833292,
+  "wheels": [
+    "altgraph-0.17.5-py2.py3-none-any.whl",
+    "importlib_metadata-8.7.1-py3-none-any.whl",
+    "numpy-2.0.2-cp39-cp39-win_amd64.whl",
+    "packaging-26.3-py3-none-any.whl",
+    "pefile-2024.8.26-py3-none-any.whl",
+    "pyinstaller-6.22.2-py3-none-win_amd64.whl",
+    "pyinstaller_hooks_contrib-2026.7-py3-none-any.whl",
+    "pyqtgraph-0.13.7-py3-none-any.whl",
+    "pyside6-6.10.3-cp39-abi3-win_amd64.whl",
+    "pyside6_addons-6.10.3-cp39-abi3-win_amd64.whl",
+    "pyside6_essentials-6.10.3-cp39-abi3-win_amd64.whl",
+    "pywin32_ctypes-0.2.3-py3-none-any.whl",
+    "scipy-1.13.1-cp39-cp39-win_amd64.whl",
+    "setuptools-82.0.1-py3-none-any.whl",
+    "shiboken6-6.10.3-cp39-abi3-win_amd64.whl",
+    "sonar_analyzer-3.10.0-py3-none-any.whl",
+    "zipp-3.23.1-py3-none-any.whl"
+  ],
+  "extras": [
+    "gui",
+    "dsp",
+    "package"
+  ],
+  "python": "3.9.13",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "message": "",
+  "offline_resolution_check": {
+    "command": "pip install --no-index --find-links dist/offline-wheels --dry-run --ignore-installed 'sonar-analyzer[gui,dsp]'",
+    "exit_code": 0,
+    "would_install": [
+      "PySide6-6.10.3",
+      "PySide6_Addons-6.10.3",
+      "PySide6_Essentials-6.10.3",
+      "numpy-2.0.2",
+      "pyqtgraph-0.13.7",
+      "scipy-1.13.1",
+      "shiboken6-6.10.3",
+      "sonar-analyzer-3.10.0"
+    ],
+    "note": "--no-index ile ag kullanilmadi; --ignore-installed ile venv'deki kurulu paketler yok sayilip her sey yerel klasorden cozuldu."
+  }
+}

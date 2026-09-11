@@ -91,6 +91,26 @@ daha çok soruna yol açar. `onedir`, kurulum sırasında bir kez yazılır.
   kısıt hâline gelirse bu ADR yeniden açılır. O zaman şart, CI'da sabit ve
   tekrar üretilebilir bir C araç zinciridir.
 
+## Offline dağıtım (`F6-011`)
+
+D-16 ("offline hedef var mı") **cevaplanmadı**. Karar bu belirsizlikte de
+verilebilir hâle geldi, çünkü iki ihtiyaç ayrıştırıldı:
+
+* **Son kullanıcı zaten offline'dır ve ek bir şey gerekmez.** `onedir`
+  paketi Python, Qt ve bütün kütüphaneleri içinde taşır; `F6-005` bunu
+  Python'un ulaşılamadığı bir ortamda doğruladı. Yani offline hedef
+  *varsa* koşul zaten sağlanmış durumdadır.
+* **Geliştirici/CI makinesi** bağlantısızsa paketi hiç üretemez. Asıl
+  eksik buydu ve `tools/offline_bundle.py` ile kapatıldı: bağımlılıklar
+  ve projenin kendi wheel'i tek klasöre indirilir (17 paket, ~309 MB) ve
+  bağlantısız makinede `pip install --no-index` ile ortam kurulur.
+
+Doğrulama `--no-index` (ağ yok) ve `--ignore-installed` (kurulu paketler
+yok sayılır) ile yapıldı; sekiz paketin tamamı yerel klasörden çözüldü.
+İlk denemede projenin **kendi** wheel'i klasörde olmadığı için çözümleme
+başarısız oldu — `pip download` yalnız bağımlılıkları indiriyordu; araç
+artık projeyi de paketliyor.
+
 ## Hedef ortam hakkında bilinmeyen
 
 Kabul kontrolü seçimin "hedef Windows ortamına" dayanmasını ister. Hedef
