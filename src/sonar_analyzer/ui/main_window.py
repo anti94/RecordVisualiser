@@ -91,6 +91,7 @@ from sonar_analyzer.repository.derived_repository import (
     DerivedChannelRepository,
 )
 from sonar_analyzer.repository.file_repository import FileRecordingRepository
+from sonar_analyzer.repository.live_repository import LiveRepository
 from sonar_analyzer.repository.mock_repository import SIMULATION_LABEL, MockRecordingRepository
 from sonar_analyzer.repository.protocol import RecordingRepository
 from sonar_analyzer.settings.store import AppSettings, SettingsWriter, save_settings
@@ -113,6 +114,7 @@ from sonar_analyzer.ui.empty_state import EmptyStatePanel
 from sonar_analyzer.ui.error_dialogs import LoadErrorNotifier
 from sonar_analyzer.ui.export_runner import ExportRunner
 from sonar_analyzer.ui.file_open import FileOpenController
+from sonar_analyzer.ui.live_runner import LiveRunner
 from sonar_analyzer.ui.panels.bit_trend_view import BitTrendView
 from sonar_analyzer.ui.plot_tool_bar import PlotToolBar
 from sonar_analyzer.ui.plots.dashboard import DashboardPanel
@@ -202,6 +204,10 @@ class MainWindow(QMainWindow):
         self._repository: RecordingRepository | None = None
         #: `F5-019` bağlı canlı kaynak; yoksa Connect eylemi pasiftir.
         self._live_source: LiveSource | None = None
+        #: `F5-022` canlı akışın worker'ı, deposu ve çizilen kanalı.
+        self._live_runner: LiveRunner | None = None
+        self._live_repository: LiveRepository | None = None
+        self._live_plot_channel = ""
         #: `F4-074` kullanıcı işaretleri; `F4-076` çalışma alanına yazar.
         self._annotations = AnnotationSet()
         #: `F4-079` zincir + işaret düzenlemelerinin undo/redo geçmişi.
@@ -573,6 +579,101 @@ class MainWindow(QMainWindow):
         """Arayüzün gösterdiği bağlantı durumu — kaynağın kendi durumu."""
         source = self._live_source
         return ConnectionState.DISCONNECTED if source is None else source.state
+
+    def start_live_stream(
+        self,
+        *,
+        buffer_capacity: int = 480_000,
+        queue_maxsize: int = 256,
+    ) -> LiveRepository:
+        """Bağlı kaynağı worker'da okumaya başlar — `F5-022`.
+
+        Okuma ayrı bir `QThread`'te olur; UI thread yalnız
+        `pump_live_stream()` ile hazır paketleri alır. Dönen
+        `LiveRepository` dosya tarafıyla **aynı** sorgu sözleşmesini
+        karşılar (`F5-021`), bu yüzden grafikler değişmeden beslenir.
+        """
+        source = self._live_source
+        if source is None:
+            raise RuntimeError("Once set_live_source() ile bir kaynak takilmali")
+        self._live_repository = LiveRepository(
+            LiveRingBuffer(capacity_samples=buffer_capacity), channels=source.channels()
+        )
+        self._live_runner = LiveRunner(queue_maxsize=queue_maxsize)
+        reader = self._live_runner.start(source)
+        reader.failed.connect(self._on_live_read_failed)
+        return self._live_repository
+
+    def stop_live_stream(self) -> None:
+        """Worker'ı durdurur; toplanan veri repository'de kalır."""
+        if self._live_runner is not None:
+            self._live_runner.stop()
+            self._live_runner = None
+
+    def pump_live_stream(self, *, limit: int | None = 64) -> int:
+        """Kuyruğu boşaltıp grafiği tazeler; **yazılan paket** sayısını döner.
+
+        UI thread burada beklemez: kuyruk boşsa hemen `0` döner. Çağrı
+        sıklığı çağıranın (zamanlayıcı) işidir — `F4-061`'in render
+        kısıtlamasıyla aynı ilke.
+        """
+        runner, repository = self._live_runner, self._live_repository
+        if runner is None or repository is None:
+            return 0
+        written = runner.drain_into(repository, limit=limit)
+        if written:
+            self.refresh_live_health(
+                queue=runner.queue,
+                buffer=repository.buffer,
+                buffer_channel=self._live_plot_channel,
+            )
+            self._refresh_live_plot(repository)
+        return written
+
+    def _refresh_live_plot(self, repository: LiveRepository) -> None:
+        """Canlı tampondan grafiği tazeler; veri yoksa dokunmaz.
+
+        İlk pakette seri `add_channel()` ile açılır; sonrakilerde
+        `update_channel_data()` kullanılır — o yol **görünür aralığı
+        korur**, yani kullanıcının pan/zoom'u her karede sıfırlanmaz
+        (`F5-023`'ün takip davranışının da dayanağı). Canlı akış için
+        ayrı bir çizim API'si açılmaz; ADR-002'nin soyutlama sınırı
+        olduğu gibi kalır.
+        """
+        channel_id = self._live_plot_channel
+        if not channel_id:
+            return
+        channel = next((item for item in repository.channels() if item.id == channel_id), None)
+        if channel is None:
+            return
+        span = repository.buffer.time_span(channel_id)
+        if span is None:
+            return
+        chunk = repository.query(channel_id, span, points_for_width(self.plot_panel.width()))
+        if not len(chunk):
+            return
+        if channel_id in self.plot_panel.plotted_channel_ids():
+            self.plot_panel.update_channel_data(channel_id, chunk)
+        else:
+            self.plot_panel.add_channel(channel, chunk)
+
+    def set_live_plot_channel(self, channel_id: str) -> None:
+        """Canlı akışta hangi kanalın çizileceğini seçer."""
+        self._live_plot_channel = channel_id
+
+    @property
+    def live_repository(self) -> LiveRepository | None:
+        return self._live_repository
+
+    @property
+    def live_queue_depth(self) -> int:
+        """Worker ile UI arasındaki kuyruğun anlık derinliği; akış yoksa `0`."""
+        runner = self._live_runner
+        return 0 if runner is None else runner.queue.depth
+
+    def _on_live_read_failed(self, message: str) -> None:
+        self.bottom_dock.append_log(f"Canli okuma hatasi: {message}")
+        self._refresh_connection_state()
 
     def update_live_health(self, health: LiveHealth) -> None:
         """Canlı akış sayaçlarını sağ sütundaki `Live` sekmesine yazar — `F5-020`.
