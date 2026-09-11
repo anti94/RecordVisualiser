@@ -79,6 +79,7 @@ from sonar_analyzer.export.pdf_export import (
     export_widget_pdf,
 )
 from sonar_analyzer.export.text_format import Delimiter
+from sonar_analyzer.io.live.protocol import ConnectionState, LiveSource
 from sonar_analyzer.logging.performance import measure
 from sonar_analyzer.processing.chain import ProcessingChain
 from sonar_analyzer.processing.steps import StepValidationError
@@ -159,6 +160,16 @@ PLAYBACK_MIN_HEIGHT = 44
 WINDOW_TITLE = "SONAR Data Analyzer"
 RIGHT_DOCK_TITLE = "BIT / Analysis / Export"
 
+#: `F5-019` durum çubuğundaki bağlantı alanının metinleri. Her durumun bir
+#: karşılığı vardır; eksik bir durum arayüzde boş bir alan bırakırdı.
+CONNECTION_LABELS: dict[ConnectionState, str] = {
+    ConnectionState.DISCONNECTED: "Bagli degil",
+    ConnectionState.CONNECTING: "Baglaniyor...",
+    ConnectionState.CONNECTED: "Bagli",
+    ConnectionState.RECONNECTING: "Yeniden baglaniyor...",
+    ConnectionState.FAILED: "Baglanti hatasi",
+}
+
 
 class MainWindow(QMainWindow):
     """Uygulamanın ana penceresi: üç sütunlu mockup düzeni."""
@@ -185,6 +196,8 @@ class MainWindow(QMainWindow):
 
         self._channels: tuple[ChannelMetadata, ...] = ()
         self._repository: RecordingRepository | None = None
+        #: `F5-019` bağlı canlı kaynak; yoksa Connect eylemi pasiftir.
+        self._live_source: LiveSource | None = None
         #: `F4-074` kullanıcı işaretleri; `F4-076` çalışma alanına yazar.
         self._annotations = AnnotationSet()
         #: `F4-079` zincir + işaret düzenlemelerinin undo/redo geçmişi.
@@ -306,6 +319,10 @@ class MainWindow(QMainWindow):
         self.setStatusBar(self.status)
         self.status.update_memory()
         self.status.cancel_requested.connect(self.cancel_active_load)
+        # F5-019: açılıştaki eylem etkinlikleri ve bağlantı alanı da aynı tek
+        # yerden türetilir; aksi halde `ActionSpec` varsayılanı ile gerçek
+        # durum daha ilk karede ayrışırdı.
+        self._refresh_connection_state()
 
         self.playback_dock.position_changed.connect(self.status.set_cursor_time)
         self.playback_dock.timeline.viewport_changed.connect(self._on_timeline_viewport_changed)
@@ -381,6 +398,9 @@ class MainWindow(QMainWindow):
         self.action("action_exit").triggered.connect(self.close)
         self.action("action_close").triggered.connect(self.close_active_recording)
         self.action("action_reset_layout").triggered.connect(self.apply_default_layout)
+        # F5-019: canli baglanti eylemleri.
+        self.action("action_connect").triggered.connect(self.connect_live_source)
+        self.action("action_disconnect").triggered.connect(self.disconnect_live_source)
 
         pairs = (
             ("action_toggle_data_explorer", self.left_dock),
@@ -503,6 +523,68 @@ class MainWindow(QMainWindow):
             return
         self.playback_dock.goto_time_ns(annotation.start_ns)
         self.go_to_time(annotation.start_ns)
+
+    # -- canli baglanti (F5-019) -------------------------------------------
+
+    @property
+    def live_source(self) -> LiveSource | None:
+        """Bağlı canlı kaynak; yoksa `None`."""
+        return self._live_source
+
+    def set_live_source(self, source: LiveSource | None) -> None:
+        """Canlı kaynağı takar/çıkarır ve arayüzü **tek yerden** tazeler."""
+        self._live_source = source
+        self._refresh_connection_state()
+
+    def connect_live_source(self) -> None:
+        """`Connect` eylemi: kaynağa bağlanır, hata olursa loglanır — `F5-019`."""
+        source = self._live_source
+        if source is None:
+            self.bottom_dock.append_log("Canli kaynak secili degil.")
+            return
+        try:
+            source.connect()
+        except Exception as exc:
+            self.bottom_dock.append_log(f"Baglanti kurulamadi: {exc}")
+        else:
+            self.bottom_dock.append_log("Canli kaynaga baglanildi.")
+        finally:
+            self._refresh_connection_state()
+
+    def disconnect_live_source(self) -> None:
+        """`Disconnect` eylemi: bağlantıyı kapatır — `F5-019`."""
+        source = self._live_source
+        if source is None:
+            return
+        try:
+            source.disconnect()
+        except Exception as exc:
+            self.bottom_dock.append_log(f"Baglanti kapatilamadi: {exc}")
+        else:
+            self.bottom_dock.append_log("Canli baglanti kapatildi.")
+        finally:
+            self._refresh_connection_state()
+
+    def connection_state(self) -> ConnectionState:
+        """Arayüzün gösterdiği bağlantı durumu — kaynağın kendi durumu."""
+        source = self._live_source
+        return ConnectionState.DISCONNECTED if source is None else source.state
+
+    def _refresh_connection_state(self) -> None:
+        """Toolbar ve durum çubuğunu **aynı** kaynaktan tazeler — `F5-019`.
+
+        Kabul kriteri ("Toolbar ve durum çubuğu aynı bağlantı durumunu
+        gösterir") burada yapısal olarak sağlanır: iki yüzey de bu tek
+        fonksiyonda, aynı `ConnectionState` değerinden türetilir. İkisini
+        ayrı ayrı güncelleyen bir kod, er geç ayrışırdı.
+        """
+        state = self.connection_state()
+        attached = self._live_source is not None
+        connected = state is ConnectionState.CONNECTED
+
+        self.action("action_connect").setEnabled(attached and not connected)
+        self.action("action_disconnect").setEnabled(attached and connected)
+        self.status.set_field("connection", CONNECTION_LABELS[state] if attached else "")
 
     # -- duzenleme gecmisi (F4-079) ----------------------------------------
 

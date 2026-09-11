@@ -92,6 +92,12 @@ MENU_SPECS: tuple[MenuSpec, ...] = (
         "&Tools",
         (
             ActionSpec("action_load_simulation", "Load Simulation Data", "Ctrl+Shift+S"),
+            # F5-019: canli baglanti. `action_disconnect` baslangicta pasiftir
+            # cunku bagli degilken kopartilacak bir sey yoktur; ikisinin de
+            # etkinligi tek bir yerden (MainWindow._refresh_connection_state)
+            # baglanti durumundan turetilir.
+            ActionSpec("action_connect", "Connect Live Source", "Ctrl+Shift+C"),
+            ActionSpec("action_disconnect", "Disconnect", "Ctrl+Shift+D", enabled=False),
             ActionSpec("action_settings", "Settings...", "Ctrl+,"),
             ActionSpec("action_diagnostics", "Diagnostics", enabled=False),
         ),
@@ -110,6 +116,8 @@ MENU_SPECS: tuple[MenuSpec, ...] = (
 TOOLBAR_ACTION_NAMES: tuple[str, ...] = (
     "action_open",
     "action_export",
+    "action_connect",
+    "action_disconnect",
     "action_reset_layout",
     "action_settings",
 )
