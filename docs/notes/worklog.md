@@ -375,8 +375,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F6-015` | 20 dk | 26 dk 54 sn | `1c510cb` | küçük performans smoke kontrolünü CI'a ekle |
 | `F6-016` | 20 dk | 9 dk 3 sn | `2b6a8b6` | windows paket smoke kontrolünü CI'a ekle |
 | `F6-017` | 20 dk | 10 dk 22 sn | `0760993` | sürüm artefaktı ve checksum iş akışını ekle |
+| `F6-018` | 15 dk | 11 dk 56 sn | `b3fef3a` | merge ve release kalite kapılarını belgeye bağla |
 
-**357 commit · olculen toplam 4320 dk 59 sn · olculemeyen 1 (ilk commit)**
+**358 commit · olculen toplam 4332 dk 55 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
