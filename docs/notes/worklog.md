@@ -318,8 +318,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-090` | 15 dk | 7 dk 10 sn | `587b1c9` | analiz milestone kabulünü kapat ve major sürümü hazırla |
 | `F5-001` | 20 dk | 9 dk 43 sn | `1de7d02` | canlı paket ve bağlantı sözleşmesini tamamla |
 | `F5-002` | 20 dk | 7 dk 43 sn | `0207c61` | bağlantı durum makinesini ekle |
+| `F5-003` | 20 dk | 10 dk 10 sn | `183c36d` | dosyadan LiveSource replay adaptörünü ekle |
 
-**300 commit · olculen toplam 3489 dk 14 sn · olculemeyen 1 (ilk commit)**
+**301 commit · olculen toplam 3499 dk 24 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

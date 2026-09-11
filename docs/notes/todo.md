@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 498 madde · 299 tamamlandı · 199 kaldı**
+**Toplam 498 madde · 300 tamamlandı · 198 kaldı**
 
-`[##############..........]` %60.0
+`[##############..........]` %60.2
 
 ## Özet
 
@@ -39,10 +39,10 @@ Work in fully autonomous mode.
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
-| Faz 5 — Canlı veri, bağlantı ve kayıt | 3 | 38 | 41 |
+| Faz 5 — Canlı veri, bağlantı ve kayıt | 4 | 37 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **299** | **199** | **498** |
+| **Toplam** | **300** | **198** | **498** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -349,14 +349,14 @@ Work in fully autonomous mode.
 | [x] | `F4-096` | `1.95.0` | 20 dk | Özet ve akış düzeltmeleri sonrası performansı doğrula |
 | [x] | `F4-090` | `2.0.0` | 15 dk | Analiz milestone kabulünü kapat ve major sürümü hazırla |
 
-### Faz 5 — Canlı veri, bağlantı ve kayıt (3/41)
+### Faz 5 — Canlı veri, bağlantı ve kayıt (4/41)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
 | [x] | `F5-001` | `2.1.0` | 20 dk | Canlı paket ve bağlantı sözleşmesini tamamla |
 | [x] | `F5-002` | `2.2.0` | 20 dk | Bağlantı durum makinesini ekle |
 | [x] | `F5-003` | `2.3.0` | 20 dk | Dosyadan LiveSource replay adaptörünü ekle |
-| [ ] | `F5-004` | `2.4.0` | 20 dk | Replay zamanlama ve durdurmayı doğrula |
+| [x] | `F5-004` | `2.4.0` | 20 dk | Replay zamanlama ve durdurmayı doğrula |
 | [ ] | `F5-005` | `2.5.0` | 20 dk | UDP alıcı bağlantısını ekle |
 | [ ] | `F5-006` | `2.6.0` | 20 dk | UDP paketlerini decoder'a bağla |
 | [ ] | `F5-007` | `2.7.0` | 20 dk | TCP bağlantı ve okuma akışını ekle |
