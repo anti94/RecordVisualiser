@@ -96,20 +96,52 @@ def pack_frame(
     )
 
 
+def peek_frame_length(data: bytes) -> int | None:
+    """Bir akışta (TCP) **tam bir çerçevenin** kaç bayt tutacağını söyler.
+
+    `HEADER_SIZE` bayt bile yoksa `None` — daha fazla bayt beklenmeli, bu bir
+    hata **değildir**: akış tamponlaması normal işleyiştir (`F5-008`).
+    Başlık tamsa ama `magic`/`version` tanınmıyorsa `UnrecognizedFrameError`
+    — bu durumda artık "daha bekle" değil, akış senkronu kaybedilmiş demektir.
+    """
+    if len(data) < HEADER_SIZE:
+        return None
+    magic, version, _protocol_id, _flags, _seq, _idx, _count, _ticks, payload_length = (
+        HEADER_STRUCT.unpack_from(data, 0)
+    )
+    if magic != MAGIC:
+        raise UnrecognizedFrameError(f"gecersiz magic: {magic!r}, beklenen {MAGIC!r}")
+    if version != SUPPORTED_VERSION:
+        raise UnrecognizedFrameError(
+            f"desteklenmeyen surum: {version}, beklenen {SUPPORTED_VERSION}"
+        )
+    return HEADER_SIZE + int(payload_length)
+
+
 def unpack_frame(data: bytes) -> tuple[LiveWireHeader, bytes]:
     """Baştaki 28 baytı çözüp `payload_length` kadar payload'ı ayırır.
 
     `data` başlıktan kısaysa veya beyan edilen `payload_length`e ulaşmıyorsa
     `TruncatedDatagramError`; `magic`/`version` tanınmıyorsa
     `UnrecognizedFrameError` fırlatılır — ikisi de `LiveWireDecodeError`.
+    Tam bir datagramın (UDP) her zaman **eksiksiz** geldiği varsayılır; bu
+    yüzden burada "daha bekle" yoktur — kısa veri doğrudan hatadır. Akış
+    tamponlaması (TCP) gereken `peek_frame_length` kullanır.
     """
-    if len(data) < HEADER_SIZE:
+    total = peek_frame_length(data)
+    if total is None:
         raise TruncatedDatagramError(
             f"cerceve {len(data)} bayt, en az {HEADER_SIZE} bayt (baslik) gerekli"
         )
+    if len(data) < total:
+        raise TruncatedDatagramError(
+            f"payload {len(data) - HEADER_SIZE} bayt, beyan edilen payload_length "
+            f"{total - HEADER_SIZE} bayta ulasmiyor"
+        )
+
     (
-        magic,
-        version,
+        _magic,
+        _version,
         protocol_id,
         flags,
         sequence_no,
@@ -118,20 +150,6 @@ def unpack_frame(data: bytes) -> tuple[LiveWireHeader, bytes]:
         device_ticks,
         payload_length,
     ) = HEADER_STRUCT.unpack_from(data, 0)
-    if magic != MAGIC:
-        raise UnrecognizedFrameError(f"gecersiz magic: {magic!r}, beklenen {MAGIC!r}")
-    if version != SUPPORTED_VERSION:
-        raise UnrecognizedFrameError(
-            f"desteklenmeyen surum: {version}, beklenen {SUPPORTED_VERSION}"
-        )
-
-    payload = data[HEADER_SIZE:]
-    if len(payload) < payload_length:
-        raise TruncatedDatagramError(
-            f"payload {len(payload)} bayt, beyan edilen payload_length "
-            f"{payload_length} bayta ulasmiyor"
-        )
-
     header = LiveWireHeader(
         protocol_id=protocol_id,
         flags=flags,
@@ -141,4 +159,4 @@ def unpack_frame(data: bytes) -> tuple[LiveWireHeader, bytes]:
         device_ticks=device_ticks,
         payload_length=payload_length,
     )
-    return header, payload[:payload_length]
+    return header, data[HEADER_SIZE:total]
