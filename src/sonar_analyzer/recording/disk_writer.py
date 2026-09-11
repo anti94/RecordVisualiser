@@ -15,8 +15,9 @@ Kayıp **görünürdür**: düşen blok sayısı, yazılan blok sayısı ve kuyr
 derinliği okunabilir sayaçlardır. Sessizce düşen bir kayıt, kullanıcının
 eksik bir dosyayı tam sanması demek olurdu.
 
-Yazma hatalarının işlenmesi (`disk dolu` vb.) `F5-030`'un işidir; burada
-hata yalnız kaydedilir ve worker durur.
+Yazma hatası olduğunda worker durur, hata metni ve `errno`'su okunabilir
+kalır. Bunun bir **kayıt durumuna** (ve kullanıcıya verilen mesaja)
+dönüşmesi `recording/session.py`'nin işidir (`F5-030`).
 
 `F5-029` — flush ve güvenli kapatma
 -----------------------------------
@@ -141,6 +142,7 @@ class DiskWriterWorker(threading.Thread):
         self._written = 0
         self._written_bytes = 0
         self._error: str | None = None
+        self._error_code: int | None = None
 
     @property
     def written_records(self) -> int:
@@ -157,8 +159,17 @@ class DiskWriterWorker(threading.Thread):
 
     @property
     def error(self) -> str | None:
-        """Yazma sırasında oluşan hata; yoksa `None` (ayrıntılı işleme `F5-030`)."""
+        """Yazma sırasında oluşan hata; yoksa `None`."""
         return self._error
+
+    @property
+    def error_code(self) -> int | None:
+        """Hatanın `errno` değeri — `ENOSPC` gibi durumları ayırt etmek için (`F5-030`)."""
+        return self._error_code
+
+    def _record_failure(self, exc: OSError) -> None:
+        self._error = f"{exc}"
+        self._error_code = exc.errno
 
     def stop(self) -> None:
         self._stopping.set()
@@ -174,7 +185,7 @@ class DiskWriterWorker(threading.Thread):
             try:
                 self._stream.write(block)
             except OSError as exc:
-                self._error = f"{exc}"
+                self._record_failure(exc)
                 break
             self._written += 1
             self._written_bytes += len(block)
@@ -192,7 +203,7 @@ class DiskWriterWorker(threading.Thread):
             try:
                 self._stream.write(block)
             except OSError as exc:
-                self._error = f"{exc}"
+                self._record_failure(exc)
                 return
             self._written += 1
             self._written_bytes += len(block)
@@ -239,6 +250,12 @@ class RecordingWriter:
     def error(self) -> str | None:
         worker = self._worker
         return None if worker is None else worker.error
+
+    @property
+    def error_code(self) -> int | None:
+        """Yazma hatasının `errno` değeri; yoksa `None` (`F5-030`)."""
+        worker = self._worker
+        return None if worker is None else worker.error_code
 
     @property
     def is_open(self) -> bool:
