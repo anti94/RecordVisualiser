@@ -53,6 +53,8 @@ dev = [
     "pyright==1.1.411",
     # F6-013: coverage olcumu ve esikleri.
     "pytest-cov>=5.0",
+    # F6-014: bagimlilik guvenlik taramasi.
+    "pip-audit>=2.7",
 ]
 
 [project.scripts]

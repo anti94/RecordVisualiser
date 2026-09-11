@@ -80,6 +80,14 @@ jobs:
         # tools/coverage_gate.py icinde (F6-013).
         run: python tools/coverage_gate.py
 
+      - name: Bagimlilik taramasi (F6-014)
+        # Engelleyici olcut: bulgu KULLANICIYA GIDEN bir bagimliliktaysa
+        # is basarisiz olur. Gelistirme araclarindaki bulgular raporlanir
+        # ama yayini durdurmaz.
+        run: |
+          python -m pip install pip-audit
+          python tools/dependency_scan.py
+
   todo-sync:
     name: todo.md plan.md ile guncel mi
     runs-on: windows-latest

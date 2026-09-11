@@ -1,0 +1,143 @@
+{
+  "scanned": true,
+  "exit_code": 1,
+  "packages_scanned": 56,
+  "findings": [
+    {
+      "package": "filelock",
+      "version": "3.19.1",
+      "vulnerability_id": "PYSEC-2026-1375",
+      "severity": "bilinmiyor",
+      "fix_versions": [
+        "3.20.1"
+      ]
+    },
+    {
+      "package": "filelock",
+      "version": "3.19.1",
+      "vulnerability_id": "PYSEC-2026-1374",
+      "severity": "bilinmiyor",
+      "fix_versions": [
+        "3.20.3"
+      ]
+    },
+    {
+      "package": "msgpack",
+      "version": "1.1.2",
+      "vulnerability_id": "PYSEC-2026-3625",
+      "severity": "bilinmiyor",
+      "fix_versions": [
+        "1.2.1"
+      ]
+    },
+    {
+      "package": "pip",
+      "version": "26.0.1",
+      "vulnerability_id": "PYSEC-2026-196",
+      "severity": "bilinmiyor",
+      "fix_versions": [
+        "26.1.2"
+      ]
+    },
+    {
+      "package": "pip",
+      "version": "26.0.1",
+      "vulnerability_id": "PYSEC-2026-2875",
+      "severity": "bilinmiyor",
+      "fix_versions": [
+        "26.1"
+      ]
+    },
+    {
+      "package": "pip",
+      "version": "26.0.1",
+      "vulnerability_id": "PYSEC-2026-2876",
+      "severity": "bilinmiyor",
+      "fix_versions": [
+        "26.1"
+      ]
+    },
+    {
+      "package": "pip",
+      "version": "26.0.1",
+      "vulnerability_id": "PYSEC-2026-3721",
+      "severity": "bilinmiyor",
+      "fix_versions": [
+        "26.2"
+      ]
+    },
+    {
+      "package": "pytest",
+      "version": "8.4.2",
+      "vulnerability_id": "PYSEC-2026-1845",
+      "severity": "bilinmiyor",
+      "fix_versions": [
+        "9.0.3"
+      ]
+    },
+    {
+      "package": "requests",
+      "version": "2.32.5",
+      "vulnerability_id": "PYSEC-2026-2275",
+      "severity": "bilinmiyor",
+      "fix_versions": [
+        "2.33.0"
+      ]
+    },
+    {
+      "package": "setuptools",
+      "version": "58.1.0",
+      "vulnerability_id": "PYSEC-2022-43012",
+      "severity": "bilinmiyor",
+      "fix_versions": [
+        "65.5.1"
+      ]
+    },
+    {
+      "package": "setuptools",
+      "version": "58.1.0",
+      "vulnerability_id": "PYSEC-2025-49",
+      "severity": "bilinmiyor",
+      "fix_versions": [
+        "78.1.1"
+      ]
+    },
+    {
+      "package": "setuptools",
+      "version": "58.1.0",
+      "vulnerability_id": "PYSEC-2026-1918",
+      "severity": "bilinmiyor",
+      "fix_versions": [
+        "70.0.0"
+      ]
+    },
+    {
+      "package": "setuptools",
+      "version": "58.1.0",
+      "vulnerability_id": "PYSEC-2026-3447",
+      "severity": "bilinmiyor",
+      "fix_versions": [
+        "83.0.0"
+      ]
+    },
+    {
+      "package": "urllib3",
+      "version": "2.6.3",
+      "vulnerability_id": "PYSEC-2026-142",
+      "severity": "bilinmiyor",
+      "fix_versions": [
+        "2.7.0"
+      ]
+    },
+    {
+      "package": "urllib3",
+      "version": "2.6.3",
+      "vulnerability_id": "PYSEC-2026-141",
+      "severity": "bilinmiyor",
+      "fix_versions": [
+        "2.7.0"
+      ]
+    }
+  ],
+  "message": ""
+}

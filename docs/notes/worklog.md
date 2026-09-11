@@ -369,8 +369,10 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F6-010` | 20 dk | 11 dk 8 sn | `34cd500` | aynı girdilerle paket üretimini karşılaştır |
 | `F6-011` | 20 dk | 23 dk 54 sn | `8dc15fd` | offline bağımlılık paketleme akışını hazırla |
 | `F6-012` | 20 dk | 10 dk 14 sn | `d7fa44e` | imzalama gereksinimini yayın akışına bağla |
+| `F6-013` | 20 dk | 19 dk 31 sn | `4f62dc2` | coverage raporu ve eşiklerini CI'a ekle |
+| `F6-013` | 20 dk | 25 sn | `b18fc4e` | plan işaretini düzelt |
 
-**351 commit · olculen toplam 4243 dk 14 sn · olculemeyen 1 (ilk commit)**
+**353 commit · olculen toplam 4263 dk 10 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
