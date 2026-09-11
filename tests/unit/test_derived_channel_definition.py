@@ -138,11 +138,12 @@ def test_the_derived_id_is_a_short_prefixed_fingerprint() -> None:
     assert digest == definition.fingerprint()[:16]
 
 
-def test_the_signature_is_readable_json_of_inputs_and_chain() -> None:
+def test_the_signature_is_readable_json_of_inputs_chain_and_expression() -> None:
     payload = json.loads(_definition().signature())
-    assert set(payload) == {"inputs", "chain"}
+    assert set(payload) == {"inputs", "chain", "expression"}
     assert payload["inputs"] == ["ch0"]
     assert len(payload["chain"]) == 1
+    assert payload["expression"] == ""
 
 
 # --------------------------------------------------------------------------- #
@@ -274,7 +275,15 @@ def test_a_definition_round_trips_through_json_text() -> None:
 def test_the_serialised_form_names_its_schema_version() -> None:
     payload = _definition().to_dict()
     assert payload["schema_version"] == DEFINITION_SCHEMA_VERSION == 1
-    assert set(payload) == {"schema_version", "name", "inputs", "chain", "unit", "description"}
+    assert set(payload) == {
+        "schema_version",
+        "name",
+        "inputs",
+        "chain",
+        "unit",
+        "description",
+        "expression",
+    }
 
 
 def test_an_unknown_schema_version_is_refused() -> None:
@@ -298,6 +307,7 @@ def test_a_missing_schema_version_is_read_as_the_current_one() -> None:
         ("chain", {}, "chain bir dizi"),
         ("unit", 3, "unit metin"),
         ("description", 7, "description metin"),
+        ("expression", 7, "expression metin"),
     ],
 )
 def test_a_malformed_field_is_refused(field_name: str, value: object, message: str) -> None:
@@ -317,3 +327,61 @@ def test_a_non_string_input_id_is_refused() -> None:
     payload["inputs"] = ["ch0", 7]
     with pytest.raises(DerivedChannelError, match="metin olmalı"):
         DerivedChannelDefinition.from_dict(payload)
+
+
+# --------------------------------------------------------------------------- #
+# ifade alani (F4-073 ile eklendi)
+# --------------------------------------------------------------------------- #
+
+
+def test_a_definition_can_carry_an_expression() -> None:
+    definition = DerivedChannelDefinition(
+        name="Fark", inputs=("ch0", "ch1"), expression="ch0 - ch1"
+    )
+    assert definition.expression == "ch0 - ch1"
+    assert definition.inputs == ("ch0", "ch1")
+
+
+def test_the_expression_changes_the_identity() -> None:
+    """İfade sonucu belirler; kimliğe girmeli."""
+    plain = DerivedChannelDefinition(name="x", inputs=("ch0", "ch1"))
+    with_expression = DerivedChannelDefinition(
+        name="x", inputs=("ch0", "ch1"), expression="ch0 - ch1"
+    )
+    other = DerivedChannelDefinition(name="x", inputs=("ch0", "ch1"), expression="ch0 + ch1")
+    assert plain.derived_id != with_expression.derived_id
+    assert with_expression.derived_id != other.derived_id
+
+
+def test_surrounding_whitespace_in_an_expression_does_not_change_the_identity() -> None:
+    first = DerivedChannelDefinition(name="x", inputs=("ch0",), expression="ch0 * 2")
+    second = DerivedChannelDefinition(name="x", inputs=("ch0",), expression="  ch0 * 2  ")
+    assert first.derived_id == second.derived_id
+
+
+def test_an_expression_needs_inputs_that_can_be_written_in_a_formula() -> None:
+    """`derived:ab12` formülde yazılamaz; ifadeli tanım onu giriş alamaz."""
+    with pytest.raises(DerivedChannelError, match="yazılabilir olmalı"):
+        DerivedChannelDefinition(name="x", inputs=("derived:ab12",), expression="a * 2")
+
+
+def test_a_chain_only_definition_may_still_use_any_input_id() -> None:
+    """İfade yoksa kısıt da yok: zincir kimliği metin olarak taşır."""
+    definition = DerivedChannelDefinition(name="x", inputs=("derived:ab12",))
+    assert definition.inputs == ("derived:ab12",)
+
+
+def test_the_expression_round_trips() -> None:
+    definition = DerivedChannelDefinition(
+        name="Fark", inputs=("ch0", "ch1"), expression="ch0 - ch1"
+    )
+    restored = DerivedChannelDefinition.from_dict(definition.to_dict())
+    assert restored.expression == "ch0 - ch1"
+    assert restored == definition
+    assert restored.derived_id == definition.derived_id
+
+
+def test_renaming_keeps_the_expression() -> None:
+    definition = DerivedChannelDefinition(name="x", inputs=("ch0",), expression="ch0 * 2")
+    assert definition.renamed("y").expression == "ch0 * 2"
+    assert definition.renamed("y").derived_id == definition.derived_id

@@ -53,12 +53,17 @@ from sonar_analyzer.application.point_budget import points_for_width
 from sonar_analyzer.application.scrub_debounce import ScrubDebouncer
 from sonar_analyzer.application.view_history import ViewCommand, ViewHistory
 from sonar_analyzer.domain.channel import ChannelMetadata
+from sonar_analyzer.domain.derived_channel_definition import DerivedChannelDefinition
 from sonar_analyzer.domain.event import Event
 from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.export.csv_export import CsvExportResult, write_channel_csv
 from sonar_analyzer.export.image_export import export_widget_png
 from sonar_analyzer.logging.performance import measure
+from sonar_analyzer.repository.derived_repository import (
+    DerivedChannelError,
+    DerivedChannelRepository,
+)
 from sonar_analyzer.repository.file_repository import FileRecordingRepository
 from sonar_analyzer.repository.mock_repository import SIMULATION_LABEL, MockRecordingRepository
 from sonar_analyzer.repository.protocol import RecordingRepository
@@ -228,6 +233,9 @@ class MainWindow(QMainWindow):
         self.right_dock.analysis_tools.apply_requested.connect(self._on_apply_processing)
         self.right_dock.analysis_tools.show_filtered_toggled.connect(
             self.plot_panel.set_processed_overlay_visible
+        )
+        self.right_dock.analysis_tools.formula_editor.definition_requested.connect(
+            self._on_derived_channel_requested
         )
         self.bottom_dock.event_selected.connect(self._on_event_selected)
         self.bottom_dock.event_activated.connect(self._on_event_activated)
@@ -692,6 +700,25 @@ class MainWindow(QMainWindow):
                 f"(kaynak {channel.sample_rate_hz or 0:g} Hz)."
             )
 
+    def _on_derived_channel_requested(self, definition: object) -> None:
+        """Formül editöründen gelen tanımı `Derived/` ağacına ekler — `F4-073`."""
+        if not isinstance(definition, DerivedChannelDefinition):
+            return
+        repository = self._repository
+        if not isinstance(repository, DerivedChannelRepository):
+            self.bottom_dock.append_log("Türetilmiş kanal için önce bir kayıt açın.")
+            return
+        try:
+            channel = repository.add(definition)
+        except DerivedChannelError as exc:
+            self.bottom_dock.append_log(f"Türetilmiş kanal eklenemedi: {exc}")
+            return
+        # Kanal ağacı ve seçiciler yeni kanalı görsün.
+        self.set_recording(repository.metadata(), repository.channels())
+        self.bottom_dock.append_log(
+            f"Türetilmiş kanal eklendi: {channel.path} = {definition.expression}"
+        )
+
     def _on_dsp_result(self, _job_id: int, channel_id: str, result: object) -> None:
         from sonar_analyzer.processing.chain import ChainResult
 
@@ -998,11 +1025,12 @@ class MainWindow(QMainWindow):
         gibi ham offseti olmayan kaynaklarda Raw alanları boş kalır.
         """
         channel = self.plot_panel.channel
-        if channel is None or not isinstance(self._repository, FileRecordingRepository):
+        source = self.base_repository()
+        if channel is None or not isinstance(source, FileRecordingRepository):
             return
         try:
             timestamp_ns = self.plot_panel.timestamp_ns_for_x(sample_seconds)
-            inspection = self._repository.inspect_sample(channel.id, timestamp_ns)
+            inspection = source.inspect_sample(channel.id, timestamp_ns)
         except (RuntimeError, LookupError, KeyError):
             return
         self.right_dock.inspector.show_raw_sample(inspection, channel.unit or "")
@@ -1554,7 +1582,14 @@ class MainWindow(QMainWindow):
         super().closeEvent(event)
 
     def set_repository(self, repository: RecordingRepository) -> None:
-        """Bir veri kaynağını açar ve panellere dağıtır."""
+        """Bir veri kaynağını açar ve panellere dağıtır.
+
+        Kaynak `F4-069` sarmalayıcısıyla sarılır: formül editörünün
+        (`F4-073`) ürettiği türetilmiş kanallar ham kaynağa dokunmadan
+        aynı sözleşme üzerinden sorgulanabilir olur.
+        """
+        if not isinstance(repository, DerivedChannelRepository):
+            repository = DerivedChannelRepository(repository)
         self._repository = repository
         metadata = repository.metadata()
         channels = repository.channels()
@@ -1711,6 +1746,8 @@ class MainWindow(QMainWindow):
         self._channels = tuple(channels)
         self.left_dock.set_recording(metadata, channels)
         self.plot_tool_bar.set_channels(list(channels))
+        # F4-073: formül editörü yalnız bu kayıttaki kanalları kabul etsin.
+        self.right_dock.analysis_tools.formula_editor.set_channels(list(channels))
         self.right_dock.close_inspector()
         self.right_dock.bit_status.clear()
         self.plot_panel.clear()
@@ -1763,9 +1800,26 @@ class MainWindow(QMainWindow):
         assert self._repository is not None
         return self._repository.metadata().source_path
 
+    @property
+    def repository(self) -> RecordingRepository | None:
+        """Panellerin okuduğu kaynak — `F4-073` sarmalayıcısı dahil."""
+        return self._repository
+
+    def base_repository(self) -> RecordingRepository | None:
+        """`F4-073` sarmalayıcısının altındaki asıl kaynak.
+
+        `set_repository` kaynağı `DerivedChannelRepository` ile sarar;
+        kimlik ve tür karşılaştırmaları (hangi dosya açık, ham kayıt
+        incelemesi) sarmalayıcıyı değil **tabanı** görmelidir.
+        """
+        repository = self._repository
+        if isinstance(repository, DerivedChannelRepository):
+            return repository.base
+        return repository
+
     def _detach_active_repository(self) -> FileRecordingRepository | None:
         """Etkin kaydı kapatıp listelerden çıkarır; varsa sıradakini döner."""
-        active = self._repository
+        active = self.base_repository()
         self._repository = None
 
         promoted: FileRecordingRepository | None = None

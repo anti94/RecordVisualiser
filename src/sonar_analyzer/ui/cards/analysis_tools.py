@@ -29,6 +29,7 @@ from PySide6.QtWidgets import (
 from sonar_analyzer.processing.chain import ProcessingChain
 from sonar_analyzer.processing.steps import ProcessingStep, StepKind
 from sonar_analyzer.ui.actions import NOT_YET_AVAILABLE
+from sonar_analyzer.ui.cards.formula_editor import FormulaEditor
 from sonar_analyzer.ui.cards.step_list_editor import StepListEditor
 from sonar_analyzer.workspace.model import FilterToolState
 
@@ -102,9 +103,17 @@ class AnalysisToolsCard(QGroupBox):
         self.tabs.addTab(self._build_filter_tab(), "Filter")
         self.tabs.addTab(_placeholder_tab(self, "FFT"), "FFT")
         self.tabs.addTab(_placeholder_tab(self, "Statistics"), "Statistics")
-        # F4-006: "Custom" sekmesi artık gerçek işlem listesi editörünü barındırır.
-        self.step_editor = StepListEditor(self)
-        self.tabs.addTab(self.step_editor, "Custom")
+        # F4-006: "Custom" sekmesi gerçek işlem listesi editörünü barındırır.
+        # F4-073: altına formül editörü eklendi; ikisi tek sayfada durur.
+        self.custom_page = QWidget(self)
+        self.custom_page.setObjectName("page_custom_tools")
+        custom_layout = QVBoxLayout(self.custom_page)
+        custom_layout.setContentsMargins(0, 0, 0, 0)
+        self.step_editor = StepListEditor(self.custom_page)
+        self.formula_editor = FormulaEditor(self.custom_page)
+        custom_layout.addWidget(self.step_editor, 1)
+        custom_layout.addWidget(self.formula_editor)
+        self.tabs.addTab(self.custom_page, "Custom")
         layout.addWidget(self.tabs)
 
     def _build_filter_tab(self) -> QWidget:
@@ -198,6 +207,10 @@ class AnalysisToolsCard(QGroupBox):
 
     def active_tab_title(self) -> str:
         return self.tabs.tabText(self.tabs.currentIndex())
+
+    def select_custom_tab(self) -> None:
+        """Custom sekmesini etkinleştirir — sayfa `F4-073` ile bir kapsayıcıdır."""
+        self.tabs.setCurrentWidget(self.custom_page)
 
     def cutoff_label_text(self) -> str:
         """İlk cutoff alanının o anki etiketi — yanıt türüne göre değişir (`F4-035`)."""

@@ -95,13 +95,19 @@ def test_placeholder_text_mentions_availability(card: AnalysisToolsCard) -> None
         assert any(NOT_YET_AVAILABLE in label.text() for label in labels)
 
 
-def test_custom_tab_hosts_the_step_list_editor(card: AnalysisToolsCard) -> None:
-    """`F4-006`: Custom sekmesi artık gerçek işlem listesi editörüdür."""
-    from sonar_analyzer.ui.cards.step_list_editor import StepListEditor
-
+def test_custom_tab_hosts_the_step_list_and_formula_editors(card: AnalysisToolsCard) -> None:
+    """`F4-006` işlem listesi, `F4-073` formül editörü — ikisi tek sayfada."""
     custom_index = card.tab_titles().index("Custom")
-    assert isinstance(card.tabs.widget(custom_index), StepListEditor)
-    assert card.step_editor is card.tabs.widget(custom_index)
+    page = card.tabs.widget(custom_index)
+    assert page is card.custom_page
+    assert card.step_editor.parent() is page
+    assert card.formula_editor.parent() is page
+
+
+def test_select_custom_tab_activates_that_page(card: AnalysisToolsCard) -> None:
+    card.select_custom_tab()
+    assert card.active_tab_title() == "Custom"
+    assert card.tabs.currentWidget() is card.custom_page
 
 
 def test_no_fake_computed_result_is_shown(card: AnalysisToolsCard) -> None:

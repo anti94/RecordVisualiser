@@ -113,7 +113,7 @@ def test_apply_logs_the_derived_channel(qtbot: QtBot) -> None:
     _add_resample(editor)
     editor.set_param_field("target_rate_hz", 4.0)  # 8 Hz -> 4 Hz
 
-    tools.tabs.setCurrentWidget(editor)
+    tools.select_custom_tab()
     tools.apply_requested.emit()
 
     log = "\n".join(window.bottom_dock.log_lines())

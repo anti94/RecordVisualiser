@@ -32,7 +32,7 @@ def win(qtbot: QtBot) -> MainWindow:
 
 def _select_custom_tab(win: MainWindow) -> None:
     tools = win.right_dock.analysis_tools
-    tools.tabs.setCurrentWidget(tools.step_editor)
+    tools.select_custom_tab()
 
 
 def _add_scale_step(win: MainWindow, factor: float) -> None:

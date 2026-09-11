@@ -61,6 +61,9 @@ class DerivedChannelDefinition:
     chain: ProcessingChain = field(default_factory=ProcessingChain)
     unit: str | None = None
     description: str = ""
+    #: Varsa seriyi **üreten** aritmetik ifade (`F4-070`); zincir onun
+    #: çıktısını işler. Boşsa kaynak doğrudan `inputs[0]`'dır.
+    expression: str = ""
 
     def __post_init__(self) -> None:
         if not self.name.strip():
@@ -79,6 +82,15 @@ class DerivedChannelDefinition:
             raise DerivedChannelError(
                 f"Zincir bildirilmemiş kanala bakıyor: {undeclared}; bildirilenler {list(inputs)}"
             )
+        if self.expression.strip():
+            # İfade sorgu anında yeniden ayrıştırılır; bunun için giriş
+            # kimliklerinin formülde yazılabilir olması şarttır.
+            unwritable = sorted(cid for cid in inputs if not cid.isidentifier())
+            if unwritable:
+                raise DerivedChannelError(
+                    f"İfadeli tanımın girişleri formülde yazılabilir olmalı; "
+                    f"şunlar tanımlayıcı değil: {unwritable}"
+                )
         object.__setattr__(self, "inputs", inputs)
 
     # -- yeniden uretilebilirlik ------------------------------------
@@ -98,6 +110,7 @@ class DerivedChannelDefinition:
         payload = {
             "inputs": list(self.inputs),
             "chain": cast("list[str]", json.loads(self.chain.signature())),
+            "expression": self.expression.strip(),
         }
         return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
@@ -124,6 +137,7 @@ class DerivedChannelDefinition:
             chain=self.chain,
             unit=self.unit,
             description=self.description,
+            expression=self.expression,
         )
 
     def with_chain(self, chain: ProcessingChain) -> DerivedChannelDefinition:
@@ -134,6 +148,7 @@ class DerivedChannelDefinition:
             chain=chain,
             unit=self.unit,
             description=self.description,
+            expression=self.expression,
         )
 
     def with_step(self, step: ProcessingStep) -> DerivedChannelDefinition:
@@ -151,6 +166,7 @@ class DerivedChannelDefinition:
             "chain": self.chain.to_list(),
             "unit": self.unit,
             "description": self.description,
+            "expression": self.expression,
         }
 
     @classmethod
@@ -184,10 +200,14 @@ class DerivedChannelDefinition:
         description = record.get("description", "")
         if not isinstance(description, str):
             raise DerivedChannelError("description metin olmalı")
+        expression = record.get("expression", "")
+        if not isinstance(expression, str):
+            raise DerivedChannelError("expression metin olmalı")
         return cls(
             name=name,
             inputs=tuple(inputs),
             chain=ProcessingChain.from_list(cast("list[object]", raw_chain)),
             unit=unit,
             description=description,
+            expression=expression,
         )

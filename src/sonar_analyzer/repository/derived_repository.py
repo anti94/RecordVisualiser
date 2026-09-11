@@ -15,6 +15,12 @@ zincir **tam çözünürlüklü** veriyle çalışır, indirgeme en sonda yapıl
 Tersi yapılsaydı kayan pencere ortalaması, RMS veya filtre indirgenmiş
 veriyi işleyip yanlış sonuç üretirdi.
 
+Bir tanım bir **ifade** taşıyorsa (`F4-073` formül editörü) seriyi o ifade
+üretir (`F4-070` ayrıştırır, `F4-071` değerlendirir) ve zincir onun
+çıktısını işler; ifade yoksa kaynak doğrudan tek girişin kendisidir.
+İfade `add()` sırasında da ayrıştırılır ki kullanıcı hatayı kanalı
+kullanmaya çalışırken değil, eklerken görsün.
+
 Türetilmiş bir kanal başka bir türetilmiş kanalı girdi alabilir; `Derived`
 gerçekten bir ağaçtır. Döngü kurulamaz: `derived_id` tanımın içeriğinden
 türediği için bir tanım kendi kimliğini önceden bilip kendine bakamaz.
@@ -25,6 +31,8 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 from sonar_analyzer.analysis.downsampling import downsample_chunk
+from sonar_analyzer.analysis.formula import FormulaError, aliases_for, parse_formula
+from sonar_analyzer.analysis.formula_eval import evaluate_formula
 from sonar_analyzer.application.derived_channel import derived_sample_rate
 from sonar_analyzer.domain.channel import ChannelMetadata, ChannelSource
 from sonar_analyzer.domain.data_chunk import DataChunk
@@ -74,12 +82,21 @@ class DerivedChannelRepository:
         Aynı `derived_id` zaten varsa aynı veriyi üreten bir tanım demektir
         (kimlik içerikten türer); yalnız görünen bilgiler tazelenir.
         """
-        if len(definition.inputs) > 1:
-            # Sessizce ilk girişi kullanmak yanlış veri üretirdi; açıkça reddedilir.
+        if len(definition.inputs) > 1 and not definition.expression.strip():
+            # İfadesiz bir zincir tek akış işler; sessizce ilk girişi
+            # kullanmak yanlış veri üretirdi.
             raise DerivedChannelError(
-                f"'{definition.name}' {len(definition.inputs)} giriş bildiriyor; işlem zinciri "
-                f"tek akış işler. Çok girişli kanallar formül desteğiyle gelir (`F4-070`+)."
+                f"'{definition.name}' {len(definition.inputs)} giriş bildiriyor ama bir ifade "
+                f"taşımıyor; işlem zinciri tek akış işler. Çok girişli kanal için bir formül "
+                f"yazın (`F4-070`)."
             )
+        if definition.expression.strip():
+            # Sorgu anında değil, **ekleme** anında patlasın: kullanıcı
+            # hatayı kanalı kullanmaya çalışırken değil, eklerken görsün.
+            try:
+                parse_formula(definition.expression, aliases_for(definition.inputs))
+            except FormulaError as exc:
+                raise DerivedChannelError(f"'{definition.name}' formülü geçersiz: {exc}") from exc
         for channel_id in definition.inputs:
             if self._lookup(channel_id) is None:
                 raise DerivedChannelError(
@@ -135,7 +152,7 @@ class DerivedChannelRepository:
             return self._base.query(channel_id, time_range, max_points)
 
         # Zincir tam çözünürlüklü veriyle çalışır; bütçe en sonda uygulanır.
-        source = self._query_source(definition.inputs[0], time_range)
+        source = self._source_chunk(definition, time_range)
         result = definition.chain.run(source.values, source.quality)
         derived = DataChunk(
             channel_id=channel_id,
@@ -144,6 +161,19 @@ class DerivedChannelRepository:
             quality=source.quality,
         )
         return downsample_chunk(derived, max_points)
+
+    def _source_chunk(
+        self, definition: DerivedChannelDefinition, time_range: TimeRange
+    ) -> DataChunk:
+        """Zincire girecek seri: ya formülün çıktısı ya da tek girişin kendisi."""
+        if not definition.expression.strip():
+            return self._query_source(definition.inputs[0], time_range)
+        formula = parse_formula(definition.expression, aliases_for(definition.inputs))
+        chunks = {
+            channel_id: self._query_source(channel_id, time_range)
+            for channel_id in formula.channel_ids
+        }
+        return evaluate_formula(formula, chunks, channel_id=definition.derived_id)
 
     def events(
         self,

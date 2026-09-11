@@ -106,7 +106,7 @@ def test_invalid_cutoff_is_reported_and_nothing_is_drawn(win: MainWindow) -> Non
 def test_custom_tab_chain_still_applies_when_it_is_active(win: MainWindow, qtbot: QtBot) -> None:
     tools = _filter_card(win)
     editor = tools.step_editor
-    tools.tabs.setCurrentWidget(editor)
+    tools.select_custom_tab()
     editor.kind_selector.setCurrentIndex(editor.kind_selector.findData(StepKind.SCALE))
     editor.add_button.click()
     editor.list.setCurrentRow(0)
