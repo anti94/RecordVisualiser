@@ -319,8 +319,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F5-001` | 20 dk | 9 dk 43 sn | `1de7d02` | canlı paket ve bağlantı sözleşmesini tamamla |
 | `F5-002` | 20 dk | 7 dk 43 sn | `0207c61` | bağlantı durum makinesini ekle |
 | `F5-003` | 20 dk | 10 dk 10 sn | `183c36d` | dosyadan LiveSource replay adaptörünü ekle |
+| `F5-004` | 20 dk | 8 dk 0 sn | `8ee9f24` | replay zamanlama ve durdurmayı doğrula |
 
-**301 commit · olculen toplam 3499 dk 24 sn · olculemeyen 1 (ilk commit)**
+**302 commit · olculen toplam 3507 dk 24 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
