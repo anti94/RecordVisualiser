@@ -236,15 +236,19 @@ def test_event_capacity_must_be_positive() -> None:
 # --------------------------------------------------------------------------- #
 
 
-def test_bit_results_are_empty_because_live_packets_do_not_carry_them() -> None:
-    """`LivePacket` şeması BIT sonucu taşımaz; dolu görünmesi için uydurulmaz."""
+def test_bit_results_stay_empty_when_the_source_reports_none() -> None:
+    """BIT bildirmeyen kaynakta sonuç **uydurulmaz**.
+
+    `F5-034` ile `LivePacket` BIT taşıyabiliyor; taşımadığında liste boş
+    kalır — doldurmak, arızasız görünen uydurma bir pano demek olurdu.
+    """
     _recorded_repo, live = _both_sources()
-    assert live.bit_results(TimeRange(0, 10**12)) == ()
+    assert list(live.bit_results(TimeRange(0, 10**12))) == []
 
 
-def test_transmissions_are_empty_for_the_same_reason() -> None:
+def test_transmissions_stay_empty_for_the_same_reason() -> None:
     _recorded_repo, live = _both_sources()
-    assert live.transmissions(TimeRange(0, 10**12)) == ()
+    assert list(live.transmissions(TimeRange(0, 10**12))) == []
 
 
 # --------------------------------------------------------------------------- #

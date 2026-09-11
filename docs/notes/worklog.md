@@ -348,8 +348,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F5-030` | 20 dk | 9 dk 49 sn | `c70c883` | disk dolması ve yazma hatasını işle |
 | `F5-031` | 20 dk | 8 dk 24 sn | `1b477d1` | boyut ve isim sınırında yeni dosyaya geç |
 | `F5-032` | 20 dk | 44 dk 48 sn | `3f7817b` | record ve Stop durumunu ana ekrana bağla |
+| `F5-033` | 20 dk | 13 dk 35 sn | `c896ddb` | bağlantı kesilmesinde kayıt davranışını uygula |
 
-**330 commit · olculen toplam 3832 dk 25 sn · olculemeyen 1 (ilk commit)**
+**331 commit · olculen toplam 3846 dk 0 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

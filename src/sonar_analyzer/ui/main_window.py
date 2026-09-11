@@ -692,10 +692,42 @@ class MainWindow(QMainWindow):
                 buffer_channel=self._live_plot_channel,
             )
             self._refresh_live_plot(repository)
+            # F5-034: BIT/TX panosu da ayni karede, ayni repository'den.
+            self._refresh_live_events(repository)
             # F5-032: kayit sayaclari da ayni karede tazelenir; ekrandaki
             # sure ile diske yazilan veri birbirini takip eder.
             self._refresh_recording_state()
         return written
+
+    def _refresh_live_events(self, repository: LiveRepository) -> None:
+        """Canlı BIT/TX olaylarını panoya bağlar — `F5-034`.
+
+        Kabul kriteri ("Sağ BIT özeti ve grafik marker'ları **aynı**
+        geçişi gösterir") burada yapısal olarak sağlanır: özet, trend,
+        marker'lar ve TX bantları tek bir zaman aralığı için **tek bir
+        repository'den** aynı çağrıda okunur. Dosya tarafındaki
+        `set_repository` ile aynı sıra ve aynı sözleşme kullanılır; iki
+        yüzeyi ayrı ayrı besleyen bir kod er geç ayrışırdı.
+        """
+        span = repository.metadata().time_range
+        if span.end_ns <= span.start_ns:
+            return
+
+        events = repository.events(span)
+        self.bottom_dock.set_events(events, start_ns=span.start_ns)
+        self.playback_dock.set_events(events)
+        self.plot_panel.set_event_markers(
+            [(event.timestamp_ns, severity_style(event.severity).color) for event in events]
+        )
+
+        transmissions = repository.transmissions(span)
+        self.plot_panel.set_tx_regions([(tx.start_ns, tx.end_ns) for tx in transmissions])
+        self.transmission_panel.set_intervals(transmissions, start_ns=span.start_ns)
+
+        bit_results = repository.bit_results(span)
+        self.right_dock.bit_status.set_results(bit_results)
+        # F4-081: ayni sonuclar, ayni olcut — ozet ve trend ayrisamaz.
+        self.bit_trend_view.set_results(bit_results, start_ns=span.start_ns, end_ns=span.end_ns)
 
     def _refresh_live_plot(self, repository: LiveRepository) -> None:
         """Canlı tampondan grafiği tazeler; veri yoksa dokunmaz.
