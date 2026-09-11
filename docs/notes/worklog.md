@@ -354,8 +354,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F5-036` | 20 dk | 14 dk 29 sn | `ff78efd` | burst, kayıp ve sıra dışı paket simülatörü ekle |
 | `F5-037` | 20 dk | 18 dk 51 sn | `5f70478` | burst ve bağlantı kesintisi sonuçlarını doğrula |
 | `F5-038` | 20 dk | 59 dk 50 sn | `55f0352` | uzun süreli canlı kayıt koşusunu hazırla |
+| `F5-039` | 20 dk | 18 dk 18 sn | `ef1fd4b` | dayanıklılık koşusu raporunu değerlendir |
 
-**336 commit · olculen toplam 3968 dk 14 sn · olculemeyen 1 (ilk commit)**
+**337 commit · olculen toplam 3986 dk 32 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

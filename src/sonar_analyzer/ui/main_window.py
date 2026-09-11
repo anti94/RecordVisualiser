@@ -107,6 +107,9 @@ from sonar_analyzer.ui.actions import (
 from sonar_analyzer.ui.cards.analysis_tools import FilterTabError
 from sonar_analyzer.ui.cards.data_export import DataExportCard
 from sonar_analyzer.ui.cards.live_status import LiveHealth
+from sonar_analyzer.ui.cards.recording_status import (
+    EMPTY_VALUE as RECORDING_EMPTY_VALUE,
+)
 from sonar_analyzer.ui.cards.recording_status import RecordingStatus
 from sonar_analyzer.ui.docks.bottom_panel import BottomPanelDock
 from sonar_analyzer.ui.docks.data_explorer import DataExplorerDock, selected_channel_ids
@@ -777,6 +780,11 @@ class MainWindow(QMainWindow):
                 self.plot_panel.update_channel_data(channel_id, chunk)
             else:
                 self.plot_panel.add_channel(channel, chunk)
+                # F5-040: merkez alan hala "veri yok" yonlendirmesinde
+                # olabilir (dosya acilmadiysa oyle olur). Canli veri
+                # cizildigi halde bos ekran gostermek, kullaniciya veri
+                # gelmiyormus gibi gorunurdu.
+                self.show_plot()
             self._follow_live_end(chunk)
         finally:
             self._live_plot_updating = False
@@ -1062,9 +1070,14 @@ class MainWindow(QMainWindow):
             return ""
         if status.state is RecordingState.FAILED:
             return "REC HATA"
-        name = status.path.name if status.path is not None else "?"
         prefix = "REC" if recording else "Kayit durdu"
-        return f"{prefix} {name} ({status.record_count})"
+        if status.path is None:
+            # Kayit basladi ama ilk veri paketi gelmedigi icin henuz dosya
+            # yok (`F5-031`: dosya, ilk kaydin pencere baslangicina
+            # capalanir). Kartla AYNI bosluk isaretini kullan; iki yuzeyin
+            # farkli sey soylemesi ayrisma gibi gorunurdu.
+            return f"{prefix} {RECORDING_EMPTY_VALUE}"
+        return f"{prefix} {status.path.name} ({status.record_count})"
 
     # -- duzenleme gecmisi (F4-079) ----------------------------------------
 

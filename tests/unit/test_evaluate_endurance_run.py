@@ -115,7 +115,8 @@ def test_a_short_run_cannot_judge_the_memory_trend() -> None:
 
 
 def test_too_few_samples_cannot_judge_the_memory_trend() -> None:
-    assert _status(_run(memory={"samples": 3, "growth_ratio": 1.0}), "bellek butcesi") == INSUFFICIENT
+    run = _run(memory={"samples": 3, "growth_ratio": 1.0})
+    assert _status(run, "bellek butcesi") == INSUFFICIENT
 
 
 # --------------------------------------------------------------------------- #
@@ -228,15 +229,11 @@ def test_the_verdict_file_is_written(tmp_path: Path) -> None:
 
 def test_the_committed_run_passes_every_criterion() -> None:
     """Depodaki gerçek 2 saatlik koşu üç ölçütü de geçer."""
-    run = json.loads(
-        (ROOT / "docs/live/results/endurance.json").read_text(encoding="utf-8")
-    )
+    run = json.loads((ROOT / "docs/live/results/endurance.json").read_text(encoding="utf-8"))
     assert [verdict.status for verdict in evaluate(run)] == [PASSED, PASSED, PASSED]
 
 
 def test_the_committed_run_is_at_least_two_hours() -> None:
-    run = json.loads(
-        (ROOT / "docs/live/results/endurance.json").read_text(encoding="utf-8")
-    )
+    run = json.loads((ROOT / "docs/live/results/endurance.json").read_text(encoding="utf-8"))
     assert run["hours"] >= 2.0
     assert run["windows"] >= 57_600
