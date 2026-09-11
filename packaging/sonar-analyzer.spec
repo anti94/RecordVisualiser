@@ -35,12 +35,19 @@ ICON_FILE = ROOT / "packaging" / "sonar-analyzer.ico"
 APP_VERSION = VERSION_FILE.read_text(encoding="utf-8").strip()
 
 # Pakete konan veri dosyalari: (kaynak, paket icindeki hedef dizin).
-# VERSION kok dizine ("." ) konur; `_bundled_version_file()` orada arar.
+# VERSION kok dizine ("." ) konur; `resolve_version()` orada arar.
 DATAS = [(str(VERSION_FILE), ".")]
 
-# Qt platform plugin'i, tema ve ikonlar PySide6/pyqtgraph hook'lariyla
-# otomatik toplanir. Toplandiklarinin DOGRULANMASI `F6-003`un isidir;
-# burada yalnizca yapilandirma tanimlanir.
+# F6-003: ikon EXE'ye gomulmenin YANINDA veri olarak da konur. Gomulu ikon
+# yalnizca Dosya Gezgini'nde gorunur; uygulamanin kendi pencere ikonunu
+# (`app.setWindowIcon`) ayarlayabilmesi icin dosyaya erisebilmesi gerekir.
+if ICON_FILE.exists():
+    DATAS.append((str(ICON_FILE), "."))
+
+# Qt platform plugin'i ve tema: platform plugin'i PySide6 hook'uyla
+# otomatik toplanir, tema ise saf Python'dur (`ui/theme.py` stil sayfasini
+# uretir) ve kodla birlikte gelir. Ucunun de paketlenmis uygulamada
+# YUKLENDIGI `--self-check` ile dogrulanir.
 HIDDEN_IMPORTS = [
     "sonar_analyzer",
 ]

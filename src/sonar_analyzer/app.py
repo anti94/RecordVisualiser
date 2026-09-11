@@ -19,7 +19,9 @@ from sonar_analyzer.application.error_handling import (
     install_exception_handler,
     qt_notifier,
 )
+from sonar_analyzer.application.self_check import run_self_check
 from sonar_analyzer.logging.setup import setup_logging
+from sonar_analyzer.resources import app_icon_path
 from sonar_analyzer.settings.store import load_settings
 
 EXIT_OK = 0
@@ -41,6 +43,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--no-window",
         action="store_true",
         help="pencere acmadan baslatmayi dogrular (duman testi)",
+    )
+    parser.add_argument(
+        "--self-check",
+        action="store_true",
+        help="tema, ikon ve Qt platform plugin'inin yuklendigini dogrular",
     )
     return parser
 
@@ -76,8 +83,28 @@ def main(argv: Sequence[str] | None = None) -> int:
     # Islenmemis hatalar sessizce kaybolmasin (F1-008).
     install_exception_handler(qt_notifier)
 
+    # F6-003: ikon paketten (ya da kaynak agacindan) yuklenir. Bulunamazsa
+    # uygulama acilmaya devam eder ama bu LOGLANIR; sessizce ikonsuz
+    # calismak, paketin eksik ciktigini gizlerdi.
+    icon_path = app_icon_path()
+    if icon_path is None:
+        logger.warning("Uygulama ikonu bulunamadi; varsayilan ikon kullanilacak")
+    else:
+        from PySide6.QtGui import QIcon
+
+        app.setWindowIcon(QIcon(str(icon_path)))
+
     logger.info("Arayuz baslatiliyor (oturum %s)", session.session_id)
     window = MainWindow(settings=settings_result.settings)
+
+    if args.self_check:
+        report = run_self_check(app, window)
+        for line in report.lines:
+            print(line)
+        window.close()
+        window.deleteLater()
+        app.processEvents()
+        return EXIT_OK if report.ok else EXIT_ERROR
 
     if args.no_window:
         # Pencere hic gosterilmeden yasam dongusu tamamlanir: giris yolunun

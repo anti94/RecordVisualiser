@@ -40,5 +40,28 @@
     "reported_version": "3.1.0",
     "version_file_location": "_internal/VERSION",
     "note": "F6-001'de yanlis bildirilen surum duzeltildi; PyInstaller 6 onedir'de bile datas dosyalarini _internal altina koyuyor."
+  },
+  "f6_003_resources": {
+    "checked_with": "packaged exe --self-check",
+    "dist_dir": "sonar-analyzer-3.2.0",
+    "platform_plugin": "windows",
+    "platform_plugins_bundled": [
+      "qdirect2d.dll",
+      "qminimal.dll",
+      "qoffscreen.dll",
+      "qwindows.dll"
+    ],
+    "stylesheet_chars": 3216,
+    "icon": "sonar-analyzer.ico",
+    "icon_sizes": [
+      16,
+      24,
+      32,
+      48,
+      64,
+      128,
+      256
+    ],
+    "result": "TAMAM"
   }
 }

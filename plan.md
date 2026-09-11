@@ -1814,7 +1814,7 @@ Kabul: Kurulabilir Windows paketi, dokümantasyon, sürüm artefaktları ve dağ
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F6-001` | `3.1.0` | 20 dk | Paketleme aracı ve dağıtım biçimi ADR'sini tamamla | PyInstaller/Nuitka seçimi spike kanıtına ve hedef Windows ortamına dayanır | `F5-041` | `docs(build): F6-001 paketleme aracı ve dağıtım biçimi ADR'sini tamamla` |
 | [x] | `F6-002` | `3.2.0` | 20 dk | Windows paketleme yapılandırmasını ekle | Giriş noktası, VERSION ve gerekli kaynaklar yapılandırmada tanımlıdır | `F6-001` | `build(package): F6-002 windows paketleme yapılandırmasını ekle` |
-| [ ] | `F6-003` | `3.3.0` | 20 dk | Qt plugin, tema ve ikon kaynaklarını pakete ekle | Paketli açılışta tema, ikon ve platform plugin'i yüklenir | `F6-002` | `build(package): F6-003 qt plugin, tema ve ikon kaynaklarını pakete ekle` |
+| [x] | `F6-003` | `3.3.0` | 20 dk | Qt plugin, tema ve ikon kaynaklarını pakete ekle | Paketli açılışta tema, ikon ve platform plugin'i yüklenir | `F6-002` | `build(package): F6-003 qt plugin, tema ve ikon kaynaklarını pakete ekle` |
 | [ ] | `F6-004` | `3.4.0` | 20 dk | Tek komutluk paket üretim akışını ekle | Komut sürümlü çıktı klasörü ve build logu üretir | `F6-003` | `build(package): F6-004 tek komutluk paket üretim akışını ekle` |
 | [ ] | `F6-005` | `3.5.0` | 20 dk | Temiz Windows ortamında paket açılışını kontrol et | Sistem Python kurulumu olmadan ana ekran açılır | `F6-004` | `test(package): F6-005 temiz Windows ortamında paket açılışını kontrol et` |
 | [ ] | `F6-006` | `3.6.0` | 20 dk | Paketli uygulamada BIN ve export akışını kontrol et | Örnek kayıt açılır; CSV/PNG çıktısı yeniden okunabilir | `F6-005` | `test(package): F6-006 paketli uygulamada BIN ve export akışını kontrol et` |
