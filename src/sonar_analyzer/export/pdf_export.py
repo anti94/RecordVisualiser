@@ -68,13 +68,21 @@ class PlotDocumentInfo:
             raise PdfExportError("PDF başlığı boş olamaz")
         if not self.source.strip():
             raise PdfExportError("PDF kaynak bilgisi boş olamaz")
+        if self.generated_at is None:
+            # Üretim zamanı **bir kez** donar. `lines()` her çağrıda
+            # `now()` okusaydı, belgeye yazılan satır ile çağırana
+            # döndürülen satır farklı olabilirdi.
+            object.__setattr__(self, "generated_at", datetime.now(tz=timezone.utc))
 
     @property
     def processing_text(self) -> str:
         return self.processing.strip() or "İşlem uygulanmadı"
 
     def lines(self) -> list[str]:
-        """Sayfada ve metadata'da **aynı sırayla** görünecek satırlar."""
+        """Sayfada ve metadata'da **aynı sırayla** görünecek satırlar.
+
+        Saf: aynı nesne her çağrıda aynı listeyi verir.
+        """
         moment = self.generated_at or datetime.now(tz=timezone.utc)
         lines = [
             self.title.strip(),

@@ -306,8 +306,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-084` | 20 dk | 13 dk 37 sn | `62075d4` | event/BIT metadata'sını JSON dışa aktar |
 | `F4-085` | 15 dk | 13 dk 19 sn | `6160b96` | tSV ayırıcı seçimini CSV akışına ekle |
 | `F4-086` | 20 dk | 9 dk 23 sn | `487042b` | statik grafiği PDF olarak dışa aktar |
+| `F4-087` | 20 dk | 6 dk 57 sn | `38df9cd` | sinüs, chirp, noise ve impulse referanslarını çalıştır |
 
-**288 commit · olculen toplam 3336 dk 45 sn · olculemeyen 1 (ilk commit)**
+**289 commit · olculen toplam 3343 dk 42 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

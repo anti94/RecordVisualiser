@@ -89,6 +89,17 @@ def test_a_blank_title_or_source_is_refused(title: str, source: str) -> None:
         PlotDocumentInfo(title=title, source=source)
 
 
+def test_the_header_lines_are_stable_across_calls() -> None:
+    """Üretim zamanı kurucuda donar; iki çağrı aynı listeyi verir.
+
+    Donmasaydı belgeye yazılan satır ile çağırana döndürülen satır
+    farklı olabilirdi — `F4-088` koşusunda tam da bu yakalandı.
+    """
+    info = PlotDocumentInfo(title="t", source="s")
+    assert info.lines() == info.lines()
+    assert info.generated_at is not None
+
+
 def test_the_metadata_repeats_every_header_line() -> None:
     """Sayfada yazan ile metadata'da duran ayrışamaz."""
     info = PlotDocumentInfo(
