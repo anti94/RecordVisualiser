@@ -1,0 +1,86 @@
+name: release
+
+# Surum artefakti ve checksum is akisi (F6-017).
+#
+# Yalniz SURUM ETIKETIYLE tetiklenir. Ilk adim surum tutarliligini
+# denetler: etiket ile VERSION ayni degilse yayin DURUR ve artefakt
+# uretilmez. Yanlis surumlu bir paketin yayinlanmasi, dogru surumlu bir
+# paketin gec yayinlanmasindan cok daha pahalidir.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Denetlenecek surum etiketi (orn. v3.17.0)"
+        required: true
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Surum artefakti
+    runs-on: windows-latest
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+        with:
+          # Etiketler surum kapisi icin gerekli.
+          fetch-depth: 0
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+          cache: pip
+
+      - name: Bagimliliklari kur
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[gui,dsp,package]"
+
+      - name: Surum kapisi (etiket ile VERSION ayni mi)
+        # Bu adim BASARISIZ olursa sonraki adimlar kosmaz ve artefakt
+        # uretilmez; kabul kriterinin karsiligi budur.
+        run: >
+          python tools/release_guard.py
+          --tag "${{ github.event.inputs.tag || github.ref_name }}"
+          --manifest dist/does-not-exist-yet.json
+
+      - name: Paketi uret
+        run: python tools/build_package.py
+
+      - name: Installer uret
+        run: python tools/build_installer.py
+
+      - name: Checksum ve surum manifesti
+        run: python tools/release_manifest.py
+
+      - name: Surum kapisi (artefaktlar dahil)
+        # Ikinci gecis: artefaktlar uretildikten SONRA manifestle birlikte
+        # yeniden denetlenir. Ilk gecis etiketi, bu gecis uretilen
+        # paketin gercekten o surum oldugunu dogrular.
+        run: >
+          python tools/release_guard.py
+          --tag "${{ github.event.inputs.tag || github.ref_name }}"
+          --manifest dist/release-manifest.json
+
+      - name: Imzalama denetimi
+        run: python tools/signing_check.py
+
+      - name: Artefaktlari yukle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ github.event.inputs.tag || github.ref_name }}
+          path: |
+            dist/sonar-analyzer-*-setup.exe
+            dist/release-manifest.json
+            dist/build-manifest.json
+            dist/build.log
+          if-no-files-found: error
+          retention-days: 90
