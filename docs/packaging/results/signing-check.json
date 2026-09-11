@@ -1,0 +1,57 @@
+{
+  "signing_required": false,
+  "certificate_configured": false,
+  "artifacts": [
+    {
+      "name": "sonar-analyzer-3.6.0-setup.exe",
+      "status": "NotSigned",
+      "signer": ""
+    },
+    {
+      "name": "sonar-analyzer-3.7.0-setup.exe",
+      "status": "NotSigned",
+      "signer": ""
+    },
+    {
+      "name": "sonar-analyzer-3.8.0-setup.exe",
+      "status": "NotSigned",
+      "signer": ""
+    },
+    {
+      "name": "sonar-analyzer.exe",
+      "status": "NotSigned",
+      "signer": ""
+    },
+    {
+      "name": "sonar-analyzer.exe",
+      "status": "NotSigned",
+      "signer": ""
+    },
+    {
+      "name": "sonar-analyzer.exe",
+      "status": "NotSigned",
+      "signer": ""
+    },
+    {
+      "name": "sonar-analyzer.exe",
+      "status": "NotSigned",
+      "signer": ""
+    },
+    {
+      "name": "sonar-analyzer.exe",
+      "status": "NotSigned",
+      "signer": ""
+    },
+    {
+      "name": "sonar-analyzer.exe",
+      "status": "NotSigned",
+      "signer": ""
+    }
+  ],
+  "decision": "IMZASIZ DAGITIM. D-17 cevaplanmadi ve sertifika yapilandirilmadi; artefaktlar imzasiz yayinlanir.",
+  "consequences": [
+    "SmartScreen bilinmeyen yayinci uyarisi gosterir; kullanici 'Yine de calistir' demek zorunda kalir.",
+    "Bazi kurumsal ilkeler imzasiz calistirilabiliri engelleyebilir.",
+    "Sertifika temini uzun surer; gerekliyse erken baslatilmali (plan D-17)."
+  ]
+}

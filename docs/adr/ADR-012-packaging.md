@@ -111,6 +111,28 @@ yok sayılır) ile yapıldı; sekiz paketin tamamı yerel klasörden çözüldü
 başarısız oldu — `pip download` yalnız bağımlılıkları indiriyordu; araç
 artık projeyi de paketliyor.
 
+## Kod imzalama (`F6-012`)
+
+D-17 ("code signing gerekli mi") **cevaplanmadı** ve sertifika temin
+edilmedi. Karar: **imzasız dağıtım**, bedeliyle birlikte kaydedilerek.
+
+Bu "hiçbir şey yapma" değildir; ölçülmüş bir durumdur.
+`tools/signing_check.py` artefaktların imza durumunu Windows'un kendi
+doğrulayıcısıyla (`Get-AuthenticodeSignature`) okur ve kaydeder — tahmin
+etmez. Ölçüm: bütün artefaktlar `NotSigned`.
+
+Kabul edilen bedel:
+
+- SmartScreen "bilinmeyen yayıncı" uyarısı gösterir; kullanıcı "Yine de
+  çalıştır" demek zorunda kalır.
+- Bazı kurumsal ilkeler imzasız çalıştırılabiliri tamamen engelleyebilir.
+- Sertifika temini uzun sürer; gerekli olduğu anlaşılırsa **erken**
+  başlatılmalıdır (plan D-17 zaten bunu söylüyor).
+
+Akış sertifika geldiği gün hazırdır: `SONAR_SIGNING_CERT` tanımlandığında
+denetim "imza zorunlu" kipine geçer ve imzasız artefakt raporu düşürür.
+Bu yüzden karar değiştiğinde kod değil yalnız yapılandırma değişir.
+
 ## Hedef ortam hakkında bilinmeyen
 
 Kabul kontrolü seçimin "hedef Windows ortamına" dayanmasını ister. Hedef
