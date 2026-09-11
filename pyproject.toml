@@ -51,6 +51,8 @@ dev = [
     # bilincli bir is olarak yapilir.
     "ruff==0.16.6",
     "pyright==1.1.411",
+    # F6-013: coverage olcumu ve esikleri.
+    "pytest-cov>=5.0",
 ]
 
 [project.scripts]
@@ -69,6 +71,29 @@ addopts = "-q"
 markers = [
     "gui: PySide6 gerektiren testler",
     "slow: uzun suren testler",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["src/sonar_analyzer"]
+# Qt arayuzu ve olcum araclari coverage hedefinin disindadir: ilki
+# ekran/etkilesim gerektirir ve zaten GUI testleriyle ayri kapsanir,
+# ikincisi urun kodu degildir.
+omit = [
+    "*/__main__.py",
+]
+
+[tool.coverage.report]
+# F6-013: plan Bolum 21 genel esigi. Kritik parser/domain icin daha
+# yuksek esik tools/coverage_gate.py ile ayrica denetlenir.
+fail_under = 70
+precision = 1
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    '\.\.\.',
 ]
 
 [tool.ruff]

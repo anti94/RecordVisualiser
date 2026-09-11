@@ -1,0 +1,39 @@
+{
+  "overall": {
+    "name": "genel",
+    "covered": 14480,
+    "total": 15027,
+    "percent": 96.4,
+    "threshold": 70.0
+  },
+  "groups": [
+    {
+      "name": "sonar_analyzer/domain",
+      "covered": 642,
+      "total": 646,
+      "percent": 99.4,
+      "threshold": 90.0
+    },
+    {
+      "name": "sonar_analyzer/io",
+      "covered": 2739,
+      "total": 2815,
+      "percent": 97.3,
+      "threshold": 85.0
+    },
+    {
+      "name": "sonar_analyzer/recording",
+      "covered": 653,
+      "total": 665,
+      "percent": 98.2,
+      "threshold": 85.0
+    },
+    {
+      "name": "sonar_analyzer/repository",
+      "covered": 790,
+      "total": 804,
+      "percent": 98.3,
+      "threshold": 80.0
+    }
+  ]
+}

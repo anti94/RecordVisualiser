@@ -38,6 +38,9 @@ ENV/
 .nox/
 .coverage
 .coverage.*
+# F6-013 coverage ciktisi; kanit docs/packaging/results altinda tutulur.
+coverage.json
+htmlcov/
 coverage.xml
 htmlcov/
 .benchmarks/
