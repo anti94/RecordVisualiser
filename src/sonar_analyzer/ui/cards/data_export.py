@@ -26,7 +26,7 @@ CARD_OBJECT_NAME = "card_data_export"
 CARD_TITLE = "Data Export"
 
 #: Plan Bolum 15.1: desteklenecek ciktilar.
-EXPORT_FORMATS: tuple[str, ...] = ("CSV", "TSV", "JSON", "PNG", "SVG")
+EXPORT_FORMATS: tuple[str, ...] = ("CSV", "TSV", "JSON", "PNG", "SVG", "PDF")
 
 #: `F4-085` — ondalık ayıracı seçenekleri.
 DECIMAL_SEPARATORS: tuple[tuple[str, str], ...] = (

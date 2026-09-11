@@ -73,6 +73,11 @@ from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.export.csv_export import CsvExportResult, write_channel_csv
 from sonar_analyzer.export.image_export import export_widget_png
 from sonar_analyzer.export.json_export import JsonExportResult, write_metadata_json
+from sonar_analyzer.export.pdf_export import (
+    PdfExportResult,
+    PlotDocumentInfo,
+    export_widget_pdf,
+)
 from sonar_analyzer.export.text_format import Delimiter
 from sonar_analyzer.logging.performance import measure
 from sonar_analyzer.processing.chain import ProcessingChain
@@ -626,6 +631,44 @@ class MainWindow(QMainWindow):
         self.bottom_dock.append_log(f"Grafik SVG olarak yazildi: {dest}")
         return dest
 
+    def plot_document_info(self) -> PlotDocumentInfo:
+        """PDF sayfasının başlık bloğu — `F4-086`.
+
+        Başlık çizili kanal(lar)dan, kaynak açık kayıttan, işlem bilgisi
+        Custom sekmesindeki zincirden gelir. Hiçbiri uydurulmaz: zincir
+        boşsa "işlem uygulanmadı" yazar.
+        """
+        channels = self.plot_panel.plotted_channel_ids()
+        primary = self.plot_panel.channel
+        title = primary.display_label if primary is not None else "Zaman serisi"
+        if len(channels) > 1:
+            title = f"{title} (+{len(channels) - 1} kanal)"
+
+        source = "Kaynak yok"
+        span_text = ""
+        if self._repository is not None:
+            metadata = self._repository.metadata()
+            source = f"{metadata.source_path} ({metadata.recording_id})"
+            span = self.plot_panel.time_region_range() or metadata.time_range
+            span_text = f"[{span.start_ns}, {span.end_ns}) ns"
+
+        chain = self.right_dock.analysis_tools.step_editor.chain()
+        steps = chain.enabled_steps
+        processing = ", ".join(step.kind.value for step in steps) if steps else ""
+        if processing:
+            processing = f"{len(steps)} adım: {processing}"
+        return PlotDocumentInfo(
+            title=title, source=source, processing=processing, time_range=span_text
+        )
+
+    def export_plot_pdf(self, path: str | Path) -> PdfExportResult:
+        """Seçili grafiği başlık bloğuyla birlikte PDF'e yazar — `F4-086`."""
+        if not self.plot_panel.plotted_channel_ids():
+            raise ValueError("Disa aktarilacak grafik yok: once bir kanal cizin")
+        result = export_widget_pdf(self.plot_panel, path, self.plot_document_info())
+        self.bottom_dock.append_log(f"Grafik PDF olarak yazildi: {result.path}")
+        return result
+
     def export_channel_csv(
         self,
         path: str | Path,
@@ -838,6 +881,8 @@ class MainWindow(QMainWindow):
             self.export_plot_png(target)
         elif kind is ExportKind.SVG:
             self.export_plot_svg(target)
+        elif kind is ExportKind.PDF:
+            self.export_plot_pdf(target)
         elif kind is ExportKind.JSON:
             self.export_metadata_json(target, selected_range_only=card.wants_selected_range())
         else:

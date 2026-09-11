@@ -28,6 +28,8 @@ class ExportKind(str, Enum):
     JSON = "json"
     #: `F4-085` — sekmeyle ayrılmış aynı tablo.
     TSV = "tsv"
+    #: `F4-086` — başlık, kaynak ve işlem bilgisiyle vektörel sayfa.
+    PDF = "pdf"
 
 
 class DataVariant(str, Enum):
@@ -44,6 +46,7 @@ FORMAT_TO_KIND: dict[str, ExportKind] = {
     "CSV": ExportKind.CSV,
     "JSON": ExportKind.JSON,
     "TSV": ExportKind.TSV,
+    "PDF": ExportKind.PDF,
 }
 
 #: Her biçimin zorunlu dosya uzantısı.
@@ -53,6 +56,7 @@ KIND_EXTENSION: dict[ExportKind, str] = {
     ExportKind.CSV: ".csv",
     ExportKind.JSON: ".json",
     ExportKind.TSV: ".tsv",
+    ExportKind.PDF: ".pdf",
 }
 
 #: Qt kaydetme diyaloğu için ad filtresi.
@@ -62,6 +66,7 @@ KIND_FILE_FILTER: dict[ExportKind, str] = {
     ExportKind.CSV: "CSV veri (*.csv)",
     ExportKind.JSON: "JSON metadata (*.json)",
     ExportKind.TSV: "TSV veri (*.tsv)",
+    ExportKind.PDF: "PDF belge (*.pdf)",
 }
 
 #: `exists(path) -> bool` — dosya sisteminden bağımsız test edilebilsin diye.
