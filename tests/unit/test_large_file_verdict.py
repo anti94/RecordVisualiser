@@ -285,7 +285,7 @@ def test_the_markdown_has_one_row_per_target() -> None:
 # --------------------------------------------------------------------------- #
 
 
-@pytest.mark.parametrize("stem", ["large-file", "large-file-indexed"])
+@pytest.mark.parametrize("stem", ["large-file", "large-file-indexed", "large-file-streaming"])
 def test_the_recorded_verdict_matches_the_recorded_run(stem: str) -> None:
     """Depodaki karar, depodaki ölçümden **yeniden üretilebilir**."""
     run = json.loads((RESULTS / f"{stem}.json").read_text(encoding="utf-8"))
@@ -311,3 +311,22 @@ def test_the_recorded_run_spans_enough_sizes_to_judge_memory() -> None:
     sizes = sorted(int(entry["file_bytes"]) for entry in run["files"])
     assert sizes[-1] / sizes[0] > 15.0  # 64 MB -> 1 GB
     assert sizes[-1] >= 1_000_000_000
+
+
+def test_the_streaming_run_proves_every_target_now_passes() -> None:
+    """`F4-094`/`F4-095` sonrası: dört §11.1 hedefinin hepsi geçer."""
+    recorded = json.loads((RESULTS / "large-file-streaming-verdict.json").read_text("utf-8"))
+    assert recorded["passed"] == [
+        "metadata_seconds",
+        "query_ms",
+        "pipeline_fps",
+        "memory_scaling",
+    ]
+    assert recorded["deviated"] == []
+    assert recorded["insufficient"] == []
+    assert recorded["status"] == PASSED
+    assert recorded["files_measured"] == [
+        "profile-b-64mb",
+        "profile-b-256mb",
+        "profile-b-1gb",
+    ]

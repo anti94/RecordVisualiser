@@ -1,0 +1,291 @@
+{
+  "benchmark": "large-file",
+  "task": "F4-064",
+  "machine": {
+    "python": "3.9.13",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+    "cpu_count": 16,
+    "total_ram_bytes": 33685835776,
+    "numpy": "2.0.2"
+  },
+  "targets": {
+    "metadata_seconds": 5.0,
+    "query_ms": 150.0,
+    "pipeline_fps": 30.0
+  },
+  "scope": "pipeline_fps excludes Qt paint; it is the upper bound of the query+downsample stage. Memory covers Python allocations (tracemalloc) and process peak working set separately.",
+  "total_seconds": 13.7157041,
+  "files": [
+    {
+      "path": ".cache\\perf\\profile-b-64mb.bin",
+      "file_bytes": 64000112,
+      "samples_per_block": 6000,
+      "channel_measured": 0,
+      "index_seconds": 0.10476269999999999,
+      "metadata": {
+        "seconds": 0.00014279999999999848,
+        "record_count": 1330,
+        "channel_count": 4,
+        "channel_ids": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "record_period_ns": 125000000,
+        "start_ns": 1788901200000000000,
+        "end_ns": 1788901366250000000,
+        "duration_s": 166.25,
+        "span_source": "header",
+        "span_verified": true
+      },
+      "queries": [
+        {
+          "label": "0.01s",
+          "span_ns": 10000000,
+          "max_points": 2000,
+          "returned_points": 480,
+          "duration_ms": 1.5382999999999925
+        },
+        {
+          "label": "0.1s",
+          "span_ns": 100000000,
+          "max_points": 2000,
+          "returned_points": 300,
+          "duration_ms": 2.8672999999999615
+        },
+        {
+          "label": "1s",
+          "span_ns": 1000000000,
+          "max_points": 2000,
+          "returned_points": 750,
+          "duration_ms": 7.472199999999985
+        },
+        {
+          "label": "10s",
+          "span_ns": 10000000000,
+          "max_points": 2000,
+          "returned_points": 1332,
+          "duration_ms": 58.008400000000016
+        },
+        {
+          "label": "full",
+          "span_ns": 166250000000,
+          "max_points": 2000,
+          "returned_points": 1332,
+          "duration_ms": 388.50649999999996
+        }
+      ],
+      "frame_rate": {
+        "frames_requested": 30,
+        "frames_completed": 30,
+        "window_ns": 1000000000,
+        "max_points": 2000,
+        "elapsed_s": 0.2259627999999999,
+        "pipeline_fps": 132.7652162214312,
+        "frame_ms_p50": 7.530449999999966,
+        "frame_ms_p95": 8.093109999999953,
+        "frame_ms_max": 8.274499999999962,
+        "truncated": false
+      },
+      "cache": {
+        "entries": 30,
+        "used_bytes": 24483120,
+        "max_bytes": 67108864,
+        "hits": 0,
+        "misses": 35,
+        "evictions": 0,
+        "rejections": 0,
+        "max_entries": 256
+      },
+      "memory": {
+        "tracemalloc_retained_bytes": 28413040,
+        "tracemalloc_peak_bytes": 30493209,
+        "peak_working_set_bytes": 133877760,
+        "retained_per_file_byte": 0.4439529730822971,
+        "peak_per_file_byte": 0.4764555568277756
+      }
+    },
+    {
+      "path": ".cache\\perf\\profile-b-256mb.bin",
+      "file_bytes": 256047032,
+      "samples_per_block": 6000,
+      "channel_measured": 0,
+      "index_seconds": 0.44178439999999997,
+      "metadata": {
+        "seconds": 0.00014209999999992284,
+        "record_count": 5321,
+        "channel_count": 4,
+        "channel_ids": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "record_period_ns": 125000000,
+        "start_ns": 1788901200000000000,
+        "end_ns": 1788901865125000000,
+        "duration_s": 665.125,
+        "span_source": "header",
+        "span_verified": true
+      },
+      "queries": [
+        {
+          "label": "0.01s",
+          "span_ns": 10000000,
+          "max_points": 2000,
+          "returned_points": 480,
+          "duration_ms": 1.2203999999997883
+        },
+        {
+          "label": "0.1s",
+          "span_ns": 100000000,
+          "max_points": 2000,
+          "returned_points": 300,
+          "duration_ms": 2.6804999999998635
+        },
+        {
+          "label": "1s",
+          "span_ns": 1000000000,
+          "max_points": 2000,
+          "returned_points": 750,
+          "duration_ms": 7.352699999999768
+        },
+        {
+          "label": "10s",
+          "span_ns": 10000000000,
+          "max_points": 2000,
+          "returned_points": 1332,
+          "duration_ms": 55.73590000000017
+        },
+        {
+          "label": "full",
+          "span_ns": 665125000000,
+          "max_points": 2000,
+          "returned_points": 1332,
+          "duration_ms": 1368.5686
+        }
+      ],
+      "frame_rate": {
+        "frames_requested": 30,
+        "frames_completed": 30,
+        "window_ns": 1000000000,
+        "max_points": 2000,
+        "elapsed_s": 0.2096157999999999,
+        "pipeline_fps": 143.11898244311743,
+        "frame_ms_p50": 6.864649999999806,
+        "frame_ms_p95": 7.541150000000019,
+        "frame_ms_max": 7.795199999999891,
+        "truncated": false
+      },
+      "cache": {
+        "entries": 30,
+        "used_bytes": 24483120,
+        "max_bytes": 67108864,
+        "hits": 0,
+        "misses": 35,
+        "evictions": 0,
+        "rejections": 0,
+        "max_entries": 256
+      },
+      "memory": {
+        "tracemalloc_retained_bytes": 39396250,
+        "tracemalloc_peak_bytes": 41494374,
+        "peak_working_set_bytes": 364109824,
+        "retained_per_file_byte": 0.15386333398310978,
+        "peak_per_file_byte": 0.16205762541313112
+      }
+    },
+    {
+      "path": ".cache\\perf\\profile-b-1gb.bin",
+      "file_bytes": 1000030352,
+      "samples_per_block": 6000,
+      "channel_measured": 0,
+      "index_seconds": 1.8265459999999996,
+      "metadata": {
+        "seconds": 0.00012780000000001124,
+        "record_count": 20782,
+        "channel_count": 4,
+        "channel_ids": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "record_period_ns": 125000000,
+        "start_ns": 1788901200000000000,
+        "end_ns": 1788903797750000000,
+        "duration_s": 2597.75,
+        "span_source": "header",
+        "span_verified": true
+      },
+      "queries": [
+        {
+          "label": "0.01s",
+          "span_ns": 10000000,
+          "max_points": 2000,
+          "returned_points": 480,
+          "duration_ms": 1.226400000000183
+        },
+        {
+          "label": "0.1s",
+          "span_ns": 100000000,
+          "max_points": 2000,
+          "returned_points": 300,
+          "duration_ms": 2.917899999999918
+        },
+        {
+          "label": "1s",
+          "span_ns": 1000000000,
+          "max_points": 2000,
+          "returned_points": 750,
+          "duration_ms": 7.443400000000544
+        },
+        {
+          "label": "10s",
+          "span_ns": 10000000000,
+          "max_points": 2000,
+          "returned_points": 1332,
+          "duration_ms": 60.83570000000016
+        },
+        {
+          "label": "full",
+          "span_ns": 2597750000000,
+          "max_points": 2000,
+          "returned_points": 1332,
+          "duration_ms": 5279.4863
+        }
+      ],
+      "frame_rate": {
+        "frames_requested": 30,
+        "frames_completed": 30,
+        "window_ns": 1000000000,
+        "max_points": 2000,
+        "elapsed_s": 0.2142906999999994,
+        "pipeline_fps": 139.9967427424526,
+        "frame_ms_p50": 7.0882000000001,
+        "frame_ms_p95": 7.5408099999995315,
+        "frame_ms_max": 7.812900000001122,
+        "truncated": false
+      },
+      "cache": {
+        "entries": 30,
+        "used_bytes": 24483120,
+        "max_bytes": 67108864,
+        "hits": 0,
+        "misses": 35,
+        "evictions": 0,
+        "rejections": 0,
+        "max_entries": 256
+      },
+      "memory": {
+        "tracemalloc_retained_bytes": 81283971,
+        "tracemalloc_peak_bytes": 83382095,
+        "peak_working_set_bytes": 1252044800,
+        "retained_per_file_byte": 0.0812815039437923,
+        "peak_per_file_byte": 0.08337956426346547
+      }
+    }
+  ]
+}

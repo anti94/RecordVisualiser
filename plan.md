@@ -1731,7 +1731,7 @@ bu yüzden bu üç iş `F4-090`'dan önce gelir.
 | [x] | `F4-093` | `1.92.0` | 20 dk | Büyük dosya koşusunu tekrarla ve kararı güncelle | `F4-064` koşusu aynı dosyalarla tekrarlanır; `F4-065` kararı ölçümden yeniden üretilir ve sapan hedeflerin durumu belgelenir | `F4-092` | `perf(bench): F4-093 büyük dosya koşusunu tekrarla ve kararı güncelle` |
 | [x] | `F4-094` | `1.93.0` | 20 dk | Özet piramidini NumPy blok işlemleriyle hızlandır | Tüm seviyelerin min/max/geçersiz seçimleri korunur; 1 saniyelik çizim sorgusu hazırlığı 30 FPS bütçesine iner | `F4-093` | `perf(index): F4-094 özet piramidini NumPy blok işlemleriyle hızlandır` |
 | [x] | `F4-095` | `1.94.0` | 20 dk | Büyük çizim aralıklarını sınırlı bellekle indirgeme | Tam kayıt çizimi ham dizinin tamamını oluşturmaz; dar darbeler, kalite ve piksel bütçesi korunur | `F4-094` | `perf(query): F4-095 büyük çizim aralıklarını sınırlı bellekle indirgeme` |
-| [ ] | `F4-096` | `1.95.0` | 20 dk | Özet ve akış düzeltmeleri sonrası performansı doğrula | Aynı dosya/parametrelerle karar yeniden üretilir; kalan sapmalar açıkça kaydedilir | `F4-095` | `perf(bench): F4-096 özet ve akış düzeltmeleri sonrası performansı doğrula` |
+| [x] | `F4-096` | `1.95.0` | 20 dk | Özet ve akış düzeltmeleri sonrası performansı doğrula | Aynı dosya/parametrelerle karar yeniden üretilir; kalan sapmalar açıkça kaydedilir | `F4-095` | `perf(bench): F4-096 özet ve akış düzeltmeleri sonrası performansı doğrula` |
 
 ##### Sürüm kabulü
 
