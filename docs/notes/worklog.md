@@ -355,8 +355,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F5-037` | 20 dk | 18 dk 51 sn | `5f70478` | burst ve bağlantı kesintisi sonuçlarını doğrula |
 | `F5-038` | 20 dk | 59 dk 50 sn | `55f0352` | uzun süreli canlı kayıt koşusunu hazırla |
 | `F5-039` | 20 dk | 18 dk 18 sn | `ef1fd4b` | dayanıklılık koşusu raporunu değerlendir |
+| `F5-040` | 20 dk | 16 dk 15 sn | `bd6c68f` | canlı modda mockup pano davranışını kontrol et |
 
-**337 commit · olculen toplam 3986 dk 32 sn · olculemeyen 1 (ilk commit)**
+**338 commit · olculen toplam 4002 dk 47 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

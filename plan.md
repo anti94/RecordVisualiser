@@ -1802,7 +1802,7 @@ Kabul: UDP/TCP/serial akışı, bağlantı durumu, canlı grafik, kayıt ve tekr
 | [x] | `F5-038` | `2.38.0` | 20 dk | Uzun süreli canlı kayıt koşusunu hazırla | En az 2 saatlik otomatik koşu bellek, kayıp ve dosya boyutunu kaydeder | `F5-037` | `test(live): F5-038 uzun süreli canlı kayıt koşusunu hazırla` |
 | [x] | `F5-039` | `2.39.0` | 20 dk | Dayanıklılık koşusu raporunu değerlendir | Bellek bütçesi, beklenen kayıp ve kayıt bütünlüğü sonuçları kanıtlıdır | `F5-038` | `docs(live): F5-039 dayanıklılık koşusu raporunu değerlendir` |
 | [x] | `F5-040` | `2.40.0` | 20 dk | Canlı modda mockup pano davranışını kontrol et | Ana yerleşim korunur; bağlantı ve kayıt durumu açıkça görünür | `F5-039` | `test(ui): F5-040 canlı modda mockup pano davranışını kontrol et` |
-| [ ] | `F5-041` | `3.0.0` | 15 dk | Canlı veri milestone kabulünü kapat ve major sürümü hazırla | Üç adaptör, yeniden okuma ve dayanıklılık kontrolleri geçer | `F5-040` | `chore(release): F5-041 canlı veri milestone kabulünü kapat ve major sürümü hazırla` |
+| [x] | `F5-041` | `3.0.0` | 15 dk | Canlı veri milestone kabulünü kapat ve major sürümü hazırla | Üç adaptör, yeniden okuma ve dayanıklılık kontrolleri geçer | `F5-040` | `chore(release): F5-041 canlı veri milestone kabulünü kapat ve major sürümü hazırla` |
 
 #### Faz 6 — Windows dağıtımı ve ürünleştirme
 
