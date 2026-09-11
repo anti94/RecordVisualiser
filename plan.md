@@ -1782,7 +1782,7 @@ Kabul: UDP/TCP/serial akışı, bağlantı durumu, canlı grafik, kayıt ve tekr
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F5-025` | `2.25.0` | 20 dk | Sürümlü dosya header yazıcısını ekle | Dosya format sürümü uygulama sürümünden bağımsız yazılır | `F5-024` | `feat(recording): F5-025 sürümlü dosya header yazıcısını ekle` |
-| [ ] | `F5-026` | `2.26.0` | 20 dk | Data kayıt serileştirmesini ekle | Ad, sıra, elapsed_us, payload ve varsa CRC decoder ile eşleşir | `F5-025` | `feat(recording): F5-026 data kayıt serileştirmesini ekle` |
+| [x] | `F5-026` | `2.26.0` | 20 dk | Data kayıt serileştirmesini ekle | Ad, sıra, elapsed_us, payload ve varsa CRC decoder ile eşleşir | `F5-025` | `feat(recording): F5-026 data kayıt serileştirmesini ekle` |
 | [ ] | `F5-027` | `2.27.0` | 20 dk | 125 ms kayıt biriktirme sınırlarını ekle | Data00000 ve Data00001 125 ms aralıklarla oluşur; ham blok örnekleri korunur | `F5-026` | `feat(recording): F5-027 125 ms kayıt biriktirme sınırlarını ekle` |
 | [ ] | `F5-028` | `2.28.0` | 20 dk | Disk yazma kuyruğunu canlı akıştan ayır | Yavaş disk UI'ı kilitlemez; taşma ve kayıp görünürdür | `F5-027` | `feat(recording): F5-028 disk yazma kuyruğunu canlı akıştan ayır` |
 | [ ] | `F5-029` | `2.29.0` | 20 dk | Flush ve güvenli dosya kapatmayı ekle | Stop sonrası bütün tam kayıtlar yeniden okunabilir | `F5-028` | `feat(recording): F5-029 flush ve güvenli dosya kapatmayı ekle` |
