@@ -343,8 +343,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F5-025` | 20 dk | 8 dk 7 sn | `de1108e` | sürümlü dosya header yazıcısını ekle |
 | `F5-026` | 20 dk | 6 dk 40 sn | `fb2985e` | data kayıt serileştirmesini ekle |
 | `F5-027` | 20 dk | 8 dk 34 sn | `36ffece` | 125 ms kayıt biriktirme sınırlarını ekle |
+| `F5-028` | 20 dk | 8 dk 12 sn | `031b53b` | disk yazma kuyruğunu canlı akıştan ayır |
 
-**325 commit · olculen toplam 3749 dk 18 sn · olculemeyen 1 (ilk commit)**
+**326 commit · olculen toplam 3757 dk 30 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

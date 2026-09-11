@@ -17,11 +17,30 @@ eksik bir dosyayı tam sanması demek olurdu.
 
 Yazma hatalarının işlenmesi (`disk dolu` vb.) `F5-030`'un işidir; burada
 hata yalnız kaydedilir ve worker durur.
+
+`F5-029` — flush ve güvenli kapatma
+-----------------------------------
+
+Kabul: **Stop sonrası bütün tam kayıtlar yeniden okunabilir.** Bu iki şey
+gerektirir ve ikisi de `close()` içinde sırayla yapılır:
+
+1. Kuyrukta bekleyen bloklar diske **iner** (worker durur, kalanı boşaltır,
+   ardından `flush` + `fsync`). Aksi hâlde son saniyelerin kaydı işletim
+   sistemi tamponunda kalıp kaybolabilirdi.
+2. Dosyanın sonunda kayıt sınırına oturmayan **yarım blok kalmaz**. Bir
+   yazma ortasında kesilirse (disk dolu) o artık baytlar kesilir ve
+   `truncated_bytes` ile görünür kalır — okuyucu tarafında bozuk bir kayıt
+   gibi görünmeleri, tam kayıtların da okunamaz sanılmasına yol açardı.
+
+`flush()` ise dosyayı **kapatmadan** bir ara noktayı diske indirir; kayıt
+sürerken çağrılabilir.
 """
 
 from __future__ import annotations
 
+import os
 import threading
+import time
 from collections import deque
 from collections.abc import Callable
 from pathlib import Path
@@ -120,11 +139,21 @@ class DiskWriterWorker(threading.Thread):
         self._queue = queue
         self._stopping = threading.Event()
         self._written = 0
+        self._written_bytes = 0
         self._error: str | None = None
 
     @property
     def written_records(self) -> int:
         return self._written
+
+    @property
+    def written_bytes(self) -> int:
+        """**Tamamı** yazılmış blokların toplam uzunluğu — `F5-029`.
+
+        Sayaç yalnız `write()` hatasız döndükten sonra artar; yarım kalan
+        bir blok buraya sayılmaz, böylece dosyanın güvenli sonu bilinir.
+        """
+        return self._written_bytes
 
     @property
     def error(self) -> str | None:
@@ -148,6 +177,7 @@ class DiskWriterWorker(threading.Thread):
                 self._error = f"{exc}"
                 break
             self._written += 1
+            self._written_bytes += len(block)
 
         # Durdurulurken kuyrukta kalanlari bosalt: yarim kalan bloklar
         # sessizce kaybolmamali.
@@ -165,6 +195,7 @@ class DiskWriterWorker(threading.Thread):
                 self._error = f"{exc}"
                 return
             self._written += 1
+            self._written_bytes += len(block)
 
 
 class RecordingWriter:
@@ -184,6 +215,8 @@ class RecordingWriter:
         self._open_stream = open_stream if open_stream is not None else _open_binary
         self._stream: BinaryIO | None = None
         self._worker: DiskWriterWorker | None = None
+        self._header_bytes = 0
+        self._truncated_bytes = 0
 
     @property
     def path(self) -> Path:
@@ -211,6 +244,17 @@ class RecordingWriter:
     def is_open(self) -> bool:
         return self._stream is not None
 
+    @property
+    def committed_bytes(self) -> int:
+        """Dosyanın **güvenli** uzunluğu: başlık + tamamı yazılmış bloklar."""
+        worker = self._worker
+        return self._header_bytes + (0 if worker is None else worker.written_bytes)
+
+    @property
+    def truncated_bytes(self) -> int:
+        """Kapatılırken atılan yarım blok baytı — normalde `0`, kayıp görünürdür."""
+        return self._truncated_bytes
+
     def open(self, header: bytes) -> None:
         """Dosyayı açar, başlığı **doğrudan** yazar ve worker'ı başlatır.
 
@@ -219,9 +263,15 @@ class RecordingWriter:
         """
         if self._stream is not None:
             raise RuntimeError("Kayit zaten acik")
+        if self._worker is not None:
+            # Kuyruk kapatildi; ayni yazici ikinci bir dosya acamaz. Dosya
+            # degistirme (`F5-031`) yeni bir RecordingWriter ile yapilir.
+            raise RuntimeError("Kapatilan kayit yeniden acilamaz")
         self._path.parent.mkdir(parents=True, exist_ok=True)
         stream = self._open_stream(self._path)
         stream.write(header)
+        self._header_bytes = len(header)
+        self._truncated_bytes = 0
         self._stream = stream
         self._worker = DiskWriterWorker(stream, self._queue)
         self._worker.start()
@@ -232,14 +282,81 @@ class RecordingWriter:
             raise RuntimeError("Once open() cagrilmali")
         return self._queue.submit(block)
 
+    def flush(self, *, timeout_s: float = 5.0) -> bool:
+        """Kuyruktakiler diske yazılana kadar bekler — `F5-029`.
+
+        Dosya **açık kalır**; kayıt sürerken bir ara noktanın diske
+        indiğinden emin olmak için kullanılır. Süre dolarsa `False` döner
+        (bloklar hâlâ yoldadır) — sessizce "tamam" denmez.
+
+        Beklenen ölçü kuyruk derinliği **değil**, yazılan blok sayısıdır:
+        worker bir bloğu kuyruktan aldığı anda derinlik sıfırlanır ama blok
+        henüz diske inmemiştir; derinliğe bakmak son kaydı ıskalardı.
+        """
+        if self._stream is None:
+            return True
+        target = self._queue.accepted_records
+        deadline = time.monotonic() + timeout_s
+        while self.written_records < target:
+            if self.error is not None or time.monotonic() > deadline:
+                return False
+            time.sleep(0.005)
+        self._sync(self._stream)
+        return self.error is None
+
     def close(self, *, wait_ms: int = 5000) -> None:
-        """Worker'ı durdurur, kalanları yazdırır ve dosyayı kapatır."""
+        """Worker'ı durdurur, kalanları yazdırır ve dosyayı **güvenle** kapatır.
+
+        `F5-029` garantisi: bu çağrı döndükten sonra dosyadaki bütün **tam**
+        kayıtlar yeniden okunabilir. Sıra önemlidir — önce worker biter
+        (kuyrukta kalan bloklar yazılır), sonra akış diske senkronlanır,
+        en son dosya kapanır. Ters sırada yarım bir kayıt kalabilirdi.
+        """
         worker, stream = self._worker, self._stream
         if worker is not None:
             worker.stop()
             worker.join(timeout=wait_ms / 1000)
             self._worker = worker  # hata/sayac okunabilsin diye korunur
         if stream is not None:
-            stream.flush()
+            self._discard_partial_tail(stream)
+            self._sync(stream)
             stream.close()
         self._stream = None
+
+    def _discard_partial_tail(self, stream: BinaryIO) -> None:
+        """Kayıt sınırına oturmayan son baytları atar — `F5-029`.
+
+        Bir blok yazılırken kesilirse (disk dolu, `F5-030`) dosyanın sonunda
+        yarım bir kayıt kalır. Okuyucu onu bozuk bir kayıt olarak görür ve
+        dosyanın tamamından şüphe edilirdi; burada kesilip `truncated_bytes`
+        ile duyurulur — sessizce atılmaz.
+        """
+        safe_end = self.committed_bytes
+        try:
+            stream.flush()
+            size = os.fstat(stream.fileno()).st_size
+        except (OSError, AttributeError, ValueError):
+            return
+        if size <= safe_end:
+            return
+        try:
+            stream.truncate(safe_end)
+        except (OSError, AttributeError, ValueError):  # pragma: no cover - nadir akis turu
+            return
+        self._truncated_bytes = size - safe_end
+
+    def _sync(self, stream: BinaryIO) -> None:
+        """Akışı ve (mümkünse) işletim sistemi tamponunu diske indirir.
+
+        `fsync` her akış türünde bulunmaz (testlerdeki sarmalayıcılar
+        gibi); bulunmaması bir hata değildir, o zaman `flush` yeterlidir.
+        """
+        try:
+            stream.flush()
+            fileno = stream.fileno()
+        except (OSError, AttributeError, ValueError):
+            return
+        try:
+            os.fsync(fileno)
+        except OSError:  # pragma: no cover - dosya sistemi destegi yoksa
+            return
