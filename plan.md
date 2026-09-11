@@ -1737,7 +1737,7 @@ bu yüzden bu üç iş `F4-090`'dan önce gelir.
 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `F4-090` | `2.0.0` | 15 dk | Analiz milestone kabulünü kapat ve major sürümü hazırla | Mockup analizi, Bölüm 3.2, doğruluk ve performans koşulları geçer | `F4-096` | `chore(release): F4-090 analiz milestone kabulünü kapat ve major sürümü hazırla` |
+| [x] | `F4-090` | `2.0.0` | 15 dk | Analiz milestone kabulünü kapat ve major sürümü hazırla | Mockup analizi, Bölüm 3.2, doğruluk ve performans koşulları geçer | `F4-096` | `chore(release): F4-090 analiz milestone kabulünü kapat ve major sürümü hazırla` |
 
 #### Faz 5 — Canlı veri, bağlantı ve kayıt
 

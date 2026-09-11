@@ -314,8 +314,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-093` | 20 dk | 10 dk 49 sn | `f7c4bd1` | büyük dosya koşusunu tekrarla ve kararı güncelle |
 | `F4-094` | 20 dk | 3 dk 56 sn | `c6d0377` | özet piramidini NumPy blok işlemleriyle hızlandır |
 | `F4-095` | 20 dk | 42 dk 12 sn | `aeeaaf6` | büyük çizim aralıklarını sınırlı bellekle indirgeme |
+| `F4-096` | 20 dk | 6 dk 57 sn | `a1127c3` | özet ve akış düzeltmeleri sonrası performansı doğrula |
 
-**296 commit · olculen toplam 3457 dk 41 sn · olculemeyen 1 (ilk commit)**
+**297 commit · olculen toplam 3464 dk 38 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
