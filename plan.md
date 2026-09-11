@@ -1774,7 +1774,7 @@ Kabul: UDP/TCP/serial akışı, bağlantı durumu, canlı grafik, kayıt ve tekr
 | [x] | `F5-020` | `2.20.0` | 20 dk | Paket kaybı, kuyruk ve buffer durumunu göster | Sentetik kayıp ve burst ekranda doğru sayaçlarla görünür | `F5-019` | `feat(ui): F5-020 paket kaybı, kuyruk ve buffer durumunu göster` |
 | [x] | `F5-021` | `2.21.0` | 20 dk | Canlı akışı ortak repository'ye bağla | Aynı kanal ve olay sorguları dosya ve canlı kaynakta çalışır | `F5-020` | `feat(repository): F5-021 canlı akışı ortak repository'ye bağla` |
 | [x] | `F5-022` | `2.22.0` | 20 dk | Canlı veriyi mevcut grafik panellerine bağla | Grafikler ring buffer'dan güncellenir; UI thread bloklanmaz | `F5-021` | `feat(plot): F5-022 canlı veriyi mevcut grafik panellerine bağla` |
-| [ ] | `F5-023` | `2.23.0` | 15 dk | Canlı sona takip etme ve sabit aralık seçimini ekle | Kullanıcı geçmişe bakarken viewport zorla sona taşınmaz | `F5-022` | `feat(ui): F5-023 canlı sona takip etme ve sabit aralık seçimini ekle` |
+| [x] | `F5-023` | `2.23.0` | 15 dk | Canlı sona takip etme ve sabit aralık seçimini ekle | Kullanıcı geçmişe bakarken viewport zorla sona taşınmaz | `F5-022` | `feat(ui): F5-023 canlı sona takip etme ve sabit aralık seçimini ekle` |
 | [ ] | `F5-024` | `2.24.0` | 20 dk | Canlı ve playback mod geçişlerini denetle | İki saat aynı grafiği eşzamanlı ilerletmez | `F5-023` | `fix(app): F5-024 canlı ve playback mod geçişlerini denetle` |
 
 ##### 125 ms kayıt yazımı

@@ -1146,6 +1146,15 @@ class PlotPanel(QWidget):
     # -- sorgular --------------------------------------------------------
 
     @property
+    def time_origin_ns(self) -> int | None:
+        """X eksenindeki `0` saniyeye karşılık gelen kanonik an; seri yoksa `None`.
+
+        Canlı takip (`F5-023`) saniye cinsinden bir aralık kurabilmek için
+        bu ankoru okur.
+        """
+        return self._t0_ns
+
+    @property
     def channel(self) -> ChannelMetadata | None:
         """Birincil kanal — ilk eklenen (veya `set_channel` ile atanan) seri."""
         if self._primary_id is None:

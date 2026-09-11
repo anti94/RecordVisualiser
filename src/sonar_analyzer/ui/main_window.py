@@ -61,6 +61,7 @@ from sonar_analyzer.domain.annotation import (
     new_annotation_id,
 )
 from sonar_analyzer.domain.channel import ChannelMetadata
+from sonar_analyzer.domain.data_chunk import DataChunk
 from sonar_analyzer.domain.derived_channel_definition import (
     DerivedChannelDefinition,
 )
@@ -69,7 +70,7 @@ from sonar_analyzer.domain.derived_channel_definition import (
 )
 from sonar_analyzer.domain.event import Event
 from sonar_analyzer.domain.recording import RecordingMetadata
-from sonar_analyzer.domain.time_range import TimeRange
+from sonar_analyzer.domain.time_range import NS_PER_SECOND, TimeRange
 from sonar_analyzer.export.csv_export import CsvExportResult, write_channel_csv
 from sonar_analyzer.export.image_export import export_widget_png
 from sonar_analyzer.export.json_export import JsonExportResult, write_metadata_json
@@ -166,6 +167,9 @@ PLAYBACK_MIN_HEIGHT = 44
 WINDOW_TITLE = "SONAR Data Analyzer"
 RIGHT_DOCK_TITLE = "BIT / Analysis / Export"
 
+#: `F5-023` canlı akışta sona takip edilen pencerenin genişliği (saniye).
+DEFAULT_LIVE_FOLLOW_WINDOW_S = 10.0
+
 #: `F5-019` durum çubuğundaki bağlantı alanının metinleri. Her durumun bir
 #: karşılığı vardır; eksik bir durum arayüzde boş bir alan bırakırdı.
 CONNECTION_LABELS: dict[ConnectionState, str] = {
@@ -208,6 +212,13 @@ class MainWindow(QMainWindow):
         self._live_runner: LiveRunner | None = None
         self._live_repository: LiveRepository | None = None
         self._live_plot_channel = ""
+        #: `F5-023` sona takip: açıkken viewport son pencereyi izler,
+        #: kullanıcı gezinince kapanır ve bir daha **zorla** sona taşınmaz.
+        self._live_follow = True
+        self._live_follow_window_s = DEFAULT_LIVE_FOLLOW_WINDOW_S
+        #: Canlı çizim kendi viewport'unu güncellerken `True` — o sırada
+        #: gelen `x_range_changed` kullanıcı gezinmesi sayılmaz.
+        self._live_plot_updating = False
         #: `F4-074` kullanıcı işaretleri; `F4-076` çalışma alanına yazar.
         self._annotations = AnnotationSet()
         #: `F4-079` zincir + işaret düzenlemelerinin undo/redo geçmişi.
@@ -652,10 +663,67 @@ class MainWindow(QMainWindow):
         chunk = repository.query(channel_id, span, points_for_width(self.plot_panel.width()))
         if not len(chunk):
             return
-        if channel_id in self.plot_panel.plotted_channel_ids():
-            self.plot_panel.update_channel_data(channel_id, chunk)
-        else:
-            self.plot_panel.add_channel(channel, chunk)
+        # F5-023: bu blok boyunca gelen `x_range_changed` sinyalleri
+        # **bizim** güncellememizden doğar (ilk seride `add_channel()`
+        # autorange yapar). Kullanıcı gezinmesi sanılıp takip kapanmasın
+        # diye bayrakla ayrılır — `PlotPanel._suppress_x_broadcast`'in
+        # pencere düzeyindeki karşılığı.
+        self._live_plot_updating = True
+        try:
+            if channel_id in self.plot_panel.plotted_channel_ids():
+                self.plot_panel.update_channel_data(channel_id, chunk)
+            else:
+                self.plot_panel.add_channel(channel, chunk)
+            self._follow_live_end(chunk)
+        finally:
+            self._live_plot_updating = False
+
+    def _follow_live_end(self, chunk: DataChunk) -> None:
+        """Takip açıksa viewport'u son pencereye kaydırır — `F5-023`.
+
+        Kaydırma `apply_x_range()` ile yapılır: o yol `x_range_changed`
+        **yaymaz**, böylece programatik takip kendi kendini "kullanıcı
+        gezindi" sanıp takibi kapatmaz.
+        """
+        if not self._live_follow or not len(chunk):
+            return
+        origin_ns = self.plot_panel.time_origin_ns
+        if origin_ns is None:
+            return
+        end_s = (int(chunk.timestamps_ns[-1]) - origin_ns) / NS_PER_SECOND
+        self.plot_panel.apply_x_range(max(0.0, end_s - self._live_follow_window_s), end_s)
+
+    # -- sona takip / sabit aralik (F5-023) --------------------------------
+
+    @property
+    def live_follow(self) -> bool:
+        """Viewport canlı akışın sonunu takip ediyor mu?"""
+        return self._live_follow
+
+    def set_live_follow(self, enabled: bool) -> None:
+        """Takibi açar/kapatır; açılınca bir sonraki pakette sona yetişir."""
+        self._live_follow = enabled
+
+    @property
+    def live_follow_window_s(self) -> float:
+        return self._live_follow_window_s
+
+    def set_live_follow_window(self, seconds: float) -> None:
+        """Takip penceresinin genişliğini saniye cinsinden ayarlar."""
+        if seconds <= 0:
+            raise ValueError(f"Takip penceresi pozitif olmali: {seconds}")
+        self._live_follow_window_s = seconds
+
+    def _on_live_user_navigated(self, _x_min: float, _x_max: float) -> None:
+        """Kullanıcı pan/zoom yaptı: takip kapanır — `F5-023` kabul kriteri.
+
+        Canlı akış **kendi** güncellemesini yaparken (`_live_plot_updating`)
+        gelen sinyaller yok sayılır: ilk seride `add_channel()`'ın autorange'i
+        de bu sinyali yayar ve takip daha ilk karede kapanırdı (ilk koşuda
+        tam bu oldu, testler yakaladı).
+        """
+        if self._live_repository is not None and not self._live_plot_updating:
+            self._live_follow = False
 
     def set_live_plot_channel(self, channel_id: str) -> None:
         """Canlı akışta hangi kanalın çizileceğini seçer."""
@@ -2383,6 +2451,9 @@ class MainWindow(QMainWindow):
         self.plot_panel.time_region_changed.connect(self._on_stats_region_changed)
         self.plot_panel.cursor_moved.connect(self._on_cursor_moved)
         self.plot_panel.x_range_changed.connect(self._sync_timeline_viewport)
+        # F5-023: kullanici gezinince canli takip kapanir (bu sinyal yalniz
+        # KULLANICI gezinmesinde yayilir; apply_x_range yaymaz).
+        self.plot_panel.x_range_changed.connect(self._on_live_user_navigated)
         self.plot_panel.plot_width_changed.connect(self._plot_refresh_timer.start)
 
         self.transmission_panel = TransmissionPanel(container)
