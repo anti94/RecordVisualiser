@@ -332,8 +332,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F5-014` | 20 dk | 7 dk 49 sn | `2419608` | sabit kapasiteli ring buffer ekle |
 | `F5-015` | 20 dk | 7 dk 17 sn | `211f407` | zaman penceresine göre buffer sorgula |
 | `F5-016` | 20 dk | 8 dk 9 sn | `b083765` | kuyruk sınırı ve drop politikasını uygula |
+| `F5-017` | 20 dk | 6 dk 56 sn | `953a1ab` | sınırlı otomatik yeniden bağlanma ekle |
 
-**314 commit · olculen toplam 3616 dk 0 sn · olculemeyen 1 (ilk commit)**
+**315 commit · olculen toplam 3622 dk 56 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

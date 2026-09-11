@@ -21,9 +21,12 @@ from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from typing import Any, cast
 
+from sonar_analyzer.io.live.connection_settings import LiveConnectionSettings
+
 #: Ayar semasinin surumu. Alan eklendiginde/anlamı degistiginde artar.
 #: v2 (`F3-017`): `favorite_groups` alani eklendi.
-SCHEMA_VERSION = 2
+#: v3 (`F5-018`): `live_connection` alani eklendi.
+SCHEMA_VERSION = 3
 
 #: `save_settings`'in imzasi — kalici hale getirmeyi enjekte etmek icin
 #: (testler gercek ayar dosyasina yazmasin diye, bkz. `F3-008`).
@@ -40,6 +43,10 @@ def _empty_str_list() -> list[str]:
 
 def _empty_group_list() -> list[FavoriteGroup]:
     return []
+
+
+def _default_live_connection() -> LiveConnectionSettings:
+    return LiveConnectionSettings()
 
 
 @dataclass(frozen=True)
@@ -66,6 +73,8 @@ class AppSettings:
     window_geometry: str = ""
     recent_files: list[str] = field(default_factory=_empty_str_list)
     favorite_groups: list[FavoriteGroup] = field(default_factory=_empty_group_list)
+    #: Canlı bağlantı ve tampon yapılandırması (`F5-018`).
+    live_connection: LiveConnectionSettings = field(default_factory=_default_live_connection)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -132,6 +141,58 @@ def _coerce(raw: dict[str, Any], warnings: list[str]) -> AppSettings:
         window_geometry=_text("window_geometry", defaults.window_geometry),
         recent_files=recent,
         favorite_groups=favorites,
+        live_connection=_live_connection(raw.get("live_connection"), warnings),
+    )
+
+
+def _live_connection(value: object, warnings: list[str]) -> LiveConnectionSettings:
+    """Canlı bağlantı ayarlarını savunmacı okur — `F5-018`.
+
+    Tek bir bozuk alan tüm bloğu düşürmez: o alan varsayılanına döner ve
+    uyarı üretilir. **Geçerlilik burada denetlenmez**; ayar dosyasında
+    duran değer geçersiz olabilir (kullanıcı elle düzenlemiş olabilir) ve
+    bunu bağlantıdan önce `LiveConnectionSettings.validate()` açıklar.
+    """
+    defaults = LiveConnectionSettings()
+    if value is None:
+        return defaults
+    if not isinstance(value, dict):
+        warnings.append("live_connection bolumu okunamadi; varsayilanlar kullanildi.")
+        return defaults
+
+    record = cast("dict[str, object]", value)
+
+    def _str_field(key: str, fallback: str) -> str:
+        raw_value = record.get(key, fallback)
+        if not isinstance(raw_value, str):
+            warnings.append(f"live_connection.{key} metin degil; varsayilan kullanildi.")
+            return fallback
+        return raw_value
+
+    def _int_field(key: str, fallback: int) -> int:
+        raw_value = record.get(key, fallback)
+        if isinstance(raw_value, bool) or not isinstance(raw_value, int):
+            warnings.append(f"live_connection.{key} tam sayi degil; varsayilan kullanildi.")
+            return fallback
+        return raw_value
+
+    def _bool_field(key: str, fallback: bool) -> bool:
+        raw_value = record.get(key, fallback)
+        if not isinstance(raw_value, bool):
+            warnings.append(f"live_connection.{key} mantiksal degil; varsayilan kullanildi.")
+            return fallback
+        return raw_value
+
+    return LiveConnectionSettings(
+        protocol=_str_field("protocol", defaults.protocol),
+        host=_str_field("host", defaults.host),
+        port=_int_field("port", defaults.port),
+        serial_port=_str_field("serial_port", defaults.serial_port),
+        baud_rate=_int_field("baud_rate", defaults.baud_rate),
+        ring_capacity_samples=_int_field("ring_capacity_samples", defaults.ring_capacity_samples),
+        queue_maxsize=_int_field("queue_maxsize", defaults.queue_maxsize),
+        drop_policy=_str_field("drop_policy", defaults.drop_policy),
+        auto_reconnect=_bool_field("auto_reconnect", defaults.auto_reconnect),
     )
 
 
@@ -197,8 +258,9 @@ def _migrate(raw: dict[str, Any], warnings: list[str]) -> dict[str, Any]:
         return raw
 
     # version < SCHEMA_VERSION: eksik alanlar `_coerce`'de varsayilanina
-    # duser. v1 -> v2 (`F3-017`): `favorite_groups` yoksa bos liste olur,
-    # ayrica bir donusum gerekmez.
+    # duser. v1 -> v2 (`F3-017`): `favorite_groups` yoksa bos liste olur.
+    # v2 -> v3 (`F5-018`): `live_connection` yoksa varsayilan yapilandirma
+    # kullanilir. Ikisi de yalnizca **ekleme**; donusum gerekmez.
     return raw
 
 

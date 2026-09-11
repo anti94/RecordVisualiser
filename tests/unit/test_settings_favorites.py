@@ -42,12 +42,18 @@ def test_saved_json_shape_is_a_list_of_name_and_channel_ids(tmp_path: Path) -> N
     assert raw["favorite_groups"] == [{"name": "G", "channel_ids": ["ch0"]}]
 
 
-def test_schema_version_is_two(tmp_path: Path) -> None:
+def test_the_written_file_carries_the_current_schema_version(tmp_path: Path) -> None:
+    """`F3-017` bunu 2'ye sabitlemişti; `F5-018` `live_connection` ekleyip 3'e taşıdı.
+
+    Sürüm sabiti ile dosyaya yazılan değerin **birlikte** ilerlediğini
+    denetler; ikisinin ayrışması eski dosyaların yanlış sürümle okunması
+    demek olurdu.
+    """
     target = tmp_path / "settings.json"
     save_settings(AppSettings(), target)
 
     raw = json.loads(target.read_text(encoding="utf-8"))
-    assert raw["schema_version"] == SCHEMA_VERSION == 2
+    assert raw["schema_version"] == SCHEMA_VERSION == 3
 
 
 def test_v1_file_without_favorites_loads_with_empty_list(tmp_path: Path) -> None:
