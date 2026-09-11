@@ -1,0 +1,38 @@
+{
+  "version": "3.6.0",
+  "succeeded": true,
+  "exit_code": 0,
+  "installer_path": "D:\\Code\\SignalProcessing\\dist\\sonar-analyzer-3.6.0-setup.exe",
+  "installer_bytes": 43468852,
+  "source_dir": "D:\\Code\\SignalProcessing\\dist\\sonar-analyzer-3.6.0",
+  "compiler": "C:\\Program Files (x86)\\NSIS\\makensis.exe",
+  "log_tail": [
+    "Datablock optimizer saved 205878 bytes (~0.1%).",
+    "",
+    "Using lzma (compress whole) compression.",
+    "",
+    "EXE header size:               37888 / 38912 bytes",
+    "Install code:                          (24880 bytes)",
+    "Install data:                          (171811168 bytes)",
+    "Uninstall code+data:                   (5924 bytes)",
+    "Compressed data:            43430960 / 171841972 bytes",
+    "CRC (0x6FF67FAA):                  4 / 4 bytes",
+    "",
+    "Total size:                 43468852 / 171880888 bytes (25.2%)"
+  ],
+  "install_roundtrip": {
+    "mode": "silent (/S) + custom dir (/D=)",
+    "install_dir_created": true,
+    "start_menu_shortcut_created": true,
+    "uninstall_registry_key_created": true,
+    "registry_display_name": "SONAR Veri Analiz Panosu",
+    "registry_display_version": "3.6.0",
+    "installed_app_self_check": "TAMAM (platform plugin: windows, ana ekran: 1520x1201)",
+    "after_uninstall": {
+      "install_dir_remains": false,
+      "shortcut_remains": false,
+      "registry_key_remains": false
+    },
+    "note": "Kurulum kullanici bazinda (HKCU + gecici dizin); dogrulama sonrasi kaldirildi, makinede iz birakilmadi."
+  }
+}
