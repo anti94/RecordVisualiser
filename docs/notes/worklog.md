@@ -321,8 +321,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F5-003` | 20 dk | 10 dk 10 sn | `183c36d` | dosyadan LiveSource replay adaptörünü ekle |
 | `F5-004` | 20 dk | 8 dk 0 sn | `8ee9f24` | replay zamanlama ve durdurmayı doğrula |
 | `F5-005` | 20 dk | 7 dk 33 sn | `c22c585` | uDP alıcı bağlantısını ekle |
+| `F5-006` | 20 dk | 12 dk 30 sn | `6e29b08` | uDP paketlerini decoder'a bağla |
 
-**303 commit · olculen toplam 3514 dk 57 sn · olculemeyen 1 (ilk commit)**
+**304 commit · olculen toplam 3527 dk 27 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

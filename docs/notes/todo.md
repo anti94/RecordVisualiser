@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 498 madde · 302 tamamlandı · 196 kaldı**
+**Toplam 498 madde · 303 tamamlandı · 195 kaldı**
 
-`[###############.........]` %60.6
+`[###############.........]` %60.8
 
 ## Özet
 
@@ -39,10 +39,10 @@ Work in fully autonomous mode.
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
-| Faz 5 — Canlı veri, bağlantı ve kayıt | 6 | 35 | 41 |
+| Faz 5 — Canlı veri, bağlantı ve kayıt | 7 | 34 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **302** | **196** | **498** |
+| **Toplam** | **303** | **195** | **498** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -349,7 +349,7 @@ Work in fully autonomous mode.
 | [x] | `F4-096` | `1.95.0` | 20 dk | Özet ve akış düzeltmeleri sonrası performansı doğrula |
 | [x] | `F4-090` | `2.0.0` | 15 dk | Analiz milestone kabulünü kapat ve major sürümü hazırla |
 
-### Faz 5 — Canlı veri, bağlantı ve kayıt (6/41)
+### Faz 5 — Canlı veri, bağlantı ve kayıt (7/41)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -359,7 +359,7 @@ Work in fully autonomous mode.
 | [x] | `F5-004` | `2.4.0` | 20 dk | Replay zamanlama ve durdurmayı doğrula |
 | [x] | `F5-005` | `2.5.0` | 20 dk | UDP alıcı bağlantısını ekle |
 | [x] | `F5-006` | `2.6.0` | 20 dk | UDP paketlerini decoder'a bağla |
-| [ ] | `F5-007` | `2.7.0` | 20 dk | TCP bağlantı ve okuma akışını ekle |
+| [x] | `F5-007` | `2.7.0` | 20 dk | TCP bağlantı ve okuma akışını ekle |
 | [ ] | `F5-008` | `2.8.0` | 20 dk | TCP parçalı ve birleşik paket ayrımını ekle |
 | [ ] | `F5-009` | `2.9.0` | 20 dk | Serial port ayar ve bağlantısını ekle |
 | [ ] | `F5-010` | `2.10.0` | 20 dk | Serial paket sınırı ve timeout işleyişini ekle |
