@@ -25,13 +25,32 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from sonar_analyzer.domain.data_chunk import DataChunk
-from sonar_analyzer.domain.time_range import RECORD_PERIOD_NS
+from sonar_analyzer.domain.time_range import RECORD_PERIOD_NS, TimeRange
+from sonar_analyzer.domain.transmission import TxState
 from sonar_analyzer.io.live.protocol import LivePacket
-from sonar_analyzer.io.profile_a_format import EXPECTED_CHANNEL_COUNT
+from sonar_analyzer.io.profile_a_format import (
+    BIT_COMPONENT_BY_BIT,
+    EXPECTED_CHANNEL_COUNT,
+    TX_STATE_LABELS,
+)
 from sonar_analyzer.recording.record_writer import build_data_record
 
 #: 125 ms kaydın mikrosaniye karşılığı (`docs/format/timing-and-naming.md`).
 RECORD_PERIOD_US = RECORD_PERIOD_NS // 1000
+
+#: Bileşen → kendisine ayrılmış **ilk** bit. Okuma tarafındaki tablodan
+#: türetilir; iki yön aynı kaynaktan beslendiği için ayrışamazlar.
+_FIRST_BIT_BY_COMPONENT: dict[str, int] = {}
+for _bit in sorted(BIT_COMPONENT_BY_BIT):
+    _FIRST_BIT_BY_COMPONENT.setdefault(BIT_COMPONENT_BY_BIT[_bit], _bit)
+
+#: Profil A `tx_status` kodları (`TX_STATE_LABELS`'in tersi).
+_TX_CODE_BY_STATE: dict[TxState, int] = {
+    TxState(label.lower()): code for code, label in TX_STATE_LABELS.items()
+}
+
+#: "Transmisyon yok" hâli; kayıt düzeni bir değer zorunlu kılar.
+_TX_IDLE_CODE = 0
 
 
 class LossyRecordError(ValueError):
@@ -105,6 +124,7 @@ class RecordAccumulator:
             self._single_value(by_channel.get(channel_id)) for channel_id in self._channel_ids
         ]
 
+        window_start = self._start_ns + sequence_no * RECORD_PERIOD_NS
         record = PendingRecord(
             sequence_no=sequence_no,
             elapsed_us=sequence_no * RECORD_PERIOD_US,
@@ -112,11 +132,60 @@ class RecordAccumulator:
                 sequence_no=sequence_no,
                 elapsed_us=sequence_no * RECORD_PERIOD_US,
                 sensor_values=values,
+                bit_status=self._bit_status(packet),
+                tx_status=self._tx_status(packet, window_start),
                 version=self._version,
             ),
         )
         self._written += 1
         return record
+
+    def _bit_status(self, packet: LivePacket) -> int:
+        """Paketin BIT sonuçlarını Profil A `bit_status` maskesine çevirir — `F5-035`.
+
+        Eşleme `BIT_COMPONENT_BY_BIT`'in tersidir; okuma tarafı
+        (`io/decoders/bit_events.py`) **aynı** tabloyu kullandığı için iki
+        yön ayrışamaz. Bir bileşenin arızası, o bileşene ayrılmış bitlerin
+        **ilkine** yazılır: `component_states()` bir bileşendeki herhangi
+        bir biti arıza sayar, bu yüzden tek bit yeterlidir ve hangi bitin
+        seçildiği okumayı değiştirmez.
+
+        Tabloda olmayan bir bileşen gelirse kayıt **sessizce kırpılmaz**:
+        Profil A o bilgiyi taşıyamaz, `LossyRecordError` yükselir.
+        """
+        status = 0
+        for result in packet.bit_results:
+            if not result.is_failure:
+                continue
+            bit = _FIRST_BIT_BY_COMPONENT.get(result.component)
+            if bit is None:
+                raise LossyRecordError(
+                    f"{result.component}: Profil A bit_status tablosunda yok "
+                    f"(docs/format/channel-map.md §4.1). Kayit bu arizayi tasiyamaz."
+                )
+            status |= 1 << bit
+        return status
+
+    def _tx_status(self, packet: LivePacket, window_start_ns: int) -> int:
+        """Pencereye denk gelen transmisyon durumunun Profil A kodu — `F5-035`.
+
+        Kayıt alanı bir **örnektir** (`io/decoders/tx_intervals.py`): bu
+        125 ms penceresinde hangi durumdaydık. Pencereyle kesişen aralık
+        yoksa `IDLE` (0) yazılır — kayıt düzeni bir değer zorunlu kılar ve
+        "aralık yok" ile "boşta" bu formatta aynı şeydir.
+        """
+        window = TimeRange(window_start_ns, window_start_ns + RECORD_PERIOD_NS)
+        for interval in packet.transmissions:
+            if not interval.time_range.overlaps(window):
+                continue
+            code = _TX_CODE_BY_STATE.get(interval.state)
+            if code is None:
+                raise LossyRecordError(
+                    f"TX durumu Profil A kodlarina cevrilemiyor: {interval.state.value} "
+                    f"(kodlar: {sorted(TX_STATE_LABELS)}). Profil B kullanilmali."
+                )
+            return code
+        return _TX_IDLE_CODE
 
     def _single_value(self, chunk: DataChunk | None) -> float:
         """Kanalın penceredeki tek değeri; veri yoksa `0.0`, çoksa hata."""

@@ -349,8 +349,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F5-031` | 20 dk | 8 dk 24 sn | `1b477d1` | boyut ve isim sınırında yeni dosyaya geç |
 | `F5-032` | 20 dk | 44 dk 48 sn | `3f7817b` | record ve Stop durumunu ana ekrana bağla |
 | `F5-033` | 20 dk | 13 dk 35 sn | `c896ddb` | bağlantı kesilmesinde kayıt davranışını uygula |
+| `F5-034` | 20 dk | 15 dk 36 sn | `739dd3f` | canlı BIT ve TX olaylarını panoya bağla |
 
-**331 commit · olculen toplam 3846 dk 0 sn · olculemeyen 1 (ilk commit)**
+**332 commit · olculen toplam 3861 dk 36 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

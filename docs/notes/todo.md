@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 498 madde · 330 tamamlandı · 168 kaldı**
+**Toplam 498 madde · 331 tamamlandı · 167 kaldı**
 
-`[################........]` %66.3
+`[################........]` %66.5
 
 ## Özet
 
@@ -39,10 +39,10 @@ Work in fully autonomous mode.
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
-| Faz 5 — Canlı veri, bağlantı ve kayıt | 34 | 7 | 41 |
+| Faz 5 — Canlı veri, bağlantı ve kayıt | 35 | 6 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **330** | **168** | **498** |
+| **Toplam** | **331** | **167** | **498** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -349,7 +349,7 @@ Work in fully autonomous mode.
 | [x] | `F4-096` | `1.95.0` | 20 dk | Özet ve akış düzeltmeleri sonrası performansı doğrula |
 | [x] | `F4-090` | `2.0.0` | 15 dk | Analiz milestone kabulünü kapat ve major sürümü hazırla |
 
-### Faz 5 — Canlı veri, bağlantı ve kayıt (34/41)
+### Faz 5 — Canlı veri, bağlantı ve kayıt (35/41)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -387,7 +387,7 @@ Work in fully autonomous mode.
 | [x] | `F5-032` | `2.32.0` | 20 dk | Record ve Stop durumunu ana ekrana bağla |
 | [x] | `F5-033` | `2.33.0` | 20 dk | Bağlantı kesilmesinde kayıt davranışını uygula |
 | [x] | `F5-034` | `2.34.0` | 20 dk | Canlı BIT ve TX olaylarını panoya bağla |
-| [ ] | `F5-035` | `2.35.0` | 20 dk | Canlı kayıt dosyasını tekrar açarak karşılaştır |
+| [x] | `F5-035` | `2.35.0` | 20 dk | Canlı kayıt dosyasını tekrar açarak karşılaştır |
 | [ ] | `F5-036` | `2.36.0` | 20 dk | Burst, kayıp ve sıra dışı paket simülatörü ekle |
 | [ ] | `F5-037` | `2.37.0` | 20 dk | Burst ve bağlantı kesintisi sonuçlarını doğrula |
 | [ ] | `F5-038` | `2.38.0` | 20 dk | Uzun süreli canlı kayıt koşusunu hazırla |
