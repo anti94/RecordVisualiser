@@ -1,0 +1,214 @@
+{
+  "cycles": 400,
+  "wall_seconds": 1.18,
+  "samples": [
+    {
+      "cycle": 10,
+      "traced_bytes": 60090,
+      "handles": 204
+    },
+    {
+      "cycle": 20,
+      "traced_bytes": 151584,
+      "handles": 204
+    },
+    {
+      "cycle": 30,
+      "traced_bytes": 151910,
+      "handles": 204
+    },
+    {
+      "cycle": 40,
+      "traced_bytes": 152154,
+      "handles": 204
+    },
+    {
+      "cycle": 50,
+      "traced_bytes": 152910,
+      "handles": 204
+    },
+    {
+      "cycle": 60,
+      "traced_bytes": 153122,
+      "handles": 204
+    },
+    {
+      "cycle": 70,
+      "traced_bytes": 153302,
+      "handles": 204
+    },
+    {
+      "cycle": 80,
+      "traced_bytes": 154279,
+      "handles": 204
+    },
+    {
+      "cycle": 90,
+      "traced_bytes": 156033,
+      "handles": 204
+    },
+    {
+      "cycle": 100,
+      "traced_bytes": 156277,
+      "handles": 204
+    },
+    {
+      "cycle": 110,
+      "traced_bytes": 156724,
+      "handles": 204
+    },
+    {
+      "cycle": 120,
+      "traced_bytes": 156904,
+      "handles": 204
+    },
+    {
+      "cycle": 130,
+      "traced_bytes": 157084,
+      "handles": 204
+    },
+    {
+      "cycle": 140,
+      "traced_bytes": 157264,
+      "handles": 204
+    },
+    {
+      "cycle": 150,
+      "traced_bytes": 157444,
+      "handles": 204
+    },
+    {
+      "cycle": 160,
+      "traced_bytes": 157624,
+      "handles": 204
+    },
+    {
+      "cycle": 170,
+      "traced_bytes": 157856,
+      "handles": 204
+    },
+    {
+      "cycle": 180,
+      "traced_bytes": 158100,
+      "handles": 204
+    },
+    {
+      "cycle": 190,
+      "traced_bytes": 158280,
+      "handles": 204
+    },
+    {
+      "cycle": 200,
+      "traced_bytes": 158460,
+      "handles": 204
+    },
+    {
+      "cycle": 210,
+      "traced_bytes": 158640,
+      "handles": 204
+    },
+    {
+      "cycle": 220,
+      "traced_bytes": 159931,
+      "handles": 204
+    },
+    {
+      "cycle": 230,
+      "traced_bytes": 160111,
+      "handles": 204
+    },
+    {
+      "cycle": 240,
+      "traced_bytes": 160291,
+      "handles": 204
+    },
+    {
+      "cycle": 250,
+      "traced_bytes": 160471,
+      "handles": 204
+    },
+    {
+      "cycle": 260,
+      "traced_bytes": 160743,
+      "handles": 204
+    },
+    {
+      "cycle": 270,
+      "traced_bytes": 160951,
+      "handles": 204
+    },
+    {
+      "cycle": 280,
+      "traced_bytes": 161462,
+      "handles": 204
+    },
+    {
+      "cycle": 290,
+      "traced_bytes": 161670,
+      "handles": 204
+    },
+    {
+      "cycle": 300,
+      "traced_bytes": 161940,
+      "handles": 204
+    },
+    {
+      "cycle": 310,
+      "traced_bytes": 162904,
+      "handles": 204
+    },
+    {
+      "cycle": 320,
+      "traced_bytes": 163112,
+      "handles": 204
+    },
+    {
+      "cycle": 330,
+      "traced_bytes": 163320,
+      "handles": 204
+    },
+    {
+      "cycle": 340,
+      "traced_bytes": 163592,
+      "handles": 204
+    },
+    {
+      "cycle": 350,
+      "traced_bytes": 163800,
+      "handles": 204
+    },
+    {
+      "cycle": 360,
+      "traced_bytes": 164008,
+      "handles": 204
+    },
+    {
+      "cycle": 370,
+      "traced_bytes": 164216,
+      "handles": 204
+    },
+    {
+      "cycle": 380,
+      "traced_bytes": 164424,
+      "handles": 204
+    },
+    {
+      "cycle": 390,
+      "traced_bytes": 164632,
+      "handles": 204
+    },
+    {
+      "cycle": 400,
+      "traced_bytes": 164840,
+      "handles": 204
+    }
+  ],
+  "close_errors": [],
+  "peak_traced_bytes": 221377,
+  "app_bytes_grown": 2555,
+  "machine": {
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.9.13"
+  },
+  "warmup_cycles": 40
+}
