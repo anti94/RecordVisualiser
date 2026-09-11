@@ -123,7 +123,7 @@ def measure(fixture: Path, work_dir: Path, repeats: int = REPEATS) -> SmokeRepor
 
     repository = open_recording()
     span = repository.metadata().time_range
-    channel = list(repository.channels())[0]
+    channel = next(iter(repository.channels()))
 
     report.measurements.append(
         Measurement(
