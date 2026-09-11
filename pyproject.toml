@@ -32,6 +32,11 @@ gui = [
 dsp = [
     "scipy>=1.11",
 ]
+live = [
+    # Serial port bağlantısı (F5-009+). Kurulu değilse `SerialConnection.connect()`
+    # açık bir hata verir; UDP/TCP kaynakları bu ekstradan etkilenmez.
+    "pyserial>=3.5",
+]
 dev = [
     "pytest>=8.0",
     "pytest-qt>=4.4",

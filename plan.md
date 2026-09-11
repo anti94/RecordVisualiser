@@ -1755,7 +1755,7 @@ Kabul: UDP/TCP/serial akışı, bağlantı durumu, canlı grafik, kayıt ve tekr
 | [x] | `F5-006` | `2.6.0` | 20 dk | UDP paketlerini decoder'a bağla | Geçerli datagram domain verisi olur; kesik datagram teşhis edilir | `F5-005` | `feat(live): F5-006 uDP paketlerini decoder'a bağla` |
 | [x] | `F5-007` | `2.7.0` | 20 dk | TCP bağlantı ve okuma akışını ekle | Yerel sunucuya bağlanır; EOF ve bağlantı hatası doğru duruma geçer | `F5-006` | `feat(live): F5-007 tCP bağlantı ve okuma akışını ekle` |
 | [x] | `F5-008` | `2.8.0` | 20 dk | TCP parçalı ve birleşik paket ayrımını ekle | Bölünmüş veya aynı okumada gelen paketler tam bir kez çözülür | `F5-007` | `feat(live): F5-008 tCP parçalı ve birleşik paket ayrımını ekle` |
-| [ ] | `F5-009` | `2.9.0` | 20 dk | Serial port ayar ve bağlantısını ekle | Port ve hız doğrulanır; kapatma kaynağı serbest bırakır | `F5-008` | `feat(live): F5-009 serial port ayar ve bağlantısını ekle` |
+| [x] | `F5-009` | `2.9.0` | 20 dk | Serial port ayar ve bağlantısını ekle | Port ve hız doğrulanır; kapatma kaynağı serbest bırakır | `F5-008` | `feat(live): F5-009 serial port ayar ve bağlantısını ekle` |
 | [ ] | `F5-010` | `2.10.0` | 20 dk | Serial paket sınırı ve timeout işleyişini ekle | Sanal portta eksik paket beklenir veya sözleşmeye göre raporlanır | `F5-009` | `feat(live): F5-010 serial paket sınırı ve timeout işleyişini ekle` |
 | [ ] | `F5-011` | `2.11.0` | 20 dk | Üç adaptör için ortak sözleşme kontrolü ekle | Connect, packets ve disconnect davranışı yerel/sanal kaynakla eşleşir | `F5-010` | `test(live): F5-011 üç adaptör için ortak sözleşme kontrolü ekle` |
 
