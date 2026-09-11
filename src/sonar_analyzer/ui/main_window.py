@@ -23,7 +23,7 @@ from time import perf_counter
 import numpy as np
 from numpy.typing import NDArray
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QAction, QCloseEvent
+from PySide6.QtGui import QAction, QCloseEvent, QGuiApplication
 from PySide6.QtWidgets import (
     QFileDialog,
     QFrame,
@@ -113,6 +113,12 @@ from sonar_analyzer.ui.status_bar import CANCELLED_TEXT, READY_TEXT, AppStatusBa
 from sonar_analyzer.ui.status_icons import severity_style
 from sonar_analyzer.ui.theme import apply_theme
 from sonar_analyzer.ui.view_tab_bar import ViewTabBar
+from sonar_analyzer.ui.window_placement import (
+    Rect,
+    clamp_to_screens,
+    decode_geometry,
+    encode_geometry,
+)
 from sonar_analyzer.workspace.model import (
     EventFilterState,
     PanelState,
@@ -1792,6 +1798,53 @@ class MainWindow(QMainWindow):
         self.file_open.set_last_directory(directory)
         self._persist_settings()
 
+    # -- pencere konumu (F4-083) -------------------------------------------
+
+    def available_screens(self) -> list[Rect]:
+        """Sistemdeki ekranların geometrisi; testler bunu değiştirebilir."""
+        screens: list[Rect] = []
+        for screen in QGuiApplication.screens():
+            geometry = screen.availableGeometry()
+            if geometry.width() > 0 and geometry.height() > 0:
+                screens.append(
+                    Rect(geometry.x(), geometry.y(), geometry.width(), geometry.height())
+                )
+        return screens
+
+    def current_placement(self) -> Rect:
+        """Pencerenin o anki konumu ve boyutu."""
+        frame = self.geometry()
+        return Rect(frame.x(), frame.y(), max(1, frame.width()), max(1, frame.height()))
+
+    def remember_window_placement(self) -> None:
+        """Konumu ayarlara yazar — `F4-083`."""
+        encoded = encode_geometry(self.current_placement())
+        if encoded == self._settings.window_geometry:
+            return
+        self._settings = replace(self._settings, window_geometry=encoded)
+        self._persist_settings()
+
+    def restore_window_placement(self, screens: Sequence[Rect] | None = None) -> bool:
+        """Kaydedilmiş konumu **görünür alana sınırlayarak** uygular — `F4-083`.
+
+        Monitör sökülmüşse kaydedilen konum hiçbir ekranın üstünde
+        olmayabilir; o durumda pencere bir ekranın içine taşınır.
+        Kayıt yoksa ya da bozuksa hiçbir şey yapılmaz (`False`).
+        """
+        rect = decode_geometry(self._settings.window_geometry)
+        if rect is None:
+            return False
+        available = list(screens) if screens is not None else self.available_screens()
+        if not available:
+            return False
+        placed = clamp_to_screens(rect, available)
+        self.setGeometry(placed.x, placed.y, placed.width, placed.height)
+        if placed != rect:
+            self.bottom_dock.append_log(
+                "Kaydedilmiş pencere konumu görünür alanda değildi; ekrana taşındı."
+            )
+        return True
+
     def _forget_recent(self, path: Path) -> None:
         remaining = recent_files.drop(self._settings.recent_files, path)
         if remaining == self._settings.recent_files:
@@ -1905,6 +1958,7 @@ class MainWindow(QMainWindow):
         self._analysis_timer.stop()
         self.file_loader.shutdown()
         self._close_owned_repositories()
+        self.remember_window_placement()
         super().closeEvent(event)
 
     def set_repository(self, repository: RecordingRepository) -> None:

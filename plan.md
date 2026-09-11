@@ -1704,7 +1704,7 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 | [x] | `F4-080` | `1.80.0` | 20 dk | BIT durum süresi ve değişim trendini hesapla | Bilinen PASS/FAIL aralıkları doğru süre ve değişim sayısı verir | `F4-079` | `feat(analysis): F4-080 bIT durum süresi ve değişim trendini hesapla` |
 | [x] | `F4-081` | `1.81.0` | 20 dk | BIT/Status trend görünümünü ekle | Sağ özet ile ayrıntılı trend aynı durumu gösterir | `F4-080` | `feat(ui): F4-081 bIT/Status trend görünümünü ekle` |
 | [x] | `F4-082` | `1.82.0` | 20 dk | Grafik penceresini ayırma ve geri takmayı ekle | Ayrılan panel veri ve X senkronizasyonunu korur | `F4-081` | `feat(ui): F4-082 grafik penceresini ayırma ve geri takmayı ekle` |
-| [ ] | `F4-083` | `1.83.0` | 20 dk | Çoklu monitör konumlarını kaydet ve sınırla | Monitör çıkartılınca pencere görünür alana geri gelir | `F4-082` | `fix(ui): F4-083 çoklu monitör konumlarını kaydet ve sınırla` |
+| [x] | `F4-083` | `1.83.0` | 20 dk | Çoklu monitör konumlarını kaydet ve sınırla | Monitör çıkartılınca pencere görünür alana geri gelir | `F4-082` | `fix(ui): F4-083 çoklu monitör konumlarını kaydet ve sınırla` |
 
 ##### Ek çıktı ve sürüm kabulü
 

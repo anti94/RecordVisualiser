@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 282 tamamlandı · 210 kaldı**
+**Toplam 492 madde · 283 tamamlandı · 209 kaldı**
 
-`[##############..........]` %57.3
+`[##############..........]` %57.5
 
 ## Özet
 
@@ -38,11 +38,11 @@ Work in fully autonomous mode.
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
-| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 82 | 8 | 90 |
+| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 83 | 7 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **282** | **210** | **492** |
+| **Toplam** | **283** | **209** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -248,7 +248,7 @@ Work in fully autonomous mode.
 | [x] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır |
 | [x] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla |
 
-### Faz 4 — Mockup analiz panosu ve büyük veri performansı (82/90)
+### Faz 4 — Mockup analiz panosu ve büyük veri performansı (83/90)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -334,7 +334,7 @@ Work in fully autonomous mode.
 | [x] | `F4-080` | `1.80.0` | 20 dk | BIT durum süresi ve değişim trendini hesapla |
 | [x] | `F4-081` | `1.81.0` | 20 dk | BIT/Status trend görünümünü ekle |
 | [x] | `F4-082` | `1.82.0` | 20 dk | Grafik penceresini ayırma ve geri takmayı ekle |
-| [ ] | `F4-083` | `1.83.0` | 20 dk | Çoklu monitör konumlarını kaydet ve sınırla |
+| [x] | `F4-083` | `1.83.0` | 20 dk | Çoklu monitör konumlarını kaydet ve sınırla |
 | [ ] | `F4-084` | `1.84.0` | 20 dk | Event/BIT metadata'sını JSON dışa aktar |
 | [ ] | `F4-085` | `1.85.0` | 15 dk | TSV ayırıcı seçimini CSV akışına ekle |
 | [ ] | `F4-086` | `1.86.0` | 20 dk | Statik grafiği PDF olarak dışa aktar |
