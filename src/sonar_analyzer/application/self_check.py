@@ -15,6 +15,9 @@ Kontroller tek tek anlamlıdır:
 * **tema** — stil sayfası boş dönerse arayüz Qt'nin varsayılanıyla açılır;
   çalışır ama mockup'a benzemez, yani sessiz bir bozulmadır.
 * **ikon** — paket veri dosyasını taşımıyorsa ikon boş kalır.
+* **ana ekran** — pencere gerçekten **gösterilebiliyor** mu (`F6-005`).
+  Pencerenin kurulabilmesi yetmez; Qt bir pencereyi oluşturup ekrana
+  alamadığında hata vermeden görünmez kalabilir.
 """
 
 from __future__ import annotations
@@ -60,6 +63,13 @@ def run_self_check(app: object, window: object) -> SelfCheckReport:
         failures.append("tema")
         lines.append("tema: YOK")
 
+    window_size = _shown_window_size(window)
+    if window_size is None:
+        failures.append("ana ekran")
+        lines.append("ana ekran: ACILAMADI")
+    else:
+        lines.append(f"ana ekran: {window_size[0]}x{window_size[1]}")
+
     icon_path = app_icon_path()
     if icon_path is None:
         failures.append("ikon")
@@ -72,6 +82,29 @@ def run_self_check(app: object, window: object) -> SelfCheckReport:
 
     lines.append("sonuc: " + ("TAMAM" if not failures else "EKSIK -> " + ", ".join(failures)))
     return SelfCheckReport(lines=lines, failures=failures)
+
+
+def _shown_window_size(window: object) -> tuple[int, int] | None:
+    """Pencereyi gösterip boyutunu döner; gösterilemiyorsa `None`.
+
+    Pencere **gerçekten gösterilir**: kurulabilmesi tek başına "ana ekran
+    açılır" demek değildir. Denetim sonunda kapatılır, çünkü bu bir
+    otomatik kontroldür, oturum değil.
+    """
+    show = getattr(window, "show", None)
+    is_visible = getattr(window, "isVisible", None)
+    width = getattr(window, "width", None)
+    height = getattr(window, "height", None)
+    if not all(callable(item) for item in (show, is_visible, width, height)):
+        return None
+    try:
+        show()  # type: ignore[misc]
+        if not bool(is_visible()):  # type: ignore[misc]
+            return None
+        size = (int(width()), int(height()))  # type: ignore[misc]
+    except Exception:  # pragma: no cover - Qt beklenmedik durum
+        return None
+    return size if size[0] > 0 and size[1] > 0 else None
 
 
 def _platform_name(app: object) -> str:

@@ -52,11 +52,30 @@ class _FakeIcon:
 
 
 class _FakeWindow:
-    def __init__(self, stylesheet: str = "QWidget { color: red; }") -> None:
+    def __init__(
+        self,
+        stylesheet: str = "QWidget { color: red; }",
+        *,
+        shows: bool = True,
+    ) -> None:
         self._stylesheet = stylesheet
+        self._shows = shows
+        self._visible = False
 
     def styleSheet(self) -> str:
         return self._stylesheet
+
+    def show(self) -> None:
+        self._visible = self._shows
+
+    def isVisible(self) -> bool:
+        return self._visible
+
+    def width(self) -> int:
+        return 1280 if self._shows else 0
+
+    def height(self) -> int:
+        return 800 if self._shows else 0
 
 
 # --------------------------------------------------------------------------- #
@@ -174,13 +193,23 @@ def test_an_unloadable_icon_is_reported() -> None:
 
 
 def test_the_report_lists_every_check_even_when_all_pass() -> None:
-    """Sessizlik "tamam" anlamına gelmez; üç satır da yazılır."""
+    """Sessizlik "tamam" anlamına gelmez; dört satır da yazılır."""
     lines = run_self_check(_FakeApp(), _FakeWindow()).lines
     assert any("platform plugin" in line for line in lines)
     assert any("tema" in line for line in lines)
+    assert any("ana ekran" in line for line in lines)
     assert any("ikon" in line for line in lines)
 
 
+def test_a_window_that_cannot_be_shown_is_reported() -> None:
+    """`F6-005`: pencerenin kurulabilmesi "ana ekran açıldı" demek değildir."""
+    report = run_self_check(_FakeApp(), _FakeWindow(shows=False))
+    assert report.ok is False
+    assert "ana ekran" in report.failures
+
+
 def test_several_faults_are_all_listed() -> None:
-    report = run_self_check(_FakeApp(platform="", icon_null=True), _FakeWindow(stylesheet=""))
-    assert set(report.failures) == {"platform plugin", "tema", "ikon"}
+    report = run_self_check(
+        _FakeApp(platform="", icon_null=True), _FakeWindow(stylesheet="", shows=False)
+    )
+    assert set(report.failures) == {"platform plugin", "tema", "ana ekran", "ikon"}
