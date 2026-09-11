@@ -13,6 +13,7 @@ hâle gelmez.
 from __future__ import annotations
 
 import base64
+import contextlib
 import logging
 from collections.abc import Callable, Iterable, Sequence
 from dataclasses import replace
@@ -103,6 +104,7 @@ from sonar_analyzer.ui.file_open import FileOpenController
 from sonar_analyzer.ui.panels.bit_trend_view import BitTrendView
 from sonar_analyzer.ui.plot_tool_bar import PlotToolBar
 from sonar_analyzer.ui.plots.dashboard import DashboardPanel
+from sonar_analyzer.ui.plots.detached_window import DetachedPlotWindow
 from sonar_analyzer.ui.plots.spectrum_panel import SpectrumPanel
 from sonar_analyzer.ui.plots.transmission_panel import TransmissionPanel
 from sonar_analyzer.ui.plots.waterfall_panel import WaterfallPanel
@@ -2010,6 +2012,8 @@ class MainWindow(QMainWindow):
 
         self.dashboard = DashboardPanel(container)
         self.plot_panel = self.dashboard.time_series
+        #: `F4-082` grafik ayrıldığında onu barındıran pencere.
+        self._detached_window: DetachedPlotWindow | None = None
         self.plot_panel.channel_dropped.connect(self._on_channel_dropped)
         self.plot_panel.time_region_changed.connect(self._on_stats_region_changed)
         self.plot_panel.cursor_moved.connect(self._on_cursor_moved)
@@ -2059,6 +2063,54 @@ class MainWindow(QMainWindow):
             self.show_plot()
         else:
             self.show_empty_state()
+
+    # -- grafigi ayirma / geri takma (F4-082) ------------------------------
+
+    @property
+    def plot_is_detached(self) -> bool:
+        return self._detached_window is not None
+
+    @property
+    def detached_window(self) -> DetachedPlotWindow | None:
+        return self._detached_window
+
+    def detach_plot(self) -> bool:
+        """Zaman serisi grafiğini ayrı bir pencereye taşır — `F4-082`.
+
+        Aynı widget yeniden ebeveynlenir; veri ve X senkronizasyonu
+        kendiliğinden korunur. Zaten ayrıksa `False` döner.
+        """
+        if self._detached_window is not None:
+            return False
+        window = DetachedPlotWindow(self)
+        window.closed.connect(self.reattach_plot)
+        window.take(self.plot_panel)
+        window.resize(self.plot_panel.size())
+        window.show()
+        self._detached_window = window
+        self.bottom_dock.append_log("Grafik ayrı pencereye alındı.")
+        return True
+
+    def reattach_plot(self) -> bool:
+        """Ayrılmış grafiği dashboard'daki yerine geri koyar — `F4-082`.
+
+        Grafik dashboard satırlarının **başına** döner; ayrılmadan önceki
+        yeri neresiyse orası.
+        """
+        window = self._detached_window
+        if window is None:
+            return False
+        self._detached_window = None
+        panel = window.release()
+        if panel is not None:
+            self.dashboard.rows.insertWidget(0, panel)
+            panel.show()
+        with contextlib.suppress(RuntimeError):
+            window.closed.disconnect(self.reattach_plot)
+        window.close()
+        window.deleteLater()
+        self.bottom_dock.append_log("Grafik ana pencereye geri takıldı.")
+        return True
 
     def show_empty_state(self) -> None:
         """Merkez alanı yönlendirme ekranına döndürür."""

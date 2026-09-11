@@ -300,8 +300,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-078` | 20 dk | 12 dk 26 sn | `878ac98` | taşınmış kaynaklar için yeniden konumlandırma ekle |
 | `F4-079` | 20 dk | 12 dk 2 sn | `41ebcb1` | işlem zinciri ve annotation undo/redo ekle |
 | `F4-080` | 20 dk | 54 dk 3 sn | `9c79b9d` | bIT durum süresi ve değişim trendini hesapla |
+| `F4-081` | 20 dk | 11 dk 29 sn | `7b23f1d` | bIT/Status trend görünümünü ekle |
 
-**282 commit · olculen toplam 3273 dk 31 sn · olculemeyen 1 (ilk commit)**
+**283 commit · olculen toplam 3285 dk 0 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
