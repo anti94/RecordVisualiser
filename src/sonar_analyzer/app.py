@@ -13,8 +13,10 @@ import argparse
 import logging
 import sys
 from collections.abc import Sequence
+from pathlib import Path
 
 from sonar_analyzer import __version__
+from sonar_analyzer.application.bin_check import run_bin_check
 from sonar_analyzer.application.error_handling import (
     install_exception_handler,
     qt_notifier,
@@ -43,6 +45,19 @@ def build_parser() -> argparse.ArgumentParser:
         "--no-window",
         action="store_true",
         help="pencere acmadan baslatmayi dogrular (duman testi)",
+    )
+    parser.add_argument(
+        "--bin-check",
+        type=Path,
+        metavar="BIN",
+        help="ornek kaydi acar, CSV/PNG uretir ve ikisini geri okur",
+    )
+    parser.add_argument(
+        "--bin-check-out",
+        type=Path,
+        default=None,
+        metavar="DIZIN",
+        help="--bin-check ciktilarinin yazilacagi dizin",
     )
     parser.add_argument(
         "--self-check",
@@ -96,6 +111,16 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     logger.info("Arayuz baslatiliyor (oturum %s)", session.session_id)
     window = MainWindow(settings=settings_result.settings)
+
+    if args.bin_check is not None:
+        out_dir = args.bin_check_out or (args.bin_check.parent / "bin-check-out")
+        bin_report = run_bin_check(args.bin_check, out_dir)
+        for line in bin_report.lines:
+            print(line)
+        window.close()
+        window.deleteLater()
+        app.processEvents()
+        return EXIT_OK if bin_report.ok else EXIT_ERROR
 
     if args.self_check:
         report = run_self_check(app, window)

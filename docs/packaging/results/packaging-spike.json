@@ -73,5 +73,16 @@
     "total_bytes": 172011707,
     "build_log_lines": 94,
     "self_check": "TAMAM (platform plugin: windows)"
+  },
+  "f6_006_bin_export_in_package": {
+    "executable": "dist/sonar-analyzer-3.5.0/sonar-analyzer.exe",
+    "source_bin": "tests/fixtures/valid_8records.bin",
+    "channels": 8,
+    "records": 8,
+    "samples_queried": 8,
+    "csv_rows_read_back": 8,
+    "png_bytes": 1406,
+    "png_signature_ok": true,
+    "result": "TAMAM"
   }
 }

@@ -361,8 +361,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F6-002` | 20 dk | 13 dk 54 sn | `8bcfe9e` | windows paketleme yapılandırmasını ekle |
 | `F6-003` | 20 dk | 23 dk 18 sn | `a775408` | qt plugin, tema ve ikon kaynaklarını pakete ekle |
 | `F6-004` | 20 dk | 20 dk 35 sn | `5ff0cf9` | tek komutluk paket üretim akışını ekle |
+| `F6-005` | 20 dk | 12 dk 11 sn | `c75f5a5` | temiz Windows ortamında paket açılışını kontrol et |
 
-**343 commit · olculen toplam 4126 dk 24 sn · olculemeyen 1 (ilk commit)**
+**344 commit · olculen toplam 4138 dk 35 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
