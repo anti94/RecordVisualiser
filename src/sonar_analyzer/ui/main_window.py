@@ -72,6 +72,7 @@ from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.export.csv_export import CsvExportResult, write_channel_csv
 from sonar_analyzer.export.image_export import export_widget_png
+from sonar_analyzer.export.json_export import JsonExportResult, write_metadata_json
 from sonar_analyzer.logging.performance import measure
 from sonar_analyzer.processing.chain import ProcessingChain
 from sonar_analyzer.processing.steps import StepValidationError
@@ -828,6 +829,8 @@ class MainWindow(QMainWindow):
             self.export_plot_png(target)
         elif kind is ExportKind.SVG:
             self.export_plot_svg(target)
+        elif kind is ExportKind.JSON:
+            self.export_metadata_json(target, selected_range_only=card.wants_selected_range())
         else:
             # F3-066: CSV büyük olabilir; worker thread'de, iptal edilebilir.
             self.start_channel_csv_export(
@@ -836,6 +839,37 @@ class MainWindow(QMainWindow):
                 include_metadata=card.wants_metadata(),
                 raw=card.selected_variant() is DataVariant.RAW,
             )
+
+    def export_metadata_json(
+        self, path: str | Path, *, selected_range_only: bool = True
+    ) -> JsonExportResult:
+        """Olay ve BIT metadata'sını JSON olarak yazar — `F4-084`.
+
+        `selected_range_only` ve grafikte bir zaman bölgesi seçiliyse yalnız
+        o aralık çıkar; yoksa kaydın tamamı. Seçilen aralık belgeye de
+        yazılır, böylece dosya kendi kapsamını taşır.
+        """
+        repository = self._repository
+        if repository is None:
+            raise ValueError("Acik kayit yok: metadata disa aktarilamaz")
+        metadata = repository.metadata()
+        span = metadata.time_range
+        if selected_range_only:
+            region = self.plot_panel.time_region_range()
+            if region is not None:
+                span = region
+        result = write_metadata_json(
+            list(repository.events(span)),
+            list(repository.bit_results(span)),
+            path,
+            recording=metadata,
+            exported_range=span,
+        )
+        self.bottom_dock.append_log(
+            f"Metadata JSON olarak yazildi: {result.path} "
+            f"({result.event_count} olay, {result.bit_count} BIT)"
+        )
+        return result
 
     # -- işlem zinciri uygulaması (F4-008) ------------------------
 

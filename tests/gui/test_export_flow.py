@@ -5,6 +5,7 @@ Kabul: var olan dosya onaysız değişmez; raw/processed seçimi açıktır.
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -136,13 +137,28 @@ def test_processed_variant_is_the_default_in_metadata(
 def test_unsupported_format_is_reported_not_written(
     window: MainWindow, qtbot: QtBot, tmp_path: Path
 ) -> None:
-    target = tmp_path / "x.json"
+    """`F4-084` JSON'ı destekledi; TSV hâlâ bekliyor (`F4-085`)."""
+    target = tmp_path / "x.tsv"
+    _use_target(window, target, overwrite=False)
+    window.right_dock.data_export.export_format.setCurrentText("TSV")
+
+    _run_export(window, qtbot)
+
+    assert not target.exists()
+    assert any("desteklenmiyor" in line for line in window.bottom_dock.log_lines())
+
+
+def test_the_json_format_writes_metadata(window: MainWindow, qtbot: QtBot, tmp_path: Path) -> None:
+    """`F4-084`: JSON artık gerçek bir çıktı üretir."""
+    target = tmp_path / "metadata.json"
     _use_target(window, target, overwrite=False)
     window.right_dock.data_export.export_format.setCurrentText("JSON")
 
     _run_export(window, qtbot)
 
-    assert not target.exists()
+    assert target.exists()
+    document = json.loads(target.read_text(encoding="utf-8"))
+    assert document["kind"] == "event-bit-metadata"
 
 
 def test_cancelling_the_save_dialog_writes_nothing(

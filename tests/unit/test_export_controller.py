@@ -26,10 +26,13 @@ def test_known_formats_map_to_a_kind() -> None:
 
 
 def test_not_yet_supported_formats_raise() -> None:
+    """`F4-084` ile JSON desteklendi; TSV hâlâ bekliyor (`F4-085`)."""
     with pytest.raises(KeyError, match="Desteklenmeyen"):
         kind_for_format("TSV")
-    with pytest.raises(KeyError):
-        kind_for_format("JSON")
+
+
+def test_json_is_supported_since_f4_084() -> None:
+    assert kind_for_format("JSON") is ExportKind.JSON
 
 
 def test_ensure_extension_appends_when_missing() -> None:
