@@ -324,8 +324,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F5-006` | 20 dk | 12 dk 30 sn | `6e29b08` | uDP paketlerini decoder'a bağla |
 | `F5-007` | 20 dk | 6 dk 46 sn | `44530db` | tCP bağlantı ve okuma akışını ekle |
 | `F5-008` | 20 dk | 9 dk 6 sn | `7cbad33` | tCP parçalı ve birleşik paket ayrımını ekle |
+| `F5-009` | 20 dk | 9 dk 46 sn | `7649b6b` | serial port ayar ve bağlantısını ekle |
 
-**306 commit · olculen toplam 3543 dk 19 sn · olculemeyen 1 (ilk commit)**
+**307 commit · olculen toplam 3553 dk 5 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
