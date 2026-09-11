@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 498 madde · 344 tamamlandı · 154 kaldı**
+**Toplam 498 madde · 345 tamamlandı · 153 kaldı**
 
-`[#################.......]` %69.1
+`[#################.......]` %69.3
 
 ## Özet
 
@@ -40,9 +40,9 @@ Work in fully autonomous mode.
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 41 | 0 | 41 |
-| Faz 6 — Windows dağıtımı ve ürünleştirme | 7 | 27 | 34 |
+| Faz 6 — Windows dağıtımı ve ürünleştirme | 8 | 26 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **344** | **154** | **498** |
+| **Toplam** | **345** | **153** | **498** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -395,7 +395,7 @@ Work in fully autonomous mode.
 | [x] | `F5-040` | `2.40.0` | 20 dk | Canlı modda mockup pano davranışını kontrol et |
 | [x] | `F5-041` | `3.0.0` | 15 dk | Canlı veri milestone kabulünü kapat ve major sürümü hazırla |
 
-### Faz 6 — Windows dağıtımı ve ürünleştirme (7/34)
+### Faz 6 — Windows dağıtımı ve ürünleştirme (8/34)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -406,7 +406,7 @@ Work in fully autonomous mode.
 | [x] | `F6-005` | `3.5.0` | 20 dk | Temiz Windows ortamında paket açılışını kontrol et |
 | [x] | `F6-006` | `3.6.0` | 20 dk | Paketli uygulamada BIN ve export akışını kontrol et |
 | [x] | `F6-007` | `3.7.0` | 20 dk | Installer oluşturma adımını ekle |
-| [ ] | `F6-008` | `3.8.0` | 20 dk | Kurulum, yükseltme ve kaldırmayı kontrol et |
+| [x] | `F6-008` | `3.8.0` | 20 dk | Kurulum, yükseltme ve kaldırmayı kontrol et |
 | [ ] | `F6-009` | `3.9.0` | 15 dk | Artefakt checksum ve sürüm manifestini üret |
 | [ ] | `F6-010` | `3.10.0` | 20 dk | Aynı girdilerle paket üretimini karşılaştır |
 | [ ] | `F6-011` | `3.11.0` | 20 dk | Offline bağımlılık paketleme akışını hazırla |

@@ -1,0 +1,61 @@
+{
+  "from_version": "3.6.0",
+  "to_version": "3.7.0",
+  "steps": [
+    {
+      "name": "eski surum kuruldu",
+      "ok": true,
+      "detail": "cikis kodu 0"
+    },
+    {
+      "name": "eski surum calisiyor",
+      "ok": true,
+      "detail": "sonar-analyzer 3.6.0"
+    },
+    {
+      "name": "kullanici verisi olusturuldu",
+      "ok": true,
+      "detail": "workspace.json, kayit.bin"
+    },
+    {
+      "name": "yukseltme yapildi",
+      "ok": true,
+      "detail": "cikis kodu 0"
+    },
+    {
+      "name": "surum degisti",
+      "ok": true,
+      "detail": "sonar-analyzer 3.6.0 -> sonar-analyzer 3.7.0"
+    },
+    {
+      "name": "yukseltme workspace'i silmedi",
+      "ok": true,
+      "detail": "C:\\Users\\Caglayan\\AppData\\Local\\Temp\\sonar-lifecycle-2ecevxhr\\kullanici\\workspace.json"
+    },
+    {
+      "name": "yukseltme kaydi silmedi",
+      "ok": true,
+      "detail": "C:\\Users\\Caglayan\\AppData\\Local\\Temp\\sonar-lifecycle-2ecevxhr\\kullanici\\kayit.bin"
+    },
+    {
+      "name": "kaldirma calisti",
+      "ok": true,
+      "detail": "cikis kodu 0"
+    },
+    {
+      "name": "kaldirma workspace'i silmedi",
+      "ok": true,
+      "detail": "C:\\Users\\Caglayan\\AppData\\Local\\Temp\\sonar-lifecycle-2ecevxhr\\kullanici\\workspace.json"
+    },
+    {
+      "name": "kaldirma kaydi silmedi",
+      "ok": true,
+      "detail": "C:\\Users\\Caglayan\\AppData\\Local\\Temp\\sonar-lifecycle-2ecevxhr\\kullanici\\kayit.bin"
+    },
+    {
+      "name": "uygulama dosyalari kaldirildi",
+      "ok": true,
+      "detail": "C:\\Users\\Caglayan\\AppData\\Local\\Temp\\sonar-lifecycle-2ecevxhr\\program"
+    }
+  ]
+}
