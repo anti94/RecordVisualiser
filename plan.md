@@ -1821,7 +1821,7 @@ Kabul: Kurulabilir Windows paketi, dokümantasyon, sürüm artefaktları ve dağ
 | [x] | `F6-007` | `3.7.0` | 20 dk | Installer oluşturma adımını ekle | Uygulama, kısayol ve kaldırma girdisi beklenen konumdadır | `F6-006` | `build(installer): F6-007 ınstaller oluşturma adımını ekle` |
 | [x] | `F6-008` | `3.8.0` | 20 dk | Kurulum, yükseltme ve kaldırmayı kontrol et | Sürüm geçişi kullanıcı workspace ve kaynak kayıtlarını silmez | `F6-007` | `test(installer): F6-008 kurulum, yükseltme ve kaldırmayı kontrol et` |
 | [x] | `F6-009` | `3.9.0` | 15 dk | Artefakt checksum ve sürüm manifestini üret | Paket sürümü, dosya adı ve hash birbiriyle eşleşir | `F6-008` | `build(release): F6-009 artefakt checksum ve sürüm manifestini üret` |
-| [ ] | `F6-010` | `3.10.0` | 20 dk | Aynı girdilerle paket üretimini karşılaştır | Araç sürümleri ve hash farkları kaydedilir; deterministik olmayan alanlar açıklanır | `F6-009` | `test(build): F6-010 aynı girdilerle paket üretimini karşılaştır` |
+| [x] | `F6-010` | `3.10.0` | 20 dk | Aynı girdilerle paket üretimini karşılaştır | Araç sürümleri ve hash farkları kaydedilir; deterministik olmayan alanlar açıklanır | `F6-009` | `test(build): F6-010 aynı girdilerle paket üretimini karşılaştır` |
 | [ ] | `F6-011` | `3.11.0` | 20 dk | Offline bağımlılık paketleme akışını hazırla | Offline hedef varsa bağlantısız kurulum doğrulanır; yoksa koşul ADR'de gerekçelenir | `F6-010` | `build(package): F6-011 offline bağımlılık paketleme akışını hazırla` |
 | [ ] | `F6-012` | `3.12.0` | 20 dk | İmzalama gereksinimini yayın akışına bağla | Gerekliyse sertifika ile doğrulanır; değilse imzasız dağıtım kararı kaydedilir | `F6-011` | `build(release): F6-012 imzalama gereksinimini yayın akışına bağla` |
 

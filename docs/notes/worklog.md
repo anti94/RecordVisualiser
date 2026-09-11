@@ -365,8 +365,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F6-006` | 20 dk | 21 dk 25 sn | `4a36a31` | paketli uygulamada BIN ve export akışını kontrol et |
 | `F6-007` | 20 dk | 13 dk 56 sn | `917fa72` | ınstaller oluşturma adımını ekle |
 | `F6-008` | 20 dk | 12 dk 35 sn | `ff87833` | kurulum, yükseltme ve kaldırmayı kontrol et |
+| `F6-009` | 15 dk | 11 dk 27 sn | `8c60e3c` | artefakt checksum ve sürüm manifestini üret |
 
-**347 commit · olculen toplam 4186 dk 31 sn · olculemeyen 1 (ilk commit)**
+**348 commit · olculen toplam 4197 dk 58 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

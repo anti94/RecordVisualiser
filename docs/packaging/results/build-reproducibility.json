@@ -1,0 +1,27 @@
+{
+  "version": "3.9.0",
+  "tools": {
+    "python": "3.9.13",
+    "pyinstaller": "6.22.2"
+  },
+  "total_files": 291,
+  "identical_files": 289,
+  "differences": [
+    {
+      "path": "_internal/base_library.zip",
+      "status": "farkli",
+      "first_sha256": "22a608ad481c16d57bacf9af79bd3f4dea0d0bc6e10b60ea3f2cd1b6858e395f",
+      "second_sha256": "fd9bdb5ab6f611027ab25bc94e2f38dce774051eba2ccbb32880a2bca017f24c",
+      "expected": true,
+      "reason": "ZIP girdileri derleme zaman damgasi tasiyor."
+    },
+    {
+      "path": "sonar-analyzer.exe",
+      "status": "farkli",
+      "first_sha256": "e02fe4ef1f8a538404b60fbd30cc1b9b74ab160cc666ee2fb4b98d133d8ed893",
+      "second_sha256": "b48b63c69ce82dd59710b04326956df1fddceae0ee15f488d28ed9224d0dc4b1",
+      "expected": true,
+      "reason": "PyInstaller bootloader'a derleme zamani ve gomulu arsiv tablosunu yaziyor; ikisi de kosudan kosuya degisiyor."
+    }
+  ]
+}
