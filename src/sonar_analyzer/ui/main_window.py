@@ -100,6 +100,7 @@ from sonar_analyzer.ui.empty_state import EmptyStatePanel
 from sonar_analyzer.ui.error_dialogs import LoadErrorNotifier
 from sonar_analyzer.ui.export_runner import ExportRunner
 from sonar_analyzer.ui.file_open import FileOpenController
+from sonar_analyzer.ui.panels.bit_trend_view import BitTrendView
 from sonar_analyzer.ui.plot_tool_bar import PlotToolBar
 from sonar_analyzer.ui.plots.dashboard import DashboardPanel
 from sonar_analyzer.ui.plots.spectrum_panel import SpectrumPanel
@@ -1932,7 +1933,10 @@ class MainWindow(QMainWindow):
         transmissions = repository.transmissions(span)
         self.plot_panel.set_tx_regions([(tx.start_ns, tx.end_ns) for tx in transmissions])
         self.transmission_panel.set_intervals(transmissions, start_ns=span.start_ns)
-        self.right_dock.bit_status.set_results(repository.bit_results(span))
+        bit_results = repository.bit_results(span)
+        self.right_dock.bit_status.set_results(bit_results)
+        # F4-081: aynı sonuçlar, aynı ölçüt — özet ve trend ayrışamaz.
+        self.bit_trend_view.set_results(bit_results, start_ns=span.start_ns, end_ns=span.end_ns)
         self._refresh_recording_tree()
 
     def _refresh_recording_tree(self) -> None:
@@ -2020,6 +2024,8 @@ class MainWindow(QMainWindow):
 
         # F4-051: "Spectrogram" sekmesi tam boy waterfall görünümü.
         self.waterfall_view = WaterfallPanel(container)
+        # F4-081: BIT / Status sekmesinin ayrıntılı trend görünümü.
+        self.bit_trend_view = BitTrendView(container)
         self.waterfall_view.setObjectName("panel_waterfall_view")
 
         self.center_stack = QStackedWidget(container)
@@ -2029,6 +2035,7 @@ class MainWindow(QMainWindow):
         self.center_stack.addWidget(self.transmission_panel)
         self.center_stack.addWidget(self.spectrum_view)
         self.center_stack.addWidget(self.waterfall_view)
+        self.center_stack.addWidget(self.bit_trend_view)
         self.center_stack.setCurrentWidget(self.empty_state)
         self.center_stack.currentChanged.connect(self._on_center_view_changed)
 
@@ -2046,6 +2053,8 @@ class MainWindow(QMainWindow):
             self.center_stack.setCurrentWidget(self.spectrum_view)
         elif title == "Spectrogram" and self._repository is not None:
             self.center_stack.setCurrentWidget(self.waterfall_view)
+        elif title == "BIT / Status" and self._repository is not None:
+            self.center_stack.setCurrentWidget(self.bit_trend_view)
         elif self._repository is not None:
             self.show_plot()
         else:
@@ -2077,6 +2086,7 @@ class MainWindow(QMainWindow):
         self.right_dock.analysis_tools.formula_editor.set_channels(list(channels))
         self.right_dock.close_inspector()
         self.right_dock.bit_status.clear()
+        self.bit_trend_view.clear()
         self.plot_panel.clear()
         self.clear_analysis_views()
         self.show_empty_state()
@@ -2180,6 +2190,7 @@ class MainWindow(QMainWindow):
         self.plot_tool_bar.set_channels([])
         self.right_dock.close_inspector()
         self.right_dock.bit_status.clear()
+        self.bit_trend_view.clear()
         self.plot_panel.clear()
         self.plot_panel.clear_event_markers()
         self.plot_panel.clear_tx_regions()

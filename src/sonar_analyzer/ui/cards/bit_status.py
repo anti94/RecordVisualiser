@@ -194,12 +194,9 @@ class BitStatusCard(QGroupBox):
 
 
 def _severity_rank(state: BitState) -> int:
-    """Tablodaki "en kötü" seçimi için sıralama."""
-    order = {
-        BitState.PASS: 0,
-        BitState.NOT_RUN: 1,
-        BitState.UNKNOWN: 2,
-        BitState.WARN: 3,
-        BitState.FAIL: 4,
-    }
-    return order.get(state, 2)
+    """Tablodaki "en kötü" seçimi için sıralama.
+
+    Sıralama `BitState.severity_rank` ile ortaktır (`F4-081`): özet kart ve
+    ayrıntılı trend görünümü aynı ölçütü kullanmak zorundadır.
+    """
+    return state.severity_rank

@@ -65,12 +65,33 @@ class BitState(str, Enum):
     def is_failure(self) -> bool:
         return self in (BitState.WARN, BitState.FAIL)
 
+    @property
+    def severity_rank(self) -> int:
+        """ "En kötü durum" seçiminde kullanılan sıralama — `F4-081`.
+
+        Tek doğruluk kaynağıdır: hem sağ sütundaki özet kart hem de
+        ayrıntılı trend görünümü bunu kullanır. İki yüzeyin aynı durumu
+        göstermesi böylece tesadüf değil, yapısal bir sonuçtur.
+        """
+        return _BIT_SEVERITY_RANK.get(self, 2)
+
 
 _BIT_STATE_BY_CODE = {
     0: BitState.PASS,
     1: BitState.WARN,
     2: BitState.FAIL,
     3: BitState.NOT_RUN,
+}
+
+#: "En kötü durum" sıralaması. Bilinmeyen bir durum PASS'ten kötü ama
+#: WARN'dan iyi sayılır: sessizce "sorun yok" demek de "arıza" demek de
+#: yanlış olurdu.
+_BIT_SEVERITY_RANK: dict[BitState, int] = {
+    BitState.PASS: 0,
+    BitState.NOT_RUN: 1,
+    BitState.UNKNOWN: 2,
+    BitState.WARN: 3,
+    BitState.FAIL: 4,
 }
 
 

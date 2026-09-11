@@ -50,7 +50,8 @@ def test_time_series_is_selected_by_default(bar: ViewTabBar) -> None:
 
 #: `F3-048` Transmission, `F4-045` Spectrum, `F4-051` Spectrogram
 #: (waterfall görünümü); kalanlar hâlâ pasiftir.
-_LIVE_TABS = {"Time Series", "Transmission", "Spectrum", "Spectrogram"}
+#: `F4-081` ile "BIT / Status" da etkinleşti.
+_LIVE_TABS = {"Time Series", "Transmission", "Spectrum", "Spectrogram", "BIT / Status"}
 
 
 def test_supported_tabs_are_enabled_the_rest_are_explicitly_passive(bar: ViewTabBar) -> None:
