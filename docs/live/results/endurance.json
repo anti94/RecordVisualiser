@@ -1,0 +1,40 @@
+{
+  "hours": 2.0,
+  "windows": 57600,
+  "seed": 20260911,
+  "profile": {
+    "loss_ratio": 0.01,
+    "reorder_ratio": 0.0,
+    "duplicate_ratio": 0.0
+  },
+  "wall_seconds": 14.61,
+  "memory": {
+    "samples": 114,
+    "first_quarter_bytes": 32982506.42857143,
+    "last_quarter_bytes": 33093835.285714287,
+    "peak_bytes": 33145571,
+    "growth_ratio": 1.0034
+  },
+  "loss": {
+    "produced_windows": 57600,
+    "network_dropped": 617,
+    "queue_dropped": 0,
+    "disk_dropped": 0,
+    "observed_missing": 617,
+    "recorded_windows": 56983
+  },
+  "files": {
+    "files": 1,
+    "total_bytes": 3874880,
+    "expected_bytes": 3874880,
+    "per_file_bytes": [
+      3874880
+    ],
+    "matches_expected": true
+  },
+  "machine": {
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.9.13",
+    "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD"
+  }
+}

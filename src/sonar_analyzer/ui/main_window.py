@@ -222,6 +222,9 @@ class MainWindow(QMainWindow):
         #: Canlı çizim kendi viewport'unu güncellerken `True` — o sırada
         #: gelen `x_range_changed` kullanıcı gezinmesi sayılmaz.
         self._live_plot_updating = False
+        #: `F5-034` en son panoya yansıtılan olay/BIT/TX sayaçları; değişmediyse
+        #: pano yeniden kurulmaz.
+        self._live_annotation_revision: tuple[int, int, int] = (0, 0, 0)
         #: `F5-032` süren kayıt; yoksa Record eylemi pasiftir.
         self._recorder: RotatingRecorder | None = None
         self._recording_outcomes: list[RecordingOutcome] = []
@@ -659,6 +662,9 @@ class MainWindow(QMainWindow):
         self._live_repository = LiveRepository(
             LiveRingBuffer(capacity_samples=buffer_capacity), channels=source.channels()
         )
+        # Yeni oturum, yeni depo: pano sayaclari da sifirlanmali, yoksa
+        # onceki oturumun sayilari yuzunden ilk tazeleme atlanirdi.
+        self._live_annotation_revision = (0, 0, 0)
         # F5-024: canli akis baslarken playback saati durdurulur; iki saat
         # ayni grafigi es zamanli ilerletemez.
         self._stop_playback_for_live()
@@ -708,7 +714,16 @@ class MainWindow(QMainWindow):
         repository'den** aynı çağrıda okunur. Dosya tarafındaki
         `set_repository` ile aynı sıra ve aynı sözleşme kullanılır; iki
         yüzeyi ayrı ayrı besleyen bir kod er geç ayrışırdı.
+
+        Tazeleme yalnız **yeni bir şey geldiğinde** yapılır: her karede
+        bütün aralığı yeniden sorgulamak, oturum uzadıkça büyüyen bir iş
+        demekti ve canlı karenin bütçesini aşıyordu.
         """
+        revision = repository.annotation_revision
+        if revision == self._live_annotation_revision:
+            return
+        self._live_annotation_revision = revision
+
         span = repository.metadata().time_range
         if span.end_ns <= span.start_ns:
             return

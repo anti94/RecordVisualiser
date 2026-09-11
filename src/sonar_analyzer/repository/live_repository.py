@@ -88,6 +88,17 @@ class LiveRepository:
     def packet_count(self) -> int:
         return self._packet_count
 
+    @property
+    def annotation_revision(self) -> tuple[int, int, int]:
+        """Olay/BIT/TX sayaçları — değişmediyse pano tazelenmesine gerek yok.
+
+        Arayüz her karede bütün aralığı yeniden sorgulasaydı iş, oturum
+        uzadıkça büyürdü (`F5-034`'ün ilk hâli bunu yapıyordu ve canlı
+        karenin bütçesini aşıyordu). Bu üçlü, gerçekten yeni bir şey gelip
+        gelmediğini **sayarak** söyler.
+        """
+        return (len(self._events), len(self._bit_results), len(self._transmissions))
+
     def ingest(self, packet: LivePacket) -> int:
         """Paketi tampona ve olay kuyruğuna yazar; **çıkarılan örnek** sayısını döner."""
         if self._closed:
