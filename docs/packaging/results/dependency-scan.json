@@ -1,7 +1,7 @@
 {
   "scanned": true,
   "exit_code": 1,
-  "packages_scanned": 56,
+  "packages_scanned": 57,
   "findings": [
     {
       "package": "filelock",

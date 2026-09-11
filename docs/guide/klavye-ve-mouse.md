@@ -106,7 +106,7 @@ açıldığında son kip geri gelir.
 > **Bilinen fark:** plan Bölüm 16 kipin *araç çubuğu durumunda* açıkça
 > gösterilmesini istiyor. Bu sürümde kip log satırı ve workspace
 > üzerinden bildirilir; araç çubuğunda kalıcı bir kip göstergesi
-> **yoktur**.
+> **yoktur** (`K-11`, `docs/release/known-issues.md`).
 
 ## 5. Fare davranışı
 
@@ -144,7 +144,7 @@ bir kısayolu denemek, hiç olmadığını bilmekten daha kötüdür.
 | Bölüm 16 | Bu sürümde | Neden |
 | --- | --- | --- |
 | `Ctrl+E` → Event paneline odaklan | `Ctrl+E` → **Export Data...** | `Ctrl+E` menüde dışa aktarmaya bağlandı; olay gezinme zaten `F4` / `Shift+F4` ile yapılıyor ve ayrı bir odak kısayoluna ihtiyaç kalmadı |
-| `Ctrl+K` → Command palette | **yok** | Komut paleti bu sürümde uygulanmadı |
+| `Ctrl+K` → Command palette | **yok** | Komut paleti bu sürümde uygulanmadı (`K-10`) |
 
 Bölüm 16'nın geri kalan **on bir kısayolu** (`Ctrl+O`, `Ctrl+S`,
 `Space`, `Home`, `X`, `Y`, `B`, `C`, `R`, `F4`, `Shift+F4`) tabloda
@@ -158,3 +158,4 @@ geri/ileri alma.
 - Ana ekran ve bölgeler: `docs/guide/ana-ekran.md`
 - Canlı bağlantı ve kayıt: `docs/guide/canli-baglanti.md`
 - Filtre ve spektral analiz: `docs/guide/filtre-ve-spektral-analiz.md`
+- Bilinen sorunlar: `docs/release/known-issues.md`

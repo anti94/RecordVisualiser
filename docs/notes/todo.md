@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 498 madde · 365 tamamlandı · 133 kaldı**
+**Toplam 498 madde · 366 tamamlandı · 132 kaldı**
 
-`[##################......]` %73.3
+`[##################......]` %73.5
 
 ## Özet
 
@@ -40,9 +40,9 @@ Work in fully autonomous mode.
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 41 | 0 | 41 |
-| Faz 6 — Windows dağıtımı ve ürünleştirme | 28 | 6 | 34 |
+| Faz 6 — Windows dağıtımı ve ürünleştirme | 29 | 5 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **365** | **133** | **498** |
+| **Toplam** | **366** | **132** | **498** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -395,7 +395,7 @@ Work in fully autonomous mode.
 | [x] | `F5-040` | `2.40.0` | 20 dk | Canlı modda mockup pano davranışını kontrol et |
 | [x] | `F5-041` | `3.0.0` | 15 dk | Canlı veri milestone kabulünü kapat ve major sürümü hazırla |
 
-### Faz 6 — Windows dağıtımı ve ürünleştirme (28/34)
+### Faz 6 — Windows dağıtımı ve ürünleştirme (29/34)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -427,7 +427,7 @@ Work in fully autonomous mode.
 | [x] | `F6-026` | `3.26.0` | 20 dk | Canlı bağlantı ve kayıt kullanım örneğini yaz |
 | [x] | `F6-027` | `3.27.0` | 20 dk | Format ve decoder kılavuzunu güncelle |
 | [x] | `F6-028` | `3.28.0` | 15 dk | Klavye, mouse ve ölçekleme kılavuzunu tamamla |
-| [ ] | `F6-029` | `3.29.0` | 15 dk | Bilinen sorunları ve veri sınırlamalarını yaz |
+| [x] | `F6-029` | `3.29.0` | 15 dk | Bilinen sorunları ve veri sınırlamalarını yaz |
 | [ ] | `F6-030` | `3.30.0` | 20 dk | Paketli uygulamada kullanıcı kabul turunu kaydet |
 | [ ] | `F6-031` | `3.31.0` | 20 dk | Paketli ana ekranı referans mockup ile karşılaştır |
 | [ ] | `F6-032` | `3.32.0` | 20 dk | Release ve geri dönüş prosedürünü yaz |
