@@ -292,8 +292,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-070` | 20 dk | 7 dk 13 sn | `903cff9` | sınırlı aritmetik formül ayrıştırıcısını ekle |
 | `F4-071` | 20 dk | 6 dk 41 sn | `610252d` | formül değerlendirmesini kanal dizilerine bağla |
 | `F4-072` | 20 dk | 8 dk 17 sn | `2fa0bab` | formül ifade ve kaynak sınırlarını doğrula |
+| `F4-073` | 20 dk | 185 dk 33 sn | `6055cbe` | custom sekmesine basit formül editörü ekle |
 
-**274 commit · olculen toplam 2968 dk 50 sn · olculemeyen 1 (ilk commit)**
+**275 commit · olculen toplam 3154 dk 23 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
