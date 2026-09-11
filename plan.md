@@ -1716,7 +1716,25 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 | [x] | `F4-087` | `1.87.0` | 20 dk | Sinüs, chirp, noise ve impulse referanslarını çalıştır | FFT, PSD, STFT ve filtre sonuçları NumPy/SciPy referanslarıyla eşleşir | `F4-086` | `test(analysis): F4-087 sinüs, chirp, noise ve impulse referanslarını çalıştır` |
 | [x] | `F4-088` | `1.88.0` | 20 dk | Kaydet/aç sonrası analiz tekrarını doğrula | Aynı kaynak ve parametreler aynı sayısal çıktıları üretir | `F4-087` | `test(workspace): F4-088 kaydet/aç sonrası analiz tekrarını doğrula` |
 | [x] | `F4-089` | `1.89.0` | 20 dk | Çalışan analiz panosunu mockup ile karşılaştır | Dokuz bölge korunur; FFT, spektrogram, filtre ve istatistik gerçek veriyle çalışır | `F4-088` | `test(ui): F4-089 çalışan analiz panosunu mockup ile karşılaştır` |
-| [ ] | `F4-090` | `2.0.0` | 15 dk | Analiz milestone kabulünü kapat ve major sürümü hazırla | Mockup analizi, Bölüm 3.2, doğruluk ve performans koşulları geçer | `F4-089` | `chore(release): F4-090 analiz milestone kabulünü kapat ve major sürümü hazırla` |
+
+##### Profil B sınırlı okuma (ADR-010 düzeltmesi)
+
+`F4-065` kararı `query_ms`, `pipeline_fps` ve `memory_scaling` hedeflerinin
+saptığını ölçtü; ADR-010 nedeni algoritmik olarak saptayıp düzeltmeyi "ayrı bir
+iş" olarak bıraktı. §22.1 gereği sapan zorunlu kontrolle milestone kapatılamaz,
+bu yüzden bu üç iş `F4-090`'dan önce gelir.
+
+| Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| [x] | `F4-091` | `1.90.0` | 20 dk | Profil B kayıt indeksini kur | İndeks yalnız kayıt başlıklarını tarar; payload'a dokunmaz ve `iter_records` ile birebir aynı kayıt/blok konumlarını verir | `F4-089` | `feat(io): F4-091 profil B kayıt indeksini kur` |
+| [ ] | `F4-092` | `1.91.0` | 20 dk | Profil B zaman sorgusunu indeksle sınırla | Sorgu yalnız pencereye düşen kayıtları okur; sonuç eski tam-çözüm referansıyla bit düzeyinde aynıdır ve dokunulan kayıt sayısı dosya boyutundan bağımsızdır | `F4-091` | `perf(io): F4-092 profil B zaman sorgusunu indeksle sınırla` |
+| [ ] | `F4-093` | `1.92.0` | 20 dk | Büyük dosya koşusunu tekrarla ve kararı güncelle | `F4-064` koşusu aynı dosyalarla tekrarlanır; `F4-065` kararı ölçümden yeniden üretilir ve sapan hedeflerin durumu belgelenir | `F4-092` | `perf(bench): F4-093 büyük dosya koşusunu tekrarla ve kararı güncelle` |
+
+##### Sürüm kabulü
+
+| Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| [ ] | `F4-090` | `2.0.0` | 15 dk | Analiz milestone kabulünü kapat ve major sürümü hazırla | Mockup analizi, Bölüm 3.2, doğruluk ve performans koşulları geçer | `F4-093` | `chore(release): F4-090 analiz milestone kabulünü kapat ve major sürümü hazırla` |
 
 #### Faz 5 — Canlı veri, bağlantı ve kayıt
 
