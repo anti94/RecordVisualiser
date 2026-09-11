@@ -51,8 +51,8 @@ from sonar_analyzer.io.decoders.profile_b import (  # noqa: E402
     decode_file_header,
 )
 from sonar_analyzer.io.decoders.profile_b_query import (  # noqa: E402
+    AcousticQuery,
     acoustic_recording_span,
-    query_acoustic_channel,
 )
 from sonar_analyzer.io.profile_b_format import SAMPLES_PER_BLOCK  # noqa: E402
 from sonar_analyzer.io.readers.mapped_source import MappedSource  # noqa: E402
@@ -405,9 +405,12 @@ def benchmark_file(
                 raise ValueError(f"Kayıtta akustik kanal yok: {path}")
             channel = metadata.channel_ids[0]
             span = TimeRange(metadata.start_ns, metadata.end_ns)
+            index_started = perf_counter()
+            reader = AcousticQuery(buffer)
+            index_seconds = perf_counter() - index_started
 
             def read(_channel_id: str, window: TimeRange) -> DataChunk:
-                return query_acoustic_channel(buffer, channel, window)
+                return reader.query(channel, window)
 
             query = DisplayQuery(read, max_bytes=cache_bytes)
             queries = measure_queries(
@@ -447,6 +450,7 @@ def benchmark_file(
         "file_bytes": file_bytes,
         "samples_per_block": SAMPLES_PER_BLOCK,
         "channel_measured": channel,
+        "index_seconds": index_seconds,
         "metadata": asdict(metadata),
         "queries": [asdict(item) for item in queries],
         "frame_rate": asdict(frame_rate),

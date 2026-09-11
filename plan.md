@@ -1727,7 +1727,7 @@ bu yüzden bu üç iş `F4-090`'dan önce gelir.
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F4-091` | `1.90.0` | 20 dk | Profil B kayıt indeksini kur | İndeks yalnız kayıt başlıklarını tarar; payload'a dokunmaz ve `iter_records` ile birebir aynı kayıt/blok konumlarını verir | `F4-089` | `feat(io): F4-091 profil B kayıt indeksini kur` |
-| [ ] | `F4-092` | `1.91.0` | 20 dk | Profil B zaman sorgusunu indeksle sınırla | Sorgu yalnız pencereye düşen kayıtları okur; sonuç eski tam-çözüm referansıyla bit düzeyinde aynıdır ve dokunulan kayıt sayısı dosya boyutundan bağımsızdır | `F4-091` | `perf(io): F4-092 profil B zaman sorgusunu indeksle sınırla` |
+| [x] | `F4-092` | `1.91.0` | 20 dk | Profil B zaman sorgusunu indeksle sınırla | Sorgu yalnız pencereye düşen kayıtları okur; sonuç eski tam-çözüm referansıyla bit düzeyinde aynıdır ve dokunulan kayıt sayısı dosya boyutundan bağımsızdır | `F4-091` | `perf(io): F4-092 profil B zaman sorgusunu indeksle sınırla` |
 | [ ] | `F4-093` | `1.92.0` | 20 dk | Büyük dosya koşusunu tekrarla ve kararı güncelle | `F4-064` koşusu aynı dosyalarla tekrarlanır; `F4-065` kararı ölçümden yeniden üretilir ve sapan hedeflerin durumu belgelenir | `F4-092` | `perf(bench): F4-093 büyük dosya koşusunu tekrarla ve kararı güncelle` |
 
 ##### Sürüm kabulü
