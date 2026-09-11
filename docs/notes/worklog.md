@@ -347,8 +347,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F5-029` | 20 dk | 11 dk 54 sn | `5a30d4b` | flush ve güvenli dosya kapatmayı ekle |
 | `F5-030` | 20 dk | 9 dk 49 sn | `c70c883` | disk dolması ve yazma hatasını işle |
 | `F5-031` | 20 dk | 8 dk 24 sn | `1b477d1` | boyut ve isim sınırında yeni dosyaya geç |
+| `F5-032` | 20 dk | 44 dk 48 sn | `3f7817b` | record ve Stop durumunu ana ekrana bağla |
 
-**329 commit · olculen toplam 3787 dk 37 sn · olculemeyen 1 (ilk commit)**
+**330 commit · olculen toplam 3832 dk 25 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

@@ -39,6 +39,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 
 from sonar_analyzer.domain.time_range import RECORD_PERIOD_NS
@@ -60,6 +61,40 @@ MAX_SEQUENCE_NO = 9_999_999
 #: kayda karşılık gelir; isim sınırından (10 milyon) sonra geldiği için
 #: pratikte önce isim sınırı devreye girer — ikisi de kontrol edilir.
 DEFAULT_MAX_BYTES = 1024 * 1024 * 1024
+
+
+class ClosureReason(Enum):
+    """Kaydın neden kapandığı — `F5-033`.
+
+    Neden **kaydedilir**, çünkü dosyanın neden bittiği dosyaya bakarak
+    anlaşılamaz: kullanıcının durdurduğu bir kayıt ile bağlantı koptuğu
+    için biten bir kayıt diskte birbirinin aynıdır.
+    """
+
+    USER_STOP = "kullanici durdurdu"
+    DISCONNECTED = "baglanti kesildi"
+    SOURCE_ERROR = "kaynak hatasi"
+    WRITE_ERROR = "disk yazma hatasi"
+
+
+@dataclass(frozen=True)
+class RecordingGap:
+    """Kayıtta atlanan pencere aralığı — `F5-033`.
+
+    `first_missing`/`last_missing` atlanan **kayıt sıralarıdır** (mutlak
+    zaman ızgarasında), `missing_count` ise kaç pencerenin hiç gelmediği.
+    """
+
+    first_missing: int
+    last_missing: int
+    missing_count: int
+    path: Path
+
+    def __str__(self) -> str:
+        return (
+            f"{self.path.name}: {self.first_missing}..{self.last_missing} arasi "
+            f"{self.missing_count} pencere gelmedi"
+        )
 
 
 @dataclass(frozen=True)
@@ -122,6 +157,9 @@ class RotatingRecorder:
         self._first_anchor_ns: int | None = None
         self._last_record_ns: int | None = None
         self._stopped = False
+        self._gaps: list[RecordingGap] = []
+        self._last_window: int | None = None
+        self._closure_reason: ClosureReason | None = None
 
     # ----------------------------------------------------------------- #
     # gozlem
@@ -160,6 +198,21 @@ class RotatingRecorder:
     def total_record_count(self) -> int:
         """Bütün dosyalara gönderilen toplam kayıt sayısı."""
         return self._total_submitted
+
+    @property
+    def gaps(self) -> list[RecordingGap]:
+        """Kayıt boyunca hiç gelmeyen pencere aralıkları — `F5-033`."""
+        return list(self._gaps)
+
+    @property
+    def missing_windows(self) -> int:
+        """Toplam kaç 125 ms penceresinin hiç gelmediği."""
+        return sum(gap.missing_count for gap in self._gaps)
+
+    @property
+    def closure_reason(self) -> ClosureReason | None:
+        """Kaydın neden kapandığı; henüz kapanmadıysa `None`."""
+        return self._closure_reason
 
     @property
     def total_dropped_records(self) -> int:
@@ -232,17 +285,48 @@ class RotatingRecorder:
         if record is None:
             return None
 
+        self._note_gap(first_ns)
         self._require_session().write(record.payload)
         self._submitted += 1
         self._total_submitted += 1
         self._last_record_ns = first_ns
         return record
 
-    def stop(self) -> list[RecordingOutcome]:
-        """Açık dosyayı kapatır ve **bütün** dosyaların sonuçlarını döndürür."""
+    def stop(self, reason: ClosureReason = ClosureReason.USER_STOP) -> list[RecordingOutcome]:
+        """Açık dosyayı kapatır ve **bütün** dosyaların sonuçlarını döndürür.
+
+        `reason` kaydedilir (`closure_reason`): bağlantı koptuğu için biten
+        bir kayıt ile kullanıcının durdurduğu kayıt diskte birbirinin
+        aynıdır; nedeni saklamazsak sonradan ayırt edilemezdi.
+        """
         self._close_current()
         self._stopped = True
+        if self._closure_reason is None:
+            self._closure_reason = reason
         return list(self._outcomes)
+
+    def _note_gap(self, first_ns: int) -> None:
+        """Bu kaydın öncekiyle arasında atlanan pencere varsa kaydeder.
+
+        Ölçü **mutlak zaman ızgarasındaki** pencere indeksidir, dosya içi
+        sıra numarası değil: dosya değişince sıra sıfırlanır ve iki dosya
+        arasındaki boşluk görünmez olurdu.
+        """
+        anchor = self._first_anchor_ns
+        if anchor is None:  # pragma: no cover - _open_file her zaman kurar
+            return
+        window = (first_ns - anchor) // RECORD_PERIOD_NS
+        previous = self._last_window
+        if previous is not None and window > previous + 1:
+            self._gaps.append(
+                RecordingGap(
+                    first_missing=previous + 1,
+                    last_missing=window - 1,
+                    missing_count=window - previous - 1,
+                    path=self._paths[-1],
+                )
+            )
+        self._last_window = window
 
     # ----------------------------------------------------------------- #
     # ic isleyis

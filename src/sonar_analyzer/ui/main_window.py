@@ -87,7 +87,7 @@ from sonar_analyzer.io.live.sequence_tracker import SequenceStats
 from sonar_analyzer.logging.performance import measure
 from sonar_analyzer.processing.chain import ProcessingChain
 from sonar_analyzer.processing.steps import StepValidationError
-from sonar_analyzer.recording.rotation import RotatingRecorder, RotationPolicy
+from sonar_analyzer.recording.rotation import ClosureReason, RotatingRecorder, RotationPolicy
 from sonar_analyzer.recording.session import RecordingOutcome, RecordingState
 from sonar_analyzer.repository.derived_repository import (
     DerivedChannelError,
@@ -592,6 +592,10 @@ class MainWindow(QMainWindow):
         source = self._live_source
         if source is None:
             return
+        # F5-033: baglanti kesilince kayit de kapanir. Once kayit kapatilir
+        # ki tam kayitlar diske insin (F5-029) ve neden "baglanti kesildi"
+        # olarak yazilsin; sonra kaynak birakilir.
+        self.stop_recording(ClosureReason.DISCONNECTED)
         try:
             source.disconnect()
         except Exception as exc:
@@ -793,6 +797,9 @@ class MainWindow(QMainWindow):
 
     def _on_live_read_failed(self, message: str) -> None:
         self.bottom_dock.append_log(f"Canli okuma hatasi: {message}")
+        # F5-033: kaynak coktuyse kayit da bitmistir; acik birakmak
+        # kullaniciya hala kayit aliniyormus gibi gosterirdi.
+        self.stop_recording(ClosureReason.SOURCE_ERROR)
         self._refresh_connection_state()
 
     def update_live_health(self, health: LiveHealth) -> None:
@@ -929,7 +936,9 @@ class MainWindow(QMainWindow):
         self._refresh_recording_state()
         return recorder
 
-    def stop_recording(self) -> list[RecordingOutcome]:
+    def stop_recording(
+        self, reason: ClosureReason = ClosureReason.USER_STOP
+    ) -> list[RecordingOutcome]:
         """`Stop` eylemi: kaydı kapatır ve **sonucu olduğu gibi** bildirir.
 
         `F5-030`: hata olmuşsa "başarılı" denmez; kaç dosya ve kaç kayıt
@@ -938,15 +947,37 @@ class MainWindow(QMainWindow):
         recorder = self._recorder
         if recorder is None or not self.recording_active:
             return []
-        outcomes = recorder.stop()
+        outcomes = recorder.stop(reason)
         # Yazici BIRAKILMAZ: durdurulmus kayit da gorunur kalmali ("Durduruldu",
         # son dosya, sure). Birakilsaydi Stop'tan hemen sonra ekran "kayit yok"
         # derdi ve kullanicinin az once aldigi kayittan iz kalmazdi.
         self._recording_outcomes = outcomes
         for outcome in outcomes:
             self.bottom_dock.append_log(outcome.message)
+        self._log_recording_closure(recorder)
         self._refresh_recording_state()
         return outcomes
+
+    def _log_recording_closure(self, recorder: RotatingRecorder) -> None:
+        """Kapanış nedenini ve boşlukları log'a yazar — `F5-033`.
+
+        Kabul kriterinin ikinci yarısı budur. İkisi de dosyaya bakarak
+        anlaşılamaz: bağlantı koptuğu için biten bir kayıt ile kullanıcının
+        durdurduğu kayıt diskte birbirinin aynıdır, ve hiç gelmemiş bir
+        pencere dosyada yalnız *olmayan* bir kayıt olarak görünür.
+        """
+        reason = recorder.closure_reason
+        if reason is not None:
+            self.bottom_dock.append_log(f"Kayit kapandi ({reason.value}).")
+        gaps = recorder.gaps
+        if not gaps:
+            self.bottom_dock.append_log("Kayitta bosluk yok: butun pencereler yazildi.")
+            return
+        self.bottom_dock.append_log(
+            f"Kayitta {len(gaps)} bosluk, toplam {recorder.missing_windows} pencere gelmedi."
+        )
+        for gap in gaps:
+            self.bottom_dock.append_log(f"  Bosluk — {gap}")
 
     def _record_live_packet(self, packet: LivePacket) -> None:
         """Canlı paketi süren kayda yazar; kayıt yoksa hiçbir şey yapmaz."""
@@ -959,7 +990,7 @@ class MainWindow(QMainWindow):
             # Kayit hatasi canli akisi durdurmaz; akis surerken kayit
             # basarisiz olur ve bu ACIKCA gorunur (F5-030).
             self.bottom_dock.append_log(f"Kayit hatasi: {exc}")
-            self.stop_recording()
+            self.stop_recording(ClosureReason.WRITE_ERROR)
 
     def _refresh_recording_state(self) -> None:
         """Eylemler, kart ve durum çubuğunu **aynı** kaynaktan tazeler — `F5-032`.

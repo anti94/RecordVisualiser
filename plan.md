@@ -1789,7 +1789,7 @@ Kabul: UDP/TCP/serial akışı, bağlantı durumu, canlı grafik, kayıt ve tekr
 | [x] | `F5-030` | `2.30.0` | 20 dk | Disk dolması ve yazma hatasını işle | Kayıt hata durumuna geçer; başarılı kayıt mesajı verilmez | `F5-029` | `fix(recording): F5-030 disk dolması ve yazma hatasını işle` |
 | [x] | `F5-031` | `2.31.0` | 20 dk | Boyut ve isim sınırında yeni dosyaya geç | Yeni dosyanın başlangıç zamanı ve sıra başlangıcı kendi içinde tutarlıdır | `F5-030` | `feat(recording): F5-031 boyut ve isim sınırında yeni dosyaya geç` |
 | [x] | `F5-032` | `2.32.0` | 20 dk | Record ve Stop durumunu ana ekrana bağla | Aktif dosya, geçen süre ve kayıt durumu görünür | `F5-031` | `feat(ui): F5-032 record ve Stop durumunu ana ekrana bağla` |
-| [ ] | `F5-033` | `2.33.0` | 20 dk | Bağlantı kesilmesinde kayıt davranışını uygula | Tam kayıtlar korunur; boşluk ve kapanış nedeni loglanır | `F5-032` | `fix(recording): F5-033 bağlantı kesilmesinde kayıt davranışını uygula` |
+| [x] | `F5-033` | `2.33.0` | 20 dk | Bağlantı kesilmesinde kayıt davranışını uygula | Tam kayıtlar korunur; boşluk ve kapanış nedeni loglanır | `F5-032` | `fix(recording): F5-033 bağlantı kesilmesinde kayıt davranışını uygula` |
 | [ ] | `F5-034` | `2.34.0` | 20 dk | Canlı BIT ve TX olaylarını panoya bağla | Sağ BIT özeti ve grafik marker'ları aynı geçişi gösterir | `F5-033` | `feat(ui): F5-034 canlı BIT ve TX olaylarını panoya bağla` |
 | [ ] | `F5-035` | `2.35.0` | 20 dk | Canlı kayıt dosyasını tekrar açarak karşılaştır | Örnekler, olaylar ve 125 ms sınırları kaynaktaki referansla eşleşir | `F5-034` | `test(recording): F5-035 canlı kayıt dosyasını tekrar açarak karşılaştır` |
 
