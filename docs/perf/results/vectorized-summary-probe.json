@@ -1,0 +1,29 @@
+{
+  "machine": {
+    "python": "3.9.13",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+    "cpu_count": 16,
+    "total_ram_bytes": 33685835776,
+    "numpy": "2.0.2"
+  },
+  "input": ".cache/perf/profile-b-1gb.bin",
+  "window_seconds": 1,
+  "max_points": 2000,
+  "index_built_before_timing": true,
+  "tracemalloc_during_timing": true,
+  "cold_query_ms": [
+    8.883200000000091,
+    8.522100000000087,
+    8.37270000000001,
+    7.811599999999919,
+    8.487400000000145,
+    8.550499999999905,
+    9.486000000000105,
+    7.794800000000102,
+    7.633199999999896,
+    7.624800000000098
+  ],
+  "tracemalloc_peak_bytes": 2967911,
+  "minimum_fps_equivalent": 105.41851149061658
+}

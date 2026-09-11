@@ -3,6 +3,7 @@
 import numpy as np
 import pytest
 
+from sonar_analyzer.analysis.downsampling import extrema_indices
 from sonar_analyzer.io.index.summary_pyramid import build_summary_pyramid
 
 
@@ -41,6 +42,42 @@ def test_summary_storage_is_bounded_and_does_not_retain_source() -> None:
 def test_empty_input_has_no_levels() -> None:
     pyramid = build_summary_pyramid(np.array([]))
     assert pyramid.sample_count == 0 and pyramid.levels == () and pyramid.nbytes == 0
+
+
+@pytest.mark.parametrize("block_size", [2, 32, 127, 1024])
+@pytest.mark.parametrize("case", ["int64", "uint64", "ties", "invalid", "mixed"])
+def test_vectorized_selection_preserves_dtype_ties_and_partial_blocks(
+    block_size: int, case: str
+) -> None:
+    if case == "int64":
+        values = np.array([2**63 - 3, 2**63 - 2, -(2**63), 2**63 - 1] * 101, dtype=np.int64)
+    elif case == "uint64":
+        values = np.array([2**64 - 3, 2**64 - 2, 0, 2**64 - 1] * 101, dtype=np.uint64)
+    elif case == "ties":
+        values = np.array([0.0, -0.0, 1.0, 1.0] * 101)
+    elif case == "invalid":
+        values = np.array([np.nan, np.inf, -np.inf, np.nan] * 101)
+    else:
+        values = np.array([np.nan, 7.0, np.inf, -3.0, -3.0, 7.0, -np.inf] * 57)
+    original = values.copy()
+    pyramid = build_summary_pyramid(values, base_block_size=block_size)
+    for level in pyramid.levels:
+        for block in range(level.block_count):
+            start = block * level.block_size
+            expected = extrema_indices(values[start : start + level.block_size]) + start
+            np.testing.assert_array_equal(level.block_indices(block), expected)
+    np.testing.assert_array_equal(values, original)
+
+
+def test_vectorized_tiles_preserve_extrema_at_tile_edges() -> None:
+    values = np.random.default_rng(81).normal(size=131_137)
+    values[131_071:131_074] = [1e9, np.nan, -1e9]
+    pyramid = build_summary_pyramid(values)
+    for level in pyramid.levels:
+        for block in range(level.block_count):
+            start = block * level.block_size
+            expected = extrema_indices(values[start : start + level.block_size]) + start
+            np.testing.assert_array_equal(level.block_indices(block), expected)
 
 
 def test_invalid_block_size_and_block_access_fail() -> None:
