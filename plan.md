@@ -1798,7 +1798,7 @@ Kabul: UDP/TCP/serial akışı, bağlantı durumu, canlı grafik, kayıt ve tekr
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F5-036` | `2.36.0` | 20 dk | Burst, kayıp ve sıra dışı paket simülatörü ekle | Her senaryo seed ile tekrar üretilebilir | `F5-035` | `test(live): F5-036 burst, kayıp ve sıra dışı paket simülatörü ekle` |
-| [ ] | `F5-037` | `2.37.0` | 20 dk | Burst ve bağlantı kesintisi sonuçlarını doğrula | Sayaçlar, kuyruk sınırı, yeniden bağlanma ve UI tepkisi bekleneni verir | `F5-036` | `test(live): F5-037 burst ve bağlantı kesintisi sonuçlarını doğrula` |
+| [x] | `F5-037` | `2.37.0` | 20 dk | Burst ve bağlantı kesintisi sonuçlarını doğrula | Sayaçlar, kuyruk sınırı, yeniden bağlanma ve UI tepkisi bekleneni verir | `F5-036` | `test(live): F5-037 burst ve bağlantı kesintisi sonuçlarını doğrula` |
 | [ ] | `F5-038` | `2.38.0` | 20 dk | Uzun süreli canlı kayıt koşusunu hazırla | En az 2 saatlik otomatik koşu bellek, kayıp ve dosya boyutunu kaydeder | `F5-037` | `test(live): F5-038 uzun süreli canlı kayıt koşusunu hazırla` |
 | [ ] | `F5-039` | `2.39.0` | 20 dk | Dayanıklılık koşusu raporunu değerlendir | Bellek bütçesi, beklenen kayıp ve kayıt bütünlüğü sonuçları kanıtlıdır | `F5-038` | `docs(live): F5-039 dayanıklılık koşusu raporunu değerlendir` |
 | [ ] | `F5-040` | `2.40.0` | 20 dk | Canlı modda mockup pano davranışını kontrol et | Ana yerleşim korunur; bağlantı ve kayıt durumu açıkça görünür | `F5-039` | `test(ui): F5-040 canlı modda mockup pano davranışını kontrol et` |
