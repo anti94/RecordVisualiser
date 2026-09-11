@@ -80,6 +80,12 @@ jobs:
         # tools/coverage_gate.py icinde (F6-013).
         run: python tools/coverage_gate.py
 
+      - name: Performans smoke (F6-015)
+        # Sabit fixture uzerinde acma/sorgu/olay olcumu. Butceler genis:
+        # amac mutlak hizi kanitlamak degil, mertebe degistiren bir
+        # yavaslamayi yakalamak.
+        run: python tools/perf_smoke.py
+
       - name: Bagimlilik taramasi (F6-014)
         # Engelleyici olcut: bulgu KULLANICIYA GIDEN bir bagimliliktaysa
         # is basarisiz olur. Gelistirme araclarindaki bulgular raporlanir

@@ -371,8 +371,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F6-012` | 20 dk | 10 dk 14 sn | `d7fa44e` | imzalama gereksinimini yayın akışına bağla |
 | `F6-013` | 20 dk | 19 dk 31 sn | `4f62dc2` | coverage raporu ve eşiklerini CI'a ekle |
 | `F6-013` | 20 dk | 25 sn | `b18fc4e` | plan işaretini düzelt |
+| `F6-014` | 20 dk | 11 dk 30 sn | `0646204` | bağımlılık taramasını CI'a ekle |
 
-**353 commit · olculen toplam 4263 dk 10 sn · olculemeyen 1 (ilk commit)**
+**354 commit · olculen toplam 4274 dk 40 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

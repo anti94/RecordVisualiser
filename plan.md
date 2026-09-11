@@ -1831,7 +1831,7 @@ Kabul: Kurulabilir Windows paketi, dokümantasyon, sürüm artefaktları ve dağ
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F6-013` | `3.13.0` | 20 dk | Coverage raporu ve eşiklerini CI'a ekle | Genel en az yüzde 70 ve kritik parser/domain için yüksek eşik denetlenir | `F6-012` | `test(quality): F6-013 coverage raporu ve eşiklerini CI'a ekle` |
 | [x] | `F6-014` | `3.14.0` | 20 dk | Bağımlılık taramasını CI'a ekle | Tarama raporu üretilir; belirlenen engelleyici sonuçta iş başarısız olur | `F6-013` | `build(ci): F6-014 bağımlılık taramasını CI'a ekle` |
-| [ ] | `F6-015` | `3.15.0` | 20 dk | Küçük performans smoke kontrolünü CI'a ekle | Sabit fixture ile bütçe sapması raporlanır | `F6-014` | `build(ci): F6-015 küçük performans smoke kontrolünü CI'a ekle` |
+| [x] | `F6-015` | `3.15.0` | 20 dk | Küçük performans smoke kontrolünü CI'a ekle | Sabit fixture ile bütçe sapması raporlanır | `F6-014` | `build(ci): F6-015 küçük performans smoke kontrolünü CI'a ekle` |
 | [ ] | `F6-016` | `3.16.0` | 20 dk | Windows paket smoke kontrolünü CI'a ekle | Build ve paketli açılış sonucu workflow artefaktına yazılır | `F6-015` | `build(ci): F6-016 windows paket smoke kontrolünü CI'a ekle` |
 | [ ] | `F6-017` | `3.17.0` | 20 dk | Sürüm artefaktı ve checksum iş akışını ekle | Sürüm etiketiyle VERSION uyuşmazsa yayın adımı durur | `F6-016` | `build(ci): F6-017 sürüm artefaktı ve checksum iş akışını ekle` |
 | [ ] | `F6-018` | `3.18.0` | 15 dk | Merge ve release kalite kapılarını belgeye bağla | Remote varsa gerekli kontroller uygulanır; yoksa yerel eşdeğer komutlar kayıtlıdır | `F6-017` | `docs(ci): F6-018 merge ve release kalite kapılarını belgeye bağla` |

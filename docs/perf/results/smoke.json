@@ -1,0 +1,25 @@
+{
+  "fixture": "valid_8records.bin",
+  "repeats": 5,
+  "measurements": [
+    {
+      "name": "open",
+      "best_ms": 0.849,
+      "budget_ms": 500.0
+    },
+    {
+      "name": "query",
+      "best_ms": 0.053,
+      "budget_ms": 250.0
+    },
+    {
+      "name": "events",
+      "best_ms": 0.001,
+      "budget_ms": 250.0
+    }
+  ],
+  "machine": {
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.9.13"
+  }
+}
