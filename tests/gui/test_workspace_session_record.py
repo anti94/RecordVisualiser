@@ -78,8 +78,9 @@ def _furnish(win: MainWindow) -> None:
 # --------------------------------------------------------------------------- #
 
 
-def test_the_schema_version_moved_to_two() -> None:
-    assert WORKSPACE_SCHEMA_VERSION == 2
+def test_the_four_families_arrived_in_schema_version_two() -> None:
+    """Dört aile v2 ile geldi; sonraki sürümler üstüne ekler."""
+    assert WORKSPACE_SCHEMA_VERSION >= 2
 
 
 def test_a_default_model_has_empty_session_records() -> None:
@@ -154,7 +155,7 @@ def test_a_version_one_document_migrates_without_losing_anything() -> None:
     }
     migrated = migrate_document(legacy)
 
-    assert migrated["schema_version"] == 2
+    assert migrated["schema_version"] == WORKSPACE_SCHEMA_VERSION
     assert migrated["source_paths"] == ["kayit.bin"]
     assert migrated["derived_channels"] == []
     assert migrated["annotations"] == []
@@ -165,7 +166,7 @@ def test_a_version_one_document_migrates_without_losing_anything() -> None:
     assert model.panels[0].zoom_mode == "x"
 
 
-def test_a_legacy_v0_document_still_reaches_version_two() -> None:
+def test_a_legacy_v0_document_still_reaches_the_current_version() -> None:
     legacy: dict[str, object] = {
         "schema_version": 0,
         "open_files": ["eski.bin"],
@@ -173,7 +174,7 @@ def test_a_legacy_v0_document_still_reaches_version_two() -> None:
         "tab": "Transmission",
     }
     model = WorkspaceModel.from_dict(migrate_document(legacy))
-    assert model.schema_version == 2
+    assert model.schema_version == WORKSPACE_SCHEMA_VERSION
     assert model.source_paths == ["eski.bin"]
     assert model.annotations == []
 
@@ -198,7 +199,7 @@ def test_the_saved_file_holds_all_four_families(win: MainWindow, tmp_path: Path)
     target = win.save_workspace(tmp_path / "oturum.sonarws")
 
     document = json.loads(target.read_text(encoding="utf-8"))
-    assert document["schema_version"] == 2
+    assert document["schema_version"] == WORKSPACE_SCHEMA_VERSION
     assert document["panels"][0]["channel_ids"] == ["ch0"]
     assert document["derived_channels"][0]["expression"] == "ch0 - ch1"
     assert document["annotations"][0]["label"] == "TX"

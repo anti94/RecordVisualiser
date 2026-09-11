@@ -84,10 +84,24 @@ def _migrate_1_to_2(doc: dict[str, object]) -> dict[str, object]:
     return migrated
 
 
+def _migrate_2_to_3(doc: dict[str, object]) -> dict[str, object]:
+    """v2'yi v3'e taşır — `F4-077`.
+
+    v3 tek alan ekler: `processing_chain` (Custom sekmesindeki işlem
+    zinciri). v2 belgelerinde yoktur; boş listeyle doldurulur. Başka
+    hiçbir alan değişmez.
+    """
+    migrated = dict(doc)
+    migrated["schema_version"] = 3
+    migrated.setdefault("processing_chain", [])
+    return migrated
+
+
 #: `v -> (v+1)` dönüştürücüleri. Her adım `schema_version`'ı da yükseltir.
 _MIGRATIONS: dict[int, Callable[[dict[str, object]], dict[str, object]]] = {
     0: _migrate_0_to_1,
     1: _migrate_1_to_2,
+    2: _migrate_2_to_3,
 }
 
 

@@ -23,7 +23,7 @@ from dataclasses import dataclass, field, replace
 from typing import cast
 
 #: Bu kod tabanının yazdığı workspace şema sürümü.
-WORKSPACE_SCHEMA_VERSION = 2
+WORKSPACE_SCHEMA_VERSION = 3
 
 #: Grafik çalışma alanı yerleşimi (bkz. `ui/plots/plot_workspace.py`).
 LAYOUT_MODES: tuple[str, ...] = ("tabs", "split")
@@ -388,6 +388,9 @@ class WorkspaceModel:
     annotations: list[dict[str, object]] = field(default_factory=_empty_records)
     #: `F4-076` — kanal kimliğine göre çizim biçimi.
     series_styles: dict[str, SeriesStyleState] = field(default_factory=_empty_styles)
+    #: `F4-077` — Custom sekmesindeki işlem zinciri (`ProcessingChain.to_list()`).
+    #: Oturum yeniden açıldığında **aynı sonucu** üretmesi için saklanır.
+    processing_chain: list[dict[str, object]] = field(default_factory=_empty_records)
     schema_version: int = WORKSPACE_SCHEMA_VERSION
 
     def __post_init__(self) -> None:
@@ -424,6 +427,7 @@ class WorkspaceModel:
             "series_styles": {
                 channel_id: style.to_dict() for channel_id, style in self.series_styles.items()
             },
+            "processing_chain": [dict(record) for record in self.processing_chain],
         }
 
     def dumps(self, *, indent: int | None = 2) -> str:
@@ -473,6 +477,9 @@ class WorkspaceModel:
             ),
             annotations=_record_list(data.get("annotations", []), "WorkspaceModel.annotations"),
             series_styles=_style_map(data.get("series_styles", {})),
+            processing_chain=_record_list(
+                data.get("processing_chain", []), "WorkspaceModel.processing_chain"
+            ),
             schema_version=version,
         )
 

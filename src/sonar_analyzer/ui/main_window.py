@@ -71,6 +71,8 @@ from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.export.csv_export import CsvExportResult, write_channel_csv
 from sonar_analyzer.export.image_export import export_widget_png
 from sonar_analyzer.logging.performance import measure
+from sonar_analyzer.processing.chain import ProcessingChain
+from sonar_analyzer.processing.steps import StepValidationError
 from sonar_analyzer.repository.derived_repository import (
     DerivedChannelError,
     DerivedChannelRepository,
@@ -916,6 +918,7 @@ class MainWindow(QMainWindow):
             derived_channels=self._captured_derived_channels(),
             annotations=self._annotations.to_list(),
             series_styles=self._captured_series_styles(),
+            processing_chain=self.right_dock.analysis_tools.step_editor.chain().to_list(),
         )
 
     def _captured_derived_channels(self) -> list[dict[str, object]]:
@@ -955,6 +958,24 @@ class MainWindow(QMainWindow):
             except (DerivedChannelDefinitionError, DerivedChannelError) as exc:
                 self.bottom_dock.append_log(f"Türetilmiş kanal geri yüklenemedi: {exc}")
         self.set_recording(repository.metadata(), repository.channels())
+
+    def _restore_processing_chain(self, model: WorkspaceModel) -> None:
+        """Custom sekmesindeki zinciri geri yükler — `F4-077`.
+
+        Zincir **aynı adımlar, aynı sıra, aynı parametreler** ile geri
+        gelir; böylece yeniden açılan oturum aynı işlem sonucunu üretir.
+        Tek bir bozuk adım tüm oturumu düşürmez: zincir atlanır ve nedeni
+        log'a yazılır.
+        """
+        if not model.processing_chain:
+            self.right_dock.analysis_tools.step_editor.set_chain(ProcessingChain())
+            return
+        try:
+            chain = ProcessingChain.from_list(list(model.processing_chain))
+        except StepValidationError as exc:
+            self.bottom_dock.append_log(f"İşlem zinciri geri yüklenemedi: {exc}")
+            return
+        self.right_dock.analysis_tools.step_editor.set_chain(chain)
 
     def _restore_series_styles(self, model: WorkspaceModel) -> None:
         """Kaydedilmiş renk/çizgi biçimlerini çizili serilere uygular — `F4-076`."""
@@ -1076,6 +1097,9 @@ class MainWindow(QMainWindow):
         # 6c) Renkler ve kullanıcı işaretleri (F4-076).
         self._restore_series_styles(model)
         self._restore_annotations(model)
+
+        # 6d) Custom sekmesindeki işlem zinciri (F4-077).
+        self._restore_processing_chain(model)
 
         # 7) Dock yerleşimi (opak Qt state).
         if model.dock_state:
