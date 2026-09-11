@@ -327,8 +327,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F5-009` | 20 dk | 9 dk 46 sn | `7649b6b` | serial port ayar ve bağlantısını ekle |
 | `F5-010` | 20 dk | 11 dk 20 sn | `bec3140` | serial paket sınırı ve timeout işleyişini ekle |
 | `F5-011` | 20 dk | 7 dk 59 sn | `afa3a83` | üç adaptör için ortak sözleşme kontrolü ekle |
+| `F5-012` | 20 dk | 7 dk 51 sn | `e61f435` | sıra numarasından paket kaybını hesapla |
 
-**309 commit · olculen toplam 3572 dk 24 sn · olculemeyen 1 (ilk commit)**
+**310 commit · olculen toplam 3580 dk 15 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

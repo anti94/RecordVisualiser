@@ -20,6 +20,8 @@ import time
 from collections.abc import Callable, Iterator, Sequence
 
 from sonar_analyzer.domain.channel import ChannelMetadata
+from sonar_analyzer.domain.time_base import TimeBase
+from sonar_analyzer.io.live.live_time import TimedWindow, timed_window_from_packet
 from sonar_analyzer.io.live.payload_codec import decode_payload
 from sonar_analyzer.io.live.protocol import ConnectionState, LivePacket, LiveStats
 from sonar_analyzer.io.live.tcp_connection import TcpConnection
@@ -40,15 +42,20 @@ class TcpLiveSource:
         *,
         channels: Sequence[ChannelMetadata] = (),
         clock_ns: Callable[[], int] = time.time_ns,
+        time_base: TimeBase | None = None,
+        ticks0: int = 0,
     ) -> None:
         self._connection = connection
         self._channels = tuple(channels)
         self._clock_ns = clock_ns
+        self._time_base = time_base
+        self._ticks0 = ticks0
         self._received = 0
         self._dropped = 0
         self._truncated = 0
         self._unrecognized = 0
         self._last_sequence: int | None = None
+        self._last_timed_window: TimedWindow | None = None
 
     @property
     def state(self) -> ConnectionState:
@@ -75,6 +82,14 @@ class TcpLiveSource:
     def diagnostics(self) -> tuple[int, int]:
         """`(kesik_sayaci, taninmayan_sayaci)` — §2.1 tanılama olayları."""
         return (self._truncated, self._unrecognized)
+
+    @property
+    def last_timed_window(self) -> TimedWindow | None:
+        """En son çözülen paketin `device_ticks`'ten hesaplanan kanonik penceresi.
+
+        Yalnız `time_base` verilmişse dolar (`F5-013`); verilmemişse `None`.
+        """
+        return self._last_timed_window
 
     def packets(self) -> Iterator[LivePacket]:
         buffer = bytearray()
@@ -110,6 +125,11 @@ class TcpLiveSource:
                 self._truncated += 1
                 self._dropped += 1
                 continue
+
+            if self._time_base is not None:
+                self._last_timed_window = timed_window_from_packet(
+                    header, chunks, self._time_base, self._ticks0
+                )
 
             self._received += 1
             self._last_sequence = header.sequence_no

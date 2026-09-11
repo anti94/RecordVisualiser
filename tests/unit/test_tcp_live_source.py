@@ -18,6 +18,7 @@ import numpy as np
 import pytest
 
 from sonar_analyzer.domain.data_chunk import DataChunk
+from sonar_analyzer.domain.time_base import TimeBase
 from sonar_analyzer.io.live.payload_codec import encode_payload
 from sonar_analyzer.io.live.protocol import ConnectionState, LiveSource
 from sonar_analyzer.io.live.tcp_connection import TcpConnection
@@ -202,3 +203,49 @@ def test_disconnect_ends_the_packets_generator(
     live.disconnect()
     with pytest.raises(StopIteration):
         next(iterator)
+
+
+# --------------------------------------------------------------------------- #
+# kanonik zaman baglantisi (F5-013)
+# --------------------------------------------------------------------------- #
+
+
+def test_without_a_time_base_no_window_is_computed(
+    source: tuple[TcpLiveSource, socket.socket],
+) -> None:
+    live, accepted = source
+    accepted.sendall(_frame(0, encode_payload([_chunk("ch0", 2)], [])))
+    next(iter(live.packets()))
+    assert live.last_timed_window is None
+
+
+def test_device_ticks_become_the_canonical_window_start(server: _LocalServer) -> None:
+    """`F5-013`: TCP tarafında da ham sayaç `TimeBase` ile kanonik zamana çevrilir."""
+    time_base = TimeBase(id="device0", epoch_utc_ns=1_788_901_200_000_000_000, tick_hz=48_000)
+    connection = TcpConnection("127.0.0.1", server.port, timeout_s=0.2)
+    live = TcpLiveSource(connection, time_base=time_base)
+    live.connect()
+    accepted = server.accept()
+    try:
+        canonical = time_base.epoch_utc_ns + 1_000_000_000  # tam 1 saniye
+        timestamps = canonical + np.arange(3, dtype=np.int64) * 1_000_000
+        chunk = DataChunk("ch0", timestamps, np.zeros(3, dtype=np.float64))
+        header = LiveWireHeader(
+            PROTOCOL_TCP,
+            flags=0,
+            sequence_no=0,
+            fragment_index=0,
+            fragment_count=1,
+            device_ticks=48_000,
+            payload_length=0,
+        )
+        accepted.sendall(pack_frame(header, encode_payload([chunk], [])))
+
+        next(iter(live.packets()))
+        window = live.last_timed_window
+        assert window is not None
+        assert window.canonical_window_start_ns == canonical
+        assert window.agrees_with_payload is True
+    finally:
+        live.disconnect()
+        accepted.close()

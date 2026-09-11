@@ -18,6 +18,7 @@ import pytest
 
 from sonar_analyzer.domain.data_chunk import DataChunk
 from sonar_analyzer.domain.event import Event, Severity
+from sonar_analyzer.domain.time_base import TimeBase
 from sonar_analyzer.domain.time_range import RECORD_PERIOD_NS
 from sonar_analyzer.io.live.payload_codec import encode_payload
 from sonar_analyzer.io.live.protocol import ConnectionState, LiveSource
@@ -41,6 +42,13 @@ class _FakeClock:
 def _chunk(channel_id: str, n: int) -> DataChunk:
     timestamps = np.arange(n, dtype=np.int64) * 1_000_000
     values = np.linspace(0.0, 1.0, n, dtype=np.float64)
+    return DataChunk(channel_id, timestamps, values)
+
+
+def _chunk_at(channel_id: str, first_ns: int, n: int = 3) -> DataChunk:
+    """İlk örneği tam olarak `first_ns` olan kanal — `F5-013` zaman karşılaştırması için."""
+    timestamps = first_ns + np.arange(n, dtype=np.int64) * 1_000_000
+    values = np.zeros(n, dtype=np.float64)
     return DataChunk(channel_id, timestamps, values)
 
 
@@ -279,3 +287,66 @@ def test_disconnect_ends_the_packets_generator(
     assert source.state is ConnectionState.DISCONNECTED
     with pytest.raises(StopIteration):
         next(iterator)
+
+
+# --------------------------------------------------------------------------- #
+# kanonik zaman baglantisi (F5-013)
+# --------------------------------------------------------------------------- #
+
+
+def test_without_a_time_base_no_window_is_computed(
+    source: UdpLiveSource, sender: socket.socket
+) -> None:
+    _send_frame(
+        sender, source.local_port, sequence_no=0, payload=encode_payload([_chunk("ch0", 2)], [])
+    )
+    next(iter(source.packets()))
+    assert source.last_timed_window is None
+
+
+def test_device_ticks_become_the_canonical_window_start(sender: socket.socket) -> None:
+    """`F5-013`: başlığın ham sayacı, `TimeBase` ile kanonik UTC ns'ye çevrilir."""
+    time_base = TimeBase(id="device0", epoch_utc_ns=1_788_901_200_000_000_000, tick_hz=48_000)
+    receiver = UdpDatagramReceiver(port=0, timeout_s=0.2)
+    live = UdpLiveSource(receiver, time_base=time_base)
+    live.connect()
+    try:
+        canonical = time_base.epoch_utc_ns + 1_000_000_000  # tam 1 saniye
+        payload = encode_payload([_chunk_at("ch0", canonical)], [])
+        _send_frame(
+            sender, receiver.local_port, sequence_no=0, payload=payload, device_ticks=48_000
+        )
+
+        next(iter(live.packets()))
+        window = live.last_timed_window
+        assert window is not None
+        assert window.canonical_window_start_ns == canonical
+        assert window.agrees_with_payload is True
+        assert window.deviation_ns == 0
+    finally:
+        live.disconnect()
+
+
+def test_a_payload_that_disagrees_with_the_device_counter_is_flagged(
+    sender: socket.socket,
+) -> None:
+    """Payload'ın kendi zamanı ile sayaçtan hesaplanan zaman ayrışırsa yakalanır."""
+    time_base = TimeBase(id="device0", epoch_utc_ns=1_788_901_200_000_000_000, tick_hz=48_000)
+    receiver = UdpDatagramReceiver(port=0, timeout_s=0.2)
+    live = UdpLiveSource(receiver, time_base=time_base)
+    live.connect()
+    try:
+        canonical = time_base.epoch_utc_ns + 1_000_000_000
+        drifted = canonical + 50_000_000  # 50 ms kayma (tolerans 1 ms)
+        payload = encode_payload([_chunk_at("ch0", drifted)], [])
+        _send_frame(
+            sender, receiver.local_port, sequence_no=0, payload=payload, device_ticks=48_000
+        )
+
+        next(iter(live.packets()))
+        window = live.last_timed_window
+        assert window is not None
+        assert window.agrees_with_payload is False
+        assert window.deviation_ns == -50_000_000
+    finally:
+        live.disconnect()
