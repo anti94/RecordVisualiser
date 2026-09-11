@@ -1765,7 +1765,7 @@ Kabul: UDP/TCP/serial akışı, bağlantı durumu, canlı grafik, kayıt ve tekr
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F5-012` | `2.12.0` | 20 dk | Sıra numarasından paket kaybını hesapla | Atlanan, tekrarlı ve sıra dışı paketler ayrı sayaç üretir | `F5-011` | `feat(live): F5-012 sıra numarasından paket kaybını hesapla` |
 | [x] | `F5-013` | `2.13.0` | 20 dk | Canlı cihaz zamanını kanonik zamana bağla | Dosya ve canlı replay aynı zaman tabanında eşleşir | `F5-012` | `feat(time): F5-013 canlı cihaz zamanını kanonik zamana bağla` |
-| [ ] | `F5-014` | `2.14.0` | 20 dk | Sabit kapasiteli ring buffer ekle | Kapasite aşılınca tanımlı eski veri çıkar; bellek sınırlı kalır | `F5-013` | `feat(live): F5-014 sabit kapasiteli ring buffer ekle` |
+| [x] | `F5-014` | `2.14.0` | 20 dk | Sabit kapasiteli ring buffer ekle | Kapasite aşılınca tanımlı eski veri çıkar; bellek sınırlı kalır | `F5-013` | `feat(live): F5-014 sabit kapasiteli ring buffer ekle` |
 | [ ] | `F5-015` | `2.15.0` | 20 dk | Zaman penceresine göre buffer sorgula | Sarılmış buffer'da zaman sırası ve seçili aralık doğrudur | `F5-014` | `feat(live): F5-015 zaman penceresine göre buffer sorgula` |
 | [ ] | `F5-016` | `2.16.0` | 20 dk | Kuyruk sınırı ve drop politikasını uygula | Burst sırasında sınır aşılmaz; düşen veri sayısı raporlanır | `F5-015` | `feat(live): F5-016 kuyruk sınırı ve drop politikasını uygula` |
 | [ ] | `F5-017` | `2.17.0` | 20 dk | Sınırlı otomatik yeniden bağlanma ekle | Denemeler görünürdür; kullanıcı durdurunca yeniden bağlantı başlamaz | `F5-016` | `feat(live): F5-017 sınırlı otomatik yeniden bağlanma ekle` |

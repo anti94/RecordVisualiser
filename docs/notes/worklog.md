@@ -328,8 +328,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F5-010` | 20 dk | 11 dk 20 sn | `bec3140` | serial paket sınırı ve timeout işleyişini ekle |
 | `F5-011` | 20 dk | 7 dk 59 sn | `afa3a83` | üç adaptör için ortak sözleşme kontrolü ekle |
 | `F5-012` | 20 dk | 7 dk 51 sn | `e61f435` | sıra numarasından paket kaybını hesapla |
+| `F5-013` | 20 dk | 12 dk 30 sn | `d6a1f5e` | canlı cihaz zamanını kanonik zamana bağla |
 
-**310 commit · olculen toplam 3580 dk 15 sn · olculemeyen 1 (ilk commit)**
+**311 commit · olculen toplam 3592 dk 45 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
