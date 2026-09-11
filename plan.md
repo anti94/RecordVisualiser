@@ -1845,7 +1845,7 @@ Kabul: Kurulabilir Windows paketi, dokümantasyon, sürüm artefaktları ve dağ
 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `F6-024` | `3.24.0` | 20 dk | Mockup üzerinden ana ekran kullanım kılavuzunu yaz | Dokuz bölge ve dosyadan analize ana akış ekranla eşleşir | `F6-023` | `docs(user): F6-024 mockup üzerinden ana ekran kullanım kılavuzunu yaz` |
+| [x] | `F6-024` | `3.24.0` | 20 dk | Mockup üzerinden ana ekran kullanım kılavuzunu yaz | Dokuz bölge ve dosyadan analize ana akış ekranla eşleşir | `F6-023` | `docs(user): F6-024 mockup üzerinden ana ekran kullanım kılavuzunu yaz` |
 | [ ] | `F6-025` | `3.25.0` | 20 dk | Filtre ve spektral analiz kullanım örneğini yaz | Birim, sample rate, ROI ve işlem geçmişi örnekte açıktır | `F6-024` | `docs(user): F6-025 filtre ve spektral analiz kullanım örneğini yaz` |
 | [ ] | `F6-026` | `3.26.0` | 20 dk | Canlı bağlantı ve kayıt kullanım örneğini yaz | Üç protokol, bağlantı kesintisi ve kayıt tekrar açma açıklanır | `F6-025` | `docs(user): F6-026 canlı bağlantı ve kayıt kullanım örneğini yaz` |
 | [ ] | `F6-027` | `3.27.0` | 20 dk | Format ve decoder kılavuzunu güncelle | 32/64 örnek, CRC'li ve akustik format sürümleri karıştırılmaz | `F6-026` | `docs(format): F6-027 format ve decoder kılavuzunu güncelle` |
