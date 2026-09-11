@@ -317,8 +317,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-096` | 20 dk | 6 dk 57 sn | `a1127c3` | özet ve akış düzeltmeleri sonrası performansı doğrula |
 | `F4-090` | 15 dk | 7 dk 10 sn | `587b1c9` | analiz milestone kabulünü kapat ve major sürümü hazırla |
 | `F5-001` | 20 dk | 9 dk 43 sn | `1de7d02` | canlı paket ve bağlantı sözleşmesini tamamla |
+| `F5-002` | 20 dk | 7 dk 43 sn | `0207c61` | bağlantı durum makinesini ekle |
 
-**299 commit · olculen toplam 3481 dk 31 sn · olculemeyen 1 (ilk commit)**
+**300 commit · olculen toplam 3489 dk 14 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
