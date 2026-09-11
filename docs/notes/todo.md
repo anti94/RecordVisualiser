@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 498 madde · 338 tamamlandı · 160 kaldı**
+**Toplam 498 madde · 339 tamamlandı · 159 kaldı**
 
-`[################........]` %67.9
+`[################........]` %68.1
 
 ## Özet
 
@@ -40,9 +40,9 @@ Work in fully autonomous mode.
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 41 | 0 | 41 |
-| Faz 6 — Windows dağıtımı ve ürünleştirme | 1 | 33 | 34 |
+| Faz 6 — Windows dağıtımı ve ürünleştirme | 2 | 32 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **338** | **160** | **498** |
+| **Toplam** | **339** | **159** | **498** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -395,12 +395,12 @@ Work in fully autonomous mode.
 | [x] | `F5-040` | `2.40.0` | 20 dk | Canlı modda mockup pano davranışını kontrol et |
 | [x] | `F5-041` | `3.0.0` | 15 dk | Canlı veri milestone kabulünü kapat ve major sürümü hazırla |
 
-### Faz 6 — Windows dağıtımı ve ürünleştirme (1/34)
+### Faz 6 — Windows dağıtımı ve ürünleştirme (2/34)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
 | [x] | `F6-001` | `3.1.0` | 20 dk | Paketleme aracı ve dağıtım biçimi ADR'sini tamamla |
-| [ ] | `F6-002` | `3.2.0` | 20 dk | Windows paketleme yapılandırmasını ekle |
+| [x] | `F6-002` | `3.2.0` | 20 dk | Windows paketleme yapılandırmasını ekle |
 | [ ] | `F6-003` | `3.3.0` | 20 dk | Qt plugin, tema ve ikon kaynaklarını pakete ekle |
 | [ ] | `F6-004` | `3.4.0` | 20 dk | Tek komutluk paket üretim akışını ekle |
 | [ ] | `F6-005` | `3.5.0` | 20 dk | Temiz Windows ortamında paket açılışını kontrol et |

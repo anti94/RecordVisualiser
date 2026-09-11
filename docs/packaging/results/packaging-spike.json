@@ -33,5 +33,12 @@
     "reported_version": "0.21.0",
     "startup_median_ms": 213
   },
-  "actual_version": "3.0.0"
+  "actual_version": "3.0.0",
+  "f6_002_spec_build": {
+    "spec": "packaging/sonar-analyzer.spec",
+    "dist_dir": "sonar-analyzer-3.1.0",
+    "reported_version": "3.1.0",
+    "version_file_location": "_internal/VERSION",
+    "note": "F6-001'de yanlis bildirilen surum duzeltildi; PyInstaller 6 onedir'de bile datas dosyalarini _internal altina koyuyor."
+  }
 }

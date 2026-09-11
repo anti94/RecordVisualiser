@@ -357,8 +357,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F5-039` | 20 dk | 18 dk 18 sn | `ef1fd4b` | dayanıklılık koşusu raporunu değerlendir |
 | `F5-040` | 20 dk | 16 dk 15 sn | `bd6c68f` | canlı modda mockup pano davranışını kontrol et |
 | `F5-041` | 15 dk | 16 dk 59 sn | `552aac4` | canlı veri milestone kabulünü kapat ve major sürümü hazırla |
+| `F6-001` | 20 dk | 48 dk 51 sn | `cc7269f` | paketleme aracı ve dağıtım biçimi ADR'sini tamamla |
 
-**339 commit · olculen toplam 4019 dk 46 sn · olculemeyen 1 (ilk commit)**
+**340 commit · olculen toplam 4068 dk 37 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
