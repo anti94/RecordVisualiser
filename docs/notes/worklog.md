@@ -303,8 +303,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-081` | 20 dk | 11 dk 29 sn | `7b23f1d` | bIT/Status trend görünümünü ekle |
 | `F4-082` | 20 dk | 6 dk 58 sn | `e31dd09` | grafik penceresini ayırma ve geri takmayı ekle |
 | `F4-083` | 20 dk | 8 dk 28 sn | `bf8122f` | çoklu monitör konumlarını kaydet ve sınırla |
+| `F4-084` | 20 dk | 13 dk 37 sn | `62075d4` | event/BIT metadata'sını JSON dışa aktar |
 
-**285 commit · olculen toplam 3300 dk 26 sn · olculemeyen 1 (ilk commit)**
+**286 commit · olculen toplam 3314 dk 3 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

@@ -26,7 +26,7 @@ from __future__ import annotations
 import csv
 import os
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -34,6 +34,7 @@ from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.data_chunk import DataChunk
 from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import TimeRange
+from sonar_analyzer.export.text_format import Delimiter, TextFormat, resolve_format
 
 #: Veri bölümünün sütun adları.
 DATA_COLUMNS: tuple[str, ...] = ("timestamp_ns", "timestamp_utc", "value")
@@ -69,6 +70,8 @@ class CsvExportResult:
     column_names: tuple[str, ...]
     #: Yazılan metadata satırları (önek olmadan, `anahtar=değer`).
     metadata_lines: tuple[str, ...]
+    #: `F4-085` — kullanılan ayırıcı ve ondalık ayıracı.
+    text_format: TextFormat = field(default_factory=resolve_format)
 
 
 def _utc_iso(timestamp_ns: int) -> str:
@@ -85,6 +88,7 @@ def build_metadata_lines(
     recording: RecordingMetadata | None = None,
     exported_range: TimeRange | None = None,
     raw: bool = False,
+    text_format: TextFormat | None = None,
 ) -> list[str]:
     """Dosya başına yazılacak `anahtar=değer` metadata satırlarını üretir."""
     lines = [
@@ -107,6 +111,9 @@ def build_metadata_lines(
             lines.append(f"device_id={recording.device_id}")
     if exported_range is not None:
         lines.append(f"range_ns=[{exported_range.start_ns},{exported_range.end_ns})")
+    if text_format is not None:
+        # F4-085: okuyucu ayırıcıyı ve ondalık biçimini dosyadan öğrensin.
+        lines.append(text_format.describe())
     lines.append(f"row_count={len(chunk)}")
     return lines
 
@@ -120,6 +127,8 @@ def write_channel_csv(
     exported_range: TimeRange | None = None,
     include_metadata: bool = True,
     raw: bool = False,
+    delimiter: Delimiter = Delimiter.COMMA,
+    decimal_separator: str | None = None,
     should_cancel: ShouldCancel | None = None,
     on_progress: OnProgress | None = None,
 ) -> CsvExportResult:
@@ -139,6 +148,7 @@ def write_channel_csv(
     * `ExportCancelled` — `should_cancel` iptal istedi.
     * `OSError` — dosya açılamadı / yazılamadı.
     """
+    text_format = resolve_format(delimiter, decimal_separator)
     if chunk.channel_id != channel.id:
         raise ValueError(f"Parça kanalı ({chunk.channel_id}) hedef kanaldan ({channel.id}) farklı")
     if raw and channel.gain == 0:
@@ -150,7 +160,12 @@ def write_channel_csv(
 
     metadata_lines = (
         build_metadata_lines(
-            channel, chunk, recording=recording, exported_range=exported_range, raw=raw
+            channel,
+            chunk,
+            recording=recording,
+            exported_range=exported_range,
+            raw=raw,
+            text_format=text_format,
         )
         if include_metadata
         else []
@@ -167,12 +182,18 @@ def write_channel_csv(
         with partial.open("w", encoding="utf-8", newline="") as handle:
             for line in metadata_lines:
                 handle.write(f"{METADATA_PREFIX}{line}\n")
-            writer = csv.writer(handle)
+            writer = csv.writer(handle, delimiter=text_format.delimiter.value)
             writer.writerow(DATA_COLUMNS)
             for index, (timestamp_ns, value) in enumerate(zip(timestamps, values)):
                 if should_cancel is not None and should_cancel():
                     raise ExportCancelled(f"{dest.name}: dışa aktarma iptal edildi")
-                writer.writerow([int(timestamp_ns), _utc_iso(int(timestamp_ns)), value])
+                writer.writerow(
+                    [
+                        int(timestamp_ns),
+                        _utc_iso(int(timestamp_ns)),
+                        text_format.format_value(float(value)),
+                    ]
+                )
                 if on_progress is not None and index % PROGRESS_INTERVAL == 0:
                     on_progress(index + 1, total)
         os.replace(partial, dest)  # atomik: hedef ya tam ya hiç
@@ -188,4 +209,5 @@ def write_channel_csv(
         row_count=total,
         column_names=DATA_COLUMNS,
         metadata_lines=tuple(metadata_lines),
+        text_format=text_format,
     )

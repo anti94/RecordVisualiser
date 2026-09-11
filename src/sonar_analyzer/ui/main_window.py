@@ -73,6 +73,7 @@ from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.export.csv_export import CsvExportResult, write_channel_csv
 from sonar_analyzer.export.image_export import export_widget_png
 from sonar_analyzer.export.json_export import JsonExportResult, write_metadata_json
+from sonar_analyzer.export.text_format import Delimiter
 from sonar_analyzer.logging.performance import measure
 from sonar_analyzer.processing.chain import ProcessingChain
 from sonar_analyzer.processing.steps import StepValidationError
@@ -665,6 +666,8 @@ class MainWindow(QMainWindow):
         selected_range_only: bool,
         include_metadata: bool,
         raw: bool,
+        delimiter: Delimiter = Delimiter.COMMA,
+        decimal_separator: str | None = None,
     ) -> Callable[[Callable[[], bool], Callable[[int, int], None] | None], CsvExportResult]:
         """Sorgu + doğrulamayı şimdi yapar; asıl yazma çağrıya bırakılır — `F3-066`.
 
@@ -702,6 +705,8 @@ class MainWindow(QMainWindow):
                 exported_range=exported_range,
                 include_metadata=include_metadata,
                 raw=raw,
+                delimiter=delimiter,
+                decimal_separator=decimal_separator,
                 should_cancel=should_cancel,
                 on_progress=on_progress,
             )
@@ -716,6 +721,8 @@ class MainWindow(QMainWindow):
         selected_range_only: bool = False,
         include_metadata: bool = True,
         raw: bool = False,
+        delimiter: Delimiter = Delimiter.COMMA,
+        decimal_separator: str | None = None,
     ) -> ExportRunner:
         """CSV dışa aktarımını worker thread'de başlatır — `F3-066`.
 
@@ -730,6 +737,8 @@ class MainWindow(QMainWindow):
             selected_range_only=selected_range_only,
             include_metadata=include_metadata,
             raw=raw,
+            delimiter=delimiter,
+            decimal_separator=decimal_separator,
         )
         runner = ExportRunner(job)
         self._export_runner = runner
@@ -832,12 +841,15 @@ class MainWindow(QMainWindow):
         elif kind is ExportKind.JSON:
             self.export_metadata_json(target, selected_range_only=card.wants_selected_range())
         else:
-            # F3-066: CSV büyük olabilir; worker thread'de, iptal edilebilir.
+            # F3-066: CSV/TSV büyük olabilir; worker thread'de, iptal edilebilir.
+            # F4-085: ayırıcı biçimden gelir, ondalık ayıracı karttan.
             self.start_channel_csv_export(
                 target,
                 selected_range_only=card.wants_selected_range(),
                 include_metadata=card.wants_metadata(),
                 raw=card.selected_variant() is DataVariant.RAW,
+                delimiter=Delimiter.TAB if kind is ExportKind.TSV else Delimiter.COMMA,
+                decimal_separator=card.selected_decimal_separator(),
             )
 
     def export_metadata_json(

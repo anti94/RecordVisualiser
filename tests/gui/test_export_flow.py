@@ -134,18 +134,21 @@ def test_processed_variant_is_the_default_in_metadata(
     assert "# variant=processed" in text
 
 
-def test_unsupported_format_is_reported_not_written(
+def test_the_tsv_format_writes_tab_separated_data(
     window: MainWindow, qtbot: QtBot, tmp_path: Path
 ) -> None:
-    """`F4-084` JSON'ı destekledi; TSV hâlâ bekliyor (`F4-085`)."""
-    target = tmp_path / "x.tsv"
+    """`F4-085`: TSV artık gerçek bir çıktı üretir."""
+    target = tmp_path / "veri.tsv"
     _use_target(window, target, overwrite=False)
     window.right_dock.data_export.export_format.setCurrentText("TSV")
 
     _run_export(window, qtbot)
 
-    assert not target.exists()
-    assert any("desteklenmiyor" in line for line in window.bottom_dock.log_lines())
+    assert target.exists()
+    lines = [
+        line for line in target.read_text(encoding="utf-8").splitlines() if not line.startswith("#")
+    ]
+    assert lines[0] == "timestamp_ns	timestamp_utc	value"
 
 
 def test_the_json_format_writes_metadata(window: MainWindow, qtbot: QtBot, tmp_path: Path) -> None:

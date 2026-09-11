@@ -25,14 +25,17 @@ def test_known_formats_map_to_a_kind() -> None:
     assert kind_for_format("Svg") is ExportKind.SVG
 
 
-def test_not_yet_supported_formats_raise() -> None:
-    """`F4-084` ile JSON desteklendi; TSV hâlâ bekliyor (`F4-085`)."""
+def test_an_unknown_format_name_raises() -> None:
     with pytest.raises(KeyError, match="Desteklenmeyen"):
-        kind_for_format("TSV")
+        kind_for_format("PARQUET")
 
 
 def test_json_is_supported_since_f4_084() -> None:
     assert kind_for_format("JSON") is ExportKind.JSON
+
+
+def test_tsv_is_supported_since_f4_085() -> None:
+    assert kind_for_format("TSV") is ExportKind.TSV
 
 
 def test_ensure_extension_appends_when_missing() -> None:

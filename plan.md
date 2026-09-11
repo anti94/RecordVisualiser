@@ -1711,7 +1711,7 @@ Kabul: Mockup'taki ana analiz panosu gerçek hesaplamalarla çalışmalı; anali
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F4-084` | `1.84.0` | 20 dk | Event/BIT metadata'sını JSON dışa aktar | Seçili aralık ve domain alanları kayıpsız çıkar | `F4-083` | `feat(export): F4-084 event/BIT metadata'sını JSON dışa aktar` |
-| [ ] | `F4-085` | `1.85.0` | 15 dk | TSV ayırıcı seçimini CSV akışına ekle | Zaman ve ondalık biçimi seçilen ayırıcıyla tutarlıdır | `F4-084` | `feat(export): F4-085 tSV ayırıcı seçimini CSV akışına ekle` |
+| [x] | `F4-085` | `1.85.0` | 15 dk | TSV ayırıcı seçimini CSV akışına ekle | Zaman ve ondalık biçimi seçilen ayırıcıyla tutarlıdır | `F4-084` | `feat(export): F4-085 tSV ayırıcı seçimini CSV akışına ekle` |
 | [ ] | `F4-086` | `1.86.0` | 20 dk | Statik grafiği PDF olarak dışa aktar | Vektörel grafik başlık, kaynak ve işlem bilgisiyle açılır | `F4-085` | `feat(export): F4-086 statik grafiği PDF olarak dışa aktar` |
 | [ ] | `F4-087` | `1.87.0` | 20 dk | Sinüs, chirp, noise ve impulse referanslarını çalıştır | FFT, PSD, STFT ve filtre sonuçları NumPy/SciPy referanslarıyla eşleşir | `F4-086` | `test(analysis): F4-087 sinüs, chirp, noise ve impulse referanslarını çalıştır` |
 | [ ] | `F4-088` | `1.88.0` | 20 dk | Kaydet/aç sonrası analiz tekrarını doğrula | Aynı kaynak ve parametreler aynı sayısal çıktıları üretir | `F4-087` | `test(workspace): F4-088 kaydet/aç sonrası analiz tekrarını doğrula` |

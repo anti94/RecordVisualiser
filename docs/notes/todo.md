@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 492 madde · 284 tamamlandı · 208 kaldı**
+**Toplam 492 madde · 285 tamamlandı · 207 kaldı**
 
-`[##############..........]` %57.7
+`[##############..........]` %57.9
 
 ## Özet
 
@@ -38,11 +38,11 @@ Work in fully autonomous mode.
 | Faz 1 — Uygulama iskeleti ve domain modeli | 44 | 0 | 44 |
 | Faz 2 — Parser, indeks ve kayıtlı veri | 41 | 0 | 41 |
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
-| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 84 | 6 | 90 |
+| Faz 4 — Mockup analiz panosu ve büyük veri performansı | 85 | 5 | 90 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 0 | 41 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 0 | 34 | 34 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **284** | **208** | **492** |
+| **Toplam** | **285** | **207** | **492** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -248,7 +248,7 @@ Work in fully autonomous mode.
 | [x] | `F3-079` | `0.181.0` | 20 dk | MVP ekran görüntüsünü ana mockup ile karşılaştır |
 | [x] | `F3-080` | `1.0.0` | 15 dk | MVP kabulünü kapat ve major sürümü hazırla |
 
-### Faz 4 — Mockup analiz panosu ve büyük veri performansı (84/90)
+### Faz 4 — Mockup analiz panosu ve büyük veri performansı (85/90)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -336,7 +336,7 @@ Work in fully autonomous mode.
 | [x] | `F4-082` | `1.82.0` | 20 dk | Grafik penceresini ayırma ve geri takmayı ekle |
 | [x] | `F4-083` | `1.83.0` | 20 dk | Çoklu monitör konumlarını kaydet ve sınırla |
 | [x] | `F4-084` | `1.84.0` | 20 dk | Event/BIT metadata'sını JSON dışa aktar |
-| [ ] | `F4-085` | `1.85.0` | 15 dk | TSV ayırıcı seçimini CSV akışına ekle |
+| [x] | `F4-085` | `1.85.0` | 15 dk | TSV ayırıcı seçimini CSV akışına ekle |
 | [ ] | `F4-086` | `1.86.0` | 20 dk | Statik grafiği PDF olarak dışa aktar |
 | [ ] | `F4-087` | `1.87.0` | 20 dk | Sinüs, chirp, noise ve impulse referanslarını çalıştır |
 | [ ] | `F4-088` | `1.88.0` | 20 dk | Kaydet/aç sonrası analiz tekrarını doğrula |

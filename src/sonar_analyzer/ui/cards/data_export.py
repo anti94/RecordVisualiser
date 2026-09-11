@@ -28,6 +28,12 @@ CARD_TITLE = "Data Export"
 #: Plan Bolum 15.1: desteklenecek ciktilar.
 EXPORT_FORMATS: tuple[str, ...] = ("CSV", "TSV", "JSON", "PNG", "SVG")
 
+#: `F4-085` — ondalık ayıracı seçenekleri.
+DECIMAL_SEPARATORS: tuple[tuple[str, str], ...] = (
+    ("Nokta (1.5)", "."),
+    ("Virgül (1,5)", ","),
+)
+
 #: (etiket, DataVariant) — ham/işlenmiş seçimi.
 DATA_VARIANTS: tuple[tuple[str, DataVariant], ...] = (
     ("Processed (scaled)", DataVariant.PROCESSED),
@@ -64,6 +70,17 @@ class DataExportCard(QGroupBox):
         )
         form.addRow("Data", self.data_variant)
 
+        # F4-085: ondalık ayıracı; ayırıcıyla çakışması yazıcıda reddedilir.
+        self.decimal_separator = QComboBox(self)
+        self.decimal_separator.setObjectName("combo_decimal_separator")
+        for label, value in DECIMAL_SEPARATORS:
+            self.decimal_separator.addItem(label, value)
+        self.decimal_separator.setToolTip(
+            "Ondalık ayıracı alan ayırıcısıyla aynı olamaz; virgülle ayrılmış "
+            "bir dosyada virgüllü sayı satırı bölerdi."
+        )
+        form.addRow("Decimal", self.decimal_separator)
+
         self.export_selected_range = QCheckBox("Export selected time range", self)
         self.export_selected_range.setObjectName("check_export_selected_range")
         self.export_selected_range.setChecked(True)
@@ -92,6 +109,11 @@ class DataExportCard(QGroupBox):
         except ValueError:
             return DataVariant.PROCESSED
 
+    def selected_decimal_separator(self) -> str:
+        """Seçilen ondalık ayıracı — `F4-085`."""
+        data = self.decimal_separator.currentData()
+        return data if isinstance(data, str) and data in {".", ","} else "."
+
     def wants_selected_range(self) -> bool:
         return self.export_selected_range.isChecked()
 
@@ -101,7 +123,7 @@ class DataExportCard(QGroupBox):
     def set_running(self, running: bool) -> None:
         """Bir dışa aktarma sürerken buton `İptal`e döner — `F3-066`."""
         self.export_button.setText("İptal" if running else "Export Data")
-        for widget in (self.export_format, self.data_variant):
+        for widget in (self.export_format, self.data_variant, self.decimal_separator):
             widget.setEnabled(not running)
 
     @property
