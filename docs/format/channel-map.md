@@ -106,7 +106,9 @@ Mockup ağacındaki her düğüm bir `float32` slotu değildir:
 Profil A'da bir hidrofon kanalı **kayıt başına tek değer** taşır → efektif 8 Hz. Bu, mockup'ta
 `Acoustic` grubunun görünmesi ve zaman serisi çizilmesi için yeterlidir; **FFT, PSD ve spektrogram için
 yeterli değildir**. Mockup'un spektral hücreleri gerçek sonuç üretecekse veri Profil B'den
-(Bölüm 8.3, 96 kHz blok) gelmelidir.
+gelmelidir — uygulanan profilde **48 kHz**, kayıt başına kanal başına
+6000 `int16` örnek (`docs/format/profile-b.md` §2; Bölüm 8.3 taslağının
+96 kHz örneği ile karıştırılmamalı, bkz. `docs/format/decoder-guide.md`).
 
 Kural: Profil A verisiyle spektral analiz paneli **gerçek sonuç izlenimi veren sahte çıktı göstermez**;
 `v2.0.0 ile kullanılabilir` durumunda kalır (Bölüm 3.1).

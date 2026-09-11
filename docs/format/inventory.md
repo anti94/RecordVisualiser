@@ -43,23 +43,51 @@ E-01 ve E-02 gelene kadar Bölüm 8.2/8.3 **taslak** olarak kalır; bu taslağa 
 Bunlar eksikliği kapatmaz, yalnız geliştirmeyi ilerletir. Hepsi `tests/fixtures/` altında izlenir
 (`.gitignore` bu yolu `*.bin` kuralından muaf tutar).
 
-| Fixture | Profil | İçerik | Üreten iş |
-| --- | --- | --- | --- |
-| `valid_8records.bin` | A | 8 kayıt, `Data00000`–`Data00007`, 0–875 ms, 544 byte | `F0-009` |
-| `gap_missing_record.bin` | A | `Data00005` eksik; sıra boşluğu | `F0-010` |
-| `truncated_header.bin` | A | 32 byte header kesik | `F0-010` |
-| `truncated_last_record.bin` | A | Son kayıt yarım | `F0-010` |
-| `crc_error.bin` | A + CRC | Bir kaydın CRC'si bozuk | `F0-010` (E-03'e bağlı) |
-| `acoustic_5s_4ch.bin` | B | 4 × 96 kHz hidrofon, 5 s, bilinen 5 kHz ton | `F4-009` civarı |
-| `large_1h.bin` | B | ~2,6 GiB, performans ölçümü | Faz 4 performans işleri |
+Aşağıdaki tablo **depoda gerçekten bulunan** fixture'ları listeler
+(`F6-027` ile gerçek dosyalara göre düzeltildi; sürüm sütunu
+`docs/format/decoder-guide.md` ile aynı ayrımı kullanır).
+
+| Fixture | Sürüm | Boyut | İçerik | Üreten |
+| --- | --- | --- | --- | --- |
+| `valid_8records.bin` | A v1 | 544 B | 8 kayıt, `Data00000`–`Data00007`, 0–875 ms | `tools/make_fixture.py` (`F0-009`) |
+| `valid_8records_v2.bin` | **A v2** | 580 B | Aynı içerik, header ve kayıt CRC'leriyle | `tools/make_corrupt_fixtures.py` → `build_valid_v2_fixture()` (`F2-014`) |
+| `gap_missing_record.bin` | A v1 | 544 B | `Data00005` eksik; sıra boşluğu | `tools/make_corrupt_fixtures.py` (`F0-010`) |
+| `name_index_mismatch.bin` | A v1 | 544 B | Ad ile `sequence_no` uyuşmuyor | `tools/make_corrupt_fixtures.py` |
+| `truncated_header.bin` | A (kesik) | 20 B | Header 32 bayta tamamlanmıyor | `tools/make_corrupt_fixtures.py` |
+| `truncated_last_record.bin` | A v1 | 524 B | Son kayıt yarım (7,69 kayıt) | `tools/make_corrupt_fixtures.py` |
+| `unsupported_version.bin` | A (`version=99`) | 544 B | Desteklenmeyen sürüm alanı | `tools/make_corrupt_fixtures.py` |
+| `crc_error.bin` | **A v2** | 580 B | Bir kaydın CRC'si bozuk; diğerleri sağlam | `tools/make_corrupt_fixtures.py` (`F2-014`) |
+| `acoustic_8records.bin` | **B** | 385 472 B | 4 hidrofon × 8 kayıt, 48 kHz `int16`, kanal başına 997/1499/2003/3001 Hz ton | `tools/make_acoustic_fixture.py` (`F4-010`) |
+
+Profil B fixture'ı **48 kHz**'dir (taslaktaki 96 kHz değil) ve kayıt
+başına kanal başına **6000** örnek taşır. SHA-256'sı üreticide sabit
+tutulur; fixture yeniden üretildiğinde değişirse bu bir hata sayılır.
+
+Büyük (~GiB) performans dosyaları depoda tutulmaz; performans ölçümleri
+gerektiğinde yerel olarak üretilir.
 
 ## 4. Format sürüm envanteri
 
-| Sürüm | Tanım yeri | Durum | Not |
-| --- | --- | --- | --- |
-| Profil A (32 B header + 64 B kayıt) | Bölüm 8.2 | Taslak | CRC alanı yok; `F0-008` ayrı sürüm tanımlar |
-| Profil B (blok tabanlı, TLV) | Bölüm 8.3 | Taslak | Ham akustik veri için; `F4-009` |
-| Gerçek cihaz formatı | — | **Bilinmiyor** | E-01/E-02 gelene kadar tanımsız |
+> `F6-027` ile güncellendi. Üç sürüm **ayrı** sözleşmelerdir ve
+> karıştırılmazlar; ayrıntılı karşılaştırma ve decoder eşlemesi için
+> `docs/format/decoder-guide.md`.
+
+| Sürüm | Magic / sürüm alanı | Boyutlar | CRC | Durum | Not |
+| --- | --- | --- | --- | --- | --- |
+| **Profil A v1** | `SONARBIN`, `version=1` | 32 B header + 64 B kayıt | **yok** | Uygulanmış — **okunur**, yazılmaz | Bölüm 8.2 taslağının ilk hâli; `valid_8records.bin` (544 B) |
+| **Profil A v2** | `SONARBIN`, `version=2` | 36 B header + 68 B kayıt | **var** (header + kayıt) | Uygulanmış — **okunur ve yazılır** | `ADR-011`; uygulamanın ürettiği sürüm (`DEFAULT_FORMAT_VERSION = 2`); `valid_8records_v2.bin` (580 B) |
+| **Profil B** | `SNRBIN\x1a\x00`, `version=1` | 256 B dosya başlığı + 64 B/kanal + blok tabanlı kayıt | **var** | Uygulanmış — okunur | Ham akustik, 48 kHz `int16`, kayıt başına 6000 örnek/kanal; `F4-009`; `acoustic_8records.bin` |
+| Gerçek cihaz formatı | — | — | — | **Bilinmiyor** | E-01/E-02 gelene kadar tanımsız; yukarıdakiler plan taslağına dayanır |
+
+**Sürüm alanı her iki Profil A sürümünde de offset 8'dedir** (`uint16`);
+sürümü öğrenmek için önce sürümü bilmek gerekmez. `version`,
+`header_size` ve `record_size` çapraz doğrulanır — uyuşmazlıkta dosya
+reddedilir, en yakın sürüme düşülmez.
+
+**Sürümler arası dönüştürme yapılmaz.** Bir v1 dosyası v1 olarak kalır:
+CRC'si hiç olmamış veriye sonradan CRC hesaplamak, yalnız dönüştürme
+anındaki baytları doğrulayan — yani hiçbir şeyi doğrulamayan — bir alan
+üretirdi. `is_crc_validated(version)` bu ayrımı açıkça taşır.
 
 ## 5. Güncelleme kuralı
 

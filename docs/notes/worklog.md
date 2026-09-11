@@ -383,8 +383,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F6-023` | 20 dk | 9 dk 5 sn | `eb650f2` | aç/kapat dayanıklılık sonuçlarını değerlendir |
 | `F6-024` | 20 dk | 9 dk 55 sn | `fcfe6fb` | mockup üzerinden ana ekran kullanım kılavuzunu yaz |
 | `F6-025` | 20 dk | 9 dk 9 sn | `9b4cb35` | filtre ve spektral analiz kullanım örneğini yaz |
+| `F6-026` | 20 dk | 69 dk 41 sn | `4717142` | canlı bağlantı ve kayıt kullanım örneğini yaz |
 
-**365 commit · olculen toplam 4403 dk 53 sn · olculemeyen 1 (ilk commit)**
+**366 commit · olculen toplam 4473 dk 34 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
