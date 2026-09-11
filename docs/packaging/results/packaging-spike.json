@@ -63,5 +63,15 @@
       256
     ],
     "result": "TAMAM"
+  },
+  "f6_004_one_command_build": {
+    "command": "tools/build_package.py",
+    "version": "3.3.0",
+    "output_dir": "dist/sonar-analyzer-3.3.0",
+    "duration_seconds": 63.8,
+    "file_count": 291,
+    "total_bytes": 172011707,
+    "build_log_lines": 94,
+    "self_check": "TAMAM (platform plugin: windows)"
   }
 }
