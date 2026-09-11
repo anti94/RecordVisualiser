@@ -294,8 +294,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-072` | 20 dk | 8 dk 17 sn | `2fa0bab` | formül ifade ve kaynak sınırlarını doğrula |
 | `F4-073` | 20 dk | 185 dk 33 sn | `6055cbe` | custom sekmesine basit formül editörü ekle |
 | `F4-074` | 15 dk | 6 dk 33 sn | `26c067c` | annotation ve bookmark modelini ekle |
+| `F4-075` | 20 dk | 12 dk 32 sn | `22bb787` | bookmark ekleme, düzenleme ve silmeyi bağla |
 
-**276 commit · olculen toplam 3160 dk 56 sn · olculemeyen 1 (ilk commit)**
+**277 commit · olculen toplam 3173 dk 28 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

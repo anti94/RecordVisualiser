@@ -52,9 +52,19 @@ from sonar_analyzer.application.load_errors import describe_load_error
 from sonar_analyzer.application.point_budget import points_for_width
 from sonar_analyzer.application.scrub_debounce import ScrubDebouncer
 from sonar_analyzer.application.view_history import ViewCommand, ViewHistory
-from sonar_analyzer.domain.annotation import Annotation, AnnotationSet, new_annotation_id
+from sonar_analyzer.domain.annotation import (
+    Annotation,
+    AnnotationError,
+    AnnotationSet,
+    new_annotation_id,
+)
 from sonar_analyzer.domain.channel import ChannelMetadata
-from sonar_analyzer.domain.derived_channel_definition import DerivedChannelDefinition
+from sonar_analyzer.domain.derived_channel_definition import (
+    DerivedChannelDefinition,
+)
+from sonar_analyzer.domain.derived_channel_definition import (
+    DerivedChannelError as DerivedChannelDefinitionError,
+)
 from sonar_analyzer.domain.event import Event
 from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import TimeRange
@@ -100,6 +110,7 @@ from sonar_analyzer.ui.view_tab_bar import ViewTabBar
 from sonar_analyzer.workspace.model import (
     EventFilterState,
     PanelState,
+    SeriesStyleState,
     ViewState,
     WorkspaceError,
     WorkspaceModel,
@@ -902,7 +913,79 @@ class MainWindow(QMainWindow):
             view=view,
             event_filter=event_filter,
             filter_tool=self.right_dock.analysis_tools.filter_tool_state(),
+            derived_channels=self._captured_derived_channels(),
+            annotations=self._annotations.to_list(),
+            series_styles=self._captured_series_styles(),
         )
+
+    def _captured_derived_channels(self) -> list[dict[str, object]]:
+        """Türetilmiş kanal tarifleri — `F4-076` ("işlemler")."""
+        repository = self._repository
+        if not isinstance(repository, DerivedChannelRepository):
+            return []
+        return [definition.to_dict() for definition in repository.definitions()]
+
+    def _captured_series_styles(self) -> dict[str, SeriesStyleState]:
+        """Çizili serilerin renk/çizgi biçimleri — `F4-076` ("renkler")."""
+        styles: dict[str, SeriesStyleState] = {}
+        for channel_id in self.plot_panel.plotted_channel_ids():
+            style = self.plot_panel.series_style(channel_id)
+            styles[channel_id] = SeriesStyleState(
+                color=style.color,
+                width=style.width,
+                line_style=style.line_style,
+                symbol=style.symbol,
+            )
+        return styles
+
+    def _restore_derived_channels(self, model: WorkspaceModel) -> None:
+        """Kaydedilmiş türetilmiş kanal tariflerini yeniden kurar — `F4-076`.
+
+        Tarif bozuksa ya da girdi kanalı artık yoksa o **tek** kanal
+        atlanır ve nedeni log'a yazılır; oturumun kalanı yüklenir.
+        """
+        repository = self._repository
+        if not isinstance(repository, DerivedChannelRepository) or not model.derived_channels:
+            return
+        repository.clear_derived()
+        for record in model.derived_channels:
+            try:
+                definition = DerivedChannelDefinition.from_dict(record)
+                repository.add(definition)
+            except (DerivedChannelDefinitionError, DerivedChannelError) as exc:
+                self.bottom_dock.append_log(f"Türetilmiş kanal geri yüklenemedi: {exc}")
+        self.set_recording(repository.metadata(), repository.channels())
+
+    def _restore_series_styles(self, model: WorkspaceModel) -> None:
+        """Kaydedilmiş renk/çizgi biçimlerini çizili serilere uygular — `F4-076`."""
+        plotted = set(self.plot_panel.plotted_channel_ids())
+        for channel_id, style in model.series_styles.items():
+            if channel_id not in plotted:
+                continue
+            self.plot_panel.set_series_style(
+                channel_id,
+                color=style.color,
+                width=style.width,
+                line_style=style.line_style,
+                symbol=style.symbol,
+            )
+
+    def _restore_annotations(self, model: WorkspaceModel) -> None:
+        """Kaydedilmiş işaretleri geri yükler — `F4-076`.
+
+        Bozuk bir kayıt tüm oturumu düşürmez: o işaret atlanır ve nedeni
+        log'a yazılır.
+        """
+        restored: list[Annotation] = []
+        for record in model.annotations:
+            try:
+                restored.append(Annotation.from_dict(record))
+            except AnnotationError as exc:
+                self.bottom_dock.append_log(f"İşaret geri yüklenemedi: {exc}")
+        try:
+            self.set_annotations(AnnotationSet(tuple(restored)))
+        except AnnotationError as exc:  # pragma: no cover - tekrarlı kimlik
+            self.bottom_dock.append_log(f"İşaret listesi geri yüklenemedi: {exc}")
 
     def save_workspace(self, path: str | Path) -> Path:
         """Şu anki oturumu bir workspace dosyasına yazar — `F3-068`."""
@@ -952,6 +1035,10 @@ class MainWindow(QMainWindow):
 
     def apply_workspace(self, model: WorkspaceModel) -> None:
         """`model`'deki düzen + görünüm durumunu açık kayda uygular — `F3-069`."""
+        # 0) Türetilmiş kanallar kanal listesinden **önce** kurulmalı;
+        #    panel onlara da atıfta bulunabilir (`F4-076`).
+        self._restore_derived_channels(model)
+
         # 1) Paneldeki kanallar (ilki grafiği sıfırlar, kalanlar eklenir).
         panel = model.panels[0] if model.panels else PanelState()
         if panel.channel_ids and self._repository is not None:
@@ -985,6 +1072,10 @@ class MainWindow(QMainWindow):
 
         # 6b) Filter sekmesi ayarları (F4-038).
         self.right_dock.analysis_tools.apply_filter_tool_state(model.filter_tool)
+
+        # 6c) Renkler ve kullanıcı işaretleri (F4-076).
+        self._restore_series_styles(model)
+        self._restore_annotations(model)
 
         # 7) Dock yerleşimi (opak Qt state).
         if model.dock_state:

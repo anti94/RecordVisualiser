@@ -23,7 +23,7 @@ from dataclasses import dataclass, field, replace
 from typing import cast
 
 #: Bu kod tabanının yazdığı workspace şema sürümü.
-WORKSPACE_SCHEMA_VERSION = 1
+WORKSPACE_SCHEMA_VERSION = 2
 
 #: Grafik çalışma alanı yerleşimi (bkz. `ui/plots/plot_workspace.py`).
 LAYOUT_MODES: tuple[str, ...] = ("tabs", "split")
@@ -131,6 +131,14 @@ def _float_or(source: dict[str, object], key: str, fallback: float) -> float:
     """`key` sayı ise `float`'ını, değilse `fallback`'i döndürür (`F4-038`)."""
     value = source.get(key)
     return float(value) if _is_number(value) and isinstance(value, (int, float)) else fallback
+
+
+def _int_field(source: dict[str, object], key: str, where: str, *, default: int) -> int:
+    """`key` tam sayı ise değerini, yoksa `default`'u döndürür — `F4-076`."""
+    raw = source.get(key, default)
+    if not _is_int(raw):
+        raise WorkspaceError(f"{where}: '{key}' tam sayı olmalı")
+    return cast("int", raw)
 
 
 def _opt_int(source: dict[str, object], key: str, where: str) -> int | None:
@@ -292,6 +300,69 @@ class FilterToolState:
 
 
 @dataclass(frozen=True)
+class SeriesStyleState:
+    """Bir kanalın çizim biçimi — `F4-076` ("renkler" projede saklanır)."""
+
+    color: str
+    width: int = 1
+    line_style: str = "solid"
+    symbol: str | None = None
+
+    def __post_init__(self) -> None:
+        if not self.color.strip():
+            raise WorkspaceError("SeriesStyleState: 'color' boş olamaz")
+        if self.width < 1:
+            raise WorkspaceError(f"SeriesStyleState: 'width' >= 1 olmalı, {self.width} verildi")
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "color": self.color,
+            "width": self.width,
+            "line_style": self.line_style,
+            "symbol": self.symbol,
+        }
+
+    @classmethod
+    def from_dict(cls, value: object) -> SeriesStyleState:
+        data = _as_dict(value, "SeriesStyleState")
+        symbol = data.get("symbol")
+        if symbol is not None and not isinstance(symbol, str):
+            raise WorkspaceError("SeriesStyleState: 'symbol' metin ya da boş olmalı")
+        return cls(
+            color=str(data.get("color", "")),
+            width=_int_field(data, "width", "SeriesStyleState", default=1),
+            line_style=str(data.get("line_style", "solid")),
+            symbol=symbol,
+        )
+
+
+def _empty_styles() -> dict[str, SeriesStyleState]:
+    return {}
+
+
+def _style_map(value: object) -> dict[str, SeriesStyleState]:
+    """`{kanal_id: biçim}` eşlemesi; kanal kimlikleri metin olmalı."""
+    data = _as_dict(value, "WorkspaceModel.series_styles")
+    return {
+        str(channel_id): SeriesStyleState.from_dict(style) for channel_id, style in data.items()
+    }
+
+
+def _empty_records() -> list[dict[str, object]]:
+    return []
+
+
+def _record_list(value: object, where: str) -> list[dict[str, object]]:
+    """Opak kayıt listesi: her öğe bir nesne olmalı, içeriği sahibi doğrular."""
+    if not isinstance(value, list):
+        raise WorkspaceError(f"{where}: liste olmalı")
+    records: list[dict[str, object]] = []
+    for entry in cast("list[object]", value):
+        records.append(_as_dict(entry, where))
+    return records
+
+
+@dataclass(frozen=True)
 class WorkspaceModel:
     """Bir çalışma oturumunun tamamı — sürümlü, JSON'a serileştirilebilir."""
 
@@ -310,6 +381,13 @@ class WorkspaceModel:
     event_filter: EventFilterState = field(default_factory=EventFilterState)
     #: `F4-038` — Analysis Tools `Filter` sekmesinin uygulanan ayarları.
     filter_tool: FilterToolState = field(default_factory=FilterToolState)
+    #: `F4-076` — türetilmiş kanal tanımları (`DerivedChannelDefinition.to_dict()`).
+    #: Model içeriği yorumlamaz; sahibi domain tarafıdır.
+    derived_channels: list[dict[str, object]] = field(default_factory=_empty_records)
+    #: `F4-076` — kullanıcı işaretleri (`Annotation.to_dict()`).
+    annotations: list[dict[str, object]] = field(default_factory=_empty_records)
+    #: `F4-076` — kanal kimliğine göre çizim biçimi.
+    series_styles: dict[str, SeriesStyleState] = field(default_factory=_empty_styles)
     schema_version: int = WORKSPACE_SCHEMA_VERSION
 
     def __post_init__(self) -> None:
@@ -341,6 +419,11 @@ class WorkspaceModel:
             "view": self.view.to_dict(),
             "event_filter": self.event_filter.to_dict(),
             "filter_tool": self.filter_tool.to_dict(),
+            "derived_channels": [dict(record) for record in self.derived_channels],
+            "annotations": [dict(record) for record in self.annotations],
+            "series_styles": {
+                channel_id: style.to_dict() for channel_id, style in self.series_styles.items()
+            },
         }
 
     def dumps(self, *, indent: int | None = 2) -> str:
@@ -385,6 +468,11 @@ class WorkspaceModel:
             view=ViewState.from_dict(data.get("view", {})),
             event_filter=EventFilterState.from_dict(data.get("event_filter", {})),
             filter_tool=FilterToolState.from_dict(data.get("filter_tool", {})),
+            derived_channels=_record_list(
+                data.get("derived_channels", []), "WorkspaceModel.derived_channels"
+            ),
+            annotations=_record_list(data.get("annotations", []), "WorkspaceModel.annotations"),
+            series_styles=_style_map(data.get("series_styles", {})),
             schema_version=version,
         )
 

@@ -68,9 +68,26 @@ def _migrate_0_to_1(doc: dict[str, object]) -> dict[str, object]:
     return migrated
 
 
+def _migrate_1_to_2(doc: dict[str, object]) -> dict[str, object]:
+    """v1'i v2'ye taşır — `F4-076`.
+
+    v2 üç alan ekler: `derived_channels` (türetilmiş kanal tanımları),
+    `annotations` (bookmark/annotation) ve `series_styles` (kanal renkleri).
+    v1 belgelerinde hiçbiri yoktur; boş varsayılanlarla doldurulur.
+    **Hiçbir v1 alanı değişmez veya silinmez**, yalnız eklenir.
+    """
+    migrated = dict(doc)
+    migrated["schema_version"] = 2
+    migrated.setdefault("derived_channels", [])
+    migrated.setdefault("annotations", [])
+    migrated.setdefault("series_styles", {})
+    return migrated
+
+
 #: `v -> (v+1)` dönüştürücüleri. Her adım `schema_version`'ı da yükseltir.
 _MIGRATIONS: dict[int, Callable[[dict[str, object]], dict[str, object]]] = {
     0: _migrate_0_to_1,
+    1: _migrate_1_to_2,
 }
 
 
