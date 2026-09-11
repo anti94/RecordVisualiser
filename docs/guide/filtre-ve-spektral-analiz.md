@@ -97,7 +97,7 @@ hakkında kesin bir şey söylenemez.
 
 Kurduğunuz zincir **kaydedilir ve geri alınabilir**:
 
-- **Geri/İleri al** (`Ctrl+Z` / `Ctrl+Y`) zincir ve işaret
+- **Geri/İleri al** (`Ctrl+Z` / `Ctrl+Shift+Z`) zincir ve işaret
   değişikliklerini adım adım geri alır.
 - Zincir, türetilmiş kanallar ve işaretler **workspace dosyasına** yazılır
   (`.sonar-workspace.json`).
