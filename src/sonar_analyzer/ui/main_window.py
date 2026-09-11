@@ -36,6 +36,7 @@ from PySide6.QtWidgets import (
 )
 
 from sonar_analyzer.application import favorite_groups, recent_files
+from sonar_analyzer.application.edit_history import EditHistory, EditSnapshot
 from sonar_analyzer.application.export_controller import (
     KIND_FILE_FILTER,
     DataVariant,
@@ -170,6 +171,10 @@ class MainWindow(QMainWindow):
         self._repository: RecordingRepository | None = None
         #: `F4-074` kullanıcı işaretleri; `F4-076` çalışma alanına yazar.
         self._annotations = AnnotationSet()
+        #: `F4-079` zincir + işaret düzenlemelerinin undo/redo geçmişi.
+        self._edit_history = EditHistory(EditSnapshot(ProcessingChain(), AnnotationSet()))
+        #: Geri/ileri alma uygularken yeni kayıt açılmasın.
+        self._restoring_edit = False
         self._dsp_projection: tuple[int, NDArray[np.int64]] | None = None
         self._processed_values: NDArray[np.float64] | None = None
         #: `F3-041` görünüm ayarları (renk, eksen) undo/redo geçmişi.
@@ -263,6 +268,7 @@ class MainWindow(QMainWindow):
         self.bottom_dock.bookmarks.edit_requested.connect(self._on_bookmark_edit)
         self.bottom_dock.bookmarks.remove_requested.connect(self._on_bookmark_remove)
         self.bottom_dock.bookmarks.selected.connect(self._on_bookmark_selected)
+        self.right_dock.analysis_tools.step_editor.chain_changed.connect(self._on_chain_edited)
         self.bottom_dock.event_selected.connect(self._on_event_selected)
         self.bottom_dock.event_activated.connect(self._on_event_activated)
         self.action("action_load_simulation").triggered.connect(self.load_simulation)
@@ -443,6 +449,7 @@ class MainWindow(QMainWindow):
             text=text,
         )
         self.set_annotations(self._annotations.added(annotation))
+        self.record_edit("İşaret eklendi")
         self.bottom_dock.bookmarks.select(annotation.id)
         kind = "aralık" if end_ns is not None else "an"
         self.bottom_dock.append_log(f"İşaret eklendi ({kind}): {annotation.label}")
@@ -457,6 +464,7 @@ class MainWindow(QMainWindow):
             return
         updated = existing.renamed(label.strip()).with_text(text)
         self.set_annotations(self._annotations.added(updated))
+        self.record_edit("İşaret düzenlendi")
         self.bottom_dock.bookmarks.select(annotation_id)
         self.bottom_dock.append_log(f"İşaret güncellendi: {updated.label}")
 
@@ -467,6 +475,7 @@ class MainWindow(QMainWindow):
         if existing is None:
             return
         self.set_annotations(self._annotations.removed(annotation_id))
+        self.record_edit("İşaret silindi")
         self.bottom_dock.append_log(f"İşaret silindi: {existing.label}")
 
     def _on_bookmark_selected(self, annotation_id: object) -> None:
@@ -478,6 +487,63 @@ class MainWindow(QMainWindow):
             return
         self.playback_dock.goto_time_ns(annotation.start_ns)
         self.go_to_time(annotation.start_ns)
+
+    # -- duzenleme gecmisi (F4-079) ----------------------------------------
+
+    @property
+    def edit_history(self) -> EditHistory:
+        """Zincir ve işaret düzenlemelerinin undo/redo geçmişi — `F4-079`."""
+        return self._edit_history
+
+    def _snapshot(self, label: str) -> EditSnapshot:
+        return EditSnapshot(
+            chain=self.right_dock.analysis_tools.step_editor.chain(),
+            annotations=self._annotations,
+            label=label,
+        )
+
+    def record_edit(self, label: str) -> bool:
+        """O anki zincir + işaret durumunu geçmişe yazar — `F4-079`.
+
+        Geri/ileri alma uygulanırken çağrılırsa **hiçbir şey yapmaz**;
+        yoksa geri alma kendi kendini geçmişe yazardı.
+        """
+        if self._restoring_edit:
+            return False
+        return self._edit_history.record(self._snapshot(label))
+
+    def _on_chain_edited(self) -> None:
+        """`StepListEditor` her düzenlemede yayar — sıra değişikliği dahil."""
+        self.record_edit("İşlem zinciri")
+
+    def _apply_edit_snapshot(self, snapshot: EditSnapshot) -> None:
+        """Bir anlık görüntüyü editöre ve işaret listesine geri yükler."""
+        self._restoring_edit = True
+        try:
+            self.right_dock.analysis_tools.step_editor.set_chain(snapshot.chain)
+            self.set_annotations(snapshot.annotations)
+        finally:
+            self._restoring_edit = False
+
+    def undo_edit(self) -> bool:
+        """Son zincir/işaret düzenlemesini geri alır — `F4-079`."""
+        label = self._edit_history.undo_label
+        snapshot = self._edit_history.undo()
+        if snapshot is None:
+            return False
+        self._apply_edit_snapshot(snapshot)
+        self.bottom_dock.append_log(f"Geri alındı: {label}")
+        return True
+
+    def redo_edit(self) -> bool:
+        """Geri alınan son düzenlemeyi yeniden uygular — `F4-079`."""
+        label = self._edit_history.redo_label
+        snapshot = self._edit_history.redo()
+        if snapshot is None:
+            return False
+        self._apply_edit_snapshot(snapshot)
+        self.bottom_dock.append_log(f"Yeniden uygulandı: {label}")
+        return True
 
     def _set_event_markers_visible(self, visible: bool) -> None:
         """`F3-050` — olay işaretlerinin görünürlüğü (veri değişmez)."""
@@ -1853,6 +1919,8 @@ class MainWindow(QMainWindow):
         self.set_recording(metadata, channels)
         # F4-075: işaretler kayda aittir; yeni kaynak yeni bir liste demektir.
         self.set_annotations(AnnotationSet())
+        # F4-079: yeni kayıt yeni bir düzenleme geçmişi demektir.
+        self._edit_history.reset(self._snapshot(""))
 
         span = metadata.time_range
         events = repository.events(span)

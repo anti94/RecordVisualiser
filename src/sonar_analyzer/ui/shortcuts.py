@@ -36,6 +36,10 @@ class ShortcutSpec:
 #: Plan §16 — uygulanan çekirdek kısayollar.
 SHORTCUTS: tuple[ShortcutSpec, ...] = (
     ShortcutSpec("Ctrl+S", "save_workspace_via_dialog", "window", "Workspace kaydet"),
+    # F4-079: işlem zinciri ve işaret düzenlemeleri. Görünüm değişikliklerinin
+    # (renk, eksen) kendi geçmişi vardır — `F3-041`, Display panelinden.
+    ShortcutSpec("Ctrl+Z", "undo_edit", "window", "Düzenlemeyi geri al"),
+    ShortcutSpec("Ctrl+Shift+Z", "redo_edit", "window", "Düzenlemeyi yeniden uygula"),
     ShortcutSpec("Space", "toggle_playback", "plot", "Oynat / duraklat"),
     ShortcutSpec("Home", "reset_plot_view", "plot", "Görünümü sıfırla"),
     ShortcutSpec("X", "set_zoom_mode_x", "plot", "X zoom modu"),
