@@ -52,6 +52,7 @@ from sonar_analyzer.application.load_errors import describe_load_error
 from sonar_analyzer.application.point_budget import points_for_width
 from sonar_analyzer.application.scrub_debounce import ScrubDebouncer
 from sonar_analyzer.application.view_history import ViewCommand, ViewHistory
+from sonar_analyzer.domain.annotation import Annotation, AnnotationSet, new_annotation_id
 from sonar_analyzer.domain.channel import ChannelMetadata
 from sonar_analyzer.domain.derived_channel_definition import DerivedChannelDefinition
 from sonar_analyzer.domain.event import Event
@@ -148,6 +149,8 @@ class MainWindow(QMainWindow):
 
         self._channels: tuple[ChannelMetadata, ...] = ()
         self._repository: RecordingRepository | None = None
+        #: `F4-074` kullanıcı işaretleri; `F4-076` çalışma alanına yazar.
+        self._annotations = AnnotationSet()
         self._dsp_projection: tuple[int, NDArray[np.int64]] | None = None
         self._processed_values: NDArray[np.float64] | None = None
         #: `F3-041` görünüm ayarları (renk, eksen) undo/redo geçmişi.
@@ -237,6 +240,10 @@ class MainWindow(QMainWindow):
         self.right_dock.analysis_tools.formula_editor.definition_requested.connect(
             self._on_derived_channel_requested
         )
+        self.bottom_dock.bookmarks.add_requested.connect(self._on_bookmark_add)
+        self.bottom_dock.bookmarks.edit_requested.connect(self._on_bookmark_edit)
+        self.bottom_dock.bookmarks.remove_requested.connect(self._on_bookmark_remove)
+        self.bottom_dock.bookmarks.selected.connect(self._on_bookmark_selected)
         self.bottom_dock.event_selected.connect(self._on_event_selected)
         self.bottom_dock.event_activated.connect(self._on_event_activated)
         self.action("action_load_simulation").triggered.connect(self.load_simulation)
@@ -375,6 +382,83 @@ class MainWindow(QMainWindow):
         """Olay satırına çift tıklama grafiği o zamana götürür — `F3-046`."""
         if isinstance(event, Event):
             self.go_to_time(event.timestamp_ns)
+
+    # -- kullanici isaretleri (F4-075) -------------------------------------
+
+    @property
+    def annotations(self) -> AnnotationSet:
+        """Açık kaydın kullanıcı işaretleri — `F4-074`."""
+        return self._annotations
+
+    def set_annotations(self, annotations: AnnotationSet) -> None:
+        """İşaret kümesini değiştirir, listeyi ve timeline'ı tazeler."""
+        self._annotations = annotations
+        start_ns = 0
+        if self._repository is not None:
+            start_ns = self._repository.metadata().time_range.start_ns
+        self.bottom_dock.bookmarks.set_annotations(annotations, start_ns)
+        self.plot_panel.set_bookmarks(
+            [(item.start_ns, item.end_ns, item.label) for item in annotations]
+        )
+
+    def bookmark_target(self) -> tuple[int, int | None]:
+        """Yeni işaretin kapsayacağı zaman: seçili aralık varsa o, yoksa imleç.
+
+        Grafikte bir zaman bölgesi seçiliyse işaret **aralık** olur;
+        seçim yoksa oynatma imlecinin bulunduğu an **nokta** olur.
+        """
+        span = self.plot_panel.time_region_range()
+        if span is not None and span.end_ns > span.start_ns:
+            return span.start_ns, span.end_ns
+        return self.playback_dock.current_time_ns(), None
+
+    def _on_bookmark_add(self, label: object, text: object) -> None:
+        if not isinstance(label, str) or not isinstance(text, str) or not label.strip():
+            return
+        start_ns, end_ns = self.bookmark_target()
+        annotation = Annotation(
+            id=new_annotation_id(),
+            label=label.strip(),
+            start_ns=start_ns,
+            end_ns=end_ns,
+            text=text,
+        )
+        self.set_annotations(self._annotations.added(annotation))
+        self.bottom_dock.bookmarks.select(annotation.id)
+        kind = "aralık" if end_ns is not None else "an"
+        self.bottom_dock.append_log(f"İşaret eklendi ({kind}): {annotation.label}")
+
+    def _on_bookmark_edit(self, annotation_id: object, label: object, text: object) -> None:
+        if not (
+            isinstance(annotation_id, str) and isinstance(label, str) and isinstance(text, str)
+        ):
+            return
+        existing = self._annotations.get(annotation_id)
+        if existing is None or not label.strip():
+            return
+        updated = existing.renamed(label.strip()).with_text(text)
+        self.set_annotations(self._annotations.added(updated))
+        self.bottom_dock.bookmarks.select(annotation_id)
+        self.bottom_dock.append_log(f"İşaret güncellendi: {updated.label}")
+
+    def _on_bookmark_remove(self, annotation_id: object) -> None:
+        if not isinstance(annotation_id, str):
+            return
+        existing = self._annotations.get(annotation_id)
+        if existing is None:
+            return
+        self.set_annotations(self._annotations.removed(annotation_id))
+        self.bottom_dock.append_log(f"İşaret silindi: {existing.label}")
+
+    def _on_bookmark_selected(self, annotation_id: object) -> None:
+        """Seçilen işaretin zamanına gider — `F4-075` kabul kriteri."""
+        if not isinstance(annotation_id, str) or not annotation_id:
+            return
+        annotation = self._annotations.get(annotation_id)
+        if annotation is None:
+            return
+        self.playback_dock.goto_time_ns(annotation.start_ns)
+        self.go_to_time(annotation.start_ns)
 
     def _set_event_markers_visible(self, visible: bool) -> None:
         """`F3-050` — olay işaretlerinin görünürlüğü (veri değişmez)."""
@@ -1594,6 +1678,8 @@ class MainWindow(QMainWindow):
         metadata = repository.metadata()
         channels = repository.channels()
         self.set_recording(metadata, channels)
+        # F4-075: işaretler kayda aittir; yeni kaynak yeni bir liste demektir.
+        self.set_annotations(AnnotationSet())
 
         span = metadata.time_range
         events = repository.events(span)
@@ -1843,6 +1929,7 @@ class MainWindow(QMainWindow):
     def _clear_recording_panels(self) -> None:
         """Hiç açık kayıt kalmadığında panelleri boş duruma döndürür."""
         self._channels = ()
+        self.set_annotations(AnnotationSet())
         self._plot_refresh_timer.stop()
         self._last_plot_request = None
         self._dsp_projection = None

@@ -293,8 +293,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F4-071` | 20 dk | 6 dk 41 sn | `610252d` | formül değerlendirmesini kanal dizilerine bağla |
 | `F4-072` | 20 dk | 8 dk 17 sn | `2fa0bab` | formül ifade ve kaynak sınırlarını doğrula |
 | `F4-073` | 20 dk | 185 dk 33 sn | `6055cbe` | custom sekmesine basit formül editörü ekle |
+| `F4-074` | 15 dk | 6 dk 33 sn | `26c067c` | annotation ve bookmark modelini ekle |
 
-**275 commit · olculen toplam 3154 dk 23 sn · olculemeyen 1 (ilk commit)**
+**276 commit · olculen toplam 3160 dk 56 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

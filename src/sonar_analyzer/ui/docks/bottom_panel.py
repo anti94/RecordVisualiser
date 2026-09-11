@@ -35,6 +35,7 @@ from PySide6.QtWidgets import (
 )
 
 from sonar_analyzer.domain.event import Event, Severity
+from sonar_analyzer.ui.docks.bookmark_panel import BOOKMARKS_TAB_TITLE, BookmarkPanel
 from sonar_analyzer.ui.docks.event_table_model import (
     EVENT_COLUMNS,
     EventGroup,
@@ -117,7 +118,14 @@ class BottomPanelDock(QDockWidget):
         self.tabs.setObjectName("tabs_bottom_panel")
         self.tabs.addTab(self._build_log(), LOG_TAB_TITLE)
         self.tabs.addTab(self._build_events(), EVENTS_TAB_TITLE)
+        # F4-075: kullanici isaretleri kendi sekmesinde.
+        self.bookmarks = BookmarkPanel(self)
+        self.tabs.addTab(self.bookmarks, BOOKMARKS_TAB_TITLE)
         self.setWidget(self.tabs)
+
+    def select_bookmarks_tab(self) -> None:
+        """Bookmarks sekmesini etkinleştirir — `F4-075`."""
+        self.tabs.setCurrentWidget(self.bookmarks)
 
     # -- kurulum ---------------------------------------------------------
 

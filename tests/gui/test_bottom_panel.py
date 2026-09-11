@@ -16,6 +16,7 @@ from pytestqt.qtbot import QtBot
 
 from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.repository.mock_repository import MockRecordingRepository
+from sonar_analyzer.ui.docks.bookmark_panel import BOOKMARKS_TAB_TITLE
 from sonar_analyzer.ui.docks.bottom_panel import (
     EVENT_COLUMNS,
     EVENTS_TAB_TITLE,
@@ -65,9 +66,10 @@ def test_panel_is_visually_below_center(window: MainWindow, qtbot: QtBot) -> Non
     assert panel_top >= center_bottom
 
 
-def test_log_and_events_are_tabs_of_the_same_area(panel: BottomPanelDock) -> None:
-    assert panel.tab_titles() == [LOG_TAB_TITLE, EVENTS_TAB_TITLE]
-    assert panel.tabs.count() == 2
+def test_log_events_and_bookmarks_are_tabs_of_the_same_area(panel: BottomPanelDock) -> None:
+    """`F4-075` ile üçüncü sekme eklendi: kullanıcı işaretleri."""
+    assert panel.tab_titles() == [LOG_TAB_TITLE, EVENTS_TAB_TITLE, BOOKMARKS_TAB_TITLE]
+    assert panel.tabs.count() == 3
 
 
 def test_dock_has_stable_object_name(window: MainWindow) -> None:

@@ -66,6 +66,11 @@ DEFAULT_ZOOM_MODE = "xy"
 #: Grid'in gorunurlugu: veri cizgisinden belirgin sekilde daha soluk (plan 6.3).
 GRID_ALPHA = 0.15
 
+#: `F4-075` kullanıcı işaretleri — olay işaretlerinden ayrışsın diye
+#: kesiksiz ve daha kalın çizilir, aralıklar sıcak bir gölge alır.
+BOOKMARK_COLOR = "#E8A33D"
+BOOKMARK_REGION_BRUSH = (232, 163, 61, 45)
+
 
 #: `F3-031` çizgi biçimleri -> Qt kalem stili.
 LINE_STYLES: dict[str, Qt.PenStyle] = {
@@ -177,6 +182,9 @@ class PlotPanel(QWidget):
         self._tx_spans: list[tuple[int, int]] = []
         self._tx_regions: list[pg.LinearRegionItem] = []
         self._tx_regions_visible = True
+        # F4-075: kullanici isaretleri (bookmark / annotation).
+        self._bookmark_marks: list[tuple[int, int | None, str]] = []
+        self._bookmark_items: list[pg.GraphicsObject] = []
 
         #: F3-034: `dispose()` çağrıldı mı — ikinci çağrı sessizce döner.
         self._disposed = False
@@ -800,6 +808,60 @@ class PlotPanel(QWidget):
             region.setVisible(self._tx_regions_visible)
             self.plot.addItem(region, ignoreBounds=True)
             self._tx_regions.append(region)
+
+    # -- kullanici isaretleri (F4-075) -------------------------
+
+    def set_bookmarks(self, marks: Sequence[tuple[int, int | None, str]]) -> None:
+        """Kullanıcı işaretlerini `(start_ns, end_ns|None, etiket)` üçlülerinden çizer.
+
+        Nokta işareti etiketli düz bir dikey çizgi, aralık işareti gölgeli
+        bir banttır. Konumlar `x_for_timestamp_ns` ile hesaplanır; işaret
+        zamanı grafik X koordinatıyla eşleşir. Zaman ankoru yoksa üçlüler
+        saklanır ve ilk seri eklenince yerleşir.
+        """
+        self._bookmark_marks = [(start, end, label) for start, end, label in marks]
+        self._rebuild_bookmarks()
+
+    def clear_bookmarks(self) -> None:
+        """Tüm kullanıcı işaretlerini kaldırır — `F4-075`."""
+        self._bookmark_marks = []
+        self._rebuild_bookmarks()
+
+    def _rebuild_bookmarks(self) -> None:
+        for item in self._bookmark_items:
+            self.plot.removeItem(item)
+        self._bookmark_items = []
+        if self._t0_ns is None:
+            return
+        for start_ns, end_ns, label in self._bookmark_marks:
+            start_x = self.x_for_timestamp_ns(start_ns)
+            if end_ns is None:
+                item: pg.GraphicsObject = pg.InfiniteLine(
+                    pos=start_x,
+                    angle=90,
+                    movable=False,
+                    pen=pg.mkPen(BOOKMARK_COLOR, width=2),
+                    label=label,
+                    labelOpts={"position": 0.92, "color": BOOKMARK_COLOR, "movable": False},
+                )
+            else:
+                item = pg.LinearRegionItem(
+                    values=(start_x, self.x_for_timestamp_ns(end_ns)),
+                    orientation="vertical",
+                    movable=False,
+                    brush=pg.mkBrush(*BOOKMARK_REGION_BRUSH),
+                )
+                item.setZValue(-5)
+            self.plot.addItem(item, ignoreBounds=True)
+            self._bookmark_items.append(item)
+
+    def bookmark_count(self) -> int:
+        """Şu an çizili kullanıcı işareti sayısı — testler için."""
+        return len(self._bookmark_items)
+
+    def bookmark_times_ns(self) -> list[int]:
+        """İşaretlerin başlangıç zamanları, verildikleri sırayla."""
+        return [start for start, _end, _label in self._bookmark_marks]
 
     def set_tx_regions_visible(self, visible: bool) -> None:
         """TX bantlarını gösterir/gizler — **veri değişmez** — `F3-050`."""

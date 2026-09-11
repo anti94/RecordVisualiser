@@ -257,6 +257,10 @@ class PlaybackDock(QDockWidget):
 
     # -- gezinme (F3-059) ----------------------------------------------
 
+    def current_time_ns(self) -> int:
+        """İmlecin kanonik (mutlak) ns konumu — `F4-075` işaretleri buna bakar."""
+        return self._current_abs_ns()
+
     def _current_abs_ns(self) -> int:
         """İmlecin kanonik (mutlak) ns konumu."""
         return self._recording_start_ns + round(self.position_s * NS_PER_SECOND)
