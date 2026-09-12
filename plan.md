@@ -1928,7 +1928,7 @@ kaydın uyuşmadığı durumda **sessizce yanlış okumamaktır**.
 | [x] | `F7-032` | `4.37.0` | 20 dk | İndeksi dosya adı, boyut ve değişiklik zamanıyla geçersizle | Bir dosya eklenir ya da değişirse indeks yeniden kurulur; her dosyanın hash'i alınmaz | `F7-031` | `feat(io): F7-032 i̇ndeksi dosya adı, boyut ve değişiklik zamanıyla geçersizle` |
 | [x] | `F7-033` | `4.38.0` | 15 dk | İndeksi atomik yaz | Yarıda kesilen yazım geçersiz indeks bırakmaz; geçici dosya üzerinden taşınır | `F7-032` | `feat(io): F7-033 i̇ndeksi atomik yaz` |
 | [x] | `F7-034` | `4.39.0` | 20 dk | Salt okunur klasörde indeksi bellekte kur | Yazılamayan klasörde kayıt yine açılır, yalnız açılış süresi uzar ve bu bildirilir | `F7-033` | `feat(io): F7-034 salt okunur klasörde indeksi bellekte kur` |
-| [ ] | `F7-035` | `4.40.0` | 20 dk | 1.200 dosyalık kayıtta indeks kurma süresini ölç | Ölçüm `docs/perf/` altına yazılır ve Bölüm 11 bütçesiyle karşılaştırılır | `F7-034` | `test(perf): F7-035 1.200 dosyalık kayıtta indeks kurma süresini ölç` |
+| [x] | `F7-035` | `4.40.0` | 20 dk | 1.200 dosyalık kayıtta indeks kurma süresini ölç | Ölçüm `docs/perf/` altına yazılır ve Bölüm 11 bütçesiyle karşılaştırılır | `F7-034` | `test(perf): F7-035 1.200 dosyalık kayıtta indeks kurma süresini ölç` |
 
 ##### Repository ve oynatma
 

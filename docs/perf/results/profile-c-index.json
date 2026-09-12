@@ -1,0 +1,26 @@
+{
+  "ceiling_files": 1200,
+  "open_budget_s": 3.0,
+  "small": {
+    "files": 1200,
+    "file_bytes": 1984,
+    "scan_s": 0.0623,
+    "scan_per_file_ms": 0.052,
+    "read_s": 1.2259,
+    "read_per_file_ms": 1.0216
+  },
+  "full": {
+    "files": 40,
+    "file_bytes": 2100544,
+    "scan_s": 0.0074,
+    "scan_per_file_ms": 0.1846,
+    "read_s": 0.0643,
+    "read_per_file_ms": 1.6085
+  },
+  "projection": {
+    "basis": "kucuk olcumden dosya sayisi maliyeti (tarama), tam boyutlu olcumden dosya basina okuma maliyeti",
+    "projected_s": 1.993,
+    "within_budget": true,
+    "caveat": "1.200 tam boyutlu dosya 2.35 GiB tutar; her olcumde yazmak diskle olcum yapmak olurdu, indeksle degil"
+  }
+}
