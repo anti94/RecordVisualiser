@@ -21,6 +21,7 @@ from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from typing import Any, cast
 
+from sonar_analyzer.domain.correlation import DEFAULT_TOLERANCE_NS
 from sonar_analyzer.io.live.connection_settings import LiveConnectionSettings
 
 #: Ayar semasinin surumu. Alan eklendiginde/anlamı degistiginde artar.
@@ -75,6 +76,11 @@ class AppSettings:
     favorite_groups: list[FavoriteGroup] = field(default_factory=_empty_group_list)
     #: Canlı bağlantı ve tampon yapılandırması (`F5-018`).
     live_connection: LiveConnectionSettings = field(default_factory=_default_live_connection)
+    #: Olay ↔ örnek eşleme toleransı, nanosaniye (plan Bölüm 9).
+    #: Cihazın kayıt periyodu değişebilir ve `D-08` hâlâ açıktır; sabit
+    #: bir sayıya gömmek, cevap geldiğinde kodun içinde aranmasını
+    #: gerektirirdi.
+    correlation_tolerance_ns: int = DEFAULT_TOLERANCE_NS
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -123,6 +129,14 @@ def _coerce(raw: dict[str, Any], warnings: list[str]) -> AppSettings:
         )
         time_display = defaults.time_display
 
+    tolerance = raw.get("correlation_tolerance_ns", defaults.correlation_tolerance_ns)
+    if not isinstance(tolerance, int) or isinstance(tolerance, bool) or tolerance < 0:
+        warnings.append(
+            f"Gecersiz korelasyon toleransi {tolerance!r}; "
+            f"{defaults.correlation_tolerance_ns} kullanildi."
+        )
+        tolerance = defaults.correlation_tolerance_ns
+
     recent = _string_list(raw.get("recent_files", []), warnings)
     favorites = _favorite_groups(raw.get("favorite_groups", []), warnings)
 
@@ -142,6 +156,7 @@ def _coerce(raw: dict[str, Any], warnings: list[str]) -> AppSettings:
         recent_files=recent,
         favorite_groups=favorites,
         live_connection=_live_connection(raw.get("live_connection"), warnings),
+        correlation_tolerance_ns=tolerance,
     )
 
 

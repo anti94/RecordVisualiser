@@ -983,7 +983,7 @@ Bu alan projenin en kritik teknik risklerinden biridir.
 - [x] Kayıp/tekrarlı/out-of-order timestamp politikası belirle.  (`F2-008`, `F2-011`: boşluk, tekrar ve sıra dışı ayrı ayrı raporlanır; zaman kaydırılmaz)
 - [x] UTC, local time ve elapsed time gösterimini birbirinden ayır.  (`F3-061`: üç gösterim aynı kanonik anı temsil eder)
 - [x] Dönüştürülmüş zamanın yanında gerekirse orijinal device timestamp’i koru.  (`F2-025`: ham `device_ticks` dönüştürülmüş zamanın yanında saklanır)
-- [ ] Sensör, BIT ve transmisyon verilerinin korelasyon toleransını yapılandırılabilir yap.  **AÇIK:** TX ve BIT korelasyonu ±125 ms kayıt sınırına bağlı (`D-08` varsayımı); tolerans ayardan yapılandırılabilir değil.
+- [x] Sensör, BIT ve transmisyon verilerinin korelasyon toleransını yapılandırılabilir yap.  (`domain/correlation.py`: `CorrelationTolerance`, öntanımlı bir kayıt periyodu; `AppSettings.correlation_tolerance_ns` ile ayarlanır, `inspect_sample` uzaklığı ve tolerans kararını taşır)
 - [x] Senkronizasyon kalite bilgisini kullanıcıya gerektiğinde göster.  (`F2-026` zaman kalitesi; Profil A'da senkron kalitesi `bilinmiyor` olarak gösterilir (`K-05`))
 
 ## 10. Veri işleme ve analiz pipeline’ı

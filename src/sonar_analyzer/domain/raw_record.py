@@ -32,3 +32,9 @@ class SampleInspection:
     byte_offset: int
     raw_value: float
     scaled_value: float
+    #: Istenen zaman ile bulunan ornegin zamani arasindaki fark (ns).
+    #: Sifirdan farkli olmasi normaldir: ornekler 125 ms izgarasindadir.
+    distance_ns: int = 0
+    #: Fark korelasyon toleransi icinde mi (plan Bolum 9). `False` ise
+    #: deger gosterilebilir ama "bu ana ait" denemez.
+    within_tolerance: bool = True

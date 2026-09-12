@@ -396,8 +396,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `-` | — | 5 dk 4 sn | `3f2074b` | Bölüm 5, 6.4 ve 8.1 kontrol listelerini uygulamaya karşı doğrula |
 | `-` | — | 4 dk 26 sn | `d3db794` | kalan bölüm içi kontrol listelerini uygulamaya karşı doğrula |
 | `-` | — | 14 dk 8 sn | `83729be` | Profil B kayıt dizisi teşhislerini ekle |
+| `-` | — | 27 dk 57 sn | `dc0aef2` | kanal ikonları, sağ tık menüsü ve boş grafik yönlendirmesi |
 
-**378 commit · olculen toplam 4648 dk 59 sn · olculemeyen 1 (ilk commit)**
+**379 commit · olculen toplam 4676 dk 56 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

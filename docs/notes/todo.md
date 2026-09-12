@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 499 madde · 478 tamamlandı · 21 kaldı**
+**Toplam 499 madde · 479 tamamlandı · 20 kaldı**
 
-`[#######################.]` %95.8
+`[#######################.]` %96.0
 
 ## Özet
 
@@ -41,8 +41,8 @@ Work in fully autonomous mode.
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 41 | 0 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 35 | 0 | 35 |
-| Bölüm içi kontrol listeleri | 124 | 21 | 145 |
-| **Toplam** | **478** | **21** | **499** |
+| Bölüm içi kontrol listeleri | 125 | 20 | 145 |
+| **Toplam** | **479** | **20** | **499** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -546,7 +546,7 @@ Work in fully autonomous mode.
 - [x] Kayıp/tekrarlı/out-of-order timestamp politikası belirle.  (`F2-008`, `F2-011`: boşluk, tekrar ve sıra dışı ayrı ayrı raporlanır; zaman kaydırılmaz)  <sub>plan.md:983</sub>
 - [x] UTC, local time ve elapsed time gösterimini birbirinden ayır.  (`F3-061`: üç gösterim aynı kanonik anı temsil eder)  <sub>plan.md:984</sub>
 - [x] Dönüştürülmüş zamanın yanında gerekirse orijinal device timestamp’i koru.  (`F2-025`: ham `device_ticks` dönüştürülmüş zamanın yanında saklanır)  <sub>plan.md:985</sub>
-- [ ] Sensör, BIT ve transmisyon verilerinin korelasyon toleransını yapılandırılabilir yap.  **AÇIK:** TX ve BIT korelasyonu ±125 ms kayıt sınırına bağlı (`D-08` varsayımı); tolerans ayardan yapılandırılabilir değil.  <sub>plan.md:986</sub>
+- [x] Sensör, BIT ve transmisyon verilerinin korelasyon toleransını yapılandırılabilir yap.  (`domain/correlation.py`: `CorrelationTolerance`, öntanımlı bir kayıt periyodu; `AppSettings.correlation_tolerance_ns` ile ayarlanır, `inspect_sample` uzaklığı ve tolerans kararını taşır)  <sub>plan.md:986</sub>
 - [x] Senkronizasyon kalite bilgisini kullanıcıya gerektiğinde göster.  (`F2-026` zaman kalitesi; Profil A'da senkron kalitesi `bilinmiyor` olarak gösterilir (`K-05`))  <sub>plan.md:987</sub>
 
 ### 10.2 İlk işlemler

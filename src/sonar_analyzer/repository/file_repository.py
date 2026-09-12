@@ -21,6 +21,11 @@ from types import TracebackType
 import numpy as np
 
 from sonar_analyzer.domain.channel import ChannelMetadata
+from sonar_analyzer.domain.correlation import (
+    DEFAULT_TOLERANCE,
+    CorrelationTolerance,
+    nearest_within,
+)
 from sonar_analyzer.domain.data_chunk import DataChunk, Quality
 from sonar_analyzer.domain.event import BitResult, Event
 from sonar_analyzer.domain.raw_record import RawRecordInspection, SampleInspection
@@ -276,11 +281,21 @@ class FileRecordingRepository:
             quality,
         )
 
-    def inspect_sample(self, channel_id: str, timestamp_ns: int) -> SampleInspection:
+    def inspect_sample(
+        self,
+        channel_id: str,
+        timestamp_ns: int,
+        tolerance: CorrelationTolerance = DEFAULT_TOLERANCE,
+    ) -> SampleInspection:
         """`timestamp_ns`'e **en yakın** örneğin ham/ölçeklenmiş görünümü — `F3-040`.
 
         Kabul: seçim kaynak offsetini ve ham/ölçeklenmiş değeri gösterir.
         Kayıt yoksa `LookupError`, bilinmeyen kanal `KeyError`.
+
+        Sonuç, istenen zamana **uzaklığı** ve bu uzaklığın korelasyon
+        toleransı içinde olup olmadığını taşır (plan Bölüm 9). Uzaktaki
+        bir örneği "bu ana ait" diye göstermek, örnek hiç göstermemekten
+        daha zararlıdır; karar çağırana bırakılır ama bilgi gizlenmez.
         """
         data, _header = self._require_open()
         slot = next(
@@ -291,10 +306,10 @@ class FileRecordingRepository:
         if not self._time_index:
             raise LookupError("Kayitta ornek yok")
 
-        pos = bisect_left(self._times, timestamp_ns)
-        candidates = [i for i in (pos - 1, pos) if 0 <= i < len(self._time_index)]
-        nearest = min(candidates, key=lambda i: abs(self._times[i] - timestamp_ns))
-        entry = self._time_index[nearest]
+        match = nearest_within(self._times, timestamp_ns, tolerance)
+        if match is None:  # pragma: no cover - ustteki bos kontrolu yakalar
+            raise LookupError("Kayitta ornek yok")
+        entry = self._time_index[match.index]
         record = read_data_record_v1(data, entry.byte_offset)
         raw_value = float(record.sensor_values[slot])
         return SampleInspection(
@@ -303,6 +318,8 @@ class FileRecordingRepository:
             byte_offset=entry.byte_offset,
             raw_value=raw_value,
             scaled_value=self._channels[slot].to_physical(raw_value),
+            distance_ns=match.distance_ns,
+            within_tolerance=match.within_tolerance,
         )
 
     def events(
