@@ -116,11 +116,30 @@ def test_an_open_decision_carries_an_assumption(text: str, identifier: str) -> N
     assert len(assumption) >= 60, f"{identifier} varsayımı çok kısa: {assumption!r}"
 
 
-def test_the_time_axis_decision_is_an_assumption_not_an_answer(text: str) -> None:
-    """`D-33` bu projenin kendi kararı; cevap bekleyen bir soru değil."""
+def test_the_time_axis_decision_is_closed_by_this_project(text: str) -> None:
+    """`D-33` cevap bekleyen bir soru değildi; `F7-005` ile bu proje karar verdi."""
     row = _row(text, "D-33")
-    assert "**VARSAYIM**" in row
+    assert "**KAPALI**" in row
+    assert "Bu proje" in row
     assert "F7-005" in row
+
+
+def test_the_time_axis_answer_names_the_canonical_source(text: str) -> None:
+    """Hangi kaynağın kanonik olduğu yazılmazsa karar uygulanamaz."""
+    row = _row(text, "D-33")
+    assert "timestamp'tir" in row
+    assert "ADR-003" in row
+
+
+def test_the_time_axis_answer_records_the_deciding_reason(text: str) -> None:
+    """Gerekçe yazılmazsa karar sonradan keyfî görünür.
+
+    Belirleyici olan şu: yayın yapılmayan saniyede Tx dosyası üretilmez.
+    Sayaç tabanlı bir eksen o boşluğu göremez ve sonraki bütün Tx
+    frame'lerini yanlış ana yerleştirir.
+    """
+    row = _row(text, "D-33")
+    assert "boşluğu göremez" in row
 
 
 def test_the_cit_field_is_not_quietly_interpreted(text: str) -> None:

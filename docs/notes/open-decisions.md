@@ -77,7 +77,7 @@ cevaplandı ve **KAPALI**; kalanlar açık ve varsayımla ilerleniyor.
 | D-30 | **CIT** tam olarak nedir, hangi alanları var? | **AÇIK** | Sonar sistem ekibi | `F7-020` frame başlığı çözümü | Ham alan olarak saklanır, **yorumlanmaz** ve hiçbir hesaba girdi olmaz. Inspector'da ham gösterilir. "Coherent Integration Time" olduğu **varsayılmaz** |
 | D-31 | **PRI değeri ve Tx süresi** nedir? | **AÇIK** | Sonar sistem ekibi | `F7-059`, `F7-060` | Üreteç PRI'yı **parametre** alır; belgeye ve koda sabit bir değer yazılmaz. Gerçek kayıt geldiğinde ölçülür |
 | D-32 | Bir frame'in 820 örneği **tam PRI'yı mı** kapsıyor? | **AÇIK** | Sonar sistem ekibi | `F7-022`, `F7-060` | İki olasılık var: ya 820 örnek tam PRI'dır ve Tx/Rx parçaları ayrı dosyalara yazılır — bu durumda Tx ve Rx frame boyutları **değişkendir** — ya da her akımın kendi 820 örneklik frame'i vardır. Üreteç ikisini de üretebilecek biçimde kurulur |
-| D-33 | Zaman ekseni **frame sayacından mı timestamp'ten mi** türeyecek? | **VARSAYIM** | Bu proje | `F7-005` | İkisi 10 dakikanın sonunda 0,586 s ayrışır. Seçim kodda **tek bir yerde** tanımlanmalı; iki panel iki kaynaktan türetirse aynı kayıt için iki farklı zaman gösterir. `F7-005` ile karara bağlanacak |
+| D-33 | Zaman ekseni **frame sayacından mı timestamp'ten mi** türeyecek? | **KAPALI** | Bu proje | `F7-005` tamamlandı | **Kanonik zaman timestamp'tir** (`ADR-003` gereği). Frame sayacı yalnız sıralama, boşluk tespiti ve tutarlılık ölçümü için kullanılır. Belirleyici gerekçe: yayın yapılmayan saniyede Tx dosyası üretilmez; sayaç tabanlı eksen o boşluğu göremez ve sonraki bütün Tx frame'lerini yanlış ana yerleştirir. Ayrıntı `docs/format/profile-c.md` §6 |
 
 ### 5.2 Ham veri analizi (Faz 8)
 

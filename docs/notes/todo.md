@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 655 madde · 484 tamamlandı · 171 kaldı**
+**Toplam 655 madde · 485 tamamlandı · 170 kaldı**
 
-`[##################......]` %73.9
+`[##################......]` %74.0
 
 ## Özet
 
@@ -41,10 +41,10 @@ Work in fully autonomous mode.
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 41 | 0 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 35 | 0 | 35 |
-| Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema | 4 | 76 | 80 |
+| Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema | 5 | 75 | 80 |
 | Faz 8 — Tx/Rx ham veri analizi ve sensör sağlığı | 0 | 76 | 76 |
 | Bölüm içi kontrol listeleri | 126 | 19 | 145 |
-| **Toplam** | **484** | **171** | **655** |
+| **Toplam** | **485** | **170** | **655** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -437,7 +437,7 @@ Work in fully autonomous mode.
 | [x] | `F6-034` | `4.0.0` | 15 dk | Dağıtım milestone kabulünü kapat ve major sürümü hazırla |
 | [x] | `F6-035` | `3.35.0` | 20 dk | Kalite bayraklarını dışa aktarmaya ve paket denetimine taşı |
 
-### Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema (4/80)
+### Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema (5/80)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -445,7 +445,7 @@ Work in fully autonomous mode.
 | [x] | `F7-002` | `4.7.0` | 20 dk | Kullanıcı kararlarını ve kalan açık kararları kayda geç |
 | [x] | `F7-003` | `4.8.0` | 20 dk | Bayt bütçesi ve zaman kayması tablosunu belgeye yaz |
 | [x] | `F7-004` | `4.9.0` | 20 dk | C++ struct → TOML eşleme sözleşmesini yaz |
-| [ ] | `F7-005` | `4.10.0` | 20 dk | Zaman ekseninin tek kaynağını sözleşmeye bağla |
+| [x] | `F7-005` | `4.10.0` | 20 dk | Zaman ekseninin tek kaynağını sözleşmeye bağla |
 | [ ] | `F7-006` | `4.11.0` | 20 dk | Örnek TOML şema dosyasını yaz (enum + struct + FrameHeader) |
 | [ ] | `F7-007` | `4.12.0` | 20 dk | cpp tipi → Python struct kodu → NumPy dtype eşleme tablosunu kur |
 | [ ] | `F7-008` | `4.13.0` | 20 dk | Şema yükleyicisini ve sürüm alanını ekle |

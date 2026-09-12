@@ -405,8 +405,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F7-001` | 20 dk | 13 dk 15 sn | `4dbab84` | profil C klasör ve dosya sözleşmesi taslağını yaz |
 | `F7-002` | 20 dk | 11 dk 49 sn | `14c6b5d` | kullanıcı kararlarını ve kalan açık kararları kayda geç |
 | `F7-003` | 20 dk | 10 dk 1 sn | `a7dfaf3` | bayt bütçesi ve zaman kayması tablosunu belgeye yaz |
+| `F7-004` | 20 dk | 33 dk 52 sn | `39ce855` | C++ struct → TOML eşleme sözleşmesini yaz |
 
-**387 commit · olculen toplam 5575 dk 3 sn · olculemeyen 1 (ilk commit)**
+**388 commit · olculen toplam 5608 dk 55 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

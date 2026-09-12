@@ -430,8 +430,12 @@ def test_the_open_decisions_are_not_quietly_answered(text: str) -> None:
         assert re.search(pattern, text), f"{decision} acik olarak isaretlenmemis"
 
 
-def test_the_time_axis_decision_is_deferred_to_a_named_task(text: str) -> None:
-    assert "`F7-005` ile karara bağlanacak" in text
+def test_the_time_axis_decision_is_closed_with_its_answer(text: str) -> None:
+    """`F7-005` ile kapandı; tabloda cevabı ve nereye bakılacağı yazılı olmalı."""
+    row = next(line for line in text.splitlines() if line.startswith("| `D-33` |"))
+    assert "**Kapalı**" in row
+    assert "timestamp kanonik" in row
+    assert "§6" in row
 
 
 def test_the_document_does_not_invent_a_pri_value(text: str) -> None:
