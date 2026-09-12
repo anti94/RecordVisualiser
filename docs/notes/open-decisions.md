@@ -6,7 +6,7 @@
 > Her satır: kimin karar vereceği, hangi işleri engellediği ve **cevap gelmezse hangi varsayımla
 > ilerlendiği**. Varsayımla ilerlenen iş `KISMİ` sayılır; gerçek cevap geldiğinde geri dönülür.
 >
-> Son güncelleme: 2026-09-08 · Depo sürümü `v0.15.0`
+> Son güncelleme: 2026-09-12 · Depo sürümü `v4.7.0`
 
 ## Durum kodları
 
@@ -61,7 +61,61 @@
 
 ---
 
-## 5. Aciliyet sırası
+## 5. Profil C kayıt mimarisi ve ham veri analizi
+
+`F7-002` çıktısı. Faz 7 ve Faz 8'in dayandığı kararlar. Dördü proje sahibi tarafından
+cevaplandı ve **KAPALI**; kalanlar açık ve varsayımla ilerleniyor.
+
+### 5.1 Kayıt yapısı (Faz 7)
+
+| ID | Konu | Durum | Karar sahibi | Engellediği işler | Cevap / varsayım |
+| --- | --- | --- | --- | --- | --- |
+| D-26 | **Azami kayıt süresi** nedir? | **KAPALI** | Proje sahibi | `F7-003`, `F7-032`, `F7-074` | **10 dakika.** Akım başına 600 dosya, toplam ≤ 1.200. 4 saatlik varsayımda 28.800 dosya çıkıyordu; tavan bunu 24 kat küçülttü |
+| D-27 | 8192 Hz ile **820 örnek/100 ms** aynı anda doğru olamaz; hangisi bağlayıcı? | **KAPALI** | Proje sahibi | `F7-005`, `F7-026` | **820 örnek bağlayıcı, kayma kabul edildi.** Frame süresi 100,0977 ms; 10 dakikada 0,586 s birikir |
+| D-28 | **Complex örnek tipi** nedir? | **KAPALI** | Proje sahibi | `F7-021`, `F7-070` | **`complex64`** (float32 I/Q, 8 bayt). 10 dakikalık kayıt 1,173 GiB eder ve MAT v5'in 2 GiB sınırının %59'unda kalır. `complex128` çıksaydı 2,346 GiB olurdu, sınır aşılır ve `h5py` bağımlılığı gerekirdi |
+| D-29 | Kayıt dosyalarını **kim yazıyor**? | **KAPALI** | Proje sahibi | Faz 7'nin bütün çerçevesi | **C++ tarafı.** Python yalnız okur. TOML, C++ struct ve enum tanımlarının tarifidir; bizim tanımladığımız bir yapı değildir. Sentetik üreteç yalnız test içindir |
+| D-30 | **CIT** tam olarak nedir, hangi alanları var? | **AÇIK** | Sonar sistem ekibi | `F7-020` frame başlığı çözümü | Ham alan olarak saklanır, **yorumlanmaz** ve hiçbir hesaba girdi olmaz. Inspector'da ham gösterilir. "Coherent Integration Time" olduğu **varsayılmaz** |
+| D-31 | **PRI değeri ve Tx süresi** nedir? | **AÇIK** | Sonar sistem ekibi | `F7-059`, `F7-060` | Üreteç PRI'yı **parametre** alır; belgeye ve koda sabit bir değer yazılmaz. Gerçek kayıt geldiğinde ölçülür |
+| D-32 | Bir frame'in 820 örneği **tam PRI'yı mı** kapsıyor? | **AÇIK** | Sonar sistem ekibi | `F7-022`, `F7-060` | İki olasılık var: ya 820 örnek tam PRI'dır ve Tx/Rx parçaları ayrı dosyalara yazılır — bu durumda Tx ve Rx frame boyutları **değişkendir** — ya da her akımın kendi 820 örneklik frame'i vardır. Üreteç ikisini de üretebilecek biçimde kurulur |
+| D-33 | Zaman ekseni **frame sayacından mı timestamp'ten mi** türeyecek? | **VARSAYIM** | Bu proje | `F7-005` | İkisi 10 dakikanın sonunda 0,586 s ayrışır. Seçim kodda **tek bir yerde** tanımlanmalı; iki panel iki kaynaktan türetirse aynı kayıt için iki farklı zaman gösterir. `F7-005` ile karara bağlanacak |
+
+### 5.2 Ham veri analizi (Faz 8)
+
+| ID | Konu | Durum | Karar sahibi | Engellediği işler | Cevap / varsayım |
+| --- | --- | --- | --- | --- | --- |
+| D-34 | **ADC bit derinliği, tam ölçek gerilimi ve analog kazanç** nedir? | **AÇIK** | Donanım ekibi | Mutlak seviye ürünleri | Ham sayılar **Volt değildir**. Sabitler girilene kadar birim `count`; arayüzde `V` ve `mV` kelimesi hiç geçmez. Tamsayı dtype'ta `dBFS` verilebilir; float veride tam ölçek kayıp olduğu için `dBFS` bile tanımsızdır |
+| D-35 | **Hidrofon duyarlılığı** (dB re 1 V/µPa) sertifikası var mı? | **AÇIK** | Donanım ekibi | Mutlak akustik seviye | Basınç birimi (`Pa`, `dB re 1 µPa`) **hiç kullanılmaz**. Kanal farkları sağlık göstergesi olarak raporlanır; dizi medyanından sapma ve zaman içindeki değişim vurgulanır |
+| D-36 | **Temel banda indirme konvansiyonu** nedir (2cos/−2sin mi, cos/sin mi)? | **AÇIK** | Sonar sistem ekibi | Mutlak genlik ürünleri | Kanal-kanal **göreli** karşılaştırmada ortak çarpan olarak sadeleşir, etkisizdir. Mutlak genlik ürünleri `±6 dB konvansiyon belirsizliği` notuyla yayımlanır |
+| D-37 | 32 kanalın **hepsi hidrofon mu**, bazıları monitör/referans mı? | **AÇIK** | Sonar sistem ekibi | Eleman sağlık karar motoru | Hepsi hidrofon varsayılır ve bu varsayım her seviye raporunun başına yazılır. Monitör kanalı varsa maskelenebilmesi için kanal dışlama arayüzü hazır tutulur |
+| D-38 | Kanallar **eşzamanlı mı** örnekleniyor, yoksa sıralı multipleks mi? | **AÇIK** | Donanım ekibi | Kanal-arası faz metrikleri | Eşzamanlı varsayılır. Multipleks çıkarsa kanal-kanal faz metriklerinden önce sabit gecikme çıkarılmalıdır; bu, bütün göreli faz ölçümlerini kaydırır |
+| D-39 | **Tx klasöründeki veri tam olarak nedir**: verici sürüş geri okuması mı, monitör hidrofonu mu, alıcı dizinin yayın anındaki kaydı mı? | **AÇIK** | Sonar sistem ekibi | Tx envanteri ve yorumu | Kanal ve örnek sayısı dosya boyutundan **ölçülür**, varsayılmaz. Cevap gelene kadar ölçümler `kaynak belirsiz` etiketiyle sunulur; "projektör sağlığı" ya da "alıcı kanal arızası" gibi nedensel ifade kullanılmaz |
+| D-40 | Kayıt zincirinde **AGC/TVG** uygulanıyor mu? Uygulanıyorsa anlık kazanç frame başlığında mı? | **AÇIK** | Sonar sistem ekibi | Bütün seviye analizi | "Uygulanmamıştır" **varsayılmaz**; veriden test edilir. PRI'dan PRI'ya kuantumlu basamaklı taban sıçraması AGC imzasıdır. İmza bulunursa seviye metrikleri `AGC şüphesi` bayrağıyla işaretlenir |
+| D-41 | **Tx ve Rx aynı saatten mi** besleniyor? Timestamp kaynağı ve çözünürlüğü nedir? | **AÇIK** | Sonar sistem ekibi | Darbe-arası faz kararlılığı | Ölçülen kararsızlığın sistem kararsızlığı mı, iki bağımsız saatin serbest koşusu mu olduğu bu cevap olmadan **yorumlanamaz**; çıktı bu uyarıyla yayımlanır |
+
+### 5.3 Dış girdiler
+
+| ID | Konu | Durum | Karar sahibi | Engellediği işler | Varsayım |
+| --- | --- | --- | --- | --- | --- |
+| E-11 | **Gerçek bir Profil C kaydı** ve onu üreten C++ struct/enum tanımları | **AÇIK** | Sonar sistem ekibi | `F7-080` kabul turu | Sentetik senaryolarla ilerleniyor. Sentetik kanıt gerçek donanım doğrulaması sayılmaz; gerçek kayıt geldiğinde TOML şeması onunla karşılaştırılacak |
+
+### 5.4 Kapsam dışına çıkan sorular
+
+Aşağıdaki sorular ilk tasarımda açık karar olarak duruyordu. Proje sahibinin kapsam
+kararıyla — hüzmeleme, eşleştirilmiş filtre, TVG, normalizasyon, CFAR, tespit ve iz sürme
+**kapsam dışıdır** — bu soruların cevabına artık ihtiyaç yoktur:
+
+| Soru | Neden artık gerekmiyor |
+| --- | --- |
+| Dizi geometrisi (sınıf, eleman aralığı, açıklık) | Yalnız hüzmeleme ve derece cinsinden yön için gerekliydi |
+| Ses hızı ve SVP profili | Yalnız menzil ekseni ve hüzmeleme gecikmeleri için gerekliydi |
+| Taşıyıcı frekans | Yalnız mutlak frekans ekseni ve Doppler'den hıza dönüşüm için gerekliydi |
+| Menzil ekseninin sıfır noktası | Yalnız A-scan ve B-scan menzil ekseni için gerekliydi |
+
+Bu sorular kapsam genişlerse yeniden açılır. Kayıt altında tutulmalarının nedeni budur.
+
+---
+
+## 6. Aciliyet sırası
 
 Cevabı **en erken** gereken üç madde:
 
@@ -73,7 +127,16 @@ Cevabı **en erken** gereken üç madde:
 Sonra gelenler: D-15 (hedef makine, performans kabulü için), D-06/D-07 (kanal ve BIT katalogları,
 arayüzün gerçek adları gösterebilmesi için), D-21 (arayüz dili, metinler yazılmadan önce).
 
-## 6. Güncelleme kuralı
+**Faz 7 ve Faz 8 için en erken gereken üçü:**
+
+1. **D-32 (frame 820 örnek tam PRI'yı mı kapsıyor)** — `F7-022` ve sentetik üreteç buna
+   bağlı; yanlış varsayım üretilen bütün test verisini boşa çıkarır.
+2. **E-11 (gerçek Profil C kaydı ve C++ struct tanımları)** — TOML şeması ancak gerçek bir
+   dosyayla doğrulanabilir; `F7-080` kabulü bunsuz "gerçek veri doğrulandı" diyemez.
+3. **D-39 (Tx klasöründeki veri tam olarak nedir)** — cevabı Tx analizinin **yorumunu**
+   değiştirir: aynı sayı ya projektör sağlığını ya alıcı kanalını anlatır.
+
+## 7. Güncelleme kuralı
 
 - Cevap geldiğinde satır `KAPALI` yapılır; cevap, tarih ve kaynak yazılır.
 - Varsayım gerçekle çelişirse: ilgili belgeler güncellenir, etkilenen işler `plan.md`'de yeniden

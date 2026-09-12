@@ -402,8 +402,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `-` | — | 1 dk 11 sn | `5d82627` | kalan çoklu-panel işini net tanımla |
 | `-` | — | 576 dk 6 sn | `78b66dd` | C4 modeli, guncel README ve videolu demo ekle |
 | `-` | — | 262 dk 43 sn | `ac9d1a0` | Faz 7 ve Faz 8'i plana ekle |
+| `F7-001` | 20 dk | 13 dk 15 sn | `4dbab84` | profil C klasör ve dosya sözleşmesi taslağını yaz |
 
-**384 commit · olculen toplam 5539 dk 58 sn · olculemeyen 1 (ilk commit)**
+**385 commit · olculen toplam 5553 dk 13 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
