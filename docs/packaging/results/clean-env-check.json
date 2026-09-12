@@ -1,6 +1,6 @@
 {
-  "executable": "D:\\Code\\SignalProcessing\\dist\\sonar-analyzer-3.4.0\\sonar-analyzer.exe",
-  "version_reported": "sonar-analyzer 3.4.0",
+  "executable": "D:\\Code\\SignalProcessing\\dist\\sonar-analyzer-4.0.0\\sonar-analyzer.exe",
+  "version_reported": "sonar-analyzer 4.0.0",
   "self_check_exit": 0,
   "self_check_lines": [
     "platform plugin: windows",
@@ -9,9 +9,11 @@
     "ikon: sonar-analyzer.ico",
     "sonuc: TAMAM"
   ],
-  "removed_env_vars": [],
-  "removed_path_entries": 15,
-  "remaining_path_entries": 59,
+  "removed_env_vars": [
+    "PYTHONIOENCODING"
+  ],
+  "removed_path_entries": 14,
+  "remaining_path_entries": 51,
   "python_on_path": false,
   "machine": {
     "platform": "Windows-10-10.0.26200-SP0"

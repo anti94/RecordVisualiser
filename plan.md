@@ -1855,7 +1855,7 @@ Kabul: Kurulabilir Windows paketi, dokümantasyon, sürüm artefaktları ve dağ
 | [x] | `F6-031` | `3.31.0` | 20 dk | Paketli ana ekranı referans mockup ile karşılaştır | Dokuz bölge, hiyerarşi, tema ve çalışan ana analizler kabul listesini karşılar | `F6-030` | `test(ui): F6-031 paketli ana ekranı referans mockup ile karşılaştır` |
 | [x] | `F6-032` | `3.32.0` | 20 dk | Release ve geri dönüş prosedürünü yaz | Önceki paket ve kullanıcı ayarlarının geri yükleme adımları uygulanabilirdir | `F6-031` | `docs(release): F6-032 release ve geri dönüş prosedürünü yaz` |
 | [x] | `F6-033` | `3.33.0` | 15 dk | Major sürüm notları ve milestone özetini hazırla | Kapsam, kontroller, bilinen sorunlar ve artefaktlar tutarlıdır | `F6-032` | `docs(release): F6-033 major sürüm notları ve milestone özetini hazırla` |
-| [ ] | `F6-034` | `4.0.0` | 15 dk | Dağıtım milestone kabulünü kapat ve major sürümü hazırla | Kurulum, mockup kabulü, kalite kapıları ve yayın belgeleri tamdır | `F6-033` | `chore(release): F6-034 dağıtım milestone kabulünü kapat ve major sürümü hazırla` |
+| [x] | `F6-034` | `4.0.0` | 15 dk | Dağıtım milestone kabulünü kapat ve major sürümü hazırla | Kurulum, mockup kabulü, kalite kapıları ve yayın belgeleri tamdır | `F6-033` | `chore(release): F6-034 dağıtım milestone kabulünü kapat ve major sürümü hazırla` |
 | [x] | `F6-035` | `3.35.0` | 20 dk | Kalite bayraklarını dışa aktarmaya ve paket denetimine taşı | CRC/gap işaretli örnekler CSV'de ve `--bin-check` özetinde görünür | `F6-030` | `fix(export): F6-035 kalite bayraklarını dışa aktarmaya ve paket denetimine taşı` |
 
 > `F6-035`, `F6-030` kabul turunun **başarısız** adımından (`M-05`) doğdu:

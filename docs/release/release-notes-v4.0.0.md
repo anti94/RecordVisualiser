@@ -100,7 +100,7 @@ bilmediğimiz bir şeyi biliyormuş gibi göstermek olurdu.
 ## Geri dönüş
 
 Geri dönüş prosedürü yazılmakla kalmadı, **provası yapıldı**:
-`3.35.0` → `3.8.0` geri dönüşü gerçek installer'larla yürütüldü ve 12
+`4.0.0` → `3.8.0` geri dönüşü gerçek installer'larla yürütüldü ve 12
 adımın tamamı geçti (`docs/release/release-and-rollback.md`).
 
 Kullanıcı ayarları kurulum dizininin dışında yaşadığı için kaldırma

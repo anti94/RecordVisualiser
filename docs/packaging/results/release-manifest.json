@@ -1,24 +1,24 @@
 {
-  "version": "3.35.0",
-  "created_utc": "2026-09-12T01:15:16+00:00",
+  "version": "4.0.0",
+  "created_utc": "2026-09-12T01:27:40+00:00",
   "artifacts": [
     {
-      "name": "sonar-analyzer-3.35.0-setup.exe",
+      "name": "sonar-analyzer-4.0.0-setup.exe",
       "kind": "installer",
-      "size_bytes": 43756204,
-      "sha256": "e27d7089404397239a8d9e606e6744e4166b6d43da0100b3b426e3791aa14c92",
-      "version_in_name": "3.35.0",
+      "size_bytes": 43774995,
+      "sha256": "62c3e9a745019890e3377f682dee9fbb65078c914b46cee48233b9a266338ef9",
+      "version_in_name": "4.0.0",
       "version_reported": "",
       "consistent": true,
       "note": ""
     },
     {
-      "name": "sonar-analyzer-3.35.0/sonar-analyzer.exe",
+      "name": "sonar-analyzer-4.0.0/sonar-analyzer.exe",
       "kind": "package",
       "size_bytes": 4618523,
       "sha256": "b6957f88fe0876ef119f550c1b850eaf4c0ae3af368474b0c48c934e243e62e3",
-      "version_in_name": "3.35.0",
-      "version_reported": "3.35.0",
+      "version_in_name": "4.0.0",
+      "version_reported": "4.0.0",
       "consistent": true,
       "note": ""
     }

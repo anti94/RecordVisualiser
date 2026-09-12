@@ -12,7 +12,7 @@ Bir sınırlamayı yazmamak onu ortadan kaldırmaz; yalnız kullanıcının onu
 izlenen sınırlardır — kapanma koşulu belli olmayan hiçbiri listede
 kalmamalıdır.
 
-Son güncelleme: `v3.35.0` · Kapsam: Faz 0–6 · Toplam açık madde: **20**
+Son güncelleme: `v4.0.0` · Kapsam: Faz 0–6 · Toplam açık madde: **20**
 
 ## Özet
 

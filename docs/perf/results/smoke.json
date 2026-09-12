@@ -4,12 +4,12 @@
   "measurements": [
     {
       "name": "open",
-      "best_ms": 0.849,
+      "best_ms": 0.928,
       "budget_ms": 500.0
     },
     {
       "name": "query",
-      "best_ms": 0.053,
+      "best_ms": 0.051,
       "budget_ms": 250.0
     },
     {

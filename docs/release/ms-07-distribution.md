@@ -153,3 +153,29 @@ Faz kabul ölçütünün dört başlığı da karşılandı:
 Kabul turunun düşen adımı **kapatıldı** (`F6-035`) ve turun bulgusu
 belgelerde izlenebilir kaldı. Bir kabul turunun değeri, geçmesi değil,
 geçmediğinde ne olduğudur.
+
+### 9.1 Kapanış koşusu
+
+Milestone, **`4.0.0` paketiyle** kapatıldı. Kapanıştan önce paket ve
+kurulum dosyası yeniden üretildi ve paketli denetimlerin tamamı o
+sürümle tekrarlandı:
+
+| Denetim | Sonuç |
+| --- | --- |
+| Temiz ortamda açılış (`clean_env_check`) | **TAMAM** — `sonar-analyzer 4.0.0`, PATH'te Python yok |
+| Paketli kabul turu (`acceptance_run`) | **9/9** |
+| Mockup karşılaştırması (`mockup_compare`) | **7/7** |
+| Geri dönüş provası (`rollback_check`) | **12/12** (`4.0.0` → `3.8.0`) |
+| Artefakt manifesti (`release_manifest`) | **TAMAM** — installer + paket, SHA-256'lı |
+| Sürüm tutarlılık kapısı (`release_guard`) | **TAMAM** — etiket, `VERSION` ve artefaktlar aynı sürüm |
+
+Kanıtların hepsi kayıtlıdır ve sürümleri `4.0.0`'dır: daha eski bir
+sürümün kanıtıyla milestone kapatmak, neyin kabul edildiğini belirsiz
+kılardı.
+
+### 9.2 Faz 6 sonrası durum
+
+Plan'ın numaralı işlerinin (`F0-001`–`F6-035`) tamamı kapandı.
+Geriye plan bölümlerinin içindeki **kontrol listesi maddeleri** kalıyor;
+bunlar ayrı iş kayıtları değil, bölüm içi hatırlatmalardır ve kendi
+bölümlerinde izlenir.
