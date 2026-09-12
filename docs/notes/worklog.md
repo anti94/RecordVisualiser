@@ -407,8 +407,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F7-003` | 20 dk | 10 dk 1 sn | `a7dfaf3` | bayt bütçesi ve zaman kayması tablosunu belgeye yaz |
 | `F7-004` | 20 dk | 33 dk 52 sn | `39ce855` | C++ struct → TOML eşleme sözleşmesini yaz |
 | `F7-005` | 20 dk | 35 sn | `16e4c92` | zaman ekseninin tek kaynağını sözleşmeye bağla |
+| `F7-006` | 20 dk | 12 dk 51 sn | `fbb8a97` | örnek TOML şema dosyasını yaz |
 
-**389 commit · olculen toplam 5609 dk 30 sn · olculemeyen 1 (ilk commit)**
+**390 commit · olculen toplam 5622 dk 21 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

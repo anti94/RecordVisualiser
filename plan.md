@@ -1890,7 +1890,7 @@ kaydın uyuşmadığı durumda **sessizce yanlış okumamaktır**.
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [x] | `F7-006` | `4.11.0` | 20 dk | Örnek TOML şema dosyasını yaz (enum + struct + FrameHeader) | `tomllib` ile ayrıştırılır; `FrameHeader` bütün alanları offset ve cpp tipiyle doludur | `F7-005` | `feat(schema): F7-006 örnek TOML şema dosyasını yaz (enum + struct + FrameHeader)` |
-| [ ] | `F7-007` | `4.12.0` | 20 dk | cpp tipi → Python struct kodu → NumPy dtype eşleme tablosunu kur | 13 temel cpp tipi için üç gösterim de tanımlı; bilinmeyen tip `SchemaTypeError` verir | `F7-006` | `feat(schema): F7-007 cpp tipi → Python struct kodu → NumPy dtype eşleme tablosunu kur` |
+| [x] | `F7-007` | `4.12.0` | 20 dk | cpp tipi → Python struct kodu → NumPy dtype eşleme tablosunu kur | 13 temel cpp tipi için üç gösterim de tanımlı; bilinmeyen tip `SchemaTypeError` verir | `F7-006` | `feat(schema): F7-007 cpp tipi → Python struct kodu → NumPy dtype eşleme tablosunu kur` |
 | [ ] | `F7-008` | `4.13.0` | 20 dk | Şema yükleyicisini ve sürüm alanını ekle | Şema kimliği ve sürümü olmayan dosya `SchemaError` ile reddedilir | `F7-007` | `feat(schema): F7-008 şema yükleyicisini ve sürüm alanını ekle` |
 | [ ] | `F7-009` | `4.14.0` | 20 dk | Enum çözümleyicisini ekle | Değer → isim eşlemesi üretilir; yinelenen değer açık hata verir | `F7-008` | `feat(schema): F7-009 enum çözümleyicisini ekle` |
 | [ ] | `F7-010` | `4.15.0` | 20 dk | Struct alan çözümleyicisini ekle | Ad, tip, offset, dizi uzunluğu ve enum referansı okunur; eksik alan reddedilir | `F7-009` | `feat(schema): F7-010 struct alan çözümleyicisini ekle` |
