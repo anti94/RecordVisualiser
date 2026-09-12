@@ -9,31 +9,110 @@ görselindeki analiz panosu.
 
 ## Durum
 
-Geliştirme sürümü. Güncel sürüm [`VERSION`](VERSION) dosyasındadır.
-İlerleme: [`docs/notes/todo.md`](docs/notes/todo.md) · Tamamlanan fazlar:
-`ms/01-format-ready` (format sözleşmesi ve kabul ölçütleri).
+Sürüm **4.5.0** (tek kaynak: [`VERSION`](VERSION)). Planın yedi milestone'u da kapandı:
 
-> **Uyarı:** Elde gerçek cihaz kaydı yoktur. Format sözleşmesi taslaktır ve sentetik veriyle
-> çalışılmaktadır; sentetik sonuçlar gerçek donanım doğrulaması sayılmaz.
-> Ayrıntı: [`docs/format/inventory.md`](docs/format/inventory.md).
+| Milestone | Etiket | İçerik |
+| --- | --- | --- |
+| 1 | `ms/01-format-ready` | Format sözleşmesi ve kabul ölçütleri |
+| 2 | `ms/02-app-shell` | Uygulama kabuğu ve üç sütunlu yerleşim |
+| 3 | `ms/03-bin-reader` | `.bin` okuma, indeks, olay/BIT/TX çıkarımı |
+| 4 | `ms/04-mvp` | Çizim, gezinme, dışa aktarma |
+| 5 | `ms/05-analysis` | FFT/PSD, STFT, DSP zinciri, türetilmiş kanal |
+| 6 | `ms/06-live-recording` | Canlı bağlantı ve diske kayıt |
+| 7 | `ms/07-distribution` | Paketleme, NSIS kurulum, yayın kapıları |
+
+Planın 354 numaralı işinin tamamı bitti. Kalan 19 kontrol maddesi
+[`docs/notes/todo.md`](docs/notes/todo.md) içinde; bunların 14'ü paydaş sorusu,
+2'si dış veri bağımlılığı, 1'i hiç tetiklenmemiş bir koşul, 2'si ertelenen
+çoklu-panel işi. Hiçbiri kod yazılarak kapatılamaz durumda değil ama hiçbiri de
+bu depoda tek başına kapatılamaz.
+
+Testler: **5295** test, tamamı geçiyor. Tip denetimi pyright **strict**, sıfır hata.
+
+> **Uyarı — gerçek donanım doğrulaması yok.** Elde gerçek cihaz kaydı yoktur. Format
+> sözleşmesi taslaktır ve sentetik veriyle çalışılmaktadır; sentetik sonuçlar gerçek
+> donanım doğrulaması sayılmaz. Açık kararlar `E-01`/`E-02`, ayrıntı
+> [`docs/format/inventory.md`](docs/format/inventory.md).
+
+> **Uyarı — Profil B arayüzden açılamaz.** `io/decoders/` altında tam bir Profil B
+> çözücüsü ve testleri var, ama dosya açma yolu yalnız `FileRecordingRepository`
+> üretiyor ve o da yalnız Profil A okuyor. Bir Profil B dosyası `Open .bin File` ile
+> seçilirse `InvalidMagicError` alınır. Ayrıntı:
+> [`docs/architecture/c4-model.md`](docs/architecture/c4-model.md).
+
+## Videolu demo
+
+`docs/demo/sonar-analyzer-demo.mp4` — 55 saniye, 14 sahne. Video çalışan uygulamanın
+kendisidir: `tools/demo_video.py` ana pencereyi görünmez bir Qt platformunda açar,
+senaryoyu uygulamanın genel API'siyle sürer ve her adımda pencereyi yakalar.
+
+```powershell
+.venv\Scripts\python.exe tools\demo_video.py --out docs\demo\sonar-analyzer-demo.mp4
+```
+
+Üçüncü sahneden sonrası **simülasyon verisidir** ve altyazıda böyle yazar. Ayrıntı:
+[`docs/demo/README.md`](docs/demo/README.md).
+
+## Kurulum (son kullanıcı)
+
+Windows kurulum paketi kullanıcı başına kurulur, yönetici hakkı istemez:
+
+```text
+dist/sonar-analyzer-<sürüm>-setup.exe
+```
+
+Paketleme PyInstaller `onedir` + NSIS'tir; ayrıntı
+[`docs/adr/ADR-012-packaging.md`](docs/adr/ADR-012-packaging.md). Yayın ve geri dönüş
+prosedürü [`docs/release/release-and-rollback.md`](docs/release/release-and-rollback.md),
+bilinen sorunlar [`docs/release/known-issues.md`](docs/release/known-issues.md).
 
 ## Belgeler
+
+**Mimari ve plan**
 
 | Konu | Belge |
 | --- | --- |
 | Geliştirme planı (ana belge) | [`plan.md`](plan.md) |
+| C4 mimari modeli (bağlam → kod) | [`docs/architecture/c4-model.md`](docs/architecture/c4-model.md) |
+| Videolu demo | [`docs/demo/README.md`](docs/demo/README.md) |
+| Mimari karar kayıtları | [`docs/adr/README.md`](docs/adr/README.md) |
 | Yapılacaklar listesi | [`docs/notes/todo.md`](docs/notes/todo.md) |
 | İş günlüğü ve süreler | [`docs/notes/worklog.md`](docs/notes/worklog.md) |
 | Açık kararlar / dış bağımlılıklar | [`docs/notes/open-decisions.md`](docs/notes/open-decisions.md) |
+
+**Dosya biçimi**
+
+| Konu | Belge |
+| --- | --- |
+| Çözücü kılavuzu (A v1 / A v2 / B ayrımı) | [`docs/format/decoder-guide.md`](docs/format/decoder-guide.md) |
+| Profil A sözleşmesi | [`docs/format/profile-a.md`](docs/format/profile-a.md) |
+| Profil B sözleşmesi | [`docs/format/profile-b.md`](docs/format/profile-b.md) |
 | Örnek dosya envanteri | [`docs/format/inventory.md`](docs/format/inventory.md) |
-| Profil A format sözleşmesi | [`docs/format/profile-a.md`](docs/format/profile-a.md) |
 | 125 ms periyot ve adlandırma | [`docs/format/timing-and-naming.md`](docs/format/timing-and-naming.md) |
 | Kanal eşlemesi | [`docs/format/channel-map.md`](docs/format/channel-map.md) |
 | Fixture beklentileri | [`docs/format/fixture-valid-8records.md`](docs/format/fixture-valid-8records.md) · [`docs/format/fixture-corrupt.md`](docs/format/fixture-corrupt.md) |
+
+**Kullanım**
+
+| Konu | Belge |
+| --- | --- |
+| Ana ekran | [`docs/guide/ana-ekran.md`](docs/guide/ana-ekran.md) |
+| Klavye ve mouse | [`docs/guide/klavye-ve-mouse.md`](docs/guide/klavye-ve-mouse.md) |
+| Filtre ve spektral analiz | [`docs/guide/filtre-ve-spektral-analiz.md`](docs/guide/filtre-ve-spektral-analiz.md) |
+| Canlı bağlantı | [`docs/guide/canli-baglanti.md`](docs/guide/canli-baglanti.md) |
 | Kullanıcı senaryoları | [`docs/scenarios.md`](docs/scenarios.md) |
+
+**Arayüz, başarım, yayın**
+
+| Konu | Belge |
+| --- | --- |
 | Arayüz yerleşimi ve kabul listesi | [`docs/ui/layout-map.md`](docs/ui/layout-map.md) · [`docs/ui/acceptance-checklist.md`](docs/ui/acceptance-checklist.md) |
+| Mockup karşılaştırması (paketli) | [`docs/ui/packaged-mockup-comparison.md`](docs/ui/packaged-mockup-comparison.md) |
+| Paketli kabul turu | [`docs/acceptance/packaged-acceptance.md`](docs/acceptance/packaged-acceptance.md) |
 | Performans bütçesi | [`docs/perf/budget.md`](docs/perf/budget.md) |
-| Mimari karar kayıtları | [`docs/adr/README.md`](docs/adr/README.md) |
+| Büyük dosya ölçümleri | [`docs/perf/large-file-verdict.md`](docs/perf/large-file-verdict.md) |
+| Kalite kapıları (CI) | [`docs/ci/quality-gates.md`](docs/ci/quality-gates.md) |
+| Sürüm notları v4.0.0 | [`docs/release/release-notes-v4.0.0.md`](docs/release/release-notes-v4.0.0.md) |
 
 ## Geliştirme kurulumu
 
@@ -158,8 +237,10 @@ Pyright **strict** modda çalışır (`[tool.pyright]`). Pyright ilk çalıştı
 plan.md                 ana geliştirme planı
 VERSION                 uygulama sürümünün tek kaynağı
 pyproject.toml          paket tanımı ve araç yapılandırması
-src/sonar_analyzer/     uygulama paketi (katmanlar için bkz. paket docstring'i)
+src/sonar_analyzer/     uygulama paketi (katmanlar için bkz. docs/architecture/c4-model.md)
 tests/                  unit · integration · gui · performance · fixtures
-tools/                  yardımcı betikler (todo eşitleme, fixture üretici)
-docs/                   format, arayüz, performans, ADR ve notlar
+tools/                  yardımcı betikler (fixture üretici, ölçüm, paketleme, yayın kapıları)
+packaging/              PyInstaller spec, NSIS betiği, uygulama ikonu
+docs/                   mimari, format, arayüz, kullanım, performans, ADR, yayın
+dist/                   üretilen paketler ve kurulum dosyaları (sürüm denetimi dışı)
 ```
