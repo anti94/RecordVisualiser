@@ -17,7 +17,7 @@ from collections.abc import Callable, Sequence
 from datetime import datetime, timezone
 
 from PySide6.QtCore import QMimeData, QPoint, Qt, Signal
-from PySide6.QtGui import QGuiApplication
+from PySide6.QtGui import QColor, QGuiApplication
 from PySide6.QtWidgets import (
     QDockWidget,
     QFormLayout,
@@ -43,6 +43,8 @@ from sonar_analyzer.ui.docks.recording_tree import (
     flatten_channel_ids,
 )
 from sonar_analyzer.ui.drag_drop import CHANNEL_MIME_TYPE, encode_channel_id
+from sonar_analyzer.ui.status_icons import channel_source_style, make_status_icon
+from sonar_analyzer.ui.theme import DARK
 
 DOCK_OBJECT_NAME = "dock_data_explorer"
 DOCK_TITLE = "Data Explorer"
@@ -97,7 +99,18 @@ _CATEGORY_BUTTON_TEXT = {
 _CATEGORY_BUTTON_WIDTH = 46
 
 #: `F3-018` kanal sağ tık menüsü eylemleri, menüde görünen sırayla.
-CHANNEL_MENU_ACTIONS: tuple[str, ...] = ("Plot", "Inspect", "Copy Path")
+#:
+#: `Plot` grafiği o kanala çevirir, `Add to Existing Plot` var olan
+#: serileri **koruyarak** ekler; ikisi aynı şey değildir ve tek bir
+#: madde altında birleştirilemez. Sıra plan Bölüm 5.2 ve
+#: `docs/ui/acceptance-checklist.md` 2.11 ile aynıdır.
+CHANNEL_MENU_ACTIONS: tuple[str, ...] = (
+    "Plot",
+    "Inspect",
+    "Add to Existing Plot",
+    "Export",
+    "Copy Path",
+)
 
 
 def _category_slug(category: str) -> str:
@@ -212,6 +225,8 @@ class DataExplorerDock(QDockWidget):
     channel_inspect_requested = Signal(str)
     #: `F3-018`: sag tik > Copy Path — kanal yolu panoya kopyalandi (yol metni).
     channel_path_copied = Signal(str)
+    #: Sag tik > Export — kanalin disa aktarilmasi istendi (kanal kimligi).
+    channel_export_requested = Signal(str)
     #: `Open .bin File` tiklandi.
     open_requested = Signal()
 
@@ -497,6 +512,9 @@ class DataExplorerDock(QDockWidget):
         item = self._new_data_tree_item(parent, node.label)
         if node.is_leaf:
             item.setData(0, Qt.ItemDataRole.UserRole, node.channel_id)
+            channel = next((c for c in self._channels if c.id == node.channel_id), None)
+            if channel is not None:
+                self._decorate_channel_item(item, channel)
             return item
 
         item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsSelectable)
@@ -604,7 +622,7 @@ class DataExplorerDock(QDockWidget):
             leaf.setData(0, Qt.ItemDataRole.UserRole, channel.id)
             leaf.setFlags(leaf.flags() | Qt.ItemFlag.ItemIsUserCheckable)
             leaf.setCheckState(0, Qt.CheckState.Unchecked)
-            leaf.setToolTip(0, channel.path)
+            self._decorate_channel_item(leaf, channel)
 
         self.tree.expandAll()
         self.empty_hint.setVisible(not self._channels)
@@ -757,12 +775,47 @@ class DataExplorerDock(QDockWidget):
         """
         if action == "Plot":
             self.channel_activated.emit(channel_id)
+        elif action == "Add to Existing Plot":
+            # Coklu secimle ayni yol: var olan seriler korunur.
+            self.channels_add_requested.emit([channel_id])
         elif action == "Inspect":
             self.channel_inspect_requested.emit(channel_id)
+        elif action == "Export":
+            self.channel_export_requested.emit(channel_id)
         elif action == "Copy Path":
             self._copy_channel_path(channel_id)
         else:
             raise ValueError(f"Bilinmeyen kanal eylemi: {action!r}")
+
+    # -- kanal ikonlari (plan Bolum 5.2) -------------------------------
+
+    def _decorate_channel_item(self, item: QTreeWidgetItem, channel: ChannelMetadata) -> None:
+        """Kanal yaprağına tür ikonu ve açıklayıcı ipucu koyar.
+
+        İkon **yalnız renk değil**, bir de simge taşır (`status_icons`):
+        renk körlüğünde ve gri tonlamalı ekran görüntüsünde renge dayalı
+        bir ayrım kaybolurdu (plan Bölüm 6.4).
+
+        İpucu kanalın yolunu, türünü ve kaynakta bulunup bulunmadığını
+        yazar; "bağlantı durumu" burada **veri kaynağındaki varlıktır**:
+        kayıtta karşılığı olmayan bir kanal seçilemez ve nedeni görünür
+        olmalıdır.
+        """
+        style = channel_source_style(channel.source)
+        item.setIcon(0, make_status_icon(style))
+
+        available = channel.id in self._available_channel_ids
+        state = "kaynakta var" if available else "kaynakta yok"
+        item.setToolTip(0, f"{channel.path}\n{style.describe()} · {state}")
+        if not available:
+            # F3-013 kabulu: olmayan kanal secilemez ve sahte veriyle cizilmez.
+            item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsSelectable)
+            item.setForeground(0, QColor(DARK.text_secondary))
+
+    @property
+    def _available_channel_ids(self) -> set[str]:
+        """Kaynakta gerçekten bulunan kanal kimlikleri."""
+        return {channel.id for channel in self._channels}
 
     def _copy_channel_path(self, channel_id: str) -> None:
         channel = next((c for c in self._channels if c.id == channel_id), None)

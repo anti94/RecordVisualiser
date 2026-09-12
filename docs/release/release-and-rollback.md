@@ -45,6 +45,8 @@ Sırayla ve hepsi geçmeden yayın yapılmaz:
 | 11 | Geri dönüş provası | `python tools/rollback_check.py` |
 | 12 | Yayın bekçisi | `python tools/release_guard.py` |
 
+Kapı 12 yalnız etiket/`VERSION`/manifest uyumuna bakmaz; **9, 10 ve 11. kapıların kanıt dosyalarının da yayınlanan sürümle koşulmuş olmasını** arar. Geliştirme sırasında `VERSION` kanıtın önüne geçebilir — bu normaldir; ama eski bir sürümün kanıtıyla yayın yapmak, kabul edilen şeyin ne olduğunu belirsiz kılardı.
+
 Kapı 11 **yayından önce** çalıştırılır. Geri dönüşü ilk kez gerçek bir
 olayda denemek, en kötü anda öğrenmek demektir.
 

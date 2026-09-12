@@ -15,6 +15,13 @@ yanlış sürümü kurar, hata raporu yanlış sürüme yazılır ve iz sürüle
 Bu araç yayın adımından **önce** koşar ve uyuşmazlıkta durur. Artefakt
 denetimi `F6-009`'un manifestine devredilir; burada asıl soru etiket ile
 `VERSION`'ın aynı olup olmadığıdır.
+
+Kapı ayrıca **paketli denetimlerin kanıtını** yayınlanan sürümle
+karşılaştırır (kabul turu, mockup karşılaştırması, geri dönüş provası).
+Geliştirme sırasında `VERSION` kanıtın önüne geçer — bu normaldir ve her
+küçük değişiklikte paketi yeniden üretmek boşa iş olurdu. Katı eşitlik
+bu yüzden testlerde değil, **tam burada** aranır: eski bir sürümün
+kanıtıyla yayın yapmak, kabul edilen şeyin ne olduğunu belirsiz kılar.
 """
 
 from __future__ import annotations
@@ -80,8 +87,16 @@ def current_tag() -> str:
     return versions[0] if versions else ""
 
 
-def check(tag: str = "", manifest_path: Path | None = None) -> ReleaseGuardReport:
-    """Etiket, `VERSION` ve (varsa) manifest sürümünü karşılaştırır."""
+def check(
+    tag: str = "",
+    manifest_path: Path | None = None,
+    evidence: tuple[tuple[str, Path], ...] | None = None,
+) -> ReleaseGuardReport:
+    """Etiket, `VERSION`, manifest ve paketli denetim kanıtlarını karşılaştırır.
+
+    `evidence` verilmezse depo içindeki gerçek kanıt dosyaları
+    kullanılır; testler kendi dosyalarını verebilir.
+    """
     version = read_version()
     effective_tag = tag or current_tag()
     report = ReleaseGuardReport(
@@ -115,7 +130,64 @@ def check(tag: str = "", manifest_path: Path | None = None) -> ReleaseGuardRepor
         if inconsistent:
             report.problems.append(f"Tutarsiz artefakt: {', '.join(map(str, inconsistent))}")
 
+    _check_packaged_evidence(version, report, PACKAGED_EVIDENCE if evidence is None else evidence)
     return report
+
+
+#: Paketli uygulama uzerinde yurutulen denetimlerin kanit dosyalari.
+#: Her biri hangi surumle kosuldugunu yazar; yayin aninda hepsi
+#: yayinlanan surumle ayni olmak zorundadir.
+PACKAGED_EVIDENCE: tuple[tuple[str, Path], ...] = (
+    ("kabul turu", ROOT / "docs" / "acceptance" / "results" / "packaged-acceptance.json"),
+    (
+        "mockup karsilastirmasi",
+        ROOT / "docs" / "ui" / "results" / "packaged-mockup-comparison.json",
+    ),
+    ("geri donus provasi", ROOT / "docs" / "packaging" / "results" / "rollback-check.json"),
+)
+
+
+def _evidence_version(payload: dict[str, object]) -> str:
+    """Kanıt dosyasının hangi sürümle koşulduğu.
+
+    Geri dönüş provası sürümü doğrudan yazmaz; **yeni** paketin
+    installer adından okunur (`sonar-analyzer-4.0.0-setup.exe`).
+    """
+    direct = payload.get("version")
+    if isinstance(direct, str) and direct:
+        return direct
+    installer = payload.get("current_installer")
+    if isinstance(installer, str) and installer:
+        return installer.replace("sonar-analyzer-", "").replace("-setup.exe", "")
+    return ""
+
+
+def _check_packaged_evidence(
+    version: str,
+    report: ReleaseGuardReport,
+    evidence: tuple[tuple[str, Path], ...],
+) -> None:
+    """Paketli denetimlerin kanıtı yayınlanan sürümle aynı mı.
+
+    Geliştirme sırasında `VERSION` kanıtın önüne geçer; bu normaldir ve
+    her küçük değişiklikte paketi yeniden üretmek boşa iş olurdu. Ama
+    **yayın anında** eski bir sürümün kanıtıyla çıkmak, kabul edilen
+    şeyin ne olduğunu belirsiz kılar — bu yüzden katı denetim tam
+    buraya konur.
+    """
+    for label, path in evidence:
+        if not path.is_file():
+            report.problems.append(f"{label} kaniti yok: {path.name}")
+            continue
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        found = _evidence_version(payload)
+        if found != version:
+            report.problems.append(
+                f"{label} kaniti {found or 'bilinmiyor'} surumuyle kosulmus, "
+                f"VERSION {version}. Paketi yeniden uretip denetimi tekrarlayin."
+            )
+        if payload.get("ok") is False:
+            report.problems.append(f"{label} basarisiz sonuclanmis; yayin yapilmamali.")
 
 
 def main(argv: list[str] | None = None) -> int:

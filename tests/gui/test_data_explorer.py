@@ -238,7 +238,8 @@ def test_channel_labels_include_unit(dock: DataExplorerDock) -> None:
     child = dock.item_for_channel("ch0")
     assert child is not None
     assert child.text(0) == "Pressure [bar]"
-    assert child.toolTip(0) == "Sensors/Pressure"
+    # Etiket kisaltilabilir; ipucu TAM yolu gostermeye devam etmeli.
+    assert child.toolTip(0).startswith("Sensors/Pressure")
 
 
 def test_repository_query_still_works_after_ui_use() -> None:

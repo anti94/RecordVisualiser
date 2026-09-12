@@ -205,11 +205,11 @@ Yapılacaklar:
 - [x] Lazy-loading destekli model/view tabanlı ağaç oluştur.  (`F3-009` ağaç modeli, `F3-010` lazy yükleme)
 - [x] Kanal adına, ID’ye, birime ve kaynağa göre arama ekle.  (`F3-011`; dört alan da testlerle kapsandı)
 - [x] `Sensors`, `BIT`, `Transmission`, `Derived` hızlı filtreleri ekle.  (`F3-012`)
-- [ ] Kanal türü, bağlantı durumu ve alarm seviyesi için ikon sistemi belirle.  **AÇIK:** severity ikonları `ui/status_icons.py` ile tanımlı ve olay tablosunda kullanılıyor; kanal türü ve bağlantı durumu için ikon ağaçta yok.
+- [x] Kanal türü, bağlantı durumu ve alarm seviyesi için ikon sistemi belirle.  (kanal türü ikonları `ui/status_icons.py` `CHANNEL_SOURCE_STYLES`; her ikon simge + metin taşır, ipucu kaynakta bulunma durumunu yazar)
 - [x] Kanalı çift tıklama ve sürükle-bırak ile grafiğe ekle.  (`F3-013` çift tık, `F3-015` sürükle-bırak)
 - [ ] Çoklu seçim ve “seçilenleri aynı grafikte/yeni grafiklerde aç” komutu ekle. (`F3-016`: “aynı grafikte” kısmı yapıldı; “yeni/ayrı grafiklerde” çoklu-panel/tab altyapısı Bölüm 5.3'te kurulunca eklenecek.)  **AÇIK:** `F3-016` "aynı grafikte" kısmını verdi; "ayrı grafiklerde" çoklu-panel altyapısına bağlı.
 - [x] Favori kanal gruplarını kaydet.  (`F3-017`)
-- [ ] Sağ tık menüsü: Plot, Inspect, Add to Existing Plot, Export, Copy Path.  **AÇIK:** `F3-018` Plot · Inspect · Copy Path verdi; "Add to Existing Plot" ve "Export" menüde yok.
+- [x] Sağ tık menüsü: Plot, Inspect, Add to Existing Plot, Export, Copy Path.  (beş eylem de bağlı: Plot · Inspect · Add to Existing Plot · Export · Copy Path)
 
 ### 5.3 Workspace ve grafik kartı
 
@@ -235,7 +235,7 @@ Yapılacaklar:
 - [x] Tüm açık grafiklerde isteğe bağlı X-axis synchronization ekle.  (`F3-032`: araç çubuğundaki `Sync` anahtarı; durumu workspace ile saklanır)
 - [x] Legend üzerinde kanal gizleme ve solo mode ekle.  (`F3-030`; `test_plot_legend_solo.py`)
 - [ ] Grafiği tab, split view ve ayrı pencere olarak açmayı destekle.  **AÇIK:** Ayrı pencere (`F4-082`, `test_detached_plot.py`) var; grafiği sekme ya da split view olarak açmak yok.
-- [ ] Boş workspace için sürükle-bırak yönlendirmesi tasarla.  **AÇIK:** Boş kanal ağacı için yönlendirme metni var (`EMPTY_TREE_HINT`); boş grafik alanı için sürükle-bırak yönlendirmesi yok.
+- [x] Boş workspace için sürükle-bırak yönlendirmesi tasarla.  (`PlotPanel.EMPTY_PLOT_HINT`: boş grafikte sürükle-bırak yönlendirmesi görünür, seri eklenince kaybolur)
 - [x] Grafik sayısı arttığında kaynak kullanımını sınırla.  (`F4-055` nokta bütçesi görünür piksel genişliğine göre örnek sayısını sınırlar; merkez yerleşimi sabit sayıda grafik taşır)
 
 ### 5.4 Inspector

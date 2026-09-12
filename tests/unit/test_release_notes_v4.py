@@ -255,10 +255,17 @@ def test_the_failed_acceptance_step_is_not_hidden_in_the_notes() -> None:
 # --------------------------------------------------------------------------- #
 
 
-def test_the_release_manifest_matches_the_current_version() -> None:
-    version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+def test_the_release_manifest_is_internally_consistent() -> None:
+    """Manifest sürümü ile artefakt adlarındaki sürüm aynı olmalı.
+
+    `VERSION` ile eşitlik yayın kapısının işidir (`tools/release_guard.py`);
+    geliştirme sırasında manifest son paketlenen sürümü gösterir.
+    """
     manifest = _json("release-manifest.json")
-    assert manifest["version"] == version
+    version = str(manifest["version"])
+    assert version
+    for entry in manifest["artifacts"]:
+        assert entry["version_in_name"] == version, entry["name"]
 
 
 def test_every_manifest_artifact_was_actually_produced() -> None:

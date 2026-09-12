@@ -316,6 +316,7 @@ class MainWindow(QMainWindow):
         self.left_dock.channel_activated.connect(self.open_channel)
         self.left_dock.channels_add_requested.connect(self._on_channels_add_requested)
         self.left_dock.channel_inspect_requested.connect(self.show_channel_in_inspector)
+        self.left_dock.channel_export_requested.connect(self._on_channel_export_requested)
         self.left_dock.channel_path_copied.connect(self._on_channel_path_copied)
         self.right_dock.bit_status.analysis_requested.connect(self.refresh_bit_analysis)
         self.right_dock.inspector.axis_range_requested.connect(self._on_axis_range_requested)
@@ -1414,13 +1415,18 @@ class MainWindow(QMainWindow):
         )
         return answer == QMessageBox.StandardButton.Yes
 
-    def _on_export_requested(self) -> None:
+    def _on_export_requested(self, channel_id: str | None = None) -> None:
         """Data Export kartındaki `Export Data`'yı işler — `F3-065`, `F3-066`.
 
         Biçim ve ham/işlenmiş seçimi karttan okunur, hedef dosya adı
         sorulur, dosya varsa üzerine yazma onayı istenir. Onay yoksa
         **hiçbir şey yazılmaz** (var olan dosya dokunulmaz). Zaten bir
         CSV dışa aktarımı sürüyorsa buton iptal düğmesi gibi davranır.
+
+        `channel_id` verilirse (sağ tık > Export) dışa aktarılan kanal
+        odaktaki kanal değil, **seçilen** kanaldır. Akışın geri kalanı
+        aynıdır: ikinci bir dışa aktarma yolu açmak, biçim ve üzerine
+        yazma kurallarının iki yerde ayrışmasına yol açardı.
         """
         if self._export_runner is not None:
             self.cancel_export()
@@ -1447,11 +1453,24 @@ class MainWindow(QMainWindow):
             return
 
         try:
-            self._dispatch_export(kind, target, card)
+            self._dispatch_export(kind, target, card, channel_id=channel_id)
         except (ValueError, OSError) as exc:
             self.bottom_dock.append_log(f"Disa aktarma basarisiz: {exc}")
 
-    def _dispatch_export(self, kind: ExportKind, target: Path, card: DataExportCard) -> None:
+    def _on_channel_export_requested(self, channel_id: str) -> None:
+        """Sağ tık > Export — seçilen kanalı kart ayarlarıyla dışa aktarır."""
+        if not any(channel.id == channel_id for channel in self._channels):
+            return
+        self._on_export_requested(channel_id)
+
+    def _dispatch_export(
+        self,
+        kind: ExportKind,
+        target: Path,
+        card: DataExportCard,
+        *,
+        channel_id: str | None = None,
+    ) -> None:
         if kind is ExportKind.PNG:
             self.export_plot_png(target)
         elif kind is ExportKind.SVG:
@@ -1465,6 +1484,7 @@ class MainWindow(QMainWindow):
             # F4-085: ayırıcı biçimden gelir, ondalık ayıracı karttan.
             self.start_channel_csv_export(
                 target,
+                channel_id=channel_id,
                 selected_range_only=card.wants_selected_range(),
                 include_metadata=card.wants_metadata(),
                 raw=card.selected_variant() is DataVariant.RAW,

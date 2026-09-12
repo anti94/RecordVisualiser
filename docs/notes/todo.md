@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 499 madde · 475 tamamlandı · 24 kaldı**
+**Toplam 499 madde · 478 tamamlandı · 21 kaldı**
 
-`[#######################.]` %95.2
+`[#######################.]` %95.8
 
 ## Özet
 
@@ -41,8 +41,8 @@ Work in fully autonomous mode.
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 41 | 0 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 35 | 0 | 35 |
-| Bölüm içi kontrol listeleri | 121 | 24 | 145 |
-| **Toplam** | **475** | **24** | **499** |
+| Bölüm içi kontrol listeleri | 124 | 21 | 145 |
+| **Toplam** | **478** | **21** | **499** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -443,11 +443,11 @@ Work in fully autonomous mode.
 - [x] Lazy-loading destekli model/view tabanlı ağaç oluştur.  (`F3-009` ağaç modeli, `F3-010` lazy yükleme)  <sub>plan.md:205</sub>
 - [x] Kanal adına, ID’ye, birime ve kaynağa göre arama ekle.  (`F3-011`; dört alan da testlerle kapsandı)  <sub>plan.md:206</sub>
 - [x] `Sensors`, `BIT`, `Transmission`, `Derived` hızlı filtreleri ekle.  (`F3-012`)  <sub>plan.md:207</sub>
-- [ ] Kanal türü, bağlantı durumu ve alarm seviyesi için ikon sistemi belirle.  **AÇIK:** severity ikonları `ui/status_icons.py` ile tanımlı ve olay tablosunda kullanılıyor; kanal türü ve bağlantı durumu için ikon ağaçta yok.  <sub>plan.md:208</sub>
+- [x] Kanal türü, bağlantı durumu ve alarm seviyesi için ikon sistemi belirle.  (kanal türü ikonları `ui/status_icons.py` `CHANNEL_SOURCE_STYLES`; her ikon simge + metin taşır, ipucu kaynakta bulunma durumunu yazar)  <sub>plan.md:208</sub>
 - [x] Kanalı çift tıklama ve sürükle-bırak ile grafiğe ekle.  (`F3-013` çift tık, `F3-015` sürükle-bırak)  <sub>plan.md:209</sub>
 - [ ] Çoklu seçim ve “seçilenleri aynı grafikte/yeni grafiklerde aç” komutu ekle. (`F3-016`: “aynı grafikte” kısmı yapıldı; “yeni/ayrı grafiklerde” çoklu-panel/tab altyapısı Bölüm 5.3'te kurulunca eklenecek.)  **AÇIK:** `F3-016` "aynı grafikte" kısmını verdi; "ayrı grafiklerde" çoklu-panel altyapısına bağlı.  <sub>plan.md:210</sub>
 - [x] Favori kanal gruplarını kaydet.  (`F3-017`)  <sub>plan.md:211</sub>
-- [ ] Sağ tık menüsü: Plot, Inspect, Add to Existing Plot, Export, Copy Path.  **AÇIK:** `F3-018` Plot · Inspect · Copy Path verdi; "Add to Existing Plot" ve "Export" menüde yok.  <sub>plan.md:212</sub>
+- [x] Sağ tık menüsü: Plot, Inspect, Add to Existing Plot, Export, Copy Path.  (beş eylem de bağlı: Plot · Inspect · Add to Existing Plot · Export · Copy Path)  <sub>plan.md:212</sub>
 
 ### 5.3 Workspace ve grafik kartı
 
@@ -457,7 +457,7 @@ Work in fully autonomous mode.
 - [x] Tüm açık grafiklerde isteğe bağlı X-axis synchronization ekle.  (`F3-032`: araç çubuğundaki `Sync` anahtarı; durumu workspace ile saklanır)  <sub>plan.md:235</sub>
 - [x] Legend üzerinde kanal gizleme ve solo mode ekle.  (`F3-030`; `test_plot_legend_solo.py`)  <sub>plan.md:236</sub>
 - [ ] Grafiği tab, split view ve ayrı pencere olarak açmayı destekle.  **AÇIK:** Ayrı pencere (`F4-082`, `test_detached_plot.py`) var; grafiği sekme ya da split view olarak açmak yok.  <sub>plan.md:237</sub>
-- [ ] Boş workspace için sürükle-bırak yönlendirmesi tasarla.  **AÇIK:** Boş kanal ağacı için yönlendirme metni var (`EMPTY_TREE_HINT`); boş grafik alanı için sürükle-bırak yönlendirmesi yok.  <sub>plan.md:238</sub>
+- [x] Boş workspace için sürükle-bırak yönlendirmesi tasarla.  (`PlotPanel.EMPTY_PLOT_HINT`: boş grafikte sürükle-bırak yönlendirmesi görünür, seri eklenince kaybolur)  <sub>plan.md:238</sub>
 - [x] Grafik sayısı arttığında kaynak kullanımını sınırla.  (`F4-055` nokta bütçesi görünür piksel genişliğine göre örnek sayısını sınırlar; merkez yerleşimi sabit sayıda grafik taşır)  <sub>plan.md:239</sub>
 
 ### 5.4 Inspector

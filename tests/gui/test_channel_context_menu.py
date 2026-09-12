@@ -81,6 +81,81 @@ def test_unknown_action_is_rejected(window: MainWindow) -> None:
         window.left_dock.apply_channel_context_action("ch0", "Nonsense")
 
 
+# -- plan Bolum 5.2: bes eylem, belgelenen sirayla -----------------------
+
+
+def test_the_menu_offers_every_action_the_plan_lists() -> None:
+    """Plan Bölüm 5.2 ve kabul listesi 2.11 aynı beş eylemi sayar."""
+    assert CHANNEL_MENU_ACTIONS == (
+        "Plot",
+        "Inspect",
+        "Add to Existing Plot",
+        "Export",
+        "Copy Path",
+    )
+
+
+def test_add_to_existing_plot_keeps_the_series_already_drawn(window: MainWindow) -> None:
+    """`Plot` grafiği o kanala çevirir; `Add to Existing Plot` eklemelidir.
+
+    İkisini tek eyleme indirmek, bir kanalı karşılaştırmak isteyen
+    kullanıcının önceki seriyi kaybetmesi demekti.
+    """
+    window.left_dock.apply_channel_context_action("ch0", "Plot")
+    assert window.plot_panel.plotted_channel_ids() == ["ch0"]
+
+    window.left_dock.apply_channel_context_action("ch1", "Add to Existing Plot")
+
+    assert window.plot_panel.plotted_channel_ids() == ["ch0", "ch1"]
+
+
+def test_plot_replaces_where_add_appends(window: MainWindow) -> None:
+    """Karşı yön: `Plot` gerçekten değiştiriyor mu."""
+    window.left_dock.apply_channel_context_action("ch0", "Plot")
+    window.left_dock.apply_channel_context_action("ch1", "Plot")
+
+    assert window.plot_panel.plotted_channel_ids() == ["ch1"]
+
+
+def test_add_to_existing_plot_reports_what_it_added(window: MainWindow) -> None:
+    window.left_dock.apply_channel_context_action("ch2", "Add to Existing Plot")
+
+    log = "\n".join(window.bottom_dock.log_lines())
+    assert "1 kanal grafige eklendi" in log
+
+
+def test_export_action_exports_the_chosen_channel_not_the_focused_one(
+    window: MainWindow, tmp_path: Path, qtbot: QtBot
+) -> None:
+    """Sağ tıklanan kanal ile grafikteki kanal farklıysa, seçilen kazanmalı."""
+    window.left_dock.apply_channel_context_action("ch0", "Plot")
+
+    target = tmp_path / "secilen.csv"
+    window.export_save_dialog = lambda _t, _f: str(target)
+    window.export_confirm_overwrite = lambda _p: True
+
+    window.left_dock.apply_channel_context_action("ch3", "Export")
+    qtbot.waitUntil(target.is_file, timeout=10_000)
+
+    text = target.read_text(encoding="utf-8")
+    assert "channel_id=ch3" in text
+    assert "channel_id=ch0" not in text
+
+
+def test_export_action_ignores_an_unknown_channel(window: MainWindow) -> None:
+    """Var olmayan kanal için dosya seçtirmek, boş bir dosya üretirdi."""
+    asked: list[str] = []
+
+    def dialog(title: str, _filter: str) -> str:
+        asked.append(title)
+        return ""
+
+    window.export_save_dialog = dialog
+    window.left_dock.channel_export_requested.emit("olmayan")
+
+    assert asked == []
+
+
 # -- gercek menu: imlec altindaki kanala baglanir, secime degil ----------
 
 

@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from PySide6.QtCore import QRectF, Qt
 from PySide6.QtGui import QColor, QFont, QIcon, QPainter, QPixmap
 
+from sonar_analyzer.domain.channel import ChannelSource
 from sonar_analyzer.domain.event import BitState, Severity
 from sonar_analyzer.ui.theme import CHANNEL_COLORS, DARK
 
@@ -53,9 +54,29 @@ SEVERITY_STYLES: dict[Severity, StatusStyle] = {
 }
 
 
+#: Kanal turleri (plan Bolum 5.2). Simge, kaynagin **turunu** soyler;
+#: renk yalnizca destekler. Yalniz renge bagli bir ayrim, renk korlugunde
+#: ve gri tonlamali ekran goruntusunde kaybolurdu.
+CHANNEL_SOURCE_STYLES: dict[ChannelSource, StatusStyle] = {
+    ChannelSource.SONAR: StatusStyle("S", "Sonar", DARK.accent),
+    ChannelSource.ACOUSTIC: StatusStyle("A", "Acoustic", DARK.accent),
+    ChannelSource.SENSORS: StatusStyle("N", "Sensors", DARK.pass_),
+    ChannelSource.NAVIGATION: StatusStyle("V", "Navigation", DARK.pass_),
+    ChannelSource.TRANSMISSION: StatusStyle("T", "Transmission", DARK.warning),
+    ChannelSource.BIT: StatusStyle("B", "BIT", DARK.warning),
+    ChannelSource.DERIVED: StatusStyle("f", "Derived", DARK.text_secondary),
+    ChannelSource.UNKNOWN: StatusStyle("?", "Unknown", DARK.text_secondary),
+}
+
+
 def bit_style(state: BitState) -> StatusStyle:
     """BIT durumunun stili; tanınmayan durum `UNKNOWN` gibi ele alınır."""
     return BIT_STYLES.get(state, BIT_STYLES[BitState.UNKNOWN])
+
+
+def channel_source_style(source: ChannelSource) -> StatusStyle:
+    """Kanal türünün stili; tanınmayan kaynak `UNKNOWN` gibi ele alınır."""
+    return CHANNEL_SOURCE_STYLES.get(source, CHANNEL_SOURCE_STYLES[ChannelSource.UNKNOWN])
 
 
 def severity_style(severity: Severity) -> StatusStyle:

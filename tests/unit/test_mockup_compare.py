@@ -83,10 +83,16 @@ def test_every_region_landed_in_its_expected_area() -> None:
         assert row["actual_area"] == row["expected_area"], row["object_name"]
 
 
-def test_the_recorded_run_used_the_packaged_executable_of_this_version() -> None:
-    version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+def test_the_recorded_run_used_a_packaged_executable_of_its_own_version() -> None:
+    """Bildirilen sürüm ile çalıştırılan paketin sürümü aynı olmalı.
+
+    `VERSION` ile eşitlik yayın anında `tools/release_guard.py`
+    tarafından aranır; burada iç tutarlılık yeter (bkz.
+    `tests/unit/test_acceptance_run.py`).
+    """
     report = _report()
-    assert report["version"] == version
+    version = str(report["version"])
+    assert version
     assert f"sonar-analyzer-{version}" in str(report["executable"])
     assert str(report["executable"]).endswith(".exe")
 

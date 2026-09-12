@@ -136,9 +136,24 @@ def test_the_rehearsal_used_two_different_real_installers() -> None:
     assert current.endswith("-setup.exe")
 
 
-def test_the_rehearsal_used_the_current_version_as_the_new_package() -> None:
-    version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
-    assert _report()["current_installer"] == f"sonar-analyzer-{version}-setup.exe"
+def test_the_rehearsal_rolled_back_from_a_newer_package_to_an_older_one() -> None:
+    """Prova ileri sürümden geriye dönmeli; tersi geri dönüş değildir.
+
+    `VERSION` ile eşitlik yayın kapısının işidir
+    (`tools/release_guard.py`); burada aranan, provanın yönüdür.
+    """
+    report = _report()
+    new_version = (
+        str(report["current_installer"]).replace("sonar-analyzer-", "").replace("-setup.exe", "")
+    )
+    old_version = (
+        str(report["previous_installer"]).replace("sonar-analyzer-", "").replace("-setup.exe", "")
+    )
+
+    def parts(text: str) -> tuple[int, ...]:
+        return tuple(int(piece) for piece in text.split("."))
+
+    assert parts(new_version) > parts(old_version)
 
 
 def test_the_rehearsal_covered_the_settings_survival_step() -> None:

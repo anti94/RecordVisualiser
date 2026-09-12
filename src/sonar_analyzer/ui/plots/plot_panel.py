@@ -63,6 +63,9 @@ EMPTY_TITLE = "Kanal secilmedi"
 ZOOM_MODES: tuple[str, ...] = ("x", "y", "xy")
 DEFAULT_ZOOM_MODE = "xy"
 
+#: Plan Bolum 5.3 — bos grafik alaninda gorunen yonlendirme.
+EMPTY_PLOT_HINT = "Kanal yok. Soldaki agactan bir kanali buraya surukleyin\nya da cift tiklayin."
+
 #: Grid'in gorunurlugu: veri cizgisinden belirgin sekilde daha soluk (plan 6.3).
 GRID_ALPHA = 0.15
 
@@ -205,6 +208,17 @@ class PlotPanel(QWidget):
         self.plot.setAcceptDrops(True)
         self.plot.installEventFilter(self)
 
+        # Plan Bolum 5.3: bos grafik ne yapilacagini SOYLEMELI. Bos bir
+        # dikdortgen, ozelligin yoklugundan ayirt edilemez; kullanici
+        # kanali buraya surukleyebilecegini bilemez.
+        self._empty_hint = pg.TextItem(
+            EMPTY_PLOT_HINT,
+            color=DARK.text_secondary,
+            anchor=(0.5, 0.5),
+        )
+        self._empty_hint.setParentItem(self.plot.getViewBox())
+        self._update_empty_hint()
+
         # F3-021: sürükleyerek pan. Sol tık sürükleme görünür aralığı
         # kaydırır (veriyi DEĞİL); tekerlek yakınlaştırır. pyqtgraph'ın
         # öntanımlısı zaten budur, ama açıkça sabitliyoruz.
@@ -341,6 +355,7 @@ class PlotPanel(QWidget):
                     self._pre_solo_visibility[channel.id] = True
 
         self._series[channel.id] = (channel, curve)
+        self._update_empty_hint()
         # F3-031: saklanan stil (varsayılan ya da kullanıcı geçersiz kılması)
         # her ekleme/güncellemede yeniden uygulanır.
         self._apply_style(channel.id)
@@ -932,6 +947,7 @@ class PlotPanel(QWidget):
         else:
             self._capture_home_range()
 
+        self._update_empty_hint()
         self._refresh_labels()
 
     def clear(self) -> None:
@@ -1173,6 +1189,32 @@ class PlotPanel(QWidget):
     def plotted_channel_ids(self) -> list[str]:
         """Şu an grafikte bulunan kanal kimlikleri, ekleme sırasıyla — testler için."""
         return list(self._series)
+
+    # -- bos grafik yonlendirmesi (plan Bolum 5.3) ---------------------
+
+    def _update_empty_hint(self) -> None:
+        """Yönlendirme yalnız grafik boşken görünür.
+
+        Seri varken de göstermek, verinin üstüne yazı basmak olurdu.
+        """
+        hint = getattr(self, "_empty_hint", None)
+        if hint is None:  # kurulum sirasinda cagrilabilir
+            return
+        empty = not self._series
+        hint.setVisible(empty)
+        if empty:
+            view_box = self.plot.getViewBox()
+            rect = view_box.boundingRect()
+            hint.setPos(rect.center())
+
+    def empty_hint_visible(self) -> bool:
+        """Boş grafik yönlendirmesi görünür mü — testler için."""
+        hint = getattr(self, "_empty_hint", None)
+        return bool(hint is not None and hint.isVisible())
+
+    def empty_hint_text(self) -> str:
+        """Yönlendirme metni — testler ve kılavuz için."""
+        return EMPTY_PLOT_HINT
 
     def export_svg(self, path: str | Path) -> Path:
         """Grafiği **vektörel** SVG olarak yazar — `F3-063`.

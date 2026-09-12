@@ -128,12 +128,18 @@ sona dönün.
 
 ### 5.2 Kanal ağacında (Bölge 1)
 
+Her kanal yaprağı **türünü gösteren bir ikon** taşır (S sonar, A akustik,
+N sensör, V seyrüsefer, T transmisyon, B BIT, f türetilmiş). İkon yalnız
+renk değil bir de simge taşır: renk körlüğünde ve gri tonlamalı ekran
+görüntüsünde renge dayalı ayrım kaybolurdu. İpucu aynı bilgiyi metinle
+verir ve kanalın kaynakta bulunup bulunmadığını yazar.
+
 | Hareket | Sonuç |
 | --- | --- |
 | Çift tık | Kanalı grafiğe ekler |
 | Sürükle–bırak | Kanalı grafiğe bırakır (ağaç yalnız **kaynaktır**, dışarıdan bir şey kabul etmez) |
 | `Ctrl` / `Shift` + tık | Çoklu seçim; **Grafiğe Ekle** ile hepsi tek komutla eklenir |
-| Sağ tık | **Plot · Inspect · Copy Path** menüsü |
+| Sağ tık | **Plot · Inspect · Add to Existing Plot · Export · Copy Path** menüsü |
 
 ## 6. Plan Bölüm 16 ile farklar
 
