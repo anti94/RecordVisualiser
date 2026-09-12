@@ -77,27 +77,34 @@ class WriteSpec:
         return self.tx_seconds is None or second in self.tx_seconds
 
 
-def _payload(spec: WriteSpec, frame_index: int) -> bytes:
-    """Bir frame'in yükü — deterministik ve frame'e göre farklı.
+#: Tx ornekleri Rx'ten bu kadar kaydirilir. Ikisi ayni veriyi tasisaydi,
+#: iki akimi karistiran bir hata hicbir testte gorunmezdi.
+STREAM_OFFSET = 500_000.0
 
-    Bütün frame'ler aynı olsaydı, bir offset hatası okunan veride fark
-    edilmezdi.
+
+def _payload(spec: WriteSpec, frame_index: int, *, stream: str) -> bytes:
+    """Bir frame'in yükü — deterministik, frame'e **ve akıma** göre farklı.
+
+    Bütün frame'ler aynı olsaydı bir offset hatası okunan veride fark
+    edilmezdi. Tx ile Rx aynı olsaydı, iki akımı karıştıran bir hata da
+    fark edilmezdi.
     """
     count = spec.sensors * spec.samples
-    base = np.arange(count, dtype=np.float32) + frame_index * 1000.0
+    shift = STREAM_OFFSET if stream == "Tx" else 0.0
+    base = np.arange(count, dtype=np.float32) + frame_index * 1000.0 + shift
     buffer = np.empty(count, dtype=np.complex64)
     buffer.real = base
     buffer.imag = -base
     return buffer.tobytes()
 
 
-def _frame(spec: WriteSpec, frame_index: int, *, tx_active: bool) -> bytes:
-    body = _payload(spec, frame_index)
+def _frame(spec: WriteSpec, frame_index: int, *, stream: str) -> bytes:
+    body = _payload(spec, frame_index, stream=stream)
     blob = bytearray(128)
     blob[0:4] = FRAME_MAGIC
     struct.pack_into("<I", blob, 4, frame_index)
     struct.pack_into("<q", blob, 8, spec.start_ns + frame_index * FRAME_PERIOD_NS)
-    struct.pack_into("<H", blob, 16, 0x0003 if tx_active else 0x0002)
+    struct.pack_into("<H", blob, 16, 0x0003 if stream == "Tx" else 0x0002)
     struct.pack_into("<H", blob, 18, spec.sensors)
     struct.pack_into("<I", blob, 20, spec.samples)
     struct.pack_into("<I", blob, 120, crc32(body) & 0xFFFFFFFF)
@@ -108,8 +115,7 @@ def _file_bytes(spec: WriteSpec, second: int, stream: str) -> bytes:
     """Bir saniyelik dosyanın tamamı, başlık CRC'si dâhil."""
     first = second * spec.frames_per_file
     frames = b"".join(
-        _frame(spec, first + offset, tx_active=stream == "Tx")
-        for offset in range(spec.frames_per_file)
+        _frame(spec, first + offset, stream=stream) for offset in range(spec.frames_per_file)
     )
 
     blob = bytearray(64)

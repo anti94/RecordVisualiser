@@ -1934,15 +1934,15 @@ kaydın uyuşmadığı durumda **sessizce yanlış okumamaktır**.
 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `F7-036` | `4.41.0` | 20 dk | `FolderRecordingRepository` iskeletini kur | `RecordingRepository` sözleşmesinin yedi metodunu da karşılar | `F7-035` | `feat(repository): F7-036 `FolderRecordingRepository` iskeletini kur` |
-| [ ] | `F7-037` | `4.42.0` | 20 dk | `metadata()` zaman aralığını klasörden üret | Başlangıç ilk frame'in timestamp'i, bitiş son frame'inki; boş klasör açık hata verir | `F7-036` | `feat(repository): F7-037 `metadata()` zaman aralığını klasörden üret` |
-| [ ] | `F7-038` | `4.43.0` | 20 dk | `channels()` ile Tx/Rx × 32 sensörü sun | 64 kanal kimliği üretilir; kanal yolu `Tx/Sensor 03` biçimindedir | `F7-037` | `feat(repository): F7-038 `channels()` ile Tx/Rx × 32 sensörü sun` |
-| [ ] | `F7-039` | `4.44.0` | 20 dk | `query()` çağrısını dosya sınırlarını aşacak biçimde kur | Üç dosyaya yayılan bir aralık tek `DataChunk` döner, örnek sayısı beklenene eşittir | `F7-038` | `feat(repository): F7-039 `query()` çağrısını dosya sınırlarını aşacak biçimde kur` |
-| [ ] | `F7-040` | `4.45.0` | 20 dk | Seyreltmeyi dosya sınırlarında tutarlı yap | Aynı aralık farklı `max_points` ile sorgulandığında dosya sınırında sıçrama olmaz | `F7-039` | `feat(repository): F7-040 seyreltmeyi dosya sınırlarında tutarlı yap` |
+| [x] | `F7-036` | `4.41.0` | 20 dk | `FolderRecordingRepository` iskeletini kur | `RecordingRepository` sözleşmesinin yedi metodunu da karşılar | `F7-035` | `feat(repository): F7-036 `FolderRecordingRepository` iskeletini kur` |
+| [x] | `F7-037` | `4.42.0` | 20 dk | `metadata()` zaman aralığını klasörden üret | Başlangıç ilk frame'in timestamp'i, bitiş son frame'inki; boş klasör açık hata verir | `F7-036` | `feat(repository): F7-037 `metadata()` zaman aralığını klasörden üret` |
+| [x] | `F7-038` | `4.43.0` | 20 dk | `channels()` ile Tx/Rx × 32 sensörü sun | 64 kanal kimliği üretilir; kanal yolu `Tx/Sensor 03` biçimindedir | `F7-037` | `feat(repository): F7-038 `channels()` ile Tx/Rx × 32 sensörü sun` |
+| [x] | `F7-039` | `4.44.0` | 20 dk | `query()` çağrısını dosya sınırlarını aşacak biçimde kur | Üç dosyaya yayılan bir aralık tek `DataChunk` döner, örnek sayısı beklenene eşittir | `F7-038` | `feat(repository): F7-039 `query()` çağrısını dosya sınırlarını aşacak biçimde kur` |
+| [x] | `F7-040` | `4.45.0` | 20 dk | Seyreltmeyi dosya sınırlarında tutarlı yap | Aynı aralık farklı `max_points` ile sorgulandığında dosya sınırında sıçrama olmaz | `F7-039` | `feat(repository): F7-040 seyreltmeyi dosya sınırlarında tutarlı yap` |
 | [ ] | `F7-041` | `4.46.0` | 20 dk | Frame header alanlarını metadata olarak sun | CIT, transmisyon ve platform alanları Inspector'da ham değerleriyle görünür | `F7-040` | `feat(repository): F7-041 frame header alanlarını metadata olarak sun` |
-| [ ] | `F7-042` | `4.47.0` | 20 dk | Önden okuma ve bellek bütçesini kur | Aynı anda bellekte tutulan dosya sayısı sınırlı; tepe bellek ölçülüp raporlanır | `F7-041` | `feat(repository): F7-042 önden okuma ve bellek bütçesini kur` |
+| [x] | `F7-042` | `4.47.0` | 20 dk | Önden okuma ve bellek bütçesini kur | Aynı anda bellekte tutulan dosya sayısı sınırlı; tepe bellek ölçülüp raporlanır | `F7-041` | `feat(repository): F7-042 önden okuma ve bellek bütçesini kur` |
 | [ ] | `F7-043` | `4.48.0` | 20 dk | Oynatmayı dosya sınırında kesintisiz yap | Saniye sınırını geçen oynatmada boşluk ya da tekrar görülmez | `F7-042` | `feat(ui): F7-043 oynatmayı dosya sınırında kesintisiz yap` |
-| [ ] | `F7-044` | `4.49.0` | 20 dk | Bozuk ve eksik dosyayı oynatmada göster | Eksik saniye zaman ekseninde boşluk olarak işaretlenir, sessizce atlanmaz | `F7-043` | `feat(ui): F7-044 bozuk ve eksik dosyayı oynatmada göster` |
+| [x] | `F7-044` | `4.49.0` | 20 dk | Bozuk ve eksik dosyayı oynatmada göster | Eksik saniye zaman ekseninde boşluk olarak işaretlenir, sessizce atlanmaz | `F7-043` | `feat(ui): F7-044 bozuk ve eksik dosyayı oynatmada göster` |
 
 ##### Arayüz
 

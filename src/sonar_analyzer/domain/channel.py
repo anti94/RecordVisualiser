@@ -11,7 +11,19 @@ from dataclasses import dataclass
 from enum import Enum
 
 #: Desteklenen ornek veri tipleri (docs/format/profile-a.md dtype tablosu).
-SUPPORTED_DTYPES = frozenset({"int16", "int32", "float32", "float64", "uint8"})
+#: Gercek degerli tipler — Profil A ve B kanallari.
+REAL_DTYPES = frozenset({"int16", "int32", "float32", "float64", "uint8"})
+
+#: Complex (I/Q) tipler — Profil C sensor kanallari (`D-28`).
+#:
+#: Ayri tutulmalari bilincli: complex bir kanala gercek degerli bir
+#: analiz uygulamak sessizce yanlis sonuc vermez, **hata verir**. NumPy
+#: 2.0'da `np.fft.rfft` complex girdide `TypeError` firlatiyor; sanal
+#: kismi sessizce atmiyor. Hangi kanalin hangi kumeden oldugunu bilmek,
+#: o hatanin kullaniciya anlamli bir mesaj olarak tasinmasini saglar.
+COMPLEX_DTYPES = frozenset({"complex64", "complex128"})
+
+SUPPORTED_DTYPES = REAL_DTYPES | COMPLEX_DTYPES
 
 
 class ChannelSource(str, Enum):

@@ -415,8 +415,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F7-027` | 20 dk | 10 dk 16 sn | `37fd8d0` | sürüm dağıtımına Profil C'yi ekle |
 | `F7-028` | 20 dk | 10 dk 32 sn | `5ffce32` | …F7-030 kayıt klasörü keşfini kur |
 | `F7-031` | 20 dk | 12 dk 10 sn | `3631a32` | …F7-034 klasör seviyesinde indeksi kur |
+| `F7-035` | 20 dk | 75 dk 22 sn | `043843f` | klasör indeksi kurma süresini ölç |
 
-**397 commit · olculen toplam 5734 dk 46 sn · olculemeyen 1 (ilk commit)**
+**398 commit · olculen toplam 5810 dk 8 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
