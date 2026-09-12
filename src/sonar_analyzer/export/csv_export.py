@@ -9,8 +9,16 @@ Dosya düzeni:
 * İstenirse `# anahtar=değer` biçiminde **metadata yorum satırları**
   (kanal, birim, kaynak, örnekleme hızı, kayıt kimliği, dışa aktarılan
   aralık, satır sayısı).
-* Bir başlık satırı: ``timestamp_ns,timestamp_utc,value``.
+* Bir başlık satırı: ``timestamp_ns,timestamp_utc,value`` — parça
+  kalite bayrağı taşıyorsa sonuna ``quality`` sütunu eklenir.
 * Her örnek için bir satır; zaman hem kanonik ns hem de UTC ISO-8601.
+
+`F6-035`: bozuk CRC'li ya da boşluklu bir örnek, dosyada **işaretli**
+görünür. Bunlar okuma katmanında zaten tespit ediliyordu ama dışa
+aktarmada düşüyordu; bozuk bir değeri ortalamaya katmak, onu hiç
+görmemekten daha zararlıdır. Bayrak bilgisi **olmayan** parçalarda
+sütun hiç yazılmaz: "OK" yazmak, bilmediğimiz bir şeyi biliyormuş gibi
+göstermek olurdu.
 
 `F3-066`: yazma **atomiktir** — önce `<hedef>.part` geçici dosyasına
 yazılır, tamamlanınca `os.replace` ile hedefe taşınır. Böylece iptal
@@ -31,13 +39,78 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from sonar_analyzer.domain.channel import ChannelMetadata
-from sonar_analyzer.domain.data_chunk import DataChunk
+from sonar_analyzer.domain.data_chunk import DataChunk, Quality
 from sonar_analyzer.domain.recording import RecordingMetadata
 from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.export.text_format import Delimiter, TextFormat, resolve_format
 
-#: Veri bölümünün sütun adları.
+#: Veri bölümünün sütun adları (kalite bilgisi olmayan parçalar için).
 DATA_COLUMNS: tuple[str, ...] = ("timestamp_ns", "timestamp_utc", "value")
+
+#: `F6-035`: parça kalite bayrağı taşıyorsa eklenen sütun.
+QUALITY_COLUMN = "quality"
+
+#: Kalite bilgisi olan parçalarda kullanılan sütun adları.
+DATA_COLUMNS_WITH_QUALITY: tuple[str, ...] = (*DATA_COLUMNS, QUALITY_COLUMN)
+
+#: Bayrağı olmayan örneğin `quality` sütununda yazan değer.
+QUALITY_OK = "OK"
+
+#: Bayrak adları `|` ile birleştirilir: `CRC_ERROR|GAP_BEFORE`.
+QUALITY_SEPARATOR = "|"
+
+
+def describe_quality(flags: int) -> str:
+    """Kalite bayrağı maskesini okunabilir adlara çevirir — `F6-035`.
+
+    Sayıyı olduğu gibi yazmak (``2``) kimseye bir şey söylemez; CSV'yi
+    inceleyen kişi bayrak tablosunu ezbere bilmek zorunda kalırdı.
+    Bilinmeyen bitler **atılmaz**, `BIT_n` olarak yazılır — sessizce
+    kaybolan bir bayrak, hiç olmayan bir bayraktan kötüdür.
+    """
+    mask = int(flags)
+    if mask == 0:
+        return QUALITY_OK
+    names: list[str] = []
+    remaining = mask
+    for flag in Quality:
+        if flag is Quality.OK:
+            continue
+        if mask & int(flag):
+            names.append(flag.name or f"BIT_{int(flag)}")
+            remaining &= ~int(flag)
+    bit = 0
+    while remaining:
+        if remaining & 1:
+            names.append(f"BIT_{bit}")
+        remaining >>= 1
+        bit += 1
+    return QUALITY_SEPARATOR.join(names)
+
+
+def summarize_quality(chunk: DataChunk) -> str:
+    """Metadata satırı: kaç örnek işaretli ve hangi bayraklardan.
+
+    Kalite bilgisi **yoksa** "hepsi sağlam" denmez; bilgi olmadığı
+    yazılır. Bilmediğini bilmek, yanlış bilmekten iyidir.
+    """
+    if chunk.quality is None:
+        return "quality_flags=yok (kaynak kalite bilgisi vermedi)"
+    total = len(chunk)
+    counts: dict[str, int] = {}
+    flagged = 0
+    for raw in chunk.quality.tolist():
+        mask = int(raw)
+        if mask == 0:
+            continue
+        flagged += 1
+        for name in describe_quality(mask).split(QUALITY_SEPARATOR):
+            counts[name] = counts.get(name, 0) + 1
+    if not flagged:
+        return f"quality_flags=var, isaretli=0/{total}"
+    detail = ", ".join(f"{name}={count}" for name, count in sorted(counts.items()))
+    return f"quality_flags=var, isaretli={flagged}/{total} ({detail})"
+
 
 #: Metadata yorum satırlarının öneki.
 METADATA_PREFIX = "# "
@@ -115,6 +188,9 @@ def build_metadata_lines(
         # F4-085: okuyucu ayırıcıyı ve ondalık biçimini dosyadan öğrensin.
         lines.append(text_format.describe())
     lines.append(f"row_count={len(chunk)}")
+    # F6-035: bozuk ya da bosluklu ornekler dosyada gorunmeliydi; ozet
+    # satiri, sutunlara bakmadan once durumu soyler.
+    lines.append(summarize_quality(chunk))
     return lines
 
 
@@ -177,23 +253,30 @@ def write_channel_csv(
     if raw:
         values = [(value - channel.offset) / channel.gain for value in values]
 
+    # F6-035: kalite sutunu yalniz parca bayrak TASIYORSA yazilir. Bayrak
+    # yokken "OK" yazmak, bilmedigimiz bir seyi biliyormus gibi
+    # gostermek olurdu.
+    quality = chunk.quality.tolist() if chunk.quality is not None else None
+    columns = DATA_COLUMNS_WITH_QUALITY if quality is not None else DATA_COLUMNS
+
     total = len(timestamps)
     try:
         with partial.open("w", encoding="utf-8", newline="") as handle:
             for line in metadata_lines:
                 handle.write(f"{METADATA_PREFIX}{line}\n")
             writer = csv.writer(handle, delimiter=text_format.delimiter.value)
-            writer.writerow(DATA_COLUMNS)
+            writer.writerow(columns)
             for index, (timestamp_ns, value) in enumerate(zip(timestamps, values)):
                 if should_cancel is not None and should_cancel():
                     raise ExportCancelled(f"{dest.name}: dışa aktarma iptal edildi")
-                writer.writerow(
-                    [
-                        int(timestamp_ns),
-                        _utc_iso(int(timestamp_ns)),
-                        text_format.format_value(float(value)),
-                    ]
-                )
+                row = [
+                    int(timestamp_ns),
+                    _utc_iso(int(timestamp_ns)),
+                    text_format.format_value(float(value)),
+                ]
+                if quality is not None:
+                    row.append(describe_quality(int(quality[index])))
+                writer.writerow(row)
                 if on_progress is not None and index % PROGRESS_INTERVAL == 0:
                     on_progress(index + 1, total)
         os.replace(partial, dest)  # atomik: hedef ya tam ya hiç
@@ -207,7 +290,7 @@ def write_channel_csv(
     return CsvExportResult(
         path=dest,
         row_count=total,
-        column_names=DATA_COLUMNS,
+        column_names=columns,
         metadata_lines=tuple(metadata_lines),
         text_format=text_format,
     )

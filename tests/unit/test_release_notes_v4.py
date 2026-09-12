@@ -171,11 +171,11 @@ def test_the_acceptance_result_matches_the_recorded_run() -> None:
         )
     )
     text = _both()
-    assert f"{report['passed_count']}/{report['step_count']}" in text or (
-        f"{report['step_count']} adımdan {report['passed_count']}'ini geçti" in text
-    )
-    assert report["failed_count"] == 1
+    assert f"{report['passed_count']}/{report['step_count']}" in text
+    assert report["failed_count"] == 0, "kayitli turda dusen adim var"
+    # Ilk kosuda dusen adim ve kapanisi, belgelerde izlenebilir kalmali.
     assert "M-05" in text
+    assert "F6-035" in text
 
 
 def test_the_mockup_result_matches_the_recorded_comparison() -> None:
@@ -202,12 +202,32 @@ def test_the_rollback_result_matches_the_recorded_rehearsal() -> None:
 # --------------------------------------------------------------------------- #
 
 
-def test_every_cited_known_issue_exists() -> None:
+#: Kapanmis ve listeden cikarilmis maddeler. Belgelerde **tarihsel
+#: kayit** olarak anilmalari dogrudur: bir kusurun bulunup kapatildigi,
+#: sonradan izlenebilir kalmalidir. Bu yuzden "listede var mi" kurali
+#: onlar icin gecmez; yerine "kapandigi yaziyor mu" aranir.
+CLOSED_ISSUES: frozenset[str] = frozenset({"K-21"})
+
+
+def test_every_cited_known_issue_exists_or_is_marked_closed() -> None:
     issues = KNOWN_ISSUES.read_text(encoding="utf-8")
     cited = set(re.findall(r"`(K-\d{2})`", _both()))
     assert len(cited) >= 6
     for issue in sorted(cited):
+        if issue in CLOSED_ISSUES:
+            continue
         assert f"### {issue} —" in issues, f"{issue} known-issues.md'de yok"
+
+
+def test_a_closed_issue_is_described_as_closed_where_it_is_cited() -> None:
+    """Kapanmış bir maddeyi hâlâ açıkmış gibi anmak, okuyanı yanıltır."""
+    text = _both()
+    for issue in sorted(CLOSED_ISSUES):
+        assert issue in text
+        assert "kapandığı için" in text, f"{issue} kapali oldugu yazilmamis"
+    issues = KNOWN_ISSUES.read_text(encoding="utf-8")
+    for issue in sorted(CLOSED_ISSUES):
+        assert f"### {issue} —" not in issues, f"{issue} hala listede"
 
 
 def test_the_declared_issue_count_matches_the_issue_document() -> None:

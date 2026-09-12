@@ -22,7 +22,10 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:  # pragma: no cover - yalniz tip denetimi
+    from sonar_analyzer.domain.data_chunk import DataChunk
 
 #: PNG dosya imzasi (`\x89PNG\r\n\x1a\n`).
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
@@ -75,6 +78,11 @@ def run_bin_check(source: Path, output_dir: Path) -> BinCheckReport:
     if not len(chunk):
         failures.append("sorgu")
 
+    # F6-035: bayrakli ornekler burada gorunmeli. Bilinen bozuk bir
+    # dosyada "sonuc: TAMAM" demek, denetimin en cok ise yarayacagi yerde
+    # sessiz kalmasi olurdu.
+    lines.append(_quality_line(chunk))
+
     # 2) CSV yazilir ve GERI OKUNUR.
     csv_path = output_dir / "export.csv"
     try:
@@ -113,6 +121,34 @@ def run_bin_check(source: Path, output_dir: Path) -> BinCheckReport:
         csv_path=str(csv_path),
         png_path=str(png_path),
     )
+
+
+def _quality_line(chunk: DataChunk) -> str:
+    """Sorgudan dönen parçanın kalite özeti — `F6-035`.
+
+    Kalite bilgisi yoksa "hepsi sağlam" denmez; bilgi olmadığı yazılır.
+    Bayrak varsa hangi bayraktan kaç örnek olduğu tek satırda görünür.
+    """
+    from sonar_analyzer.export.csv_export import QUALITY_SEPARATOR, describe_quality
+
+    quality = chunk.quality
+    if quality is None:
+        return "kalite: bilgi yok (kaynak bayrak vermedi)"
+
+    counts: dict[str, int] = {}
+    flagged = 0
+    for raw in quality.tolist():
+        mask = int(raw)
+        if mask == 0:
+            continue
+        flagged += 1
+        for name in describe_quality(mask).split(QUALITY_SEPARATOR):
+            counts[name] = counts.get(name, 0) + 1
+    total = len(quality)
+    if not flagged:
+        return f"kalite: {total} ornegin hicbirinde bayrak yok"
+    detail = ", ".join(f"{name}={count}" for name, count in sorted(counts.items()))
+    return f"kalite: {flagged}/{total} ornek isaretli ({detail})"
 
 
 def _csv_data_rows(path: Path) -> int:

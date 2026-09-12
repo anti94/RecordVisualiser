@@ -8,7 +8,7 @@ Bu belge iki prosedür tanımlar: bir sürümü **yayınlamak** ve bir sürümde
 `tools/rollback_check.py` §4'teki adımları gerçek installer'larla
 yürütür ve sonucu `docs/packaging/results/rollback-check.json`'a yazar.
 
-Son yürütme: `3.33.0` → `3.8.0`, **12 adımın 12'si geçti**.
+Son yürütme: `3.35.0` → `3.8.0`, **12 adımın 12'si geçti**.
 
 ## 1. Neye dayanıyor
 
@@ -148,12 +148,12 @@ kapanmadan yeniden yayınlanmaz.
 
 ## 5. Son provanın sonucu
 
-`tools/rollback_check.py`, `3.33.0` → `3.8.0` geri dönüşünü yürüttü:
+`tools/rollback_check.py`, `3.35.0` → `3.8.0` geri dönüşünü yürüttü:
 
 | # | Adım | Sonuç |
 | --- | --- | --- |
 | 1 | Yeni sürüm kurulur | **TAMAM** |
-| 2 | Yeni sürüm çalışıyor (`sonar-analyzer 3.33.0`) | **TAMAM** |
+| 2 | Yeni sürüm çalışıyor (`sonar-analyzer 3.35.0`) | **TAMAM** |
 | 3 | Ayarlar yazılır ve yedeklenir | **TAMAM** |
 | 4 | Yeni sürümün uygulama dosyaları kaldırılır | **TAMAM** |
 | 5 | Ayarlar kaldırmadan sağ çıktı | **TAMAM** |

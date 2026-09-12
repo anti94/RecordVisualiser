@@ -8,7 +8,7 @@ kanıtlanmıştı?" sorusuna tek yerden cevap verebilmektir.
 | --- | --- |
 | Milestone | `ms/07-distribution` |
 | Sürüm | `v4.0.0` |
-| İş sayısı | 34 (`F6-001`–`F6-034`) + `F6-035` (kabul turundan doğdu) |
+| İş sayısı | 34 (`F6-001`–`F6-034`) + `F6-035` (kabul turundan doğdu, kapatıldı) |
 | Önceki milestone | `ms/06-live-recording` (`v3.0.0`) |
 
 ## 1. Faz kabul ölçütü
@@ -63,23 +63,32 @@ yerleşiminden okundu.
 %150 DPI ölçeklemesi bu turda ölçülmedi (kaynak ağacındaki DPI
 testlerinde kapsanıyor).
 
-## 5. Kullanıcı kabul turu — 8/9
+## 5. Kullanıcı kabul turu — 9/9
 
 `tools/acceptance_run.py`, iki rolü paketli `.exe` üzerinde yürüttü.
 
 | Rol | Adım | Sonuç |
 | --- | --- | --- |
 | Operatör | Sürüm · ekransız başlangıç · ana ekran · kayıt açma ve CSV/PNG | **4/4** |
-| Mühendis | v1 kayıt · sıra boşluğu · desteklenmeyen sürüm reddi · kesik başlık reddi · bozuk CRC | **4/5** |
+| Mühendis | v1 kayıt · sıra boşluğu · desteklenmeyen sürüm reddi · kesik başlık reddi · bozuk CRC | **5/5** |
 
-**Düşen adım `M-05`.** Bozuk CRC'li bir kayıt açılıyor ve sekiz örneği
-okunuyor, ancak CSV çıktısı bozuk örneği hiçbir işaret olmadan
-yazıyor. Okuma katmanı doğru (`Quality.CRC_ERROR` atanıyor); kayıp,
-bilgiyi kullanıcıya taşıyan yolda.
+**İlk koşuda `M-05` düştü.** Bozuk CRC'li bir kayıt açılıyor ve sekiz
+örneği okunuyordu, ancak CSV çıktısı bozuk örneği hiçbir işaret olmadan
+yazıyordu. Okuma katmanı doğruydu (`Quality.CRC_ERROR` atanıyordu);
+kayıp, bilgiyi kullanıcıya taşıyan yoldaydı.
 
-Bulgu **ayrı işe dönüştürüldü**: `F6-035`, ve kullanıcıya dönük
-sınırlama olarak `K-21`. Kabul turu içinde düzeltilmedi; turun işi
-kusuru bulup kaydetmektir.
+Bulgu **ayrı işe dönüştürüldü** (`F6-035`) ve kullanıcıya dönük
+sınırlama olarak kaydedildi (`K-21`). Kabul turu içinde düzeltilmedi;
+turun işi kusuru bulup kaydetmektir.
+
+`F6-035` tamamlandıktan sonra paket yeniden üretildi ve tur
+tekrarlandı: **9/9**. `M-05` artık aradığı kanıtı buluyor —
+`kalite: 1/8 ornek isaretli (CRC_ERROR=1)`. `K-21` kapandığı için
+bilinen sorunlar listesinden çıkarıldı (20 madde kaldı).
+
+Bu, turun **ne işe yaradığının** kaydıdır: kaynak ağacındaki 5000'den
+fazla test bu kusuru yakalamamıştı, çünkü hiçbiri "bozuk bir kayıttan
+alınan CSV'yi bir mühendis okusa ne görür?" sorusunu sormuyordu.
 
 ## 6. Kalite kapıları — geçti
 
@@ -101,9 +110,9 @@ saymak kapıyı sürekli çalar ve kapı kapatılır.
 | Belge | Durum |
 | --- | --- |
 | `docs/release/release-notes-v4.0.0.md` | **var** |
-| `docs/release/known-issues.md` | **var** — 21 açık madde, her biri etki/iş/hedef düzeltme ile |
+| `docs/release/known-issues.md` | **var** — 20 açık madde, her biri etki/iş/hedef düzeltme ile |
 | `docs/release/release-and-rollback.md` | **var** — geri dönüş provası 12/12 |
-| `docs/acceptance/packaged-acceptance.md` | **var** — 8/9, düşen adım kayıtlı |
+| `docs/acceptance/packaged-acceptance.md` | **var** — 9/9; ilk koşudaki düşen adım ve kapanışı kayıtlı |
 | `docs/ui/packaged-mockup-comparison.md` | **var** — 7/7 |
 | `docs/ci/quality-gates.md` | **var** |
 | Beş kullanım kılavuzu | **var** (`F6-024`–`F6-028`) |
@@ -141,5 +150,6 @@ Faz kabul ölçütünün dört başlığı da karşılandı:
 - **Yayın belgeleri** — sürüm notları, bilinen sorunlar, geri dönüş
   prosedürü ve kabul kanıtları tam.
 
-Kabul turunun düşen adımı bir engel değil, **kayıtlı bir açık iştir**
-(`F6-035`, `K-21`): etkisi, iş kimliği ve hedef düzeltmesi yazılıdır.
+Kabul turunun düşen adımı **kapatıldı** (`F6-035`) ve turun bulgusu
+belgelerde izlenebilir kaldı. Bir kabul turunun değeri, geçmesi değil,
+geçmediğinde ne olduğudur.

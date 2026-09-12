@@ -1,6 +1,6 @@
 {
   "previous_installer": "sonar-analyzer-3.8.0-setup.exe",
-  "current_installer": "sonar-analyzer-3.33.0-setup.exe",
+  "current_installer": "sonar-analyzer-3.35.0-setup.exe",
   "platform": "Windows-10-10.0.26200-SP0",
   "step_count": 12,
   "passed_count": 12,
@@ -15,7 +15,7 @@
     {
       "name": "2. Yeni sürüm çalışıyor",
       "ok": true,
-      "detail": "sonar-analyzer 3.33.0"
+      "detail": "sonar-analyzer 3.35.0"
     },
     {
       "name": "3. Ayarlar yazılır ve yedeklenir",

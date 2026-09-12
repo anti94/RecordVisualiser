@@ -81,20 +81,26 @@ Bu sürümde yapılan kontroller ve nerede kayıtlı oldukları:
 Kabul turu ve mockup karşılaştırması **paketli `.exe` üzerinde**
 yürütülür. Kaynak ağacından çalıştırmak paketi kanıtlamaz.
 
-### Kabul turunun sonucu dürüsttür
+### Kabul turu bir kusur buldu ve kapattı
 
-Paketli kabul turu **9 adımdan 8'ini geçti**. Düşen adım (`M-05`)
-gizlenmedi: bozuk CRC'li bir kayıttan alınan CSV, bozuk örneği hiçbir
-işaret olmadan yazıyor. Bulgu `F6-035` işine ve `K-21` bilinen sorununa
-dönüştürüldü.
+Paketli kabul turu ilk koşuda **9 adımdan 8'ini** geçti. Düşen adım
+(`M-05`) gizlenmedi: bozuk CRC'li bir kayıttan alınan CSV, bozuk örneği
+hiçbir işaret olmadan yazıyordu.
 
-Okuma katmanı doğru çalışıyor — kayıt `CRC_ERROR` olarak işaretleniyor;
-kayıp, bilgiyi kullanıcıya taşıyan yolda.
+Okuma katmanı doğru çalışıyordu — kayıt `CRC_ERROR` olarak
+işaretleniyordu; kayıp, bilgiyi kullanıcıya taşıyan yoldaydı.
+
+Bulgu `F6-035` işine dönüştürüldü ve kapatıldı: CSV artık bayrak taşıyan
+parçalarda bir `quality` sütunu yazıyor, `--bin-check` de işaretli örnek
+sayısını özetliyor. Paket yeniden üretilip tur tekrarlandı: **9/9**.
+
+Bayrak bilgisi **olmayan** parçalarda sütun hiç yazılmaz. "OK" yazmak,
+bilmediğimiz bir şeyi biliyormuş gibi göstermek olurdu.
 
 ## Geri dönüş
 
 Geri dönüş prosedürü yazılmakla kalmadı, **provası yapıldı**:
-`3.32.0` → `3.8.0` geri dönüşü gerçek installer'larla yürütüldü ve 12
+`3.35.0` → `3.8.0` geri dönüşü gerçek installer'larla yürütüldü ve 12
 adımın tamamı geçti (`docs/release/release-and-rollback.md`).
 
 Kullanıcı ayarları kurulum dizininin dışında yaşadığı için kaldırma
@@ -103,14 +109,12 @@ dosyasını (ileri şema, tanımadığı alanlar) sorunsuz açar.
 
 ## Bilinen sınırlar
 
-Tam liste: `docs/release/known-issues.md` (**21 açık madde**). Bu
+Tam liste: `docs/release/known-issues.md` (**20 açık madde**). Bu
 sürümde kullanıcıyı en çok ilgilendirenler:
 
 - **`K-16` Dağıtım imzasız.** Windows SmartScreen bilinmeyen yayıncı
   uyarısı gösterir; kullanıcı *Daha fazla bilgi → Yine de çalıştır*
   demek zorundadır. Sertifika kararı (`D-17`) hâlâ açık.
-- **`K-21` CSV çıktısı kalite bayraklarını taşımıyor.** Bozuk CRC'li ya
-  da boşluklu bir kayıttan alınan CSV, bu durumu göstermez (`F6-035`).
 - **`K-08` Analysis menüsü kalıcı olarak pasif.** Analiz işlevleri
   çalışıyor ama sağ sütundan ve sekmelerden kullanılıyor; menüden
   arayan kullanıcı yok sanabilir.

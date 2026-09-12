@@ -14,12 +14,12 @@ Ham kanıt: `docs/acceptance/results/packaged-acceptance.json`
 
 | | |
 | --- | --- |
-| Çalıştırılan | `dist/sonar-analyzer-3.33.0/sonar-analyzer.exe` |
-| Sürüm | `3.33.0` |
+| Çalıştırılan | `dist/sonar-analyzer-3.35.0/sonar-analyzer.exe` |
+| Sürüm | `3.35.0` |
 | Platform | Windows 11 (10.0.26200), x64 |
 | Adım sayısı | **9** (4 operatör + 5 mühendis) |
-| Geçen | **8** |
-| Başarısız | **1** (`M-05`) |
+| Geçen | **9** |
+| Başarısız | **0** |
 
 ## 2. Yöntem
 
@@ -41,7 +41,7 @@ Operatör uygulamayı açar, bir kaydı görüntüler, çıktı alır. Onun içi
 
 | Adım | Ne denendi | Sonuç | Kanıt |
 | --- | --- | --- | --- |
-| `O-01` | Doğru sürüm kuruldu mu | **TAMAM** | `sonar-analyzer 3.33.0` |
+| `O-01` | Doğru sürüm kuruldu mu | **TAMAM** | `sonar-analyzer 3.35.0` |
 | `O-02` | Ekransız temiz başlangıç ve kapanış | **TAMAM** | çıkış kodu 0; oturum log'u yazıldı |
 | `O-03` | Ana ekran, tema ve ikon | **TAMAM** | `platform plugin: windows`, `tema: 3216 karakterlik stil sayfasi`, `ana ekran: 1520x1201`, `ikon: sonar-analyzer.ico` |
 | `O-04` | Kayıt açma, CSV ve PNG çıktısı | **TAMAM** | 8 kanal / 8 kayıt; `export.csv` 8 satır geri okundu; `export.png` 1406 bayt, imza doğru |
@@ -65,15 +65,18 @@ verinin reddedilmesi** ve sağlam verinin eksiksiz okunmasıdır.
 | `M-02` | Sıra boşluklu kayıt | açılmalı | **TAMAM** | boşluk kaydı bozulma sayılmadı, 8 örnek okundu |
 | `M-03` | Desteklenmeyen format sürümü | **reddedilmeli** | **TAMAM** | `desteklenmeyen surum: 99 (desteklenen: 1, 2) (offset 8)`, çıkış kodu 1 |
 | `M-04` | Kesik başlıklı dosya | **reddedilmeli** | **TAMAM** | `kesik header: 32 bayt gerekli, 20 bayt bulundu (offset 0)`, çıkış kodu 1 |
-| `M-05` | Bozuk CRC'li kayıt | açılmalı **ve işaret görünmeli** | **BAŞARISIZ** | dosya açıldı, 8 örnek okundu, `sonuc: TAMAM` — CRC işareti hiçbir yerde görünmedi |
+| `M-05` | Bozuk CRC'li kayıt | açılmalı **ve işaret görünmeli** | **TAMAM** | `kalite: 1/8 ornek isaretli (CRC_ERROR=1)`; CSV'de `quality` sütunu |
 
 `M-03` ve `M-04`'te ret mesajları **nedenini ve bayt konumunu** veriyor.
 "Dosya açılamadı" demek yerine hangi alanın hangi offsette
 uyuşmadığını söylemek, sorunu firmware tarafında aranabilir kılar.
 
-## 5. Başarısız adım: `M-05`
+## 5. İlk turda düşen adım: `M-05` — düzeltildi
 
-### Ne bekleniyordu
+Bu bölüm, turun **ne işe yaradığının** kaydıdır: ilk koşuda `M-05`
+düştü, bulgu ayrı bir işe dönüştürüldü, iş yapıldı ve tur tekrarlandı.
+
+### 5.1 Ne bekleniyordu
 
 `ADR-011` §2.4: kayıt CRC hatası **fatal değildir** — dosya açılır,
 bozuk kayıt `CRC_ERROR` olarak işaretlenir ve verisi çizilmez. Dosyanın
@@ -81,10 +84,10 @@ tamamını reddetmek sağlam kayıtları da kaybettirirdi.
 
 İşaretlenmiş olması tek başına yetmez: mühendis bunu **görebilmelidir**.
 
-### Ne oldu
+### 5.2 İlk koşuda ne oldu
 
 `crc_error.bin` (bilinen bozuk CRC'li tek kayıt içerir) paketli
-uygulamayla açıldı:
+uygulamayla açıldı ve şu çıktı alındı:
 
 ```text
 kayit: 8 kanal, 8 kayit
@@ -94,37 +97,50 @@ png: 1406 bayt, imza dogru (export.png)
 sonuc: TAMAM
 ```
 
-Üretilen CSV'nin sütunları yalnız `timestamp_ns, timestamp_utc, value`.
-Bozuk kaydın değeri **diğer yedisinden ayırt edilemeden** yazıldı.
+Üretilen CSV'nin sütunları yalnız `timestamp_ns, timestamp_utc, value`
+idi. Bozuk kaydın değeri **diğer yedisinden ayırt edilemeden** yazıldı.
 
-### Kök neden
+### 5.3 Kök neden
 
-Hata okuma katmanında **değil**. `FileRecordingRepository`, sürüm 2
+Hata okuma katmanında **değildi**. `FileRecordingRepository`, sürüm 2
 dosyalarda her kaydın CRC'sini doğruluyor ve uyuşmayan kaydı
-`Quality.CRC_ERROR` ile işaretliyor — bu doğru çalışıyor.
+`Quality.CRC_ERROR` ile işaretliyordu — bu doğru çalışıyordu.
 
-Kayıp, bilgiyi kullanıcıya taşıyan yolda:
+Kayıp, bilgiyi kullanıcıya taşıyan yoldaydı:
 
-1. **CSV dışa aktarma** kalite bayraklarını hiç yazmıyor; `DataChunk`
-   içindeki bayrak bilgisi dosyaya çıkarken düşüyor.
-2. **`--bin-check`** sorgudan dönen bayrakları özetlemiyor; bu yüzden
-   bilinen bozuk bir dosyada bile `sonuc: TAMAM` diyor.
-
-### Etkisi
+1. **CSV dışa aktarma** kalite bayraklarını hiç yazmıyordu; `DataChunk`
+   içindeki bayrak bilgisi dosyaya çıkarken düşüyordu.
+2. **`--bin-check`** sorgudan dönen bayrakları özetlemiyordu; bu yüzden
+   bilinen bozuk bir dosyada bile `sonuc: TAMAM` diyordu.
 
 Bozuk bir kayıttan alınan CSV'yi inceleyen biri, o sekiz sayıdan
-birinin bütünlük denetiminden geçemediğini **anlayamaz**. Bozuk bir
+birinin bütünlük denetiminden geçemediğini **anlayamazdı**. Bozuk bir
 değeri ortalamaya katmak, onu hiç görmemekten daha zararlıdır.
 
-### Ayrı işe dönüştürüldü
+### 5.4 Ayrı işe dönüştürüldü ve kapatıldı
 
 `F6-035` — *Kalite bayraklarını dışa aktarmaya ve paket denetimine
-taşı*. Kabul: CRC/gap işaretli örnekler CSV'de ve `--bin-check`
-özetinde görünür.
+taşı*. Bulgu ayrıca `K-21` olarak bilinen sorunlara yazıldı.
 
-Bu turda **düzeltilmedi**: kabul turunun işi kusuru bulmak ve
+Kabul turu içinde **düzeltilmedi**: turun işi kusuru bulmak ve
 kaydetmektir; bulduğu kusuru aynı iş içinde kapatmak, turun
 başarısızlık yolunu da denetimsiz bırakırdı.
+
+`F6-035` tamamlandıktan sonra paket yeniden üretildi ve tur
+tekrarlandı:
+
+```text
+kayit: 8 kanal, 8 kayit
+sorgu: ch0 -> 8 ornek
+kalite: 1/8 ornek isaretli (CRC_ERROR=1)
+csv: 8 satir geri okundu (export.csv)
+png: 1406 bayt, imza dogru (export.png)
+sonuc: TAMAM
+```
+
+CSV artık bir `quality` sütunu taşıyor ve bozuk örnek `CRC_ERROR`
+olarak işaretli. `K-21` kapandığı için bilinen sorunlar listesinden
+çıkarıldı.
 
 ## 6. Turun kendisi hakkında
 

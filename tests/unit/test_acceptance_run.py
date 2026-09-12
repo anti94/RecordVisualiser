@@ -30,8 +30,8 @@ REPORT = ROOT / "docs" / "acceptance" / "results" / "packaged-acceptance.json"
 DOC = ROOT / "docs" / "acceptance" / "packaged-acceptance.md"
 PLAN = ROOT / "plan.md"
 
-#: Turda basarisiz olan ve ayri ise donusen adim.
-FAILED_STEP = "M-05"
+#: Ilk turda dusen, ayri ise donusen ve `F6-035` ile kapatilan adim.
+ONCE_FAILED_STEP = "M-05"
 FOLLOW_UP = "F6-035"
 
 
@@ -242,18 +242,39 @@ def test_successful_data_steps_recorded_artifact_evidence() -> None:
     assert seen, "hicbir adim dosya kaniti birakmamis"
 
 
-def test_the_known_failure_is_recorded_as_a_failure() -> None:
-    """`M-05` geçmiş gösterilmemeli; bulunan kusur turun çıktısıdır."""
-    failed = [entry for entry in _results() if entry["problems"]]
-    assert [entry["step_id"] for entry in failed] == [FAILED_STEP]
+def test_the_recorded_run_has_no_failing_step() -> None:
+    """`F6-035` kapandıktan sonra tur tekrarlandı; dokuz adım da geçmeli."""
+    failed = [entry["step_id"] for entry in _results() if entry["problems"]]
+    assert failed == [], f"dusen adim: {failed}"
+    assert _report()["ok"] is True
 
 
-def test_the_failure_becomes_a_separate_work_item() -> None:
-    """Kabul kriteri: başarısızlıklar ayrı işe dönüşür."""
+def test_the_once_failing_step_now_shows_the_flag_it_was_looking_for() -> None:
+    """`M-05` "geçti" demesi yetmez; aradığı kanıtı bulmuş olmalı."""
+    entry = next(item for item in _results() if item["step_id"] == ONCE_FAILED_STEP)
+    joined = "\n".join(cast("list[str]", entry["stdout_tail"]))
+    assert "CRC_ERROR" in joined
+    assert "isaretli" in joined
+
+
+def test_the_failure_became_a_separate_work_item() -> None:
+    """Kabul kriteri: başarısızlıklar ayrı işe dönüşür.
+
+    İş kapandı ama **kaydı silinmedi**: turun bir kusur bulup
+    kapattırdığı, sonradan izlenebilir olmalı.
+    """
     plan = PLAN.read_text(encoding="utf-8")
     assert f"`{FOLLOW_UP}`" in plan
     assert "Kalite bayraklarını dışa aktarmaya" in plan
-    assert f"`{FAILED_STEP}`" in plan  # isin nereden dogdugu yaziyor
+    assert f"`{ONCE_FAILED_STEP}`" in plan  # isin nereden dogdugu yaziyor
+
+
+def test_the_report_document_keeps_the_history_of_the_finding() -> None:
+    """Bulgu kapandı diye silinmemeli; turun ne işe yaradığının kanıtı."""
+    text = DOC.read_text(encoding="utf-8")
+    assert "İlk koşuda ne oldu" in text
+    assert "Kök neden" in text
+    assert "K-21" in text
 
 
 def test_the_report_document_agrees_with_the_recorded_evidence() -> None:
@@ -263,7 +284,7 @@ def test_the_report_document_agrees_with_the_recorded_evidence() -> None:
     assert f"**{report['step_count']}**" in text
     assert f"**{report['passed_count']}**" in text
     assert f"**{report['failed_count']}**" in text
-    assert FAILED_STEP in text
+    assert ONCE_FAILED_STEP in text
     assert FOLLOW_UP in text
 
 
