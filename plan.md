@@ -1907,14 +1907,14 @@ kaydın uyuşmadığı durumda **sessizce yanlış okumamaktır**.
 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `F7-019` | `4.24.0` | 20 dk | Profil C dosya header'ını çöz | Sihirli sayı, şema kimliği, sensör sayısı, örnekleme hızı ve frame sayısı okunur | `F7-018` | `feat(parser): F7-019 profil C dosya header'ını çöz` |
-| [ ] | `F7-020` | `4.25.0` | 20 dk | Frame header'ını şemadan çöz | Frame indeksi, timestamp, CIT, transmisyon ve platform alanları şemanın dediği offsetlerden okunur | `F7-019` | `feat(parser): F7-020 frame header'ını şemadan çöz` |
-| [ ] | `F7-021` | `4.26.0` | 20 dk | `complex64` payload'unu kopyasız oku | `np.frombuffer` ile (32, 820) complex64 dizi üretilir; kopya alınmadığı `base` ile doğrulanır | `F7-020` | `feat(parser): F7-021 `complex64` payload'unu kopyasız oku` |
-| [ ] | `F7-022` | `4.27.0` | 20 dk | Sensör × örnek yerleşimini doğrula | Yerleşim şemadan gelir; beklenen bayt sayısı tutmazsa `ProfileCFormatError` verir | `F7-021` | `feat(parser): F7-022 sensör × örnek yerleşimini doğrula` |
-| [ ] | `F7-023` | `4.28.0` | 20 dk | Frame CRC doğrulamasını ekle | Bozuk CRC'li frame işaretlenir, komşu frame'ler etkilenmez | `F7-022` | `feat(parser): F7-023 frame CRC doğrulamasını ekle` |
-| [ ] | `F7-024` | `4.29.0` | 20 dk | Kesik dosyayı raporla, tam frame'leri kullan | Yarım frame atılır, kaç bayt atıldığı kullanıcıya bildirilir | `F7-023` | `feat(parser): F7-024 kesik dosyayı raporla, tam frame'leri kullan` |
-| [ ] | `F7-025` | `4.30.0` | 15 dk | Frame indeksi ile dosya adı uyuşmazlığını raporla | `RxData00007.bin` içinde 70'ten farklı başlayan indeks uyarı üretir | `F7-024` | `feat(parser): F7-025 frame indeksi ile dosya adı uyuşmazlığını raporla` |
-| [ ] | `F7-026` | `4.31.0` | 20 dk | Timestamp ile frame sayacı arasındaki kaymayı ölç | Kayma ppm olarak raporlanır; 820/8192 kaynaklı beklenen kayma ile karşılaştırılır | `F7-025` | `feat(parser): F7-026 timestamp ile frame sayacı arasındaki kaymayı ölç` |
+| [x] | `F7-019` | `4.24.0` | 20 dk | Profil C dosya header'ını çöz | Sihirli sayı, şema kimliği, sensör sayısı, örnekleme hızı ve frame sayısı okunur | `F7-018` | `feat(parser): F7-019 profil C dosya header'ını çöz` |
+| [x] | `F7-020` | `4.25.0` | 20 dk | Frame header'ını şemadan çöz | Frame indeksi, timestamp, CIT, transmisyon ve platform alanları şemanın dediği offsetlerden okunur | `F7-019` | `feat(parser): F7-020 frame header'ını şemadan çöz` |
+| [x] | `F7-021` | `4.26.0` | 20 dk | `complex64` payload'unu kopyasız oku | `np.frombuffer` ile (32, 820) complex64 dizi üretilir; kopya alınmadığı `base` ile doğrulanır | `F7-020` | `feat(parser): F7-021 `complex64` payload'unu kopyasız oku` |
+| [x] | `F7-022` | `4.27.0` | 20 dk | Sensör × örnek yerleşimini doğrula | Yerleşim şemadan gelir; beklenen bayt sayısı tutmazsa `ProfileCFormatError` verir | `F7-021` | `feat(parser): F7-022 sensör × örnek yerleşimini doğrula` |
+| [x] | `F7-023` | `4.28.0` | 20 dk | Frame CRC doğrulamasını ekle | Bozuk CRC'li frame işaretlenir, komşu frame'ler etkilenmez | `F7-022` | `feat(parser): F7-023 frame CRC doğrulamasını ekle` |
+| [x] | `F7-024` | `4.29.0` | 20 dk | Kesik dosyayı raporla, tam frame'leri kullan | Yarım frame atılır, kaç bayt atıldığı kullanıcıya bildirilir | `F7-023` | `feat(parser): F7-024 kesik dosyayı raporla, tam frame'leri kullan` |
+| [x] | `F7-025` | `4.30.0` | 15 dk | Frame indeksi ile dosya adı uyuşmazlığını raporla | `RxData00007.bin` içinde 70'ten farklı başlayan indeks uyarı üretir | `F7-024` | `feat(parser): F7-025 frame indeksi ile dosya adı uyuşmazlığını raporla` |
+| [x] | `F7-026` | `4.31.0` | 20 dk | Timestamp ile frame sayacı arasındaki kaymayı ölç | Kayma ppm olarak raporlanır; 820/8192 kaynaklı beklenen kayma ile karşılaştırılır | `F7-025` | `feat(parser): F7-026 timestamp ile frame sayacı arasındaki kaymayı ölç` |
 | [ ] | `F7-027` | `4.32.0` | 20 dk | Sürüm dağıtımına Profil C'yi ekle | Profil A, B ve C dosyaları doğru çözücüye gider; bilinmeyen sürüm açık hata verir | `F7-026` | `feat(parser): F7-027 sürüm dağıtımına Profil C'yi ekle` |
 
 ##### Klasör keşfi ve indeks

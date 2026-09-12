@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 655 madde · 498 tamamlandı · 157 kaldı**
+**Toplam 655 madde · 506 tamamlandı · 149 kaldı**
 
-`[##################......]` %76.0
+`[###################.....]` %77.3
 
 ## Özet
 
@@ -41,10 +41,10 @@ Work in fully autonomous mode.
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 41 | 0 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 35 | 0 | 35 |
-| Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema | 18 | 62 | 80 |
+| Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema | 26 | 54 | 80 |
 | Faz 8 — Tx/Rx ham veri analizi ve sensör sağlığı | 0 | 76 | 76 |
 | Bölüm içi kontrol listeleri | 126 | 19 | 145 |
-| **Toplam** | **498** | **157** | **655** |
+| **Toplam** | **506** | **149** | **655** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -437,7 +437,7 @@ Work in fully autonomous mode.
 | [x] | `F6-034` | `4.0.0` | 15 dk | Dağıtım milestone kabulünü kapat ve major sürümü hazırla |
 | [x] | `F6-035` | `3.35.0` | 20 dk | Kalite bayraklarını dışa aktarmaya ve paket denetimine taşı |
 
-### Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema (18/80)
+### Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema (26/80)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -459,14 +459,14 @@ Work in fully autonomous mode.
 | [x] | `F7-016` | `4.21.0` | 15 dk | Şema parmak izini hesapla ve kayda yaz |
 | [x] | `F7-017` | `4.22.0` | 20 dk | Şema ile kayıt uyuşmazlığını tespit eden kapıyı kur |
 | [x] | `F7-018` | `4.23.0` | 20 dk | Şema doğrulama hatalarını kullanıcıya taşıyan mesajları yaz |
-| [ ] | `F7-019` | `4.24.0` | 20 dk | Profil C dosya header'ını çöz |
-| [ ] | `F7-020` | `4.25.0` | 20 dk | Frame header'ını şemadan çöz |
-| [ ] | `F7-021` | `4.26.0` | 20 dk | `complex64` payload'unu kopyasız oku |
-| [ ] | `F7-022` | `4.27.0` | 20 dk | Sensör × örnek yerleşimini doğrula |
-| [ ] | `F7-023` | `4.28.0` | 20 dk | Frame CRC doğrulamasını ekle |
-| [ ] | `F7-024` | `4.29.0` | 20 dk | Kesik dosyayı raporla, tam frame'leri kullan |
-| [ ] | `F7-025` | `4.30.0` | 15 dk | Frame indeksi ile dosya adı uyuşmazlığını raporla |
-| [ ] | `F7-026` | `4.31.0` | 20 dk | Timestamp ile frame sayacı arasındaki kaymayı ölç |
+| [x] | `F7-019` | `4.24.0` | 20 dk | Profil C dosya header'ını çöz |
+| [x] | `F7-020` | `4.25.0` | 20 dk | Frame header'ını şemadan çöz |
+| [x] | `F7-021` | `4.26.0` | 20 dk | `complex64` payload'unu kopyasız oku |
+| [x] | `F7-022` | `4.27.0` | 20 dk | Sensör × örnek yerleşimini doğrula |
+| [x] | `F7-023` | `4.28.0` | 20 dk | Frame CRC doğrulamasını ekle |
+| [x] | `F7-024` | `4.29.0` | 20 dk | Kesik dosyayı raporla, tam frame'leri kullan |
+| [x] | `F7-025` | `4.30.0` | 15 dk | Frame indeksi ile dosya adı uyuşmazlığını raporla |
+| [x] | `F7-026` | `4.31.0` | 20 dk | Timestamp ile frame sayacı arasındaki kaymayı ölç |
 | [ ] | `F7-027` | `4.32.0` | 20 dk | Sürüm dağıtımına Profil C'yi ekle |
 | [ ] | `F7-028` | `4.33.0` | 20 dk | Kayıt klasörü düzenini keşfet |
 | [ ] | `F7-029` | `4.34.0` | 20 dk | Dosya sayacı sırasını doğrula ve boşlukları raporla |
