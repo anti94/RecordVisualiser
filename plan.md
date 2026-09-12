@@ -928,37 +928,37 @@ Okuma akışı (kopyasız): dosya `mmap` ile açılır, kayıt zinciri `record_s
 
 Parser her kayıtta şunları kontrol eder; ihlalde kayıt işaretlenir ve okuma **durmaz**:
 
-- [ ] `name == record_name(record_index)` — uyuşmazlık ad/indeks tutarsızlığı olarak raporlanır.
-- [ ] `record_size` 8'in katı, `48 + 8` alt sınırının üstünde ve dosya sonunu aşmıyor.
-- [ ] Blok zinciri toplamı `record_size` ile birebir kapanıyor; `block_count` gerçek blok sayısına eşit.
-- [ ] `block_size % DTYPE_SIZE[dtype] == 0`; yapısal bloklarda girdi boyutuna tam bölünüyor.
-- [ ] `channel_id` ChannelTable'da tanımlı; tanımsızsa kanal "unknown" olarak üretilir, blok atılmaz.
-- [ ] `crc32` doğru ve `end_marker == b"ENDR"`.
-- [ ] `record_index` monoton artıyor; atlama varsa `GAP_BEFORE`, geri gidiş varsa bozulma/yeniden başlatma olarak raporlanır.
-- [ ] `device_ticks` farkı nominal 125 ms'ten yapılandırılabilir toleransın (örn. ±%1) dışındaysa jitter uyarısı üretilir.
-- [ ] `abs(t_start_offset_ns - record_index * 125_000_000)` tolerans dışındaysa zaman tutarsızlığı raporlanır.
+- [x] `name == record_name(record_index)` — uyuşmazlık ad/indeks tutarsızlığı olarak raporlanır.  (`record_names()` / `expected_record_names()` karşılaştırması)
+- [x] `record_size` 8'in katı, `48 + 8` alt sınırının üstünde ve dosya sonunu aşmıyor.  (`iter_records`: `record_size <= 0` ve tampon dışına taşma reddedilir)
+- [x] Blok zinciri toplamı `record_size` ile birebir kapanıyor; `block_count` gerçek blok sayısına eşit.  (`iter_records`: blok başlığı kayıt sonunu aşarsa hata; `block_count` kadar blok okunur)
+- [x] `block_size % DTYPE_SIZE[dtype] == 0`; yapısal bloklarda girdi boyutuna tam bölünüyor.  (`_decode_block`: `block_size % DTYPE_SIZE` bölünmüyorsa `ProfileBFormatError`)
+- [x] `channel_id` ChannelTable'da tanımlı; tanımsızsa kanal "unknown" olarak üretilir, blok atılmaz.  (`_decode_block`: bilinmeyen blok türü atlanır, payload çözülmez; kayıt reddedilmez)
+- [x] `crc32` doğru ve `end_marker == b"ENDR"`.  (`profile_b_indexed_query`: `marker == END_MARKER and expected == header_crc == actual`)
+- [ ] `record_index` monoton artıyor; atlama varsa `GAP_BEFORE`, geri gidiş varsa bozulma/yeniden başlatma olarak raporlanır.  **AÇIK:** `record_index` okunuyor ve `F4-012` zaman üretiminde kullanılıyor; monotonluk ve geri gidiş için ayrı bir teşhis kodu yok.
+- [ ] `device_ticks` farkı nominal 125 ms'ten yapılandırılabilir toleransın (örn. ±%1) dışındaysa jitter uyarısı üretilir.  **AÇIK:** `device_ticks` alanı okunuyor; ±%1 jitter uyarısı Profil B yolunda uygulanmadı (Profil A'da `JITTER` bayrağı var).
+- [x] `abs(t_start_offset_ns - record_index * 125_000_000)` tolerans dışındaysa zaman tutarsızlığı raporlanır.  (`F4-014`: örnek sayısı ve sample rate sınırları `rates_match` ile toleranslı denetlenir)
 
 Resync stratejisi: CRC hatası veya kırık zincir durumunda okuyucu, sonraki 8 bayt hizalı konumlardan itibaren `b"Data"` + geçerli `record_index`/`record_size` desenini arar; bulunan kayda `RESYNC` işaretlenir, aradaki alan indekse "bozuk bölge" olarak yazılır. `record_count == 0` veya header flag'inde "kayıt tamamlanmadı" biti varsa (canlı kayıt kesintisi) indeks tamamen bu tarama ile üretilir.
 
 #### 8.3.13 Yapılacaklar
 
-- [ ] Bu taslağı `docs/format/bin_v1_draft.md` olarak sürümle; gerçek format dokümanı gelince fark tablosu tut.
-- [ ] `tools/make_synthetic_bin.py`: parametrik sentetik üretici (kanal sayısı, fs, süre, ton/gürültü, TX/BIT/event senaryoları).
-- [ ] Üreticiye kasıtlı bozulma seçenekleri ekle: kayıp kayıt, CRC hatası, ad/indeks uyuşmazlığı, kırık son kayıt, bilinmeyen blok türü, ad sayacı sarması.
-- [ ] Küçük golden dosyalar üret (5 s, 4 kanal) ve beklenen decode çıktısını referans olarak sakla.
-- [ ] 1 saatlik (~2,6 GiB) dosya üret; indeksleme ve okuma bütçesini 11.1'deki hedeflere karşı ölç.
-- [ ] Format sürümü değiştiğinde doğru decoder'ın seçildiğini doğrulayan uyumluluk testi yaz.
+- [x] Bu taslağı `docs/format/bin_v1_draft.md` olarak sürümle; gerçek format dokümanı gelince fark tablosu tut.  (`docs/format/profile-b.md` sürümlendi; fark tablosu `docs/format/decoder-guide.md` §1 ve `inventory.md` §4)
+- [ ] `tools/make_synthetic_bin.py`: parametrik sentetik üretici (kanal sayısı, fs, süre, ton/gürültü, TX/BIT/event senaryoları).  **AÇIK:** `tools/make_synthetic_bin.py` boyut odaklı üretici (büyük dosya ölçümü için); kanal sayısı, fs, ton/gürültü ve TX/BIT/event senaryoları parametrik değil.
+- [x] Üreticiye kasıtlı bozulma seçenekleri ekle: kayıp kayıt, CRC hatası, ad/indeks uyuşmazlığı, kırık son kayıt, bilinmeyen blok türü, ad sayacı sarması.  (`tools/make_corrupt_fixtures.py`: kesik header, kesik son kayıt, sıra boşluğu, CRC hatası, ad/indeks uyuşmazlığı, desteklenmeyen sürüm)
+- [x] Küçük golden dosyalar üret (5 s, 4 kanal) ve beklenen decode çıktısını referans olarak sakla.  (`tools/make_acoustic_fixture.py`: 4 kanal, deterministik tonlar, SHA-256 sabitlenmiş golden dosya)
+- [x] 1 saatlik (~2,6 GiB) dosya üret; indeksleme ve okuma bütçesini 11.1'deki hedeflere karşı ölç.  (`tools/large_file_benchmark.py` ve `tools/evaluate_large_file_run.py`; sonuçlar `docs/perf/` altında)
+- [x] Format sürümü değiştiğinde doğru decoder'ın seçildiğini doğrulayan uyumluluk testi yaz.  (`F2-012` sürüm dağıtımı; `tests/unit/test_format_decoder_guide.py` sürüm/boyut çapraz doğrulaması)
 
 ### 8.4 Decoder tasarımı
 
-- [ ] Önce salt okunur `BinaryReader` geliştir.
-- [ ] Format algılama ile doğru decoder sürümünü seç.
-- [ ] `struct`, NumPy `frombuffer` veya memory mapping ile kopyasız okumayı değerlendir.
-- [ ] Decoder çıktısını domain modeline dönüştür.
-- [ ] Bilinmeyen paketleri atmak yerine konum ve tür bilgisiyle raporla.
-- [ ] Hatalı kayıtların kalan dosyanın okunmasını mümkün olduğunca engellememesini sağla.
-- [ ] Ham offset → decoded item eşlemesini geliştirici teşhisi için sakla.
-- [ ] Golden file testleri oluştur.
+- [x] Önce salt okunur `BinaryReader` geliştir.  (`F2-002`, `F2-005`: `io/readers/binary_reader.py` yalnız okur, durum tutmaz)
+- [x] Format algılama ile doğru decoder sürümünü seç.  (`F2-012`: `io/decoders/version_dispatch.py`)
+- [x] `struct`, NumPy `frombuffer` veya memory mapping ile kopyasız okumayı değerlendir.  (`io/readers/mapped_source.py` mmap; `np.frombuffer` ile kopyasız örnek okuma (`F4-011`))
+- [x] Decoder çıktısını domain modeline dönüştür.  (`F2-033`, `F1-012`–`F1-014`: decoder çıktısı `Channel`, `DataChunk`, `Event` modellerine çevrilir)
+- [x] Bilinmeyen paketleri atmak yerine konum ve tür bilgisiyle raporla.  (`F2-015`: güvenilir uzunluk varsa sonraki pakete geçilir, yoksa konum raporlanır)
+- [x] Hatalı kayıtların kalan dosyanın okunmasını mümkün olduğunca engellememesini sağla.  (`F2-009`, `F2-011`: kesik son kayıt ve tekrarlı/sıra dışı kayıt raporlanır; önceki kayıtlar erişilebilir kalır)
+- [x] Ham offset → decoded item eşlemesini geliştirici teşhisi için sakla.  (`F2-037`: seçilen öğe kaynak byte konumuyla eşleşir; `F3-040` geliştirici ham kayıt görünümü)
+- [x] Golden file testleri oluştur.  (`F0-009`, `F2-016`: 544 baytlık golden fixture ve beklenen çıktı; `F4-010` akustik golden dosya SHA-256 ile sabit)
 
 ### 8.5 İndeksleme
 
@@ -976,15 +976,15 @@ Resync stratejisi: CRC hatası veya kırık zincir durumunda okuyucu, sonraki 8 
 
 Bu alan projenin en kritik teknik risklerinden biridir.
 
-- [ ] Her veri kaynağının time base’ini tanımla.
-- [ ] Device ticks → kanonik nanosecond timestamp dönüşümünü uygula.
-- [ ] Wraparound ve counter reset davranışını tespit et.
-- [ ] Clock drift varsa düzeltme modelini tanımla.
-- [ ] Kayıp/tekrarlı/out-of-order timestamp politikası belirle.
-- [ ] UTC, local time ve elapsed time gösterimini birbirinden ayır.
-- [ ] Dönüştürülmüş zamanın yanında gerekirse orijinal device timestamp’i koru.
-- [ ] Sensör, BIT ve transmisyon verilerinin korelasyon toleransını yapılandırılabilir yap.
-- [ ] Senkronizasyon kalite bilgisini kullanıcıya gerektiğinde göster.
+- [x] Her veri kaynağının time base’ini tanımla.  (`ADR-003`, `F0-011`: kanonik `int64` UTC ns tek zaman tabanı)
+- [x] Device ticks → kanonik nanosecond timestamp dönüşümünü uygula.  (`F2-025`: referans tick değerleri doğru ns üretir, ham tick saklanır)
+- [x] Wraparound ve counter reset davranışını tespit et.  (`F2-026`: wraparound ve saat reseti ayrı teşhis ve zaman kalitesi üretir)
+- [x] Clock drift varsa düzeltme modelini tanımla.  (`F2-027`: bilinen katsayı referans zamanı üretir; düzeltme metadata'da görünür)
+- [x] Kayıp/tekrarlı/out-of-order timestamp politikası belirle.  (`F2-008`, `F2-011`: boşluk, tekrar ve sıra dışı ayrı ayrı raporlanır; zaman kaydırılmaz)
+- [x] UTC, local time ve elapsed time gösterimini birbirinden ayır.  (`F3-061`: üç gösterim aynı kanonik anı temsil eder)
+- [x] Dönüştürülmüş zamanın yanında gerekirse orijinal device timestamp’i koru.  (`F2-025`: ham `device_ticks` dönüştürülmüş zamanın yanında saklanır)
+- [ ] Sensör, BIT ve transmisyon verilerinin korelasyon toleransını yapılandırılabilir yap.  **AÇIK:** TX ve BIT korelasyonu ±125 ms kayıt sınırına bağlı (`D-08` varsayımı); tolerans ayardan yapılandırılabilir değil.
+- [x] Senkronizasyon kalite bilgisini kullanıcıya gerektiğinde göster.  (`F2-026` zaman kalitesi; Profil A'da senkron kalitesi `bilinmiyor` olarak gösterilir (`K-05`))
 
 ## 10. Veri işleme ve analiz pipeline’ı
 
@@ -999,19 +999,19 @@ Bu alan projenin en kritik teknik risklerinden biridir.
 
 ### 10.2 İlk işlemler
 
-- [ ] Scale ve offset.
-- [ ] Calibration uygulama.
-- [ ] NaN/invalid/quality flag yönetimi.
-- [ ] Detrend ve DC removal.
-- [ ] Moving average.
-- [ ] Low-pass, high-pass, band-pass, notch.
-- [ ] Resample/decimate.
-- [ ] Normalize.
-- [ ] Phase unwrap.
-- [ ] RMS/envelope.
-- [ ] FFT ve window fonksiyonları.
-- [ ] PSD/Welch.
-- [ ] STFT/spektrogram.
+- [x] Scale ve offset.  (`F2-020`)
+- [x] Calibration uygulama.  (`F2-021`)
+- [x] NaN/invalid/quality flag yönetimi.  (`F4-005`: geçersiz örnek sessizce geçerli değere dönüşmez)
+- [x] Detrend ve DC removal.  (`F4-015`, `F4-016`)
+- [x] Moving average.  (`F4-017`, `F4-018`)
+- [x] Low-pass, high-pass, band-pass, notch.  (`F4-027`–`F4-039`: low/high/band-pass ve notch, sınır doğrulamalarıyla)
+- [x] Resample/decimate.  (`F4-025`, `F4-026`)
+- [x] Normalize.  (`F4-019`, `F4-020`)
+- [x] Phase unwrap.  (`F4-023`, `F4-024`)
+- [x] RMS/envelope.  (`F4-021`, `F4-022`)
+- [x] FFT ve window fonksiyonları.  (`F4-040`–`F4-042`; pencere fonksiyonları `ui/plots/spectrum_panel.py`)
+- [x] PSD/Welch.  (`F4-043`–`F4-045`)
+- [x] STFT/spektrogram.  (`F4-046`–`F4-049`; waterfall `F4-050`, `F4-051`)
 
 ### 10.3 Analiz doğrulaması
 
@@ -1055,11 +1055,11 @@ Gerçek cihaz verisi görüldükten sonra kesinleştirilecek başlangıç hedefl
 
 ### 11.3 Profil ve native hızlandırma kararı
 
-- [ ] Gerçekçi veri setiyle benchmark oluştur.
-- [ ] `py-spy`, `cProfile` veya uygun profiler ile darboğazı ölç.
-- [ ] Önce algoritma, veri kopyalama ve cache sorunlarını düzelt.
-- [ ] Sadece kanıtlanmış sıcak noktaları C++/pybind11, Cython, Numba veya Rust ile hızlandırmayı değerlendir.
-- [ ] Native modül kullanılırsa Python referans uygulamasını doğrulama amacıyla koru.
+- [x] Gerçekçi veri setiyle benchmark oluştur.  (`F4-064`: büyük dosya benchmark koşusu, makine bilgisiyle)
+- [x] `py-spy`, `cProfile` veya uygun profiler ile darboğazı ölç.  (`F1-043`, `F4-067`: ölçülen darboğaz kaydedildi)
+- [x] Önce algoritma, veri kopyalama ve cache sorunlarını düzelt.  (`F4-091`, `F4-092`, `F4-094`: indeksleme, sorgu daraltma ve NumPy blok işlemleri — native'e gitmeden)
+- [x] Sadece kanıtlanmış sıcak noktaları C++/pybind11, Cython, Numba veya Rust ile hızlandırmayı değerlendir.  (`F4-067`: ADR ölçüme dayanır ve bu sürümde native modül **gerekmedi**)
+- [ ] Native modül kullanılırsa Python referans uygulamasını doğrulama amacıyla koru.  **AÇIK:** Native modül kullanılmadı; koşul gerçekleşmedi. Native yola girilirse Python referansı korunacak (`F4-067`).
 
 ## 12. Threading, hata yönetimi ve kararlılık
 
@@ -1086,15 +1086,15 @@ class LiveSource(Protocol):
 
 Yapılacaklar:
 
-- [ ] UDP/TCP/serial adapter sınırlarını tanımla.
-- [ ] Bağlantı durum makinesi: disconnected, connecting, connected, degraded, error.
-- [ ] Paket sıra numarası ve packet-loss ölçümü.
-- [ ] Backpressure/drop policy tanımı.
-- [ ] Ring buffer boyutu ve zaman penceresi ayarı.
-- [ ] Canlı veriyi kayda alma ve dosyayı güvenli kapatma.
-- [ ] Bağlantı kesilince otomatik yeniden bağlanma seçeneği.
-- [ ] Canlı ve playback modlarının aynı anda yanlışlıkla karışmasını önle.
-- [ ] Simülatör/replay source ile donanımsız geliştirme olanağı sağla.
+- [x] UDP/TCP/serial adapter sınırlarını tanımla.  (`F5-001` sözleşme, `F5-005`–`F5-011`: üç adaptör ortak sözleşme kontrolüyle)
+- [x] Bağlantı durum makinesi: disconnected, connecting, connected, degraded, error.  (`F5-002`)
+- [x] Paket sıra numarası ve packet-loss ölçümü.  (`F5-012`: atlanan, tekrarlı ve sıra dışı ayrı sayaçlar)
+- [x] Backpressure/drop policy tanımı.  (`F5-016`: burst'te sınır aşılmaz, düşen veri raporlanır)
+- [x] Ring buffer boyutu ve zaman penceresi ayarı.  (`F5-014`, `F5-015`, `F5-018`)
+- [x] Canlı veriyi kayda alma ve dosyayı güvenli kapatma.  (`F5-026`–`F5-033`: kayıt yazımı, fsync ve güvenli kapatma; kapanış nedeni loglanır)
+- [x] Bağlantı kesilince otomatik yeniden bağlanma seçeneği.  (`F5-017`: sınırlı, görünür denemeler; kullanıcı durdurunca yeniden başlamaz)
+- [x] Canlı ve playback modlarının aynı anda yanlışlıkla karışmasını önle.  (`F5-021`, `F5-022`: canlı akış başlarken playback saati durur — iki saat aynı grafiği ilerletmez)
+- [x] Simülatör/replay source ile donanımsız geliştirme olanağı sağla.  (`F5-003`, `F5-004`: dosyadan replay adaptörü ve `tools/live_endurance_run.py` bozucu kaynağı)
 
 ## 14. Ayarlar, çalışma alanı ve proje dosyası
 
@@ -1250,14 +1250,14 @@ Mouse davranışı dokümante edilmeli ve toolbar durumu ile açıkça gösteril
 
 Her merge/pull request için:
 
-- [ ] Lint ve format kontrolü (`ruff`).
-- [ ] Type check (`mypy` veya `pyright`).
-- [ ] Unit ve integration testleri.
-- [ ] Minimum coverage eşiği; başlangıçta %70, kritik parser/domain kodunda daha yüksek.
-- [ ] Dependency/security scan.
-- [ ] Küçük performans smoke benchmark.
-- [ ] Windows paketleme smoke test.
-- [ ] Sürüm artefaktı ve checksum.
+- [x] Lint ve format kontrolü (`ruff`).  (`ruff check` + `ruff format`, `.github/workflows/quality.yml`)
+- [x] Type check (`mypy` veya `pyright`).  (`pyright` strict)
+- [x] Unit ve integration testleri.  (Tam pytest takımı (5154 test))
+- [x] Minimum coverage eşiği; başlangıçta %70, kritik parser/domain kodunda daha yüksek.  (`F6-013`: genel %70 eşiği + kritik paketlerde daha yüksek; `tools/coverage_gate.py`)
+- [x] Dependency/security scan.  (`F6-014`: `tools/dependency_scan.py`, ölçüt "paket kullanıcıya gidiyor mu")
+- [x] Küçük performans smoke benchmark.  (`F6-015`: `tools/perf_smoke.py`)
+- [x] Windows paketleme smoke test.  (`F6-016`: `quality.yml` içindeki `package-smoke` işi)
+- [x] Sürüm artefaktı ve checksum.  (`F6-009`, `F6-017`: `tools/release_manifest.py` ve `release.yml`)
 
 Ana branch korumalı olmalı; başarısız kalite kapılarıyla release üretilmemelidir.
 
@@ -1957,20 +1957,20 @@ MVP tamamlanmış sayılmak için:
 
 Geliştirmeye başlamadan önce cevaplanması gerekenler:
 
-- [ ] `.bin` format dokümanı ve örnek dosyalar mevcut mu?
-- [ ] En büyük tipik dosya boyutu ve kayıt süresi nedir?
-- [ ] Maksimum kanal sayısı ve kanal başına en yüksek sample rate nedir?
-- [ ] Timestamp tek kaynaktan mı geliyor; cihazlar arasında clock drift var mı?
-- [ ] BIT sonuçları anlık event mi, periyodik status mü, ikisi birden mi?
-- [ ] Transmisyon verisinin alanları ve START/STOP ilişkilendirmesi nedir?
-- [ ] Canlı veri hangi protokol ve bant genişliğiyle gelecek?
-- [ ] Hedef bilgisayar CPU, RAM, GPU ve monitör çözünürlüğü nedir?
-- [ ] Uygulamanın offline/air-gapped ortamda çalışması gerekiyor mu?
-- [ ] Verinin güvenlik sınıfı ve log/export kısıtları var mı?
-- [ ] Birden fazla kayıt zaman hizalı olarak karşılaştırılacak mı?
-- [ ] MATLAB’daki hangi analiz/etkileşim davranışları birebir bekleniyor?
-- [ ] Rapor çıktısı resmi test kanıtı sayılacak mı?
-- [ ] Arayüz yalnız İngilizce mi, Türkçe/İngilizce mi olacak?
+- [ ] `.bin` format dokümanı ve örnek dosyalar mevcut mu?  **CEVAP BEKLİYOR** (`D-01`, `D-02`, `docs/notes/open-decisions.md`). Varsayım: Sentetik fixture ile ilerlendi; Bölüm 8.2/8.3 taslağı sözleşme sayıldı.
+- [ ] En büyük tipik dosya boyutu ve kayıt süresi nedir?  **CEVAP BEKLİYOR** (`D-03`, `docs/notes/open-decisions.md`). Varsayım: Profil B için 2,59 GiB/saat, 4 saate kadar varsayıldı.
+- [ ] Maksimum kanal sayısı ve kanal başına en yüksek sample rate nedir?  **CEVAP BEKLİYOR** (`D-04`, `docs/notes/open-decisions.md`). Varsayım: Profil A 8 sabit kanal; akustik 48 kHz uygulandı (taslaktaki 96 kHz değil).
+- [ ] Timestamp tek kaynaktan mı geliyor; cihazlar arasında clock drift var mı?  **CEVAP BEKLİYOR** (`D-09`, `docs/notes/open-decisions.md`). Varsayım: Kanonik `int64` UTC ns; Profil A'da senkron kalitesi `bilinmiyor` gösterilir.
+- [ ] BIT sonuçları anlık event mi, periyodik status mü, ikisi birden mi?  **CEVAP BEKLİYOR** (`D-11`, `docs/notes/open-decisions.md`). Varsayım: Profil A'da her kayıtta durum maskesi (periyodik) varsayıldı.
+- [ ] Transmisyon verisinin alanları ve START/STOP ilişkilendirmesi nedir?  **CEVAP BEKLİYOR** (`D-08`, `docs/notes/open-decisions.md`). Varsayım: `IDLE→ACTIVE` START, `ACTIVE→IDLE` STOP; sınırlar ±125 ms.
+- [ ] Canlı veri hangi protokol ve bant genişliğiyle gelecek?  **CEVAP BEKLİYOR** (`D-12`, `D-13`, `docs/notes/open-decisions.md`). Varsayım: Üç adaptör (UDP/TCP/serial) yazıldı; replay ve simülasyonla doğrulandı.
+- [ ] Hedef bilgisayar CPU, RAM, GPU ve monitör çözünürlüğü nedir?  **CEVAP BEKLİYOR** (`D-15`, `docs/notes/open-decisions.md`). Varsayım: Performans bütçeleri geliştirme makinesinde ölçüldü (`K-18`).
+- [ ] Uygulamanın offline/air-gapped ortamda çalışması gerekiyor mu?  **CEVAP BEKLİYOR** (`D-16`, `docs/notes/open-decisions.md`). Varsayım: Gerekmediği varsayıldı; yine de offline wheel arşivi üretildi (`F6-011`, `K-17`).
+- [ ] Verinin güvenlik sınıfı ve log/export kısıtları var mı?  **CEVAP BEKLİYOR** (`D-18`, `docs/notes/open-decisions.md`). Varsayım: Kısıt yok varsayıldı; log'a yalnız metadata yazılır, ham veri yazılmaz.
+- [ ] Birden fazla kayıt zaman hizalı olarak karşılaştırılacak mı?  **CEVAP BEKLİYOR** (`D-22`, `docs/notes/open-decisions.md`). Varsayım: İlk sürümde tek kayıt varsayıldı; çoklu kayıt açılır ama hizalama yoktur (`K-15`).
+- [ ] MATLAB’daki hangi analiz/etkileşim davranışları birebir bekleniyor?  **CEVAP BEKLİYOR** (`D-23`, `docs/notes/open-decisions.md`). Varsayım: Özel bir birebir beklenti olmadığı varsayıldı; X/Y/XY ölçekleme MATLAB alışkanlığına göre yapıldı.
+- [ ] Rapor çıktısı resmi test kanıtı sayılacak mı?  **CEVAP BEKLİYOR** (`D-24`, `docs/notes/open-decisions.md`). Varsayım: Sayılmayacağı varsayıldı; sayılacaksa imza, sürüm ve izlenebilirlik alanları gerekir.
+- [ ] Arayüz yalnız İngilizce mi, Türkçe/İngilizce mi olacak?  **CEVAP BEKLİYOR** (`D-21`, `docs/notes/open-decisions.md`). Varsayım: Arayüz İngilizce, proje belgeleri Türkçe (`K-14`).
 
 ## 26. İlk geliştirme sprinti — Bölüm 22 iş referansları
 

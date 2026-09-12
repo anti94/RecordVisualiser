@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 499 madde · 411 tamamlandı · 88 kaldı**
+**Toplam 499 madde · 473 tamamlandı · 26 kaldı**
 
-`[####################....]` %82.4
+`[#######################.]` %94.8
 
 ## Özet
 
@@ -41,8 +41,8 @@ Work in fully autonomous mode.
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 41 | 0 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 35 | 0 | 35 |
-| Bölüm içi kontrol listeleri | 57 | 88 | 145 |
-| **Toplam** | **411** | **88** | **499** |
+| Bölüm içi kontrol listeleri | 119 | 26 | 145 |
+| **Toplam** | **473** | **26** | **499** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -507,94 +507,94 @@ Work in fully autonomous mode.
 
 ### 8.3.12 Doğrulama kuralları
 
-- [ ] `name == record_name(record_index)` — uyuşmazlık ad/indeks tutarsızlığı olarak raporlanır.  <sub>plan.md:931</sub>
-- [ ] `record_size` 8'in katı, `48 + 8` alt sınırının üstünde ve dosya sonunu aşmıyor.  <sub>plan.md:932</sub>
-- [ ] Blok zinciri toplamı `record_size` ile birebir kapanıyor; `block_count` gerçek blok sayısına eşit.  <sub>plan.md:933</sub>
-- [ ] `block_size % DTYPE_SIZE[dtype] == 0`; yapısal bloklarda girdi boyutuna tam bölünüyor.  <sub>plan.md:934</sub>
-- [ ] `channel_id` ChannelTable'da tanımlı; tanımsızsa kanal "unknown" olarak üretilir, blok atılmaz.  <sub>plan.md:935</sub>
-- [ ] `crc32` doğru ve `end_marker == b"ENDR"`.  <sub>plan.md:936</sub>
-- [ ] `record_index` monoton artıyor; atlama varsa `GAP_BEFORE`, geri gidiş varsa bozulma/yeniden başlatma olarak raporlanır.  <sub>plan.md:937</sub>
-- [ ] `device_ticks` farkı nominal 125 ms'ten yapılandırılabilir toleransın (örn. ±%1) dışındaysa jitter uyarısı üretilir.  <sub>plan.md:938</sub>
-- [ ] `abs(t_start_offset_ns - record_index * 125_000_000)` tolerans dışındaysa zaman tutarsızlığı raporlanır.  <sub>plan.md:939</sub>
+- [x] `name == record_name(record_index)` — uyuşmazlık ad/indeks tutarsızlığı olarak raporlanır.  (`record_names()` / `expected_record_names()` karşılaştırması)  <sub>plan.md:931</sub>
+- [x] `record_size` 8'in katı, `48 + 8` alt sınırının üstünde ve dosya sonunu aşmıyor.  (`iter_records`: `record_size <= 0` ve tampon dışına taşma reddedilir)  <sub>plan.md:932</sub>
+- [x] Blok zinciri toplamı `record_size` ile birebir kapanıyor; `block_count` gerçek blok sayısına eşit.  (`iter_records`: blok başlığı kayıt sonunu aşarsa hata; `block_count` kadar blok okunur)  <sub>plan.md:933</sub>
+- [x] `block_size % DTYPE_SIZE[dtype] == 0`; yapısal bloklarda girdi boyutuna tam bölünüyor.  (`_decode_block`: `block_size % DTYPE_SIZE` bölünmüyorsa `ProfileBFormatError`)  <sub>plan.md:934</sub>
+- [x] `channel_id` ChannelTable'da tanımlı; tanımsızsa kanal "unknown" olarak üretilir, blok atılmaz.  (`_decode_block`: bilinmeyen blok türü atlanır, payload çözülmez; kayıt reddedilmez)  <sub>plan.md:935</sub>
+- [x] `crc32` doğru ve `end_marker == b"ENDR"`.  (`profile_b_indexed_query`: `marker == END_MARKER and expected == header_crc == actual`)  <sub>plan.md:936</sub>
+- [ ] `record_index` monoton artıyor; atlama varsa `GAP_BEFORE`, geri gidiş varsa bozulma/yeniden başlatma olarak raporlanır.  **AÇIK:** `record_index` okunuyor ve `F4-012` zaman üretiminde kullanılıyor; monotonluk ve geri gidiş için ayrı bir teşhis kodu yok.  <sub>plan.md:937</sub>
+- [ ] `device_ticks` farkı nominal 125 ms'ten yapılandırılabilir toleransın (örn. ±%1) dışındaysa jitter uyarısı üretilir.  **AÇIK:** `device_ticks` alanı okunuyor; ±%1 jitter uyarısı Profil B yolunda uygulanmadı (Profil A'da `JITTER` bayrağı var).  <sub>plan.md:938</sub>
+- [x] `abs(t_start_offset_ns - record_index * 125_000_000)` tolerans dışındaysa zaman tutarsızlığı raporlanır.  (`F4-014`: örnek sayısı ve sample rate sınırları `rates_match` ile toleranslı denetlenir)  <sub>plan.md:939</sub>
 
 ### 8.3.13 Yapılacaklar
 
-- [ ] Bu taslağı `docs/format/bin_v1_draft.md` olarak sürümle; gerçek format dokümanı gelince fark tablosu tut.  <sub>plan.md:945</sub>
-- [ ] `tools/make_synthetic_bin.py`: parametrik sentetik üretici (kanal sayısı, fs, süre, ton/gürültü, TX/BIT/event senaryoları).  <sub>plan.md:946</sub>
-- [ ] Üreticiye kasıtlı bozulma seçenekleri ekle: kayıp kayıt, CRC hatası, ad/indeks uyuşmazlığı, kırık son kayıt, bilinmeyen blok türü, ad sayacı sarması.  <sub>plan.md:947</sub>
-- [ ] Küçük golden dosyalar üret (5 s, 4 kanal) ve beklenen decode çıktısını referans olarak sakla.  <sub>plan.md:948</sub>
-- [ ] 1 saatlik (~2,6 GiB) dosya üret; indeksleme ve okuma bütçesini 11.1'deki hedeflere karşı ölç.  <sub>plan.md:949</sub>
-- [ ] Format sürümü değiştiğinde doğru decoder'ın seçildiğini doğrulayan uyumluluk testi yaz.  <sub>plan.md:950</sub>
+- [x] Bu taslağı `docs/format/bin_v1_draft.md` olarak sürümle; gerçek format dokümanı gelince fark tablosu tut.  (`docs/format/profile-b.md` sürümlendi; fark tablosu `docs/format/decoder-guide.md` §1 ve `inventory.md` §4)  <sub>plan.md:945</sub>
+- [ ] `tools/make_synthetic_bin.py`: parametrik sentetik üretici (kanal sayısı, fs, süre, ton/gürültü, TX/BIT/event senaryoları).  **AÇIK:** `tools/make_synthetic_bin.py` boyut odaklı üretici (büyük dosya ölçümü için); kanal sayısı, fs, ton/gürültü ve TX/BIT/event senaryoları parametrik değil.  <sub>plan.md:946</sub>
+- [x] Üreticiye kasıtlı bozulma seçenekleri ekle: kayıp kayıt, CRC hatası, ad/indeks uyuşmazlığı, kırık son kayıt, bilinmeyen blok türü, ad sayacı sarması.  (`tools/make_corrupt_fixtures.py`: kesik header, kesik son kayıt, sıra boşluğu, CRC hatası, ad/indeks uyuşmazlığı, desteklenmeyen sürüm)  <sub>plan.md:947</sub>
+- [x] Küçük golden dosyalar üret (5 s, 4 kanal) ve beklenen decode çıktısını referans olarak sakla.  (`tools/make_acoustic_fixture.py`: 4 kanal, deterministik tonlar, SHA-256 sabitlenmiş golden dosya)  <sub>plan.md:948</sub>
+- [x] 1 saatlik (~2,6 GiB) dosya üret; indeksleme ve okuma bütçesini 11.1'deki hedeflere karşı ölç.  (`tools/large_file_benchmark.py` ve `tools/evaluate_large_file_run.py`; sonuçlar `docs/perf/` altında)  <sub>plan.md:949</sub>
+- [x] Format sürümü değiştiğinde doğru decoder'ın seçildiğini doğrulayan uyumluluk testi yaz.  (`F2-012` sürüm dağıtımı; `tests/unit/test_format_decoder_guide.py` sürüm/boyut çapraz doğrulaması)  <sub>plan.md:950</sub>
 
 ### 8.4 Decoder tasarımı
 
-- [ ] Önce salt okunur `BinaryReader` geliştir.  <sub>plan.md:954</sub>
-- [ ] Format algılama ile doğru decoder sürümünü seç.  <sub>plan.md:955</sub>
-- [ ] `struct`, NumPy `frombuffer` veya memory mapping ile kopyasız okumayı değerlendir.  <sub>plan.md:956</sub>
-- [ ] Decoder çıktısını domain modeline dönüştür.  <sub>plan.md:957</sub>
-- [ ] Bilinmeyen paketleri atmak yerine konum ve tür bilgisiyle raporla.  <sub>plan.md:958</sub>
-- [ ] Hatalı kayıtların kalan dosyanın okunmasını mümkün olduğunca engellememesini sağla.  <sub>plan.md:959</sub>
-- [ ] Ham offset → decoded item eşlemesini geliştirici teşhisi için sakla.  <sub>plan.md:960</sub>
-- [ ] Golden file testleri oluştur.  <sub>plan.md:961</sub>
+- [x] Önce salt okunur `BinaryReader` geliştir.  (`F2-002`, `F2-005`: `io/readers/binary_reader.py` yalnız okur, durum tutmaz)  <sub>plan.md:954</sub>
+- [x] Format algılama ile doğru decoder sürümünü seç.  (`F2-012`: `io/decoders/version_dispatch.py`)  <sub>plan.md:955</sub>
+- [x] `struct`, NumPy `frombuffer` veya memory mapping ile kopyasız okumayı değerlendir.  (`io/readers/mapped_source.py` mmap; `np.frombuffer` ile kopyasız örnek okuma (`F4-011`))  <sub>plan.md:956</sub>
+- [x] Decoder çıktısını domain modeline dönüştür.  (`F2-033`, `F1-012`–`F1-014`: decoder çıktısı `Channel`, `DataChunk`, `Event` modellerine çevrilir)  <sub>plan.md:957</sub>
+- [x] Bilinmeyen paketleri atmak yerine konum ve tür bilgisiyle raporla.  (`F2-015`: güvenilir uzunluk varsa sonraki pakete geçilir, yoksa konum raporlanır)  <sub>plan.md:958</sub>
+- [x] Hatalı kayıtların kalan dosyanın okunmasını mümkün olduğunca engellememesini sağla.  (`F2-009`, `F2-011`: kesik son kayıt ve tekrarlı/sıra dışı kayıt raporlanır; önceki kayıtlar erişilebilir kalır)  <sub>plan.md:959</sub>
+- [x] Ham offset → decoded item eşlemesini geliştirici teşhisi için sakla.  (`F2-037`: seçilen öğe kaynak byte konumuyla eşleşir; `F3-040` geliştirici ham kayıt görünümü)  <sub>plan.md:960</sub>
+- [x] Golden file testleri oluştur.  (`F0-009`, `F2-016`: 544 baytlık golden fixture ve beklenen çıktı; `F4-010` akustik golden dosya SHA-256 ile sabit)  <sub>plan.md:961</sub>
 
 ### 9. Zaman senkronizasyonu
 
-- [ ] Her veri kaynağının time base’ini tanımla.  <sub>plan.md:979</sub>
-- [ ] Device ticks → kanonik nanosecond timestamp dönüşümünü uygula.  <sub>plan.md:980</sub>
-- [ ] Wraparound ve counter reset davranışını tespit et.  <sub>plan.md:981</sub>
-- [ ] Clock drift varsa düzeltme modelini tanımla.  <sub>plan.md:982</sub>
-- [ ] Kayıp/tekrarlı/out-of-order timestamp politikası belirle.  <sub>plan.md:983</sub>
-- [ ] UTC, local time ve elapsed time gösterimini birbirinden ayır.  <sub>plan.md:984</sub>
-- [ ] Dönüştürülmüş zamanın yanında gerekirse orijinal device timestamp’i koru.  <sub>plan.md:985</sub>
-- [ ] Sensör, BIT ve transmisyon verilerinin korelasyon toleransını yapılandırılabilir yap.  <sub>plan.md:986</sub>
-- [ ] Senkronizasyon kalite bilgisini kullanıcıya gerektiğinde göster.  <sub>plan.md:987</sub>
+- [x] Her veri kaynağının time base’ini tanımla.  (`ADR-003`, `F0-011`: kanonik `int64` UTC ns tek zaman tabanı)  <sub>plan.md:979</sub>
+- [x] Device ticks → kanonik nanosecond timestamp dönüşümünü uygula.  (`F2-025`: referans tick değerleri doğru ns üretir, ham tick saklanır)  <sub>plan.md:980</sub>
+- [x] Wraparound ve counter reset davranışını tespit et.  (`F2-026`: wraparound ve saat reseti ayrı teşhis ve zaman kalitesi üretir)  <sub>plan.md:981</sub>
+- [x] Clock drift varsa düzeltme modelini tanımla.  (`F2-027`: bilinen katsayı referans zamanı üretir; düzeltme metadata'da görünür)  <sub>plan.md:982</sub>
+- [x] Kayıp/tekrarlı/out-of-order timestamp politikası belirle.  (`F2-008`, `F2-011`: boşluk, tekrar ve sıra dışı ayrı ayrı raporlanır; zaman kaydırılmaz)  <sub>plan.md:983</sub>
+- [x] UTC, local time ve elapsed time gösterimini birbirinden ayır.  (`F3-061`: üç gösterim aynı kanonik anı temsil eder)  <sub>plan.md:984</sub>
+- [x] Dönüştürülmüş zamanın yanında gerekirse orijinal device timestamp’i koru.  (`F2-025`: ham `device_ticks` dönüştürülmüş zamanın yanında saklanır)  <sub>plan.md:985</sub>
+- [ ] Sensör, BIT ve transmisyon verilerinin korelasyon toleransını yapılandırılabilir yap.  **AÇIK:** TX ve BIT korelasyonu ±125 ms kayıt sınırına bağlı (`D-08` varsayımı); tolerans ayardan yapılandırılabilir değil.  <sub>plan.md:986</sub>
+- [x] Senkronizasyon kalite bilgisini kullanıcıya gerektiğinde göster.  (`F2-026` zaman kalitesi; Profil A'da senkron kalitesi `bilinmiyor` olarak gösterilir (`K-05`))  <sub>plan.md:987</sub>
 
 ### 10.2 İlk işlemler
 
-- [ ] Scale ve offset.  <sub>plan.md:1002</sub>
-- [ ] Calibration uygulama.  <sub>plan.md:1003</sub>
-- [ ] NaN/invalid/quality flag yönetimi.  <sub>plan.md:1004</sub>
-- [ ] Detrend ve DC removal.  <sub>plan.md:1005</sub>
-- [ ] Moving average.  <sub>plan.md:1006</sub>
-- [ ] Low-pass, high-pass, band-pass, notch.  <sub>plan.md:1007</sub>
-- [ ] Resample/decimate.  <sub>plan.md:1008</sub>
-- [ ] Normalize.  <sub>plan.md:1009</sub>
-- [ ] Phase unwrap.  <sub>plan.md:1010</sub>
-- [ ] RMS/envelope.  <sub>plan.md:1011</sub>
-- [ ] FFT ve window fonksiyonları.  <sub>plan.md:1012</sub>
-- [ ] PSD/Welch.  <sub>plan.md:1013</sub>
-- [ ] STFT/spektrogram.  <sub>plan.md:1014</sub>
+- [x] Scale ve offset.  (`F2-020`)  <sub>plan.md:1002</sub>
+- [x] Calibration uygulama.  (`F2-021`)  <sub>plan.md:1003</sub>
+- [x] NaN/invalid/quality flag yönetimi.  (`F4-005`: geçersiz örnek sessizce geçerli değere dönüşmez)  <sub>plan.md:1004</sub>
+- [x] Detrend ve DC removal.  (`F4-015`, `F4-016`)  <sub>plan.md:1005</sub>
+- [x] Moving average.  (`F4-017`, `F4-018`)  <sub>plan.md:1006</sub>
+- [x] Low-pass, high-pass, band-pass, notch.  (`F4-027`–`F4-039`: low/high/band-pass ve notch, sınır doğrulamalarıyla)  <sub>plan.md:1007</sub>
+- [x] Resample/decimate.  (`F4-025`, `F4-026`)  <sub>plan.md:1008</sub>
+- [x] Normalize.  (`F4-019`, `F4-020`)  <sub>plan.md:1009</sub>
+- [x] Phase unwrap.  (`F4-023`, `F4-024`)  <sub>plan.md:1010</sub>
+- [x] RMS/envelope.  (`F4-021`, `F4-022`)  <sub>plan.md:1011</sub>
+- [x] FFT ve window fonksiyonları.  (`F4-040`–`F4-042`; pencere fonksiyonları `ui/plots/spectrum_panel.py`)  <sub>plan.md:1012</sub>
+- [x] PSD/Welch.  (`F4-043`–`F4-045`)  <sub>plan.md:1013</sub>
+- [x] STFT/spektrogram.  (`F4-046`–`F4-049`; waterfall `F4-050`, `F4-051`)  <sub>plan.md:1014</sub>
 
 ### 11.3 Profil ve native hızlandırma kararı
 
-- [ ] Gerçekçi veri setiyle benchmark oluştur.  <sub>plan.md:1058</sub>
-- [ ] `py-spy`, `cProfile` veya uygun profiler ile darboğazı ölç.  <sub>plan.md:1059</sub>
-- [ ] Önce algoritma, veri kopyalama ve cache sorunlarını düzelt.  <sub>plan.md:1060</sub>
-- [ ] Sadece kanıtlanmış sıcak noktaları C++/pybind11, Cython, Numba veya Rust ile hızlandırmayı değerlendir.  <sub>plan.md:1061</sub>
-- [ ] Native modül kullanılırsa Python referans uygulamasını doğrulama amacıyla koru.  <sub>plan.md:1062</sub>
+- [x] Gerçekçi veri setiyle benchmark oluştur.  (`F4-064`: büyük dosya benchmark koşusu, makine bilgisiyle)  <sub>plan.md:1058</sub>
+- [x] `py-spy`, `cProfile` veya uygun profiler ile darboğazı ölç.  (`F1-043`, `F4-067`: ölçülen darboğaz kaydedildi)  <sub>plan.md:1059</sub>
+- [x] Önce algoritma, veri kopyalama ve cache sorunlarını düzelt.  (`F4-091`, `F4-092`, `F4-094`: indeksleme, sorgu daraltma ve NumPy blok işlemleri — native'e gitmeden)  <sub>plan.md:1060</sub>
+- [x] Sadece kanıtlanmış sıcak noktaları C++/pybind11, Cython, Numba veya Rust ile hızlandırmayı değerlendir.  (`F4-067`: ADR ölçüme dayanır ve bu sürümde native modül **gerekmedi**)  <sub>plan.md:1061</sub>
+- [ ] Native modül kullanılırsa Python referans uygulamasını doğrulama amacıyla koru.  **AÇIK:** Native modül kullanılmadı; koşul gerçekleşmedi. Native yola girilirse Python referansı korunacak (`F4-067`).  <sub>plan.md:1062</sub>
 
 ### 13. Canlı veri mimarisi
 
-- [ ] UDP/TCP/serial adapter sınırlarını tanımla.  <sub>plan.md:1089</sub>
-- [ ] Bağlantı durum makinesi: disconnected, connecting, connected, degraded, error.  <sub>plan.md:1090</sub>
-- [ ] Paket sıra numarası ve packet-loss ölçümü.  <sub>plan.md:1091</sub>
-- [ ] Backpressure/drop policy tanımı.  <sub>plan.md:1092</sub>
-- [ ] Ring buffer boyutu ve zaman penceresi ayarı.  <sub>plan.md:1093</sub>
-- [ ] Canlı veriyi kayda alma ve dosyayı güvenli kapatma.  <sub>plan.md:1094</sub>
-- [ ] Bağlantı kesilince otomatik yeniden bağlanma seçeneği.  <sub>plan.md:1095</sub>
-- [ ] Canlı ve playback modlarının aynı anda yanlışlıkla karışmasını önle.  <sub>plan.md:1096</sub>
-- [ ] Simülatör/replay source ile donanımsız geliştirme olanağı sağla.  <sub>plan.md:1097</sub>
+- [x] UDP/TCP/serial adapter sınırlarını tanımla.  (`F5-001` sözleşme, `F5-005`–`F5-011`: üç adaptör ortak sözleşme kontrolüyle)  <sub>plan.md:1089</sub>
+- [x] Bağlantı durum makinesi: disconnected, connecting, connected, degraded, error.  (`F5-002`)  <sub>plan.md:1090</sub>
+- [x] Paket sıra numarası ve packet-loss ölçümü.  (`F5-012`: atlanan, tekrarlı ve sıra dışı ayrı sayaçlar)  <sub>plan.md:1091</sub>
+- [x] Backpressure/drop policy tanımı.  (`F5-016`: burst'te sınır aşılmaz, düşen veri raporlanır)  <sub>plan.md:1092</sub>
+- [x] Ring buffer boyutu ve zaman penceresi ayarı.  (`F5-014`, `F5-015`, `F5-018`)  <sub>plan.md:1093</sub>
+- [x] Canlı veriyi kayda alma ve dosyayı güvenli kapatma.  (`F5-026`–`F5-033`: kayıt yazımı, fsync ve güvenli kapatma; kapanış nedeni loglanır)  <sub>plan.md:1094</sub>
+- [x] Bağlantı kesilince otomatik yeniden bağlanma seçeneği.  (`F5-017`: sınırlı, görünür denemeler; kullanıcı durdurunca yeniden başlamaz)  <sub>plan.md:1095</sub>
+- [x] Canlı ve playback modlarının aynı anda yanlışlıkla karışmasını önle.  (`F5-021`, `F5-022`: canlı akış başlarken playback saati durur — iki saat aynı grafiği ilerletmez)  <sub>plan.md:1096</sub>
+- [x] Simülatör/replay source ile donanımsız geliştirme olanağı sağla.  (`F5-003`, `F5-004`: dosyadan replay adaptörü ve `tools/live_endurance_run.py` bozucu kaynağı)  <sub>plan.md:1097</sub>
 
 ### 21. CI/CD kalite kapıları
 
-- [ ] Lint ve format kontrolü (`ruff`).  <sub>plan.md:1253</sub>
-- [ ] Type check (`mypy` veya `pyright`).  <sub>plan.md:1254</sub>
-- [ ] Unit ve integration testleri.  <sub>plan.md:1255</sub>
-- [ ] Minimum coverage eşiği; başlangıçta %70, kritik parser/domain kodunda daha yüksek.  <sub>plan.md:1256</sub>
-- [ ] Dependency/security scan.  <sub>plan.md:1257</sub>
-- [ ] Küçük performans smoke benchmark.  <sub>plan.md:1258</sub>
-- [ ] Windows paketleme smoke test.  <sub>plan.md:1259</sub>
-- [ ] Sürüm artefaktı ve checksum.  <sub>plan.md:1260</sub>
+- [x] Lint ve format kontrolü (`ruff`).  (`ruff check` + `ruff format`, `.github/workflows/quality.yml`)  <sub>plan.md:1253</sub>
+- [x] Type check (`mypy` veya `pyright`).  (`pyright` strict)  <sub>plan.md:1254</sub>
+- [x] Unit ve integration testleri.  (Tam pytest takımı (5154 test))  <sub>plan.md:1255</sub>
+- [x] Minimum coverage eşiği; başlangıçta %70, kritik parser/domain kodunda daha yüksek.  (`F6-013`: genel %70 eşiği + kritik paketlerde daha yüksek; `tools/coverage_gate.py`)  <sub>plan.md:1256</sub>
+- [x] Dependency/security scan.  (`F6-014`: `tools/dependency_scan.py`, ölçüt "paket kullanıcıya gidiyor mu")  <sub>plan.md:1257</sub>
+- [x] Küçük performans smoke benchmark.  (`F6-015`: `tools/perf_smoke.py`)  <sub>plan.md:1258</sub>
+- [x] Windows paketleme smoke test.  (`F6-016`: `quality.yml` içindeki `package-smoke` işi)  <sub>plan.md:1259</sub>
+- [x] Sürüm artefaktı ve checksum.  (`F6-009`, `F6-017`: `tools/release_manifest.py` ve `release.yml`)  <sub>plan.md:1260</sub>
 
 ### 23. MVP “Definition of Done”
 
@@ -619,17 +619,17 @@ Work in fully autonomous mode.
 
 ### 25. Açık kararlar
 
-- [ ] `.bin` format dokümanı ve örnek dosyalar mevcut mu?  <sub>plan.md:1960</sub>
-- [ ] En büyük tipik dosya boyutu ve kayıt süresi nedir?  <sub>plan.md:1961</sub>
-- [ ] Maksimum kanal sayısı ve kanal başına en yüksek sample rate nedir?  <sub>plan.md:1962</sub>
-- [ ] Timestamp tek kaynaktan mı geliyor; cihazlar arasında clock drift var mı?  <sub>plan.md:1963</sub>
-- [ ] BIT sonuçları anlık event mi, periyodik status mü, ikisi birden mi?  <sub>plan.md:1964</sub>
-- [ ] Transmisyon verisinin alanları ve START/STOP ilişkilendirmesi nedir?  <sub>plan.md:1965</sub>
-- [ ] Canlı veri hangi protokol ve bant genişliğiyle gelecek?  <sub>plan.md:1966</sub>
-- [ ] Hedef bilgisayar CPU, RAM, GPU ve monitör çözünürlüğü nedir?  <sub>plan.md:1967</sub>
-- [ ] Uygulamanın offline/air-gapped ortamda çalışması gerekiyor mu?  <sub>plan.md:1968</sub>
-- [ ] Verinin güvenlik sınıfı ve log/export kısıtları var mı?  <sub>plan.md:1969</sub>
-- [ ] Birden fazla kayıt zaman hizalı olarak karşılaştırılacak mı?  <sub>plan.md:1970</sub>
-- [ ] MATLAB’daki hangi analiz/etkileşim davranışları birebir bekleniyor?  <sub>plan.md:1971</sub>
-- [ ] Rapor çıktısı resmi test kanıtı sayılacak mı?  <sub>plan.md:1972</sub>
-- [ ] Arayüz yalnız İngilizce mi, Türkçe/İngilizce mi olacak?  <sub>plan.md:1973</sub>
+- [ ] `.bin` format dokümanı ve örnek dosyalar mevcut mu?  **CEVAP BEKLİYOR** (`D-01`, `D-02`, `docs/notes/open-decisions.md`). Varsayım: Sentetik fixture ile ilerlendi; Bölüm 8.2/8.3 taslağı sözleşme sayıldı.  <sub>plan.md:1960</sub>
+- [ ] En büyük tipik dosya boyutu ve kayıt süresi nedir?  **CEVAP BEKLİYOR** (`D-03`, `docs/notes/open-decisions.md`). Varsayım: Profil B için 2,59 GiB/saat, 4 saate kadar varsayıldı.  <sub>plan.md:1961</sub>
+- [ ] Maksimum kanal sayısı ve kanal başına en yüksek sample rate nedir?  **CEVAP BEKLİYOR** (`D-04`, `docs/notes/open-decisions.md`). Varsayım: Profil A 8 sabit kanal; akustik 48 kHz uygulandı (taslaktaki 96 kHz değil).  <sub>plan.md:1962</sub>
+- [ ] Timestamp tek kaynaktan mı geliyor; cihazlar arasında clock drift var mı?  **CEVAP BEKLİYOR** (`D-09`, `docs/notes/open-decisions.md`). Varsayım: Kanonik `int64` UTC ns; Profil A'da senkron kalitesi `bilinmiyor` gösterilir.  <sub>plan.md:1963</sub>
+- [ ] BIT sonuçları anlık event mi, periyodik status mü, ikisi birden mi?  **CEVAP BEKLİYOR** (`D-11`, `docs/notes/open-decisions.md`). Varsayım: Profil A'da her kayıtta durum maskesi (periyodik) varsayıldı.  <sub>plan.md:1964</sub>
+- [ ] Transmisyon verisinin alanları ve START/STOP ilişkilendirmesi nedir?  **CEVAP BEKLİYOR** (`D-08`, `docs/notes/open-decisions.md`). Varsayım: `IDLE→ACTIVE` START, `ACTIVE→IDLE` STOP; sınırlar ±125 ms.  <sub>plan.md:1965</sub>
+- [ ] Canlı veri hangi protokol ve bant genişliğiyle gelecek?  **CEVAP BEKLİYOR** (`D-12`, `D-13`, `docs/notes/open-decisions.md`). Varsayım: Üç adaptör (UDP/TCP/serial) yazıldı; replay ve simülasyonla doğrulandı.  <sub>plan.md:1966</sub>
+- [ ] Hedef bilgisayar CPU, RAM, GPU ve monitör çözünürlüğü nedir?  **CEVAP BEKLİYOR** (`D-15`, `docs/notes/open-decisions.md`). Varsayım: Performans bütçeleri geliştirme makinesinde ölçüldü (`K-18`).  <sub>plan.md:1967</sub>
+- [ ] Uygulamanın offline/air-gapped ortamda çalışması gerekiyor mu?  **CEVAP BEKLİYOR** (`D-16`, `docs/notes/open-decisions.md`). Varsayım: Gerekmediği varsayıldı; yine de offline wheel arşivi üretildi (`F6-011`, `K-17`).  <sub>plan.md:1968</sub>
+- [ ] Verinin güvenlik sınıfı ve log/export kısıtları var mı?  **CEVAP BEKLİYOR** (`D-18`, `docs/notes/open-decisions.md`). Varsayım: Kısıt yok varsayıldı; log'a yalnız metadata yazılır, ham veri yazılmaz.  <sub>plan.md:1969</sub>
+- [ ] Birden fazla kayıt zaman hizalı olarak karşılaştırılacak mı?  **CEVAP BEKLİYOR** (`D-22`, `docs/notes/open-decisions.md`). Varsayım: İlk sürümde tek kayıt varsayıldı; çoklu kayıt açılır ama hizalama yoktur (`K-15`).  <sub>plan.md:1970</sub>
+- [ ] MATLAB’daki hangi analiz/etkileşim davranışları birebir bekleniyor?  **CEVAP BEKLİYOR** (`D-23`, `docs/notes/open-decisions.md`). Varsayım: Özel bir birebir beklenti olmadığı varsayıldı; X/Y/XY ölçekleme MATLAB alışkanlığına göre yapıldı.  <sub>plan.md:1971</sub>
+- [ ] Rapor çıktısı resmi test kanıtı sayılacak mı?  **CEVAP BEKLİYOR** (`D-24`, `docs/notes/open-decisions.md`). Varsayım: Sayılmayacağı varsayıldı; sayılacaksa imza, sürüm ve izlenebilirlik alanları gerekir.  <sub>plan.md:1972</sub>
+- [ ] Arayüz yalnız İngilizce mi, Türkçe/İngilizce mi olacak?  **CEVAP BEKLİYOR** (`D-21`, `docs/notes/open-decisions.md`). Varsayım: Arayüz İngilizce, proje belgeleri Türkçe (`K-14`).  <sub>plan.md:1973</sub>

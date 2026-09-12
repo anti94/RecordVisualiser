@@ -393,8 +393,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F6-033` | 15 dk | 13 dk 54 sn | `4e11786` | major sürüm notları ve milestone özetini hazırla |
 | `F6-035` | 20 dk | 18 dk 43 sn | `b8c7d02` | kalite bayraklarını dışa aktarmaya ve paket denetimine taşı |
 | `F6-034` | 15 dk | 12 dk 10 sn | `6e551f6` | dağıtım milestone kabulünü kapat ve major sürümü hazırla |
+| `-` | — | 5 dk 4 sn | `3f2074b` | Bölüm 5, 6.4 ve 8.1 kontrol listelerini uygulamaya karşı doğrula |
 
-**375 commit · olculen toplam 4625 dk 21 sn · olculemeyen 1 (ilk commit)**
+**376 commit · olculen toplam 4630 dk 25 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
