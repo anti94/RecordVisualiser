@@ -1879,7 +1879,7 @@ kaydın uyuşmadığı durumda **sessizce yanlış okumamaktır**.
 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `F7-001` | `4.6.0` | 20 dk | Profil C klasör ve dosya sözleşmesi taslağını yaz | Tarih klasörü, `Tx/` ve `Rx/` alt klasörleri, `TxData00000.bin` adlandırması ve sayaç sarması belgede tanımlıdır | `F6-034` | `docs(format): F7-001 profil C klasör ve dosya sözleşmesi taslağını yaz` |
+| [x] | `F7-001` | `4.6.0` | 20 dk | Profil C klasör ve dosya sözleşmesi taslağını yaz | Tarih klasörü, `Tx/` ve `Rx/` alt klasörleri, `TxData00000.bin` adlandırması ve sayaç sarması belgede tanımlıdır | `F6-034` | `docs(format): F7-001 profil C klasör ve dosya sözleşmesi taslağını yaz` |
 | [ ] | `F7-002` | `4.7.0` | 20 dk | Kullanıcı kararlarını ve kalan açık kararları kayda geç | 10 dk tavan, kayma kabulü, `complex64` ve C++ sahipliği `open-decisions.md`'de `D-26`…`D-31` olarak izlenir | `F7-001` | `docs(notes): F7-002 kullanıcı kararlarını ve kalan açık kararları kayda geç` |
 | [ ] | `F7-003` | `4.8.0` | 20 dk | Bayt bütçesi ve zaman kayması tablosunu belgeye yaz | 820/8192 = 100,0977 ms, 10 dk'da 0,586 s kayma ve 1,173 GiB toplam belgede hesabıyla gösterilir | `F7-002` | `docs(format): F7-003 bayt bütçesi ve zaman kayması tablosunu belgeye yaz` |
 | [ ] | `F7-004` | `4.9.0` | 20 dk | C++ struct → TOML eşleme sözleşmesini yaz | Paketleme (`#pragma pack`), hizalama, endianness ve bit alanı kuralları örnekle tanımlıdır | `F7-003` | `docs(format): F7-004 c++ struct → TOML eşleme sözleşmesini yaz` |
