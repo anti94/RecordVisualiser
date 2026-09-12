@@ -1,0 +1,208 @@
+{
+  "executable": "D:\\Code\\SignalProcessing\\dist\\sonar-analyzer-3.30.0\\sonar-analyzer.exe",
+  "version": "3.30.0",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "python": "3.9.13",
+  "step_count": 9,
+  "passed_count": 8,
+  "failed_count": 1,
+  "missing_fixtures": [],
+  "ok": false,
+  "results": [
+    {
+      "step_id": "O-01",
+      "role": "operator",
+      "title": "Doğru sürüm kuruldu mu",
+      "why": "Yanlış sürümü çalıştırıp 'düzeldi' sanmak, bir hatayı iki kez aramaya yol açar.",
+      "command": "sonar-analyzer.exe --version",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "duration_s": 2.484,
+      "stdout_tail": [
+        "sonar-analyzer 3.30.0"
+      ],
+      "artifacts": [],
+      "problems": []
+    },
+    {
+      "step_id": "O-02",
+      "role": "operator",
+      "title": "Uygulama ekransız da olsa temiz başlayıp kapanıyor mu",
+      "why": "Giriş yolunun paketten çalıştığını, pencere açmadan gösterir; çökmeden kapanmak da sonucun parçasıdır.",
+      "command": "sonar-analyzer.exe --no-window",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "duration_s": 1.156,
+      "stdout_tail": [
+        "2026-09-12 02:55:39 INFO    [3.30.0 71a362c1] sonar_analyzer: Oturum basladi: surum 3.30.0, oturum 71a362c1",
+        "2026-09-12 02:55:40 INFO    [3.30.0 71a362c1] sonar_analyzer: Arayuz baslatiliyor (oturum 71a362c1)"
+      ],
+      "artifacts": [],
+      "problems": []
+    },
+    {
+      "step_id": "O-03",
+      "role": "operator",
+      "title": "Ana ekran açılıyor, tema ve ikon yükleniyor mu",
+      "why": "Paketlemede en sık kaybolan şeyler bunlardır: Qt platform eklentisi, tema ve ikon. Üçü de pencere gerçekten gösterilerek denetlenir.",
+      "command": "sonar-analyzer.exe --self-check",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "duration_s": 1.266,
+      "stdout_tail": [
+        "platform plugin: windows",
+        "tema: 3216 karakterlik stil sayfasi",
+        "ana ekran: 1520x1201",
+        "ikon: sonar-analyzer.ico",
+        "sonuc: TAMAM",
+        "2026-09-12 02:55:40 INFO    [3.30.0 e4e5fd3a] sonar_analyzer: Oturum basladi: surum 3.30.0, oturum e4e5fd3a",
+        "2026-09-12 02:55:41 INFO    [3.30.0 e4e5fd3a] sonar_analyzer: Arayuz baslatiliyor (oturum e4e5fd3a)"
+      ],
+      "artifacts": [],
+      "problems": []
+    },
+    {
+      "step_id": "O-04",
+      "role": "operator",
+      "title": "Güncel kayıt açılıyor, CSV ve PNG çıktısı alınıyor mu",
+      "why": "Operatörün günlük işi budur. Çıktılar yazıldıktan sonra geri okunur; yazıp 'oldu' demek yetmez, bozuk bir dosya da yazılmış olur.",
+      "command": "sonar-analyzer.exe --bin-check D:\\Code\\SignalProcessing\\tests\\fixtures\\valid_8records_v2.bin --bin-check-out D:\\Code\\SignalProcessing\\docs\\acceptance\\results\\artifacts\\O-04",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "duration_s": 1.016,
+      "stdout_tail": [
+        "sorgu: ch0 -> 8 ornek",
+        "csv: 8 satir geri okundu (export.csv)",
+        "png: 1406 bayt, imza dogru (export.png)",
+        "sonuc: TAMAM",
+        "2026-09-12 02:55:42 INFO    [3.30.0 db41b350] sonar_analyzer: Oturum basladi: surum 3.30.0, oturum db41b350",
+        "2026-09-12 02:55:42 INFO    [3.30.0 db41b350] sonar_analyzer: Arayuz baslatiliyor (oturum db41b350)",
+        "2026-09-12 02:55:42 INFO    [3.30.0 db41b350] sonar_analyzer.performance: performance {\"source_bytes\": 580, \"parser_version\": 1, \"operation\": \"index\", \"duration_ms\": 0.26479999999995396, \"status\": \"ok\"}",
+        "2026-09-12 02:55:42 INFO    [3.30.0 db41b350] sonar_analyzer.performance: performance {\"channel_id\": \"ch0\", \"kind\": \"analysis\", \"max_points\": null, \"start_ns\": 1788901200000000000, \"end_ns\": 1788901201000000000, \"operation\": \"query\", \"duration_ms\": 0.1126999999999656, \"status\": \"ok\"}"
+      ],
+      "artifacts": [
+        {
+          "path": "O-04/export.csv",
+          "bytes": 822,
+          "sha256": "82ca5c88007d06ea81794a38d5e0b2b42d1cee201abd8864fc83f6bd597cb080"
+        },
+        {
+          "path": "O-04/export.png",
+          "bytes": 1406,
+          "sha256": "37149c00792aa6108d0d2d640e1ea3ef23ae4ba68a98371ebb2ce411bbad88d3"
+        }
+      ],
+      "problems": []
+    },
+    {
+      "step_id": "M-01",
+      "role": "engineer",
+      "title": "CRC'siz eski sürüm (v1) kayıt hâlâ okunuyor mu",
+      "why": "Eski kayıtlar arşivde kalır. Yeni sürüm onları okumayı bırakırsa geçmiş ölçümler erişilemez olur.",
+      "command": "sonar-analyzer.exe --bin-check D:\\Code\\SignalProcessing\\tests\\fixtures\\valid_8records.bin --bin-check-out D:\\Code\\SignalProcessing\\docs\\acceptance\\results\\artifacts\\M-01",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "duration_s": 0.969,
+      "stdout_tail": [
+        "sorgu: ch0 -> 8 ornek",
+        "csv: 8 satir geri okundu (export.csv)",
+        "png: 1406 bayt, imza dogru (export.png)",
+        "sonuc: TAMAM",
+        "2026-09-12 02:55:43 INFO    [3.30.0 a83e86c5] sonar_analyzer: Oturum basladi: surum 3.30.0, oturum a83e86c5",
+        "2026-09-12 02:55:43 INFO    [3.30.0 a83e86c5] sonar_analyzer: Arayuz baslatiliyor (oturum a83e86c5)",
+        "2026-09-12 02:55:43 INFO    [3.30.0 a83e86c5] sonar_analyzer.performance: performance {\"source_bytes\": 544, \"parser_version\": 1, \"operation\": \"index\", \"duration_ms\": 0.28290000000008586, \"status\": \"ok\"}",
+        "2026-09-12 02:55:43 INFO    [3.30.0 a83e86c5] sonar_analyzer.performance: performance {\"channel_id\": \"ch0\", \"kind\": \"analysis\", \"max_points\": null, \"start_ns\": 1788901200000000000, \"end_ns\": 1788901201000000000, \"operation\": \"query\", \"duration_ms\": 0.08879999999999999, \"status\": \"ok\"}"
+      ],
+      "artifacts": [
+        {
+          "path": "M-01/export.csv",
+          "bytes": 819,
+          "sha256": "b9f30fa6baa8a82bba330e0027e8cfcb14cc4a24f95c01f13f25af089dc213fc"
+        }
+      ],
+      "problems": []
+    },
+    {
+      "step_id": "M-02",
+      "role": "engineer",
+      "title": "Sıra boşluğu olan kayıt eksiksiz açılıyor mu",
+      "why": "Paket kaybı bir bozulma değildir. Boşluklu kayıt açılmazsa, elde olan veri de kaybedilmiş olur.",
+      "command": "sonar-analyzer.exe --bin-check D:\\Code\\SignalProcessing\\tests\\fixtures\\gap_missing_record.bin --bin-check-out D:\\Code\\SignalProcessing\\docs\\acceptance\\results\\artifacts\\M-02",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "duration_s": 1.031,
+      "stdout_tail": [
+        "sorgu: ch0 -> 8 ornek",
+        "csv: 8 satir geri okundu (export.csv)",
+        "png: 1406 bayt, imza dogru (export.png)",
+        "sonuc: TAMAM",
+        "2026-09-12 02:55:44 INFO    [3.30.0 c27b4e20] sonar_analyzer: Oturum basladi: surum 3.30.0, oturum c27b4e20",
+        "2026-09-12 02:55:44 INFO    [3.30.0 c27b4e20] sonar_analyzer: Arayuz baslatiliyor (oturum c27b4e20)",
+        "2026-09-12 02:55:44 INFO    [3.30.0 c27b4e20] sonar_analyzer.performance: performance {\"source_bytes\": 544, \"parser_version\": 1, \"operation\": \"index\", \"duration_ms\": 0.34849999999997383, \"status\": \"ok\"}",
+        "2026-09-12 02:55:44 INFO    [3.30.0 c27b4e20] sonar_analyzer.performance: performance {\"channel_id\": \"ch0\", \"kind\": \"analysis\", \"max_points\": null, \"start_ns\": 1788901200000000000, \"end_ns\": 1788901201125000000, \"operation\": \"query\", \"duration_ms\": 0.09510000000001462, \"status\": \"ok\"}"
+      ],
+      "artifacts": [],
+      "problems": []
+    },
+    {
+      "step_id": "M-03",
+      "role": "engineer",
+      "title": "Desteklenmeyen format sürümü reddediliyor mu",
+      "why": "Bilinmeyen sürümü en yakın sürüm sanıp okumak, sessizce yanlış veri üretirdi. Ret, burada geçme koşuludur.",
+      "command": "sonar-analyzer.exe --bin-check D:\\Code\\SignalProcessing\\tests\\fixtures\\unsupported_version.bin --bin-check-out D:\\Code\\SignalProcessing\\docs\\acceptance\\results\\artifacts\\M-03",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "duration_s": 0.984,
+      "stdout_tail": [
+        "kayit: ACILAMADI (desteklenmeyen surum: 99 (desteklenen: 1, 2) (offset 8))",
+        "sonuc: EKSIK -> kayit",
+        "2026-09-12 02:55:45 INFO    [3.30.0 ecfcaba8] sonar_analyzer: Oturum basladi: surum 3.30.0, oturum ecfcaba8",
+        "2026-09-12 02:55:45 INFO    [3.30.0 ecfcaba8] sonar_analyzer: Arayuz baslatiliyor (oturum ecfcaba8)"
+      ],
+      "artifacts": [],
+      "problems": []
+    },
+    {
+      "step_id": "M-04",
+      "role": "engineer",
+      "title": "Kesik başlıklı dosya reddediliyor mu",
+      "why": "Yarım bir başlıkla açılıp uydurma alanlar göstermek, açılmamaktan daha zararlıdır.",
+      "command": "sonar-analyzer.exe --bin-check D:\\Code\\SignalProcessing\\tests\\fixtures\\truncated_header.bin --bin-check-out D:\\Code\\SignalProcessing\\docs\\acceptance\\results\\artifacts\\M-04",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "duration_s": 0.985,
+      "stdout_tail": [
+        "kayit: ACILAMADI (kesik header: 32 bayt gerekli, 20 bayt bulundu (offset 0))",
+        "sonuc: EKSIK -> kayit",
+        "2026-09-12 02:55:46 INFO    [3.30.0 73ffe597] sonar_analyzer: Oturum basladi: surum 3.30.0, oturum 73ffe597",
+        "2026-09-12 02:55:46 INFO    [3.30.0 73ffe597] sonar_analyzer: Arayuz baslatiliyor (oturum 73ffe597)"
+      ],
+      "artifacts": [],
+      "problems": []
+    },
+    {
+      "step_id": "M-05",
+      "role": "engineer",
+      "title": "Bozuk CRC'li kayıt açılıyor ama sessiz geçilmiyor mu",
+      "why": "ADR-011: kayıt CRC hatası fatal değildir — dosya açılır, bozuk kayıt işaretlenir. Dosyanın tamamını reddetmek sağlam kayıtları da kaybettirirdi. Ama işaretlenmiş olması yetmez: mühendis bunu **görebilmelidir**. Bu adım, bilinen bir bozuk kaydın kullanıcıya ulaşan yolda görünür olmasını arar.",
+      "command": "sonar-analyzer.exe --bin-check D:\\Code\\SignalProcessing\\tests\\fixtures\\crc_error.bin --bin-check-out D:\\Code\\SignalProcessing\\docs\\acceptance\\results\\artifacts\\M-05",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "duration_s": 1.0,
+      "stdout_tail": [
+        "sorgu: ch0 -> 8 ornek",
+        "csv: 8 satir geri okundu (export.csv)",
+        "png: 1406 bayt, imza dogru (export.png)",
+        "sonuc: TAMAM",
+        "2026-09-12 02:55:47 INFO    [3.30.0 a8fcc235] sonar_analyzer: Oturum basladi: surum 3.30.0, oturum a8fcc235",
+        "2026-09-12 02:55:47 INFO    [3.30.0 a8fcc235] sonar_analyzer: Arayuz baslatiliyor (oturum a8fcc235)",
+        "2026-09-12 02:55:47 INFO    [3.30.0 a8fcc235] sonar_analyzer.performance: performance {\"source_bytes\": 580, \"parser_version\": 1, \"operation\": \"index\", \"duration_ms\": 0.2982000000000262, \"status\": \"ok\"}",
+        "2026-09-12 02:55:47 INFO    [3.30.0 a8fcc235] sonar_analyzer.performance: performance {\"channel_id\": \"ch0\", \"kind\": \"analysis\", \"max_points\": null, \"start_ns\": 1788901200000000000, \"end_ns\": 1788901201000000000, \"operation\": \"query\", \"duration_ms\": 0.12250000000002537, \"status\": \"ok\"}"
+      ],
+      "artifacts": [],
+      "problems": [
+        "ciktida bulunamadi: 'CRC_ERROR'"
+      ]
+    }
+  ]
+}

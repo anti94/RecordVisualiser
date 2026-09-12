@@ -12,7 +12,7 @@ Bir sınırlamayı yazmamak onu ortadan kaldırmaz; yalnız kullanıcının onu
 izlenen sınırlardır — kapanma koşulu belli olmayan hiçbiri listede
 kalmamalıdır.
 
-Son güncelleme: `v3.29.0` · Kapsam: Faz 0–6 · Toplam açık madde: **20**
+Son güncelleme: `v3.30.0` · Kapsam: Faz 0–6 · Toplam açık madde: **21**
 
 ## Özet
 
@@ -38,6 +38,7 @@ Son güncelleme: `v3.29.0` · Kapsam: Faz 0–6 · Toplam açık madde: **20**
 | `K-18` | Hedef ölçüm bilgisayarı bilinmiyor | Orta |
 | `K-19` | Uygulama Python 3.9 üzerinde çalışıyor | Düşük |
 | `K-20` | Geliştirme araçlarında 15 güvenlik bulgusu | Düşük |
+| `K-21` | CSV çıktısı kalite bayraklarını taşımıyor | **Yüksek** |
 
 ---
 
@@ -298,6 +299,26 @@ engelleme ölçütü "paket kullanıcıya gidiyor mu"dur, bulgunun
 
 **Hedef düzeltme:** Geliştirme bağımlılıkları düzeltme sürümlerine
 yükseltilir. Rapor: `docs/packaging/results/dependency-scan.json`.
+
+### K-21 — CSV çıktısı kalite bayraklarını taşımıyor
+
+**Etki:** Okuma katmanı bozuk kayıtları doğru işaretliyor: sürüm 2
+dosyalarda her kaydın CRC'si doğrulanıyor ve uyuşmayan kayıt
+`Quality.CRC_ERROR` alıyor, sıra boşlukları `GAP_BEFORE` ile
+gösteriliyor. Ancak **CSV dışa aktarma bu bayrakları hiç yazmıyor**;
+sütunlar yalnız `timestamp_ns, timestamp_utc, value`. Bozuk CRC'li bir
+kayıttan alınan CSV'yi inceleyen biri, o değerlerden birinin bütünlük
+denetiminden geçemediğini anlayamaz. Aynı boşluk `--bin-check`
+özetinde de var: bilinen bozuk bir dosyada bile `sonuc: TAMAM` diyor.
+Bozuk bir değeri ortalamaya katmak, onu hiç görmemekten daha
+zararlıdır.
+
+**İş kimliği:** `F6-035` (`F6-030` kabul turunun `M-05` adımından
+doğdu), `ADR-011`
+
+**Hedef düzeltme:** Kalite bayrakları CSV'ye bir sütun olarak taşınır ve
+`--bin-check` bayraklı örnek sayısını özetler. Ayrıntı ve kanıt:
+`docs/acceptance/packaged-acceptance.md`.
 
 ---
 
