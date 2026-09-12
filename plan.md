@@ -943,7 +943,7 @@ Resync stratejisi: CRC hatası veya kırık zincir durumunda okuyucu, sonraki 8 
 #### 8.3.13 Yapılacaklar
 
 - [x] Bu taslağı `docs/format/bin_v1_draft.md` olarak sürümle; gerçek format dokümanı gelince fark tablosu tut.  (`docs/format/profile-b.md` sürümlendi; fark tablosu `docs/format/decoder-guide.md` §1 ve `inventory.md` §4)
-- [ ] `tools/make_synthetic_bin.py`: parametrik sentetik üretici (kanal sayısı, fs, süre, ton/gürültü, TX/BIT/event senaryoları).  **AÇIK:** `tools/make_synthetic_bin.py` boyut odaklı üretici (büyük dosya ölçümü için); kanal sayısı, fs, ton/gürültü ve TX/BIT/event senaryoları parametrik değil.
+- [x] `tools/make_synthetic_bin.py`: parametrik sentetik üretici (kanal sayısı, fs, süre, ton/gürültü, TX/BIT/event senaryoları).  (`tools/synthetic_profile_b.py`: `SyntheticSpec` ile kanal sayısı, örnekleme hızı, süre, kanal başına ton, gürültü ve TX/BIT blokları parametrik; `make_synthetic_bin.py` boyut odaklı üretici olarak kalır, golden fixture sözleşmesi bozulmaz)
 - [x] Üreticiye kasıtlı bozulma seçenekleri ekle: kayıp kayıt, CRC hatası, ad/indeks uyuşmazlığı, kırık son kayıt, bilinmeyen blok türü, ad sayacı sarması.  (`tools/make_corrupt_fixtures.py`: kesik header, kesik son kayıt, sıra boşluğu, CRC hatası, ad/indeks uyuşmazlığı, desteklenmeyen sürüm)
 - [x] Küçük golden dosyalar üret (5 s, 4 kanal) ve beklenen decode çıktısını referans olarak sakla.  (`tools/make_acoustic_fixture.py`: 4 kanal, deterministik tonlar, SHA-256 sabitlenmiş golden dosya)
 - [x] 1 saatlik (~2,6 GiB) dosya üret; indeksleme ve okuma bütçesini 11.1'deki hedeflere karşı ölç.  (`tools/large_file_benchmark.py` ve `tools/evaluate_large_file_run.py`; sonuçlar `docs/perf/` altında)

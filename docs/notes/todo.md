@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 499 madde · 479 tamamlandı · 20 kaldı**
+**Toplam 499 madde · 480 tamamlandı · 19 kaldı**
 
-`[#######################.]` %96.0
+`[#######################.]` %96.2
 
 ## Özet
 
@@ -41,8 +41,8 @@ Work in fully autonomous mode.
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 41 | 0 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 35 | 0 | 35 |
-| Bölüm içi kontrol listeleri | 125 | 20 | 145 |
-| **Toplam** | **479** | **20** | **499** |
+| Bölüm içi kontrol listeleri | 126 | 19 | 145 |
+| **Toplam** | **480** | **19** | **499** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -520,7 +520,7 @@ Work in fully autonomous mode.
 ### 8.3.13 Yapılacaklar
 
 - [x] Bu taslağı `docs/format/bin_v1_draft.md` olarak sürümle; gerçek format dokümanı gelince fark tablosu tut.  (`docs/format/profile-b.md` sürümlendi; fark tablosu `docs/format/decoder-guide.md` §1 ve `inventory.md` §4)  <sub>plan.md:945</sub>
-- [ ] `tools/make_synthetic_bin.py`: parametrik sentetik üretici (kanal sayısı, fs, süre, ton/gürültü, TX/BIT/event senaryoları).  **AÇIK:** `tools/make_synthetic_bin.py` boyut odaklı üretici (büyük dosya ölçümü için); kanal sayısı, fs, ton/gürültü ve TX/BIT/event senaryoları parametrik değil.  <sub>plan.md:946</sub>
+- [x] `tools/make_synthetic_bin.py`: parametrik sentetik üretici (kanal sayısı, fs, süre, ton/gürültü, TX/BIT/event senaryoları).  (`tools/synthetic_profile_b.py`: `SyntheticSpec` ile kanal sayısı, örnekleme hızı, süre, kanal başına ton, gürültü ve TX/BIT blokları parametrik; `make_synthetic_bin.py` boyut odaklı üretici olarak kalır, golden fixture sözleşmesi bozulmaz)  <sub>plan.md:946</sub>
 - [x] Üreticiye kasıtlı bozulma seçenekleri ekle: kayıp kayıt, CRC hatası, ad/indeks uyuşmazlığı, kırık son kayıt, bilinmeyen blok türü, ad sayacı sarması.  (`tools/make_corrupt_fixtures.py`: kesik header, kesik son kayıt, sıra boşluğu, CRC hatası, ad/indeks uyuşmazlığı, desteklenmeyen sürüm)  <sub>plan.md:947</sub>
 - [x] Küçük golden dosyalar üret (5 s, 4 kanal) ve beklenen decode çıktısını referans olarak sakla.  (`tools/make_acoustic_fixture.py`: 4 kanal, deterministik tonlar, SHA-256 sabitlenmiş golden dosya)  <sub>plan.md:948</sub>
 - [x] 1 saatlik (~2,6 GiB) dosya üret; indeksleme ve okuma bütçesini 11.1'deki hedeflere karşı ölç.  (`tools/large_file_benchmark.py` ve `tools/evaluate_large_file_run.py`; sonuçlar `docs/perf/` altında)  <sub>plan.md:949</sub>
