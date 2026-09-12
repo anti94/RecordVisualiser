@@ -196,7 +196,147 @@ def test_the_file_count_ceiling_uses_a_less_than_or_equal(text: str) -> None:
 
 def test_the_size_arithmetic_line_is_shown(text: str) -> None:
     """Sayı verip hesabı gizlemek, okuyanın doğrulamasını imkânsız kılar."""
-    assert "820 örnek × 32 sensör × 8 bayt × 10 frame" in text
+    assert "= 820 × 32 × 8" in text
+    assert "= 209.920 × 10" in text
+    assert "= 2.099.200 × 600" in text
+
+
+# --------------------------------------------------------------------------- #
+# BAYT BUTCESI VE ZAMAN KAYMASI — F7-003
+# --------------------------------------------------------------------------- #
+
+
+def test_the_budget_section_defines_its_input_symbols(text: str) -> None:
+    """Türetilmiş bir sayı, girdileri adlandırılmadan doğrulanamaz."""
+    assert "### 3.1 Girdi büyüklükleri" in text
+    for symbol in ("`fs`", "`N`", "`S`", "`B`", "`F`", "`T`"):
+        assert symbol in text, f"{symbol} tanımlanmamış"
+
+
+def test_the_frame_payload_is_right(text: str) -> None:
+    payload = FRAME_SAMPLES * SENSOR_COUNT * BYTES_PER_COMPLEX64
+    assert payload == 209_920
+    assert "209.920 bayt" in text
+    assert abs(payload / 1024 - 205.0) < 0.05
+    assert "205,0 KiB" in text
+
+
+def test_the_ten_minute_byte_count_is_right(text: str) -> None:
+    total = FRAME_SAMPLES * SENSOR_COUNT * BYTES_PER_COMPLEX64 * FRAMES_PER_SECOND * MAX_DURATION_S
+    assert total == 1_259_520_000
+    assert "1.259.520.000 bayt" in text
+
+
+def test_the_complex128_column_is_exactly_double(text: str) -> None:
+    """Karşılaştırma sütunu yanlışsa, tip kararının gerekçesi çürür."""
+    single = FRAME_SAMPLES * SENSOR_COUNT * 8 * FRAMES_PER_SECOND * MAX_DURATION_S
+    double = FRAME_SAMPLES * SENSOR_COUNT * 16 * FRAMES_PER_SECOND * MAX_DURATION_S
+    assert double == 2 * single
+    assert abs(double / 1024**3 - 2.346) < 0.001, f"gercek {double / 1024**3:.4f} GiB"
+    assert "2,346 GiB" in text
+    assert "410,0 KiB" in text
+    assert "4,004 MiB" in text
+
+
+def test_the_one_minute_row_is_right(text: str) -> None:
+    minute = FRAME_SAMPLES * SENSOR_COUNT * BYTES_PER_COMPLEX64 * FRAMES_PER_SECOND * 60
+    assert abs(minute / 1024**2 - 120.1) < 0.1, f"gercek {minute / 1024**2:.2f} MiB"
+    assert "120,1 MiB" in text
+
+
+def test_the_total_belongs_to_both_streams_together(text: str, prose: str) -> None:
+    """Tx ve Rx tamamlayıcıdır; toplamı iki kez saymak boyutu ikiye katlardı."""
+    assert "**Tx ve Rx'in toplamıdır**" in prose
+    assert "her biri için ayrı ayrı değil" in prose
+
+
+# --------------------------------------------------------------------------- #
+# MAT V5 ESIGI
+# --------------------------------------------------------------------------- #
+
+
+def test_the_mat_v5_threshold_percentages_are_right(text: str) -> None:
+    """Asıl kabul: `.mat` kararı bu iki yüzdeye dayanıyor, doğru olmalılar."""
+    limit = 2 * 1024**3
+    per_second = FRAME_SAMPLES * SENSOR_COUNT * FRAMES_PER_SECOND
+    single = per_second * 8 * MAX_DURATION_S
+    double = per_second * 16 * MAX_DURATION_S
+
+    assert abs(single / limit * 100 - 58.7) < 0.1, f"gercek %{single / limit * 100:.1f}"
+    assert abs(double / limit * 100 - 117.3) < 0.1, f"gercek %{double / limit * 100:.1f}"
+    assert "%58,7" in text
+    assert "%117,3" in text
+
+
+def test_single_precision_fits_and_double_does_not(text: str) -> None:
+    """Eşiğin hangi yanına düştüğü bir bağımlılığı belirliyor."""
+    limit = 2 * 1024**3
+    per_second = FRAME_SAMPLES * SENSOR_COUNT * FRAMES_PER_SECOND
+    assert per_second * 8 * MAX_DURATION_S < limit
+    assert per_second * 16 * MAX_DURATION_S > limit
+
+
+def test_the_scipy_limitation_is_stated(text: str, prose: str) -> None:
+    assert "yalnız v4 ve v5 yazar" in prose
+    assert "v7.3" in text
+
+
+def test_the_mat_claim_is_sourced(text: str) -> None:
+    """Bir bağımlılık kararına dayanak olan iddia kaynaksız kalamaz."""
+    assert "docs.scipy.org" in text
+    assert "mathworks.com" in text
+
+
+def test_the_dependency_conclusion_is_conditional(text: str, prose: str) -> None:
+    """Sonuç tek duyarlığa bağlı; koşulsuz yazmak sonradan yanlışa dönerdi."""
+    assert "tek duyarlığa bağlıdır" in prose
+    assert "`F7-070`" in text
+
+
+# --------------------------------------------------------------------------- #
+# ZAMAN KAYMASI TABLOSU
+# --------------------------------------------------------------------------- #
+
+
+def test_the_drift_arithmetic_is_written_out(text: str) -> None:
+    assert "819,2 örnek" in text
+    assert "97,66 µs" in text
+    assert "0,9766 ms" in text
+
+
+def test_the_per_minute_drift_is_right(text: str) -> None:
+    per_second_s = (FRAME_SAMPLES / SAMPLE_RATE_HZ - 0.1) * FRAMES_PER_SECOND
+    minute_ms = per_second_s * 60 * 1000
+    assert abs(minute_ms - 58.6) < 0.1, f"gercek {minute_ms:.2f} ms"
+    assert "58,6 ms" in text
+
+
+def test_the_relative_drift_is_constant(text: str) -> None:
+    """Bağıl kayma süreden bağımsızdır; tabloda üç kez aynı görünmeli."""
+    relative = (FRAME_SAMPLES / SAMPLE_RATE_HZ - 0.1) / 0.1 * 100
+    assert abs(relative - 0.0977) < 0.0005, f"gercek %{relative:.4f}"
+    assert text.count("%0,0977") >= 3
+
+
+def test_the_out_of_ceiling_row_is_marked_as_such(text: str, prose: str) -> None:
+    """Tavan dışı bir satır tavanmış gibi okunursa, sınır yanlış anlaşılır."""
+    hour_s = (FRAME_SAMPLES / SAMPLE_RATE_HZ - 0.1) * FRAMES_PER_SECOND * 3600
+    assert abs(hour_s - 3.516) < 0.002, f"gercek {hour_s:.3f} s"
+    assert "*(1 saat — tavan dışı)*" in text
+    assert "Son satır tavanın dışındadır" in prose
+
+
+def test_the_frequency_resolution_is_right(text: str) -> None:
+    resolution = SAMPLE_RATE_HZ / FRAME_SAMPLES
+    assert abs(resolution - 9.990) < 0.001, f"gercek {resolution:.4f} Hz"
+    assert "9,990 Hz" in text
+
+
+def test_the_index_is_justified_by_the_file_count(text: str, prose: str) -> None:
+    """1.200 dosyayı tek tek açmak ilk açılış bütçesinin tamamını yer."""
+    assert "1,2 saniye" in text
+    assert "`F7-032`" in text
+    assert "zorunludur" in prose
 
 
 # --------------------------------------------------------------------------- #

@@ -24,7 +24,7 @@ kritik maddesi bu ayrışmayı yakalamaktır (§7).
 | Azami kayıt süresi | 10 dakika | Karar `D-26` |
 
 **Frame süresi tam olarak 100 ms değildir.** 820 / 8192 = 100,0977 ms. Bu fark bilinçlidir
-ve kabul edilmiştir (`D-27`); ayrıntı ve birikim hesabı §6'dadır.
+ve kabul edilmiştir (`D-27`); hesabı ve birikim tablosu §3.5'tedir.
 
 ## 2. Klasör ağacı
 
@@ -95,23 +95,107 @@ Yine de okuyucu sarmayı varsaymaz: sayaç azalarak devam ederse bu bir sarma de
 **tutarsızlık** olarak raporlanır. Sessizce sarma varsaymak, karışmış iki kaydın tek
 kayıt gibi okunmasına yol açardı.
 
-## 3. Dosya sayısı ve boyut
+## 3. Bayt bütçesi ve zaman kayması
 
-| Süre | Saniye | Tx dosyası | Rx dosyası | Toplam dosya |
+Bu bölümdeki her sayı türetilmiştir; hesabı da yazılıdır. Sayı verip hesabı gizlemek,
+okuyanın doğrulamasını imkânsız kılar ve bir hata fark edilmeden yayılır.
+
+### 3.1 Girdi büyüklükleri
+
+| Simge | Anlamı | Değer |
+| --- | --- | --- |
+| `fs` | Örnekleme frekansı | 8192 Hz |
+| `N` | Frame başına complex örnek | 820 |
+| `S` | Sensör sayısı | 32 |
+| `B` | Complex örnek başına bayt (`complex64`) | 8 |
+| `F` | Saniyedeki frame sayısı | 10 |
+| `T` | Azami kayıt süresi | 600 s |
+
+### 3.2 Yük boyutu
+
+```text
+frame yükü      = N × S × B           = 820 × 32 × 8      =   209.920 bayt = 205,0 KiB
+saniyelik yük   = frame yükü × F      = 209.920 × 10      = 2.099.200 bayt = 2,002 MiB
+10 dakikalık yük= saniyelik yük × T   = 2.099.200 × 600   = 1.259.520.000 bayt = 1,173 GiB
+```
+
+| Birim | `complex64` (8 B) | `complex128` (16 B) |
+| --- | --- | --- |
+| Frame | 205,0 KiB | 410,0 KiB |
+| 1 saniyelik dosya | 2,002 MiB | 4,004 MiB |
+| 1 dakika | 120,1 MiB | 240,2 MiB |
+| **10 dakika (tavan)** | **1,173 GiB** | **2,346 GiB** |
+
+`complex128` sütunu karşılaştırma içindir. Seçilen tip `complex64`'tür (`D-28`).
+
+Bu toplam **Tx ve Rx'in toplamıdır**, her biri için ayrı ayrı değil: Tx ve Rx
+tamamlayıcıdır, bir PRI'nın her örneği yalnız birine gider. Bölüşüm oranı PRI içindeki
+yayın süresine bağlıdır ve `D-31` cevaplanana kadar bilinmiyor. Bilinen şu: hiçbiri
+toplamı aşamaz, yani her iki akım için de üst sınır 1,173 GiB'dır.
+
+### 3.3 MAT v5 sınırı — tek duyarlığa bağlı bir eşik
+
+MATLAB'ın v5 dosya biçiminde **tek bir değişken 2 GiB'i aşamaz**; aşan veri için v7.3
+(HDF5 tabanlı) gerekir. `scipy.io.savemat` yalnız v4 ve v5 yazar, v7.3 yazmaz.
+
+| Tip | 10 dakikalık toplam | 2 GiB sınırının | Sonuç |
+| --- | --- | --- | --- |
+| `complex64` | 1,173 GiB | **%58,7** | `scipy` yeter, yeni bağımlılık **gerekmez** |
+| `complex128` | 2,346 GiB | %117,3 | Sınır aşılır, `h5py` gerekir |
+
+Karar sınırın rahat tarafında duruyor ama **tek duyarlığa bağlıdır**. Veri tipinin
+`complex128` olduğu ortaya çıkarsa `.mat` tasarımı yeniden açılır (`F7-070`).
+
+Kaynaklar: [scipy.io.savemat](https://docs.scipy.org/doc/scipy/reference/generated/scipy.io.savemat.html),
+[MATLAB Large MAT Files](https://www.mathworks.com/help/matlab/large-mat-files.html),
+[MAT File Versions](https://www.mathworks.com/help/matlab/import_export/mat-file-versions.html).
+
+### 3.4 Dosya sayısı
+
+| Süre | Saniye | Tx dosyası | Rx dosyası | Toplam |
 | --- | --- | --- | --- | --- |
 | 1 dakika | 60 | ≤ 60 | 60 | ≤ 120 |
 | **10 dakika (tavan)** | **600** | **≤ 600** | **600** | **≤ 1.200** |
 
-Tx dosya sayısı "≤" ile yazılıdır: yayın yapılmayan saniyelerde dosya üretilmez.
+Tx sayısı `≤` ile yazılıdır: yayın yapılmayan saniyelerde Tx dosyası üretilmez.
 
-Bir saniyelik dosyanın yükü (header hariç):
+1.200 dosya tek klasörde sorun değil. Ama tek tek açıp taramak sorundur: dosya başına
+yalnız 1 ms sürse bile 1,2 saniye eder ve bu, ilk açılış bütçesinin tamamını yer.
+Klasör seviyesinde tek bir indeks bu yüzden zorunludur (`F7-032`).
+
+### 3.5 Zaman kayması
+
+820 örnek 8192 Hz'de **100,0977 ms** eder, 100 ms değil.
 
 ```text
-820 örnek × 32 sensör × 8 bayt × 10 frame = 2.099.200 bayt = 2,002 MiB
+nominal 100 ms  = 0,1 × 8192          = 819,2 örnek
+gerçek frame    = 820 örnek           = 820 / 8192 = 100,0977 ms
+frame başına fark = 0,8 örnek         = 97,66 µs
+saniyede fark   = 0,8 × 10 = 8 örnek  = 0,9766 ms
 ```
 
-10 dakikalık bir kaydın Tx ve Rx toplamı **1,173 GiB**'dır. Ayrıntılı bütçe `F7-003`
-ile bu belgeye eklenecektir.
+| Süre | Birikmiş kayma | Bağıl |
+| --- | --- | --- |
+| 1 saniye | 0,977 ms | %0,0977 |
+| 1 dakika | 58,6 ms | %0,0977 |
+| **10 dakika (tavan)** | **0,586 s** | %0,0977 |
+| *(1 saat — tavan dışı)* | *3,516 s* | %0,0977 |
+
+Son satır tavanın dışındadır ve yalnız karşılaştırma içindir: 10 dakikalık sınır
+konmasaydı kaymanın nereye gideceğini gösterir.
+
+Kayma **kabul edilmiştir** (`D-27`). Ama bir kural doğurur ve o kural §6'dadır: zaman
+ekseni frame sayacından türetilirse bu kayma birikir, timestamp'ten türetilirse
+birikmez. İkisi 10 dakikanın sonunda tam da bu 0,586 saniye kadar ayrışır.
+
+### 3.6 Frekans çözünürlüğü
+
+```text
+Δf = fs / N = 8192 / 820 = 9,990 Hz
+```
+
+Bir frame içinde elde edilebilecek en ince frekans adımı budur. Daha ince çözünürlük
+frame'ler arası biriktirme gerektirir ve bu, frame sınırındaki faz sürekliliğine bağlıdır.
 
 ## 4. Kayıt klasörünün kökü
 
@@ -160,8 +244,9 @@ Bir frame 820 örnek taşır ve 8192 Hz'de bu **100,0977 ms** eder, 100 ms deği
 | 1 dakika | 58,6 ms |
 | **10 dakika (tavan)** | **0,586 s** |
 
-Bu kayma kabul edilmiştir (`D-27`). Ama bir kural doğurur: zaman ekseni **frame
-sayacından mı yoksa frame başlığındaki timestamp'ten mi** türetilecek? İkisi 10 dakikanın
+Kaymanın hesabı ve birikim tablosu §3.5'tedir. Kayma kabul edilmiştir (`D-27`); ama
+bir kural doğurur: zaman ekseni **frame sayacından mı yoksa frame başlığındaki
+timestamp'ten mi** türetilecek? İkisi 10 dakikanın
 sonunda tam da bu 0,586 saniye kadar ayrışır.
 
 Seçim kodda **tek bir yerde** tanımlanmalıdır. İki panel iki farklı kaynaktan türetirse
