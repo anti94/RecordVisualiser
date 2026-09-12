@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 499 madde · 480 tamamlandı · 19 kaldı**
+**Toplam 655 madde · 480 tamamlandı · 175 kaldı**
 
-`[#######################.]` %96.2
+`[##################......]` %73.3
 
 ## Özet
 
@@ -41,8 +41,10 @@ Work in fully autonomous mode.
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 41 | 0 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 35 | 0 | 35 |
+| Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema | 0 | 80 | 80 |
+| Faz 8 — Tx/Rx ham veri analizi ve sensör sağlığı | 0 | 76 | 76 |
 | Bölüm içi kontrol listeleri | 126 | 19 | 145 |
-| **Toplam** | **480** | **19** | **499** |
+| **Toplam** | **480** | **175** | **655** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -435,6 +437,172 @@ Work in fully autonomous mode.
 | [x] | `F6-034` | `4.0.0` | 15 dk | Dağıtım milestone kabulünü kapat ve major sürümü hazırla |
 | [x] | `F6-035` | `3.35.0` | 20 dk | Kalite bayraklarını dışa aktarmaya ve paket denetimine taşı |
 
+### Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema (0/80)
+
+| | İş | Sürüm | Süre | Çıktı |
+| --- | --- | --- | --- | --- |
+| [ ] | `F7-001` | `4.6.0` | 20 dk | Profil C klasör ve dosya sözleşmesi taslağını yaz |
+| [ ] | `F7-002` | `4.7.0` | 20 dk | Kullanıcı kararlarını ve kalan açık kararları kayda geç |
+| [ ] | `F7-003` | `4.8.0` | 20 dk | Bayt bütçesi ve zaman kayması tablosunu belgeye yaz |
+| [ ] | `F7-004` | `4.9.0` | 20 dk | C++ struct → TOML eşleme sözleşmesini yaz |
+| [ ] | `F7-005` | `4.10.0` | 20 dk | Zaman ekseninin tek kaynağını sözleşmeye bağla |
+| [ ] | `F7-006` | `4.11.0` | 20 dk | Örnek TOML şema dosyasını yaz (enum + struct + FrameHeader) |
+| [ ] | `F7-007` | `4.12.0` | 20 dk | cpp tipi → Python struct kodu → NumPy dtype eşleme tablosunu kur |
+| [ ] | `F7-008` | `4.13.0` | 20 dk | Şema yükleyicisini ve sürüm alanını ekle |
+| [ ] | `F7-009` | `4.14.0` | 20 dk | Enum çözümleyicisini ekle |
+| [ ] | `F7-010` | `4.15.0` | 20 dk | Struct alan çözümleyicisini ekle |
+| [ ] | `F7-011` | `4.16.0` | 20 dk | Offset çakışması ve boşluk denetimini ekle |
+| [ ] | `F7-012` | `4.17.0` | 15 dk | Bildirilen boyut ile hesaplanan boyut uyuşmazlığını reddet |
+| [ ] | `F7-013` | `4.18.0` | 20 dk | Hizalama ihlali denetimini ekle |
+| [ ] | `F7-014` | `4.19.0` | 20 dk | Şemadan çalışma zamanında `struct.Struct` üret |
+| [ ] | `F7-015` | `4.20.0` | 20 dk | Şemadan NumPy structured dtype üret |
+| [ ] | `F7-016` | `4.21.0` | 15 dk | Şema parmak izini hesapla ve kayda yaz |
+| [ ] | `F7-017` | `4.22.0` | 20 dk | Şema ile kayıt uyuşmazlığını tespit eden kapıyı kur |
+| [ ] | `F7-018` | `4.23.0` | 20 dk | Şema doğrulama hatalarını kullanıcıya taşıyan mesajları yaz |
+| [ ] | `F7-019` | `4.24.0` | 20 dk | Profil C dosya header'ını çöz |
+| [ ] | `F7-020` | `4.25.0` | 20 dk | Frame header'ını şemadan çöz |
+| [ ] | `F7-021` | `4.26.0` | 20 dk | `complex64` payload'unu kopyasız oku |
+| [ ] | `F7-022` | `4.27.0` | 20 dk | Sensör × örnek yerleşimini doğrula |
+| [ ] | `F7-023` | `4.28.0` | 20 dk | Frame CRC doğrulamasını ekle |
+| [ ] | `F7-024` | `4.29.0` | 20 dk | Kesik dosyayı raporla, tam frame'leri kullan |
+| [ ] | `F7-025` | `4.30.0` | 15 dk | Frame indeksi ile dosya adı uyuşmazlığını raporla |
+| [ ] | `F7-026` | `4.31.0` | 20 dk | Timestamp ile frame sayacı arasındaki kaymayı ölç |
+| [ ] | `F7-027` | `4.32.0` | 20 dk | Sürüm dağıtımına Profil C'yi ekle |
+| [ ] | `F7-028` | `4.33.0` | 20 dk | Kayıt klasörü düzenini keşfet |
+| [ ] | `F7-029` | `4.34.0` | 20 dk | Dosya sayacı sırasını doğrula ve boşlukları raporla |
+| [ ] | `F7-030` | `4.35.0` | 20 dk | Klasör manifestini oku ve yoksa üret |
+| [ ] | `F7-031` | `4.36.0` | 20 dk | Klasör seviyesinde indeks yapısını kur |
+| [ ] | `F7-032` | `4.37.0` | 20 dk | İndeksi dosya adı, boyut ve değişiklik zamanıyla geçersizle |
+| [ ] | `F7-033` | `4.38.0` | 15 dk | İndeksi atomik yaz |
+| [ ] | `F7-034` | `4.39.0` | 20 dk | Salt okunur klasörde indeksi bellekte kur |
+| [ ] | `F7-035` | `4.40.0` | 20 dk | 1.200 dosyalık kayıtta indeks kurma süresini ölç |
+| [ ] | `F7-036` | `4.41.0` | 20 dk | `FolderRecordingRepository` iskeletini kur |
+| [ ] | `F7-037` | `4.42.0` | 20 dk | `metadata()` zaman aralığını klasörden üret |
+| [ ] | `F7-038` | `4.43.0` | 20 dk | `channels()` ile Tx/Rx × 32 sensörü sun |
+| [ ] | `F7-039` | `4.44.0` | 20 dk | `query()` çağrısını dosya sınırlarını aşacak biçimde kur |
+| [ ] | `F7-040` | `4.45.0` | 20 dk | Seyreltmeyi dosya sınırlarında tutarlı yap |
+| [ ] | `F7-041` | `4.46.0` | 20 dk | Frame header alanlarını metadata olarak sun |
+| [ ] | `F7-042` | `4.47.0` | 20 dk | Önden okuma ve bellek bütçesini kur |
+| [ ] | `F7-043` | `4.48.0` | 20 dk | Oynatmayı dosya sınırında kesintisiz yap |
+| [ ] | `F7-044` | `4.49.0` | 20 dk | Bozuk ve eksik dosyayı oynatmada göster |
+| [ ] | `F7-045` | `4.50.0` | 20 dk | Klasör açma diyalogunu ekle |
+| [ ] | `F7-046` | `4.51.0` | 15 dk | Son kullanılanlara klasör yolunu ekle |
+| [ ] | `F7-047` | `4.52.0` | 20 dk | Data Explorer'da Tx/Rx ağacını kur |
+| [ ] | `F7-048` | `4.53.0` | 20 dk | Şema dosyası seçimini ayarlara ekle |
+| [ ] | `F7-049` | `4.54.0` | 20 dk | Şema değişince açık kaydı yeniden yükle |
+| [ ] | `F7-050` | `4.55.0` | 20 dk | Geçersiz şemayı arayüzde göster |
+| [ ] | `F7-051` | `4.56.0` | 15 dk | Sürükle bırakta klasör kabul et |
+| [ ] | `F7-052` | `4.57.0` | 20 dk | Kayıt kartında klasör ve şema bilgisini göster |
+| [ ] | `F7-053` | `4.58.0` | 20 dk | Profil C sentetik üreteç iskeletini kur |
+| [ ] | `F7-054` | `4.59.0` | 20 dk | CW dalga biçimi üretimini ekle |
+| [ ] | `F7-055` | `4.60.0` | 20 dk | LFM yukarı ve aşağı cıvıltı üretimini ekle |
+| [ ] | `F7-056` | `4.61.0` | 20 dk | HFM ve kodlu dalga biçimi üretimini ekle |
+| [ ] | `F7-057` | `4.62.0` | 20 dk | PRI ve darbe uzunluğu parametrelerini ekle |
+| [ ] | `F7-058` | `4.63.0` | 20 dk | Tx/Rx bölüşümünü PRI ve darbe süresine göre yap |
+| [ ] | `F7-059` | `4.64.0` | 20 dk | Platform ve CIT alanlarını doldur |
+| [ ] | `F7-060` | `4.65.0` | 20 dk | Eleman arızası enjeksiyonunu ekle |
+| [ ] | `F7-061` | `4.66.0` | 20 dk | I/Q bozulması enjeksiyonunu ekle |
+| [ ] | `F7-062` | `4.67.0` | 20 dk | Dosya ve şema bozulma senaryolarını ekle |
+| [ ] | `F7-063` | `4.68.0` | 20 dk | On iki senaryonun parametre setini tanımla |
+| [ ] | `F7-064` | `4.69.0` | 20 dk | Golden dilim fixture'ını üret ve SHA-256 sabitle |
+| [ ] | `F7-065` | `4.70.0` | 15 dk | Büyük senaryoların depoya girmediğini teste bağla |
+| [ ] | `F7-066` | `4.71.0` | 20 dk | .mat dışa aktarma hedefini kaydet |
+| [ ] | `F7-067` | `4.72.0` | 20 dk | Rx ve Tx için ayrı `.mat` dosyası üret |
+| [ ] | `F7-068` | `4.73.0` | 20 dk | Değişken düzenini kur |
+| [ ] | `F7-069` | `4.74.0` | 20 dk | Metadata'yı `.mat` içine koy |
+| [ ] | `F7-070` | `4.75.0` | 20 dk | MAT v5 boyut sınırını denetle |
+| [ ] | `F7-071` | `4.76.0` | 20 dk | İlerleme ve iptal desteğini bağla |
+| [ ] | `F7-072` | `4.77.0` | 15 dk | Atomik yazımı kur |
+| [ ] | `F7-073` | `4.78.0` | 20 dk | Üretilen `.mat`'i geri okuyarak doğrula |
+| [ ] | `F7-074` | `4.79.0` | 20 dk | 10 dakikalık kaydın açılış süresini ölç |
+| [ ] | `F7-075` | `4.80.0` | 20 dk | Sorgu ve seyreltme bütçesini ölç |
+| [ ] | `F7-076` | `4.81.0` | 20 dk | Tepe bellek kullanımını ölç |
+| [ ] | `F7-077` | `4.82.0` | 20 dk | Profil C format belgesini tamamla |
+| [ ] | `F7-078` | `4.83.0` | 20 dk | TOML şema kılavuzunu yaz |
+| [ ] | `F7-079` | `4.84.0` | 20 dk | MATLAB kullanım notunu yaz |
+| [ ] | `F7-080` | `5.0.0` | 20 dk | Faz 7 milestone kabul turunu koştur ve etiketle |
+
+### Faz 8 — Tx/Rx ham veri analizi ve sensör sağlığı (0/76)
+
+| | İş | Sürüm | Süre | Çıktı |
+| --- | --- | --- | --- | --- |
+| [ ] | `F8-001` | `5.1.0` | 20 dk | analysis/complex_guard.py: complex girdide sessiz gerçek-kısım düşürmesini ComplexDataError'a çeviren tek g... |
+| [ ] | `F8-002` | `5.2.0` | 15 dk | pyproject.toml pytest bölümünde filterwarnings = error::numpy.exceptions.ComplexWarning |
+| [ ] | `F8-003` | `5.3.0` | 15 dk | domain/channel.py SUPPORTED_DTYPES'a complex64 ve complex128 eklenir |
+| [ ] | `F8-004` | `5.4.0` | 20 dk | domain/array_frame.py: değişmez ArrayFrame (frame_index, timestamp_ns, values (32,820) complex64, quality m... |
+| [ ] | `F8-005` | `5.5.0` | 20 dk | analysis/complex_spectrum.py: iki taraflı FFT (fft + fftfreq + fftshift) ve faz alanı taşıyan ComplexSpectr... |
+| [ ] | `F8-006` | `5.6.0` | 20 dk | 820 örneklik frame için FFT plan notu ve zero-pad yardımcısı; 820 = 2^2 * 5 * 41 olduğu için radix-2 yoktur |
+| [ ] | `F8-007` | `5.7.0` | 20 dk | repository protokolüne query_array(channel_ids, time_range) toplu çok kanallı sorgu eklenir |
+| [ ] | `F8-008` | `5.8.0` | 20 dk | Dosya boyutu Diophantine çözücüsü: dosya_boyutu = H_dosya + F*(H_frame + C*S*B) denkleminden dtype ve başlı... |
+| [ ] | `F8-009` | `5.9.0` | 20 dk | Kuantalama adımı q ve etkin bit derinliği B_eff kestirimi (sıfır olmayan ardışık farkların yaklaşık OBEB'i... |
+| [ ] | `F8-010` | `5.10.0` | 20 dk | Bit düzeyinde takılı-bit taraması: kanal x bit toggle oranı matrisi |
+| [ ] | `F8-011` | `5.11.0` | 20 dk | Frame başlığı ikili düzeni keşif tarayıcısı: sabit adımlı offset taraması ile monoton frame indeksi ve time... |
+| [ ] | `F8-012` | `5.12.0` | 20 dk | Frame süreklilik ve bütünlük QC motoru: indeks atlaması, tekrar, timestamp monotonluğu, percent_availabilit... |
+| [ ] | `F8-013` | `5.13.0` | 15 dk | Örnek-sayısı ile zaman damgası arasındaki sürüklenme ölçümü: drift_ppm = (dt_timestamp - N/fs)/(N/fs)*1e6,... |
+| [ ] | `F8-014` | `5.14.0` | 20 dk | Frame-arası faz sürekliliği testi: kararlı dar bant bileşende frame sınırındaki faz sıçramasından alt-örnek... |
+| [ ] | `F8-015` | `5.15.0` | 20 dk | Kanal örnekleme eşzamanlılığı testi: ortak geçici olayda kanal başına grup gecikmesinden 'simültane S/H' mi... |
+| [ ] | `F8-016` | `5.16.0` | 20 dk | Anti-alias bant kenarı ölçümü: çok frame ortalamalı iki taraflı gürültü PSD'sinden gerçek kullanılabilir B |
+| [ ] | `F8-017` | `5.17.0` | 20 dk | I/Q yerleşim hipotezi seçici: interleaved/planar x kanal-majör/örnek-majör dört hipotezin dairesellik, zarf... |
+| [ ] | `F8-018` | `5.18.0` | 20 dk | LevelMetrics: akustik grup (Vpp_env = 2*max |
+| [ ] | `F8-019` | `5.19.0` | 15 dk | dBFS dönüşümü: yalnız tam ölçek referansı bilindiğinde; float veride None ve 'göreli dB' etiketi |
+| [ ] | `F8-020` | `5.20.0` | 20 dk | Tepe faktörü / PAPR iki ayrı tanımla: CF_env = max |
+| [ ] | `F8-021` | `5.21.0` | 20 dk | Kırpılma tespiti iki yöntemle: tam ölçek biliniyorsa doğrudan sayım, bilinmiyorsa histogram uç-bin yığılma... |
+| [ ] | `F8-022` | `5.22.0` | 15 dk | Donmuş örnek / dijital ölü kanal metriği (QARTOD Flat Line): ardışık aynı değer oranı F ve I=Q=0 oranı Z |
+| [ ] | `F8-023` | `5.23.0` | 20 dk | Kuantalama gürültü tabanı ve ENOB kıyası: ölçülen taban ile teorik q^2/(12*fs) tabanının farkı; 'ölü' ile '... |
+| [ ] | `F8-024` | `5.24.0` | 15 dk | DC ofset / LO sızıntısı: mean(I), mean(Q) ve complex DCR_dB = 10*log10( |
+| [ ] | `F8-025` | `5.25.0` | 20 dk | Kazanç dengesizliği g_hat = Q_rms/I_rms ve kuadratür faz hatası phi_hat = arcsin(E[I*Q]/(I_rms*Q_rms)) — GE... |
+| [ ] | `F8-026` | `5.26.0` | 20 dk | Kör IMRR: dairesellik katsayısı rho = E[z^2]/E[ |
+| [ ] | `F8-027` | `5.27.0` | 15 dk | Doğrudan IMRR: baskın ton varken S(-f0)/S(+f0); f0 tepe konumundan bulunur, f_c bilinmesi gerekmez |
+| [ ] | `F8-028` | `5.28.0` | 20 dk | Kanal-arası I/Q tutarlılığı: delta_g_m, delta_phi_m, delta_IMRR_m medyana göre; 'tek kanal mı sistem mi' ay... |
+| [ ] | `F8-029` | `5.29.0` | 20 dk | welch_psd'nin iki taraflı complex yolu (mevcut |
+| [ ] | `F8-030` | `5.30.0` | 20 dk | Pencere kataloğunu genişletme: Blackman-Harris-4, Nuttall, Tukey, Kaiser (mevcut windows.py referans tablo... |
+| [ ] | `F8-031` | `5.31.0` | 20 dk | Çapraz spektrum S_mk(f) ve genlik-kare koherans gamma^2_mk(f) matrisi |
+| [ ] | `F8-032` | `5.32.0` | 20 dk | Koherans anlamlılık eşiği gamma^2_crit = 1 - alpha^(1/(K-1)) ve ÖRTÜŞMELİ Welch için etkin K düzeltmesi |
+| [ ] | `F8-033` | `5.33.0` | 20 dk | Bant içi spektral eğim: log-genlik/frekans doğrusal uydurma, birim dB/kHz (dB/oktav DEĞİL — f_c bilinmediği... |
+| [ ] | `F8-034` | `5.34.0` | 20 dk | Kanal-arası göreli seviye haritası ve robust aykırı tespiti (medyan + MAD, Iglewicz-Hoaglin modified z) |
+| [ ] | `F8-035` | `5.35.0` | 15 dk | Göreli gürültü tabanı sapması delta_NL_m (dizi medyanına göre, ortak-mod bastırmalı) |
+| [ ] | `F8-036` | `5.36.0` | 20 dk | 32x32 karmaşık korelasyon matrisi ile ölü kanal, cross-talk ve polarite tersliği bayrakları |
+| [ ] | `F8-037` | `5.37.0` | 20 dk | Kovaryans kestirimi: snapshot'lar frame İÇİ komşu FFT binlerinden alınır; frame-ARASI toplama F8-014 kanıtı... |
+| [ ] | `F8-038` | `5.38.0` | 20 dk | Özdeğer spektrumu, sayısal rank, koşul sayısı (Marchenko-Pastur referansıyla) ve özvektör yoğunlaşma metriğ... |
+| [ ] | `F8-039` | `5.39.0` | 20 dk | Örtüşen çift korelasyon arıza tekilleştiricisi: kanal haritası bilinmediği için 32*31/2 = 496 çiftin tamamı... |
+| [ ] | `F8-040` | `5.40.0` | 20 dk | PCA leave-one-out rekonstrüksiyon kalıntısı (SVI) ve ön koşul kapısı: lambda_1/lambda_ort yetersizse yöntem... |
+| [ ] | `F8-041` | `5.41.0` | 20 dk | Çok-metrik karar motoru: OK / UYARI / ARIZA durum makinesi, tetikleyen metrik listesi, kanal maskeleme çıkışı |
+| [ ] | `F8-042` | `5.42.0` | 20 dk | Eleman ekseni DFT'si: her frekans bininde 32 elemanlı vektöre FFT; eksen 'derece/eleman faz ilerlemesi' (u... |
+| [ ] | `F8-043` | `5.43.0` | 20 dk | Ölçülen koherent dizi kazancı: baş özvektör hüzmeleyici (yön vektörü gerektirmez), teorik üst sınırdan sapma |
+| [ ] | `F8-044` | `5.44.0` | 20 dk | Geometri sınıfı hipotez testi (doğrusal vs dairesel) ve kanal haritası doğrulaması (korelasyon matrisinin b... |
+| [ ] | `F8-045` | `5.45.0` | 20 dk | Tx klasörü ham envanteri: kanal sayısı ve frame başına örnek sayısı dosya boyutundan ÖLÇÜLÜR; Rx ile uyuşma... |
+| [ ] | `F8-046` | `5.46.0` | 20 dk | Darbe envanteri: zarf eşiği ve histerezisle Tx segment tespiti, alt-örnek interpolasyonlu TOA, PW, IEEE 181... |
+| [ ] | `F8-047` | `5.47.0` | 20 dk | Anlık frekans kestirimi: CFD f[n] = arg(z[n+1]*conj(z[n-1]))/(4*pi*T) ve ayrı adlandırılmış FFD f[n] = arg(... |
+| [ ] | `F8-048` | `5.48.0` | 20 dk | Dalga biçimi sınıflandırıcısı (CW / LFM-up / LFM-down / kodlu) ve faz-bölgesi kalıntısı ile chirp doğrusallığı |
+| [ ] | `F8-049` | `5.49.0` | 20 dk | PRI / PRF / jitter: TOA tabanlı ve timestamp tabanlı iki bağımsız ölçüm, histogram, kümülatif zaman hatası,... |
+| [ ] | `F8-050` | `5.50.0` | 20 dk | Tx/Rx örnek bütçesi kapanış testi: N_tx + N_rx toplamından PRI ve T_tx ölçümü, sabit/uyarlamalı kapı kararı |
+| [ ] | `F8-051` | `5.51.0` | 20 dk | Darbe-arası genlik/faz kararlılığı, normalize koherens gamma, frekans ofseti sürüklenmesi ve delta_phi_p di... |
+| [ ] | `F8-052` | `5.52.0` | 20 dk | Alıcı toparlanma süresi tau_rec: Tx sonrası zarfa üstel+sabit uydurma, kanal-kanal fark olarak (reverberasy... |
+| [ ] | `F8-053` | `5.53.0` | 20 dk | Ölçülen Tx replikası: çok darbeli koherent ortalama (genlik-SNR sqrt(P), güç-SNR P kat) |
+| [ ] | `F8-054` | `5.54.0` | 20 dk | RX bant şelalesi paneli verisi: frame başına iki taraflı STFT, eksen 'f - f_c (Hz)', 9,99 Hz bin, saniyede... |
+| [ ] | `F8-055` | `5.55.0` | 15 dk | Geniş bant enerji izi: kanal ve frame başına toplam |
+| [ ] | `F8-056` | `5.56.0` | 20 dk | Zarf modülasyon spektrumu (DEMON çekirdeği): e[n] = |
+| [ ] | `F8-057` | `5.57.0` | 20 dk | DEMON PRI-tarağı belirsizlik kapısı: kapılama zarf spektrumunu PRI tarağıyla katladığı için etkilenen binle... |
+| [ ] | `F8-058` | `5.58.0` | 20 dk | array_profile.json şeması: status (UNCALIBRATED/PARTIAL/CALIBRATED), acquisition, array (tip, eleman konuml... |
+| [ ] | `F8-059` | `5.59.0` | 20 dk | Ölçekleme alt şeması (adc_bits, adc_fullscale_v, analog_gain_db, iq_convention_gain, hydrophone_sensitivity... |
+| [ ] | `F8-060` | `5.60.0` | 20 dk | Mutlak Vpp/Vrms dönüşümü (sabitler girildiğinde açılır) ve konvansiyon belirsizliği notu |
+| [ ] | `F8-061` | `5.61.0` | 20 dk | AGC/TVG imza testi: PRI'dan PRI'ya kuantumlu basamaklı taban seviyesi sıçraması taraması |
+| [ ] | `F8-062` | `5.62.0` | 20 dk | Cross Analysis sekmesini etkinleştir (ENABLED_TABS + _on_view_tab_changed) ve 32x32 korelasyon/koherans ısı... |
+| [ ] | `F8-063` | `5.63.0` | 20 dk | Kanal x frekans sapma ısı haritası (medyandan dB) ile özdeğer scree grafiği ve koşul sayısı göstergesini ay... |
+| [ ] | `F8-064` | `5.64.0` | 20 dk | Eleman sağlık matrisi (32 hücre x durum, tetikleyen metrik ipucu) ve karmaşık kazanç polar grafiği aynı pan... |
+| [ ] | `F8-065` | `5.65.0` | 20 dk | 3D View sekmesini etkinleştir ve kanal × frekans × zaman küpü panelini bağla |
+| [ ] | `F8-066` | `5.66.0` | 20 dk | Tx darbe paneli: darbe zarflarının üst üste bindirilmesi, anlık frekans eğrisi ve PRI histogramı |
+| [ ] | `F8-067` | `5.67.0` | 20 dk | Report sekmesini etkinleştir ve sağlık skor kartını bağla (kanal |
+| [ ] | `F8-068` | `5.68.0` | 20 dk | Sürümlü JSON şeması + CSV sağlık raporu; her alan birim (count/dBFS/rel-dB/örnek/Hz) ve olculen |
+| [ ] | `F8-069` | `5.69.0` | 20 dk | HDF5/netCDF4 dışa aktarma (ICES SONAR-netCDF4 grup yapısı referans alınır) ve kalite maskesinin veriyle bir... |
+| [ ] | `F8-070` | `5.70.0` | 20 dk | Mevcut Profil B sentetik üreticisini complex 32x820 Tx/Rx klasör yapısına genişlet (tarih klasörü / Tx-Rx a... |
+| [ ] | `F8-071` | `5.71.0` | 20 dk | On arıza modeli enjeksiyonu (ölü, gürültülü, kazanç sapmalı, faz kaymalı, kırpılmış, DC ofsetli, I/Q denges... |
+| [ ] | `F8-072` | `5.72.0` | 20 dk | Zaman ekseni arıza modelleri: frame atlama, timestamp geri sıçraması, 0,8 örnek/frame kayma, PRI jitter ve... |
+| [ ] | `F8-073` | `5.73.0` | 20 dk | Eşik kalibrasyon aracı: metrik dağılımını dizi boyunca çizip doğal kümeleri bulan ve eşik öneren yardımcı;... |
+| [ ] | `F8-074` | `5.74.0` | 20 dk | docs/analysis/array-health.md: her metrik için formül, birim, eşik, kaynak veya 'KAYNAK YOK — genel mühendi... |
+| [ ] | `F8-075` | `5.75.0` | 20 dk | docs/notes/open-decisions.md'ye Faz 8 açık kararlarının eklenmesi (mevcut tablo biçimi ve durum kodları kor... |
+| [ ] | `F8-076` | `6.0.0` | 20 dk | Faz 8 milestone kabul tutanağı ve etiket |
+
 ## B. Bölüm içi kontrol listeleri
 
 
@@ -598,38 +766,38 @@ Work in fully autonomous mode.
 
 ### 23. MVP “Definition of Done”
 
-- [x] Ana ekran referans mockup'ın dokuz bölgesini, üç sütunlu düzenini ve panel hiyerarşisini karşılıyor.  <sub>plan.md:1922</sub>
-- [x] Sağ BIT genel özeti alt sistem durumlarıyla tutarlı; gerçek veri ile simülasyon ayırt ediliyor.  <sub>plan.md:1923</sub>
-- [x] FFT/spektrogram gibi v2 işlevleri MVP'de açıklamalı pasif durumda; tamamlanmamış işlev başarılı sonuç göstermez.  <sub>plan.md:1924</sub>
-- [x] Desteklenen `.bin` dosyası salt okunur biçimde güvenilir açılıyor.  <sub>plan.md:1925</sub>
-- [x] Parser sonuçları referans kayıtlarla doğrulanmış.  <sub>plan.md:1926</sub>
-- [x] Kanal ağacı binlerce öğede kullanılabilir hızda çalışıyor.  <sub>plan.md:1927</sub>
-- [x] Kullanıcı kanalları grafiğe ekleyip kaldırabiliyor.  <sub>plan.md:1928</sub>
-- [x] Birden fazla grafik ortak X zaman ekseninde senkronize olabiliyor.  <sub>plan.md:1929</sub>
-- [x] X, Y ve XY zoom davranışları tutarlı.  <sub>plan.md:1930</sub>
-- [x] Cursor ve region ölçümleri doğru.  <sub>plan.md:1931</sub>
-- [x] BIT/event satırından grafikte aynı zamana gidiliyor.  <sub>plan.md:1932</sub>
-- [x] TX aralıkları ve kritik olaylar grafik üzerinde gösteriliyor.  <sub>plan.md:1933</sub>
-- [x] Uzun işler UI’ı dondurmuyor ve iptal edilebiliyor.  <sub>plan.md:1934</sub>
-- [x] PNG ve CSV dışa aktarma metadata ile çalışıyor.  <sub>plan.md:1935</sub>
-- [x] Workspace kaydet/aç işlevi temel düzeni koruyor.  <sub>plan.md:1936</sub>
-- [x] Kritik unit/integration/GUI testleri CI’da geçiyor.  <sub>plan.md:1937</sub>
-- [x] Desteklenen Windows ölçeklemelerinde arayüz bozulmuyor.  <sub>plan.md:1938</sub>
-- [x] Bilinen kritik hata bulunmuyor; diğer bilinen sorunlar release notes’ta yer alıyor.  <sub>plan.md:1939</sub>
+- [x] Ana ekran referans mockup'ın dokuz bölgesini, üç sütunlu düzenini ve panel hiyerarşisini karşılıyor.  <sub>plan.md:2214</sub>
+- [x] Sağ BIT genel özeti alt sistem durumlarıyla tutarlı; gerçek veri ile simülasyon ayırt ediliyor.  <sub>plan.md:2215</sub>
+- [x] FFT/spektrogram gibi v2 işlevleri MVP'de açıklamalı pasif durumda; tamamlanmamış işlev başarılı sonuç göstermez.  <sub>plan.md:2216</sub>
+- [x] Desteklenen `.bin` dosyası salt okunur biçimde güvenilir açılıyor.  <sub>plan.md:2217</sub>
+- [x] Parser sonuçları referans kayıtlarla doğrulanmış.  <sub>plan.md:2218</sub>
+- [x] Kanal ağacı binlerce öğede kullanılabilir hızda çalışıyor.  <sub>plan.md:2219</sub>
+- [x] Kullanıcı kanalları grafiğe ekleyip kaldırabiliyor.  <sub>plan.md:2220</sub>
+- [x] Birden fazla grafik ortak X zaman ekseninde senkronize olabiliyor.  <sub>plan.md:2221</sub>
+- [x] X, Y ve XY zoom davranışları tutarlı.  <sub>plan.md:2222</sub>
+- [x] Cursor ve region ölçümleri doğru.  <sub>plan.md:2223</sub>
+- [x] BIT/event satırından grafikte aynı zamana gidiliyor.  <sub>plan.md:2224</sub>
+- [x] TX aralıkları ve kritik olaylar grafik üzerinde gösteriliyor.  <sub>plan.md:2225</sub>
+- [x] Uzun işler UI’ı dondurmuyor ve iptal edilebiliyor.  <sub>plan.md:2226</sub>
+- [x] PNG ve CSV dışa aktarma metadata ile çalışıyor.  <sub>plan.md:2227</sub>
+- [x] Workspace kaydet/aç işlevi temel düzeni koruyor.  <sub>plan.md:2228</sub>
+- [x] Kritik unit/integration/GUI testleri CI’da geçiyor.  <sub>plan.md:2229</sub>
+- [x] Desteklenen Windows ölçeklemelerinde arayüz bozulmuyor.  <sub>plan.md:2230</sub>
+- [x] Bilinen kritik hata bulunmuyor; diğer bilinen sorunlar release notes’ta yer alıyor.  <sub>plan.md:2231</sub>
 
 ### 25. Açık kararlar
 
-- [ ] `.bin` format dokümanı ve örnek dosyalar mevcut mu?  **CEVAP BEKLİYOR** (`D-01`, `D-02`, `docs/notes/open-decisions.md`). Varsayım: Sentetik fixture ile ilerlendi; Bölüm 8.2/8.3 taslağı sözleşme sayıldı.  <sub>plan.md:1960</sub>
-- [ ] En büyük tipik dosya boyutu ve kayıt süresi nedir?  **CEVAP BEKLİYOR** (`D-03`, `docs/notes/open-decisions.md`). Varsayım: Profil B için 2,59 GiB/saat, 4 saate kadar varsayıldı.  <sub>plan.md:1961</sub>
-- [ ] Maksimum kanal sayısı ve kanal başına en yüksek sample rate nedir?  **CEVAP BEKLİYOR** (`D-04`, `docs/notes/open-decisions.md`). Varsayım: Profil A 8 sabit kanal; akustik 48 kHz uygulandı (taslaktaki 96 kHz değil).  <sub>plan.md:1962</sub>
-- [ ] Timestamp tek kaynaktan mı geliyor; cihazlar arasında clock drift var mı?  **CEVAP BEKLİYOR** (`D-09`, `docs/notes/open-decisions.md`). Varsayım: Kanonik `int64` UTC ns; Profil A'da senkron kalitesi `bilinmiyor` gösterilir.  <sub>plan.md:1963</sub>
-- [ ] BIT sonuçları anlık event mi, periyodik status mü, ikisi birden mi?  **CEVAP BEKLİYOR** (`D-11`, `docs/notes/open-decisions.md`). Varsayım: Profil A'da her kayıtta durum maskesi (periyodik) varsayıldı.  <sub>plan.md:1964</sub>
-- [ ] Transmisyon verisinin alanları ve START/STOP ilişkilendirmesi nedir?  **CEVAP BEKLİYOR** (`D-08`, `docs/notes/open-decisions.md`). Varsayım: `IDLE→ACTIVE` START, `ACTIVE→IDLE` STOP; sınırlar ±125 ms.  <sub>plan.md:1965</sub>
-- [ ] Canlı veri hangi protokol ve bant genişliğiyle gelecek?  **CEVAP BEKLİYOR** (`D-12`, `D-13`, `docs/notes/open-decisions.md`). Varsayım: Üç adaptör (UDP/TCP/serial) yazıldı; replay ve simülasyonla doğrulandı.  <sub>plan.md:1966</sub>
-- [ ] Hedef bilgisayar CPU, RAM, GPU ve monitör çözünürlüğü nedir?  **CEVAP BEKLİYOR** (`D-15`, `docs/notes/open-decisions.md`). Varsayım: Performans bütçeleri geliştirme makinesinde ölçüldü (`K-18`).  <sub>plan.md:1967</sub>
-- [ ] Uygulamanın offline/air-gapped ortamda çalışması gerekiyor mu?  **CEVAP BEKLİYOR** (`D-16`, `docs/notes/open-decisions.md`). Varsayım: Gerekmediği varsayıldı; yine de offline wheel arşivi üretildi (`F6-011`, `K-17`).  <sub>plan.md:1968</sub>
-- [ ] Verinin güvenlik sınıfı ve log/export kısıtları var mı?  **CEVAP BEKLİYOR** (`D-18`, `docs/notes/open-decisions.md`). Varsayım: Kısıt yok varsayıldı; log'a yalnız metadata yazılır, ham veri yazılmaz.  <sub>plan.md:1969</sub>
-- [ ] Birden fazla kayıt zaman hizalı olarak karşılaştırılacak mı?  **CEVAP BEKLİYOR** (`D-22`, `docs/notes/open-decisions.md`). Varsayım: İlk sürümde tek kayıt varsayıldı; çoklu kayıt açılır ama hizalama yoktur (`K-15`).  <sub>plan.md:1970</sub>
-- [ ] MATLAB’daki hangi analiz/etkileşim davranışları birebir bekleniyor?  **CEVAP BEKLİYOR** (`D-23`, `docs/notes/open-decisions.md`). Varsayım: Özel bir birebir beklenti olmadığı varsayıldı; X/Y/XY ölçekleme MATLAB alışkanlığına göre yapıldı.  <sub>plan.md:1971</sub>
-- [ ] Rapor çıktısı resmi test kanıtı sayılacak mı?  **CEVAP BEKLİYOR** (`D-24`, `docs/notes/open-decisions.md`). Varsayım: Sayılmayacağı varsayıldı; sayılacaksa imza, sürüm ve izlenebilirlik alanları gerekir.  <sub>plan.md:1972</sub>
-- [ ] Arayüz yalnız İngilizce mi, Türkçe/İngilizce mi olacak?  **CEVAP BEKLİYOR** (`D-21`, `docs/notes/open-decisions.md`). Varsayım: Arayüz İngilizce, proje belgeleri Türkçe (`K-14`).  <sub>plan.md:1973</sub>
+- [ ] `.bin` format dokümanı ve örnek dosyalar mevcut mu?  **CEVAP BEKLİYOR** (`D-01`, `D-02`, `docs/notes/open-decisions.md`). Varsayım: Sentetik fixture ile ilerlendi; Bölüm 8.2/8.3 taslağı sözleşme sayıldı.  <sub>plan.md:2252</sub>
+- [ ] En büyük tipik dosya boyutu ve kayıt süresi nedir?  **CEVAP BEKLİYOR** (`D-03`, `docs/notes/open-decisions.md`). Varsayım: Profil B için 2,59 GiB/saat, 4 saate kadar varsayıldı.  <sub>plan.md:2253</sub>
+- [ ] Maksimum kanal sayısı ve kanal başına en yüksek sample rate nedir?  **CEVAP BEKLİYOR** (`D-04`, `docs/notes/open-decisions.md`). Varsayım: Profil A 8 sabit kanal; akustik 48 kHz uygulandı (taslaktaki 96 kHz değil).  <sub>plan.md:2254</sub>
+- [ ] Timestamp tek kaynaktan mı geliyor; cihazlar arasında clock drift var mı?  **CEVAP BEKLİYOR** (`D-09`, `docs/notes/open-decisions.md`). Varsayım: Kanonik `int64` UTC ns; Profil A'da senkron kalitesi `bilinmiyor` gösterilir.  <sub>plan.md:2255</sub>
+- [ ] BIT sonuçları anlık event mi, periyodik status mü, ikisi birden mi?  **CEVAP BEKLİYOR** (`D-11`, `docs/notes/open-decisions.md`). Varsayım: Profil A'da her kayıtta durum maskesi (periyodik) varsayıldı.  <sub>plan.md:2256</sub>
+- [ ] Transmisyon verisinin alanları ve START/STOP ilişkilendirmesi nedir?  **CEVAP BEKLİYOR** (`D-08`, `docs/notes/open-decisions.md`). Varsayım: `IDLE→ACTIVE` START, `ACTIVE→IDLE` STOP; sınırlar ±125 ms.  <sub>plan.md:2257</sub>
+- [ ] Canlı veri hangi protokol ve bant genişliğiyle gelecek?  **CEVAP BEKLİYOR** (`D-12`, `D-13`, `docs/notes/open-decisions.md`). Varsayım: Üç adaptör (UDP/TCP/serial) yazıldı; replay ve simülasyonla doğrulandı.  <sub>plan.md:2258</sub>
+- [ ] Hedef bilgisayar CPU, RAM, GPU ve monitör çözünürlüğü nedir?  **CEVAP BEKLİYOR** (`D-15`, `docs/notes/open-decisions.md`). Varsayım: Performans bütçeleri geliştirme makinesinde ölçüldü (`K-18`).  <sub>plan.md:2259</sub>
+- [ ] Uygulamanın offline/air-gapped ortamda çalışması gerekiyor mu?  **CEVAP BEKLİYOR** (`D-16`, `docs/notes/open-decisions.md`). Varsayım: Gerekmediği varsayıldı; yine de offline wheel arşivi üretildi (`F6-011`, `K-17`).  <sub>plan.md:2260</sub>
+- [ ] Verinin güvenlik sınıfı ve log/export kısıtları var mı?  **CEVAP BEKLİYOR** (`D-18`, `docs/notes/open-decisions.md`). Varsayım: Kısıt yok varsayıldı; log'a yalnız metadata yazılır, ham veri yazılmaz.  <sub>plan.md:2261</sub>
+- [ ] Birden fazla kayıt zaman hizalı olarak karşılaştırılacak mı?  **CEVAP BEKLİYOR** (`D-22`, `docs/notes/open-decisions.md`). Varsayım: İlk sürümde tek kayıt varsayıldı; çoklu kayıt açılır ama hizalama yoktur (`K-15`).  <sub>plan.md:2262</sub>
+- [ ] MATLAB’daki hangi analiz/etkileşim davranışları birebir bekleniyor?  **CEVAP BEKLİYOR** (`D-23`, `docs/notes/open-decisions.md`). Varsayım: Özel bir birebir beklenti olmadığı varsayıldı; X/Y/XY ölçekleme MATLAB alışkanlığına göre yapıldı.  <sub>plan.md:2263</sub>
+- [ ] Rapor çıktısı resmi test kanıtı sayılacak mı?  **CEVAP BEKLİYOR** (`D-24`, `docs/notes/open-decisions.md`). Varsayım: Sayılmayacağı varsayıldı; sayılacaksa imza, sürüm ve izlenebilirlik alanları gerekir.  <sub>plan.md:2264</sub>
+- [ ] Arayüz yalnız İngilizce mi, Türkçe/İngilizce mi olacak?  **CEVAP BEKLİYOR** (`D-21`, `docs/notes/open-decisions.md`). Varsayım: Arayüz İngilizce, proje belgeleri Türkçe (`K-14`).  <sub>plan.md:2265</sub>

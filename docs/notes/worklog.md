@@ -399,8 +399,10 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `-` | — | 27 dk 57 sn | `dc0aef2` | kanal ikonları, sağ tık menüsü ve boş grafik yönlendirmesi |
 | `-` | — | 11 dk 30 sn | `bd499f4` | korelasyon toleransını yapılandırılabilir yap |
 | `-` | — | 11 dk 32 sn | `92c70d9` | parametrik Profil B sentetik üreticisi ekle |
+| `-` | — | 1 dk 11 sn | `5d82627` | kalan çoklu-panel işini net tanımla |
+| `-` | — | 576 dk 6 sn | `78b66dd` | C4 modeli, guncel README ve videolu demo ekle |
 
-**381 commit · olculen toplam 4699 dk 58 sn · olculemeyen 1 (ilk commit)**
+**383 commit · olculen toplam 5277 dk 15 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

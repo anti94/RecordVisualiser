@@ -39,6 +39,8 @@ PHASE_NAMES = {
     "F4": "Faz 4 — Mockup analiz panosu ve büyük veri performansı",
     "F5": "Faz 5 — Canlı veri, bağlantı ve kayıt",
     "F6": "Faz 6 — Windows dağıtımı ve ürünleştirme",
+    "F7": "Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema",
+    "F8": "Faz 8 — Tx/Rx ham veri analizi ve sensör sağlığı",
 }
 
 
