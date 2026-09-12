@@ -9,7 +9,8 @@ tarif ile gerçek dosya ayrışırsa veri **hatasız ama yanlış** okunur. Söz
 kritik maddesi bu ayrışmayı yakalamaktır (§7).
 
 İlgili belgeler: [`decoder-guide.md`](decoder-guide.md) (üç profilin ayrımı),
-[`profile-a.md`](profile-a.md), [`profile-b.md`](profile-b.md).
+[`profile-a.md`](profile-a.md), [`profile-b.md`](profile-b.md),
+[`toml-schema.md`](toml-schema.md) (C++ struct tanımlarının tarifi).
 
 ## 1. Sinyal parametreleri
 
@@ -234,24 +235,84 @@ Sıralama **dosya adındaki sayaca** göredir, dosya sisteminin döndürdüğü 
 değil. Sözlük sıralaması beş haneli sıfır dolgu sayesinde sayısal sıralamayla aynıdır;
 dolgu olmasaydı `TxData10.bin`, `TxData9.bin`'den önce gelirdi.
 
-## 6. Zaman ekseni
+## 6. Zaman ekseninin tek kaynağı
 
-Bir frame 820 örnek taşır ve 8192 Hz'de bu **100,0977 ms** eder, 100 ms değil.
+Bir Profil C kaydında zamanı iki farklı yoldan türetmek mümkündür ve ikisi **aynı sonucu
+vermez**:
 
-| Süre | Birikmiş kayma |
+| Kaynak | Nasıl hesaplanır | Ne anlatır |
+| --- | --- | --- |
+| **Frame sayacı** | `t = başlangıç + frame_indeksi × 820 / 8192` | Kaçıncı frame olduğunu |
+| **Frame timestamp'i** | Frame başlığındaki `int64` UTC ns alanı | Ne zaman kaydedildiğini |
+
+İkisi 10 dakikanın sonunda **0,586 saniye** ayrışır (§3.5). Bu, gözden kaçacak kadar
+küçük ama iki panelin farklı değer göstermesine yetecek kadar büyüktür.
+
+### 6.1 Karar
+
+**Kanonik zaman, frame başlığındaki timestamp'tir.**
+
+Bu karar `ADR-003`'ün doğrudan sonucudur: kanonik birim `int64` UTC epoch nanosaniyedir
+ve cihaz sayacı kanonik yapılmaz. Frame sayacı bir **indekstir**, bir zaman değil.
+
+Frame sayacı üç iş için kullanılır ve yalnız bu üçü için:
+
+1. **Sıralama** — frame'lerin doğru sırada okunması.
+2. **Boşluk tespiti** — atlanan bir indeks kayıp frame demektir.
+3. **Tutarlılık ölçümü** — sayaçtan türeyen nominal zaman ile timestamp'in farkı
+   ölçülür ve raporlanır.
+
+Üçüncüsü `ADR-003` §2.6'nın bu profildeki karşılığıdır: **drift ölçülür, sessizce
+düzeltilmez.**
+
+### 6.2 Neden timestamp
+
+| Gerekçe | Açıklama |
 | --- | --- |
-| 1 saniye | 0,977 ms |
-| 1 dakika | 58,6 ms |
-| **10 dakika (tavan)** | **0,586 s** |
+| Gerçeği taşır | Timestamp örneğin gerçekten ne zaman alındığını söyler; sayaç yalnız kaçıncı olduğunu |
+| Boşluğa dayanıklı | Bir saniye eksikse sayaç tabanlı zaman bütün sonrasını 1 s öne kaydırır; timestamp kaymaz |
+| Akımları hizalar | Tx ve Rx sayaçları bağımsızdır; ortak eksen ancak timestamp'tir |
+| `ADR-003` ile tutarlı | Diğer profiller de kanonik UTC ns kullanıyor; kayıtlar arası karşılaştırma korunur |
 
-Kaymanın hesabı ve birikim tablosu §3.5'tedir. Kayma kabul edilmiştir (`D-27`); ama
-bir kural doğurur: zaman ekseni **frame sayacından mı yoksa frame başlığındaki
-timestamp'ten mi** türetilecek? İkisi 10 dakikanın
-sonunda tam da bu 0,586 saniye kadar ayrışır.
+İkinci satır tek başına belirleyicidir. Yayın yapılmayan bir saniyede Tx dosyası
+üretilmez (§2.3); sayaç tabanlı bir eksen o boşluğu göremez ve sonraki bütün Tx
+frame'lerini yanlış ana yerleştirir.
 
-Seçim kodda **tek bir yerde** tanımlanmalıdır. İki panel iki farklı kaynaktan türetirse
-aynı kayıt için iki farklı zaman gösterirler ve hangisinin doğru olduğu anlaşılmaz.
-Bu seçim `F7-005` ile sözleşmeye bağlanacaktır.
+### 6.3 Timestamp yoksa ya da bozuksa
+
+| Durum | Davranış |
+| --- | --- |
+| Alan hiç yok | Sayaç tabanlı zamana düşülür ve bu **açıkça işaretlenir**; kayıt `zaman kaynağı: sayaç` diye görünür |
+| Geriye sıçrıyor | Frame `SUSPECT` işaretlenir, veri atılmaz (`ADR-003` §2.7) |
+| Tekrar ediyor | Aynı biçimde işaretlenir; ikinci frame atılmaz |
+| Nominalden çok sapıyor | `JITTER` işaretlenir; eşik yapılandırılabilir |
+
+Sessizce sayaca düşmek en kötü davranış olurdu: kullanıcı gerçek zamana baktığını
+sanırken nominal bir ızgara görürdü.
+
+### 6.4 Tek yer
+
+Bu seçim kodda **tek bir işlevde** uygulanır ve her yer oradan okur. İki panel iki
+farklı kaynaktan türetirse aynı kayıt için iki farklı zaman gösterirler ve hangisinin
+doğru olduğu ekrandan anlaşılamaz.
+
+Kural testle korunur: hiçbir panel ya da dışa aktarma modülü frame indeksinden
+doğrudan zaman hesaplayamaz (`F7-026`, `F7-038`).
+
+### 6.5 Ölçülen sapmanın raporlanması
+
+Nominal ile gerçek arasındaki fark ppm olarak hesaplanır:
+
+```text
+sapma_ppm = (timestamp_adımı − 820 / 8192) / (820 / 8192) × 10⁶
+```
+
+Frame periyodu tam olarak 820/8192 ise sapma sıfırdır. Cihaz saati nominal 100 ms
+ızgarasına göre yazıyorsa sapma −975,6 ppm çıkar. İşaret önemlidir ve raporda
+gösterilir: hangi tarafın hızlı olduğunu söyler.
+
+Bu sayı bir hata değil bir **ölçümdür**. Ne olduğunu anlamadan düzeltmek, veriyi
+bozmanın en sessiz yoludur.
 
 ## 7. Şema ile kaydın ayrışması
 
@@ -299,4 +360,4 @@ yalnız test içindir ve bir ürün özelliği değildir.
 | `D-30` | CIT alanı tam olarak nedir | **Açık** |
 | `D-31` | PRI değeri ve Tx süresi | **Açık** |
 | `D-32` | Bir frame'in 820 örneği tam PRI'yı mı kapsıyor | **Açık** |
-| `D-33` | Zaman ekseni frame sayacından mı timestamp'ten mi | `F7-005` ile karara bağlanacak |
+| `D-33` | Zaman ekseni frame sayacından mı timestamp'ten mi | **Kapalı** — timestamp kanonik (§6) |

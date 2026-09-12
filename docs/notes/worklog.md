@@ -404,8 +404,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `-` | — | 262 dk 43 sn | `ac9d1a0` | Faz 7 ve Faz 8'i plana ekle |
 | `F7-001` | 20 dk | 13 dk 15 sn | `4dbab84` | profil C klasör ve dosya sözleşmesi taslağını yaz |
 | `F7-002` | 20 dk | 11 dk 49 sn | `14c6b5d` | kullanıcı kararlarını ve kalan açık kararları kayda geç |
+| `F7-003` | 20 dk | 10 dk 1 sn | `a7dfaf3` | bayt bütçesi ve zaman kayması tablosunu belgeye yaz |
 
-**386 commit · olculen toplam 5565 dk 2 sn · olculemeyen 1 (ilk commit)**
+**387 commit · olculen toplam 5575 dk 3 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 
