@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 499 madde · 372 tamamlandı · 127 kaldı**
+**Toplam 499 madde · 411 tamamlandı · 88 kaldı**
 
-`[##################......]` %74.5
+`[####################....]` %82.4
 
 ## Özet
 
@@ -41,8 +41,8 @@ Work in fully autonomous mode.
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 41 | 0 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 35 | 0 | 35 |
-| Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **372** | **127** | **499** |
+| Bölüm içi kontrol listeleri | 57 | 88 | 145 |
+| **Toplam** | **411** | **88** | **499** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -440,70 +440,70 @@ Work in fully autonomous mode.
 
 ### 5.2 Data Explorer
 
-- [ ] Lazy-loading destekli model/view tabanlı ağaç oluştur.  <sub>plan.md:205</sub>
-- [ ] Kanal adına, ID’ye, birime ve kaynağa göre arama ekle.  <sub>plan.md:206</sub>
-- [ ] `Sensors`, `BIT`, `Transmission`, `Derived` hızlı filtreleri ekle.  <sub>plan.md:207</sub>
-- [ ] Kanal türü, bağlantı durumu ve alarm seviyesi için ikon sistemi belirle.  <sub>plan.md:208</sub>
-- [ ] Kanalı çift tıklama ve sürükle-bırak ile grafiğe ekle.  <sub>plan.md:209</sub>
-- [ ] Çoklu seçim ve “seçilenleri aynı grafikte/yeni grafiklerde aç” komutu ekle. (`F3-016`: “aynı grafikte” kısmı yapıldı; “yeni/ayrı grafiklerde” çoklu-panel/tab altyapısı Bölüm 5.3'te kurulunca eklenecek.)  <sub>plan.md:210</sub>
-- [ ] Favori kanal gruplarını kaydet.  <sub>plan.md:211</sub>
-- [ ] Sağ tık menüsü: Plot, Inspect, Add to Existing Plot, Export, Copy Path.  <sub>plan.md:212</sub>
+- [x] Lazy-loading destekli model/view tabanlı ağaç oluştur.  (`F3-009` ağaç modeli, `F3-010` lazy yükleme)  <sub>plan.md:205</sub>
+- [x] Kanal adına, ID’ye, birime ve kaynağa göre arama ekle.  (`F3-011`; dört alan da testlerle kapsandı)  <sub>plan.md:206</sub>
+- [x] `Sensors`, `BIT`, `Transmission`, `Derived` hızlı filtreleri ekle.  (`F3-012`)  <sub>plan.md:207</sub>
+- [ ] Kanal türü, bağlantı durumu ve alarm seviyesi için ikon sistemi belirle.  **AÇIK:** severity ikonları `ui/status_icons.py` ile tanımlı ve olay tablosunda kullanılıyor; kanal türü ve bağlantı durumu için ikon ağaçta yok.  <sub>plan.md:208</sub>
+- [x] Kanalı çift tıklama ve sürükle-bırak ile grafiğe ekle.  (`F3-013` çift tık, `F3-015` sürükle-bırak)  <sub>plan.md:209</sub>
+- [ ] Çoklu seçim ve “seçilenleri aynı grafikte/yeni grafiklerde aç” komutu ekle. (`F3-016`: “aynı grafikte” kısmı yapıldı; “yeni/ayrı grafiklerde” çoklu-panel/tab altyapısı Bölüm 5.3'te kurulunca eklenecek.)  **AÇIK:** `F3-016` "aynı grafikte" kısmını verdi; "ayrı grafiklerde" çoklu-panel altyapısına bağlı.  <sub>plan.md:210</sub>
+- [x] Favori kanal gruplarını kaydet.  (`F3-017`)  <sub>plan.md:211</sub>
+- [ ] Sağ tık menüsü: Plot, Inspect, Add to Existing Plot, Export, Copy Path.  **AÇIK:** `F3-018` Plot · Inspect · Copy Path verdi; "Add to Existing Plot" ve "Export" menüde yok.  <sub>plan.md:212</sub>
 
 ### 5.3 Workspace ve grafik kartı
 
-- [ ] `PlotPanel` temel bileşenini oluştur.  <sub>plan.md:232</sub>
-- [ ] Birden fazla kanalı aynı panelde destekle.  <sub>plan.md:233</sub>
-- [ ] Sol/sağ Y ekseni veya ayrı eksen grupları desteğini değerlendir.  <sub>plan.md:234</sub>
-- [ ] Tüm açık grafiklerde isteğe bağlı X-axis synchronization ekle.  <sub>plan.md:235</sub>
-- [ ] Legend üzerinde kanal gizleme ve solo mode ekle.  <sub>plan.md:236</sub>
-- [ ] Grafiği tab, split view ve ayrı pencere olarak açmayı destekle.  <sub>plan.md:237</sub>
-- [ ] Boş workspace için sürükle-bırak yönlendirmesi tasarla.  <sub>plan.md:238</sub>
-- [ ] Grafik sayısı arttığında kaynak kullanımını sınırla.  <sub>plan.md:239</sub>
+- [x] `PlotPanel` temel bileşenini oluştur.  (`F1-031`; çoklu seri `F3-019`)  <sub>plan.md:232</sub>
+- [x] Birden fazla kanalı aynı panelde destekle.  (`F3-019`)  <sub>plan.md:233</sub>
+- [x] Sol/sağ Y ekseni veya ayrı eksen grupları desteğini değerlendir.  (`F3-020`: ikinci Y ekseni farklı birimli seriler için eklendi)  <sub>plan.md:234</sub>
+- [x] Tüm açık grafiklerde isteğe bağlı X-axis synchronization ekle.  (`F3-032`: araç çubuğundaki `Sync` anahtarı; durumu workspace ile saklanır)  <sub>plan.md:235</sub>
+- [x] Legend üzerinde kanal gizleme ve solo mode ekle.  (`F3-030`; `test_plot_legend_solo.py`)  <sub>plan.md:236</sub>
+- [ ] Grafiği tab, split view ve ayrı pencere olarak açmayı destekle.  **AÇIK:** Ayrı pencere (`F4-082`, `test_detached_plot.py`) var; grafiği sekme ya da split view olarak açmak yok.  <sub>plan.md:237</sub>
+- [ ] Boş workspace için sürükle-bırak yönlendirmesi tasarla.  **AÇIK:** Boş kanal ağacı için yönlendirme metni var (`EMPTY_TREE_HINT`); boş grafik alanı için sürükle-bırak yönlendirmesi yok.  <sub>plan.md:238</sub>
+- [x] Grafik sayısı arttığında kaynak kullanımını sınırla.  (`F4-055` nokta bütçesi görünür piksel genişliğine göre örnek sayısını sınırlar; merkez yerleşimi sabit sayıda grafik taşır)  <sub>plan.md:239</sub>
 
 ### 5.4 Inspector
 
-- [ ] Seçime göre içeriği dinamik güncelle.  <sub>plan.md:255</sub>
-- [ ] Değişiklikleri undo/redo sistemine bağla.  <sub>plan.md:256</sub>
-- [ ] İşlenmiş kanalın ham veriyi değiştirmediğini açıkça göster.  <sub>plan.md:257</sub>
-- [ ] Filtre sırasını sürükle-bırak ile değiştirmeyi destekle.  <sub>plan.md:258</sub>
-- [ ] Geçersiz parametreleri çalıştırmadan önce doğrula.  <sub>plan.md:259</sub>
+- [x] Seçime göre içeriği dinamik güncelle.  (`F1-025`, `F3-035`, `F3-044`: seçilen kanal ve olay Inspector içeriğini günceller)  <sub>plan.md:255</sub>
+- [x] Değişiklikleri undo/redo sistemine bağla.  (`F3-041` görünüm ayarları, `F4-079` işlem zinciri ve işaretler)  <sub>plan.md:256</sub>
+- [x] İşlenmiş kanalın ham veriyi değiştirmediğini açıkça göster.  (`F4-005` ham dizi değişmez; `raw` dışa aktarma `variant=raw` ile ayrı yazılır)  <sub>plan.md:257</sub>
+- [x] Filtre sırasını sürükle-bırak ile değiştirmeyi destekle.  (`F4-006`: Analysis Tools listesinde adım ekleme, silme ve sıralama)  <sub>plan.md:258</sub>
+- [x] Geçersiz parametreleri çalıştırmadan önce doğrula.  (`F4-007`: geçersiz değer işlem başlamadan alanda açıklanır)  <sub>plan.md:259</sub>
 
 ### 5.5 BIT, Events ve Transmission paneli
 
-- [ ] Zaman, kategori, severity, source ve metin filtreleri ekle.  <sub>plan.md:280</sub>
-- [ ] Severity renklerini yalnızca renge bağlı bırakma; ikon ve metin de kullan.  <sub>plan.md:281</sub>
-- [ ] Satıra çift tıklayınca tüm senkronize grafikleri ilgili zamana götür.  <sub>plan.md:282</sub>
-- [ ] Event seçildiğinde Inspector’da detay ve ilişkili kanalları göster.  <sub>plan.md:283</sub>
-- [ ] Aynı veya çok yakın zamandaki tekrarları gruplayabil.  <sub>plan.md:284</sub>
-- [ ] PASS/FAIL/UNKNOWN için tutarlı durum bileşeni oluştur.  <sub>plan.md:285</sub>
-- [ ] TX START/STOP aralıklarını grafik üzerinde gölgeli bölge olarak gösterebil.  <sub>plan.md:286</sub>
+- [x] Zaman, kategori, severity, source ve metin filtreleri ekle.  (`F3-043` zaman/severity/kaynak/metin, `F2-035` kategori sorgusu)  <sub>plan.md:280</sub>
+- [x] Severity renklerini yalnızca renge bağlı bırakma; ikon ve metin de kullan.  (`ui/status_icons.py`: severity hem ikon hem metin taşır, yalnız renge bağlı değil)  <sub>plan.md:281</sub>
+- [x] Satıra çift tıklayınca tüm senkronize grafikleri ilgili zamana götür.  (`F3-046`)  <sub>plan.md:282</sub>
+- [x] Event seçildiğinde Inspector’da detay ve ilişkili kanalları göster.  (`F3-044`)  <sub>plan.md:283</sub>
+- [x] Aynı veya çok yakın zamandaki tekrarları gruplayabil.  (`F3-049`)  <sub>plan.md:284</sub>
+- [x] PASS/FAIL/UNKNOWN için tutarlı durum bileşeni oluştur.  (`F1-014` PASS/FAIL/UNKNOWN modeli, `F3-051` BIT kartı ortak durum bileşeni)  <sub>plan.md:285</sub>
+- [x] TX START/STOP aralıklarını grafik üzerinde gölgeli bölge olarak gösterebil.  (`F3-047`)  <sub>plan.md:286</sub>
 
 ### 5.6 Timeline ve playback
 
-- [ ] Playback durum makinesini UI’dan bağımsız geliştir.  <sub>plan.md:299</sub>
-- [ ] Scrubbing sırasında ağır analizleri debounce et.  <sub>plan.md:300</sub>
-- [ ] Viewport değişimini tüm senkronize panellere yayınla.  <sub>plan.md:301</sub>
-- [ ] Dosya zamanı, UTC ve elapsed time gösterimlerini destekle.  <sub>plan.md:302</sub>
+- [x] Playback durum makinesini UI’dan bağımsız geliştir.  (`F3-056`: durum makinesi GUI olmadan doğrulanır)  <sub>plan.md:299</sub>
+- [x] Scrubbing sırasında ağır analizleri debounce et.  (`F3-060`)  <sub>plan.md:300</sub>
+- [x] Viewport değişimini tüm senkronize panellere yayınla.  (`F3-055`, `F3-032`)  <sub>plan.md:301</sub>
+- [x] Dosya zamanı, UTC ve elapsed time gösterimlerini destekle.  (`F3-061`: UTC, yerel ve geçen süre aynı kanonik anı gösterir)  <sub>plan.md:302</sub>
 
 ### 6.4 Erişilebilirlik ve kullanım
 
-- [ ] Minimum metin kontrastını kontrol et.  <sub>plan.md:341</sub>
-- [ ] %100, %125, %150 ve %200 Windows ölçeklemede test et.  <sub>plan.md:342</sub>
-- [ ] Sadece klavyeyle temel navigasyonu destekle.  <sub>plan.md:343</sub>
-- [ ] Tooltip yerine kalıcı açıklama gereken kritik terimleri etiketle.  <sub>plan.md:344</sub>
-- [ ] Kritik eylemlerde durum geri bildirimi ver.  <sub>plan.md:345</sub>
-- [ ] Yanlışlıkla uzun işlem başlatılırsa iptal olanağı sun.  <sub>plan.md:346</sub>
+- [x] Minimum metin kontrastını kontrol et.  (`F1-029` tema kontrastı, `F3-074` kontrast kontrolü; `tests/unit/test_theme.py`)  <sub>plan.md:341</sub>
+- [x] %100, %125, %150 ve %200 Windows ölçeklemede test et.  (`F3-074`; `tests/gui/test_dpi_scaling.py` dört ölçeği kapsar)  <sub>plan.md:342</sub>
+- [x] Sadece klavyeyle temel navigasyonu destekle.  (`F3-072` kısayollar, `F3-073` odak sırası: ana akış yalnız klavyeyle tamamlanır)  <sub>plan.md:343</sub>
+- [x] Tooltip yerine kalıcı açıklama gereken kritik terimleri etiketle.  (`F3-073`: kritik terimler kalıcı etiketle açıklanır, yalnız tooltip'e bırakılmaz)  <sub>plan.md:344</sub>
+- [x] Kritik eylemlerde durum geri bildirimi ver.  (`F1-028` durum çubuğu alanları; `F3-053` zaman damgalı log mesajları)  <sub>plan.md:345</sub>
+- [x] Yanlışlıkla uzun işlem başlatılırsa iptal olanağı sun.  (`F3-003` yükleme, `F3-066` export, `F4-004` DSP: üçü de iptal edilebilir)  <sub>plan.md:346</sub>
 
 ### 8.1 Ön analiz
 
-- [ ] Format dokümanlarını ve örnek kayıtları topla.  <sub>plan.md:516</sub>
-- [ ] Magic bytes, header, sürüm, endian, alignment ve paket yapılarını belgeleyin.  <sub>plan.md:517</sub>
-- [ ] Timestamp kaynağını ve çözünürlüğünü belirle.  <sub>plan.md:518</sub>
-- [ ] Sensör, BIT, TX ve event paket türlerini listele.  <sub>plan.md:519</sub>
-- [ ] CRC/checksum algoritmasını netleştir.  <sub>plan.md:520</sub>
-- [ ] Eksik/bozuk paket davranışını tanımla.  <sub>plan.md:521</sub>
-- [ ] Ölçekleme, calibration, signed/unsigned ve unit dönüşümlerini doğrula.  <sub>plan.md:522</sub>
-- [ ] Farklı firmware/format sürümlerinin uyumluluk tablosunu çıkar.  <sub>plan.md:523</sub>
+- [ ] Format dokümanlarını ve örnek kayıtları topla.  **AÇIK:** Sentetik fixture'lar toplandı (`F0-009`, `F0-010`); **gerçek kayıt ve resmî doküman yok** (`E-01`, `E-02`, `K-01`, `K-02`).  <sub>plan.md:516</sub>
+- [x] Magic bytes, header, sürüm, endian, alignment ve paket yapılarını belgeleyin.  (`F0-004`, `F0-005`; `docs/format/profile-a.md`, `profile-b.md`, `docs/format/decoder-guide.md`)  <sub>plan.md:517</sub>
+- [x] Timestamp kaynağını ve çözünürlüğünü belirle.  (`F0-011`, `ADR-003`: kanonik `int64` UTC ns, 125 ms kayıt ızgarası)  <sub>plan.md:518</sub>
+- [x] Sensör, BIT, TX ve event paket türlerini listele.  (`F0-005` sensör/BIT/TX alanları, `F0-007` kanal grupları; Profil B blok türleri `io/profile_b_format.py`)  <sub>plan.md:519</sub>
+- [x] CRC/checksum algoritmasını netleştir.  (`F0-008`, `ADR-011`: CRC-32/ISO-HDLC, kendi alanı hariç kapsam)  <sub>plan.md:520</sub>
+- [x] Eksik/bozuk paket davranışını tanımla.  (`F0-010` senaryolar, `F2-017` fixture'lar, `F2-015` bilinmeyen paket teşhisi)  <sub>plan.md:521</sub>
+- [x] Ölçekleme, calibration, signed/unsigned ve unit dönüşümlerini doğrula.  (`F2-020` scale/offset, `F2-021` calibration ve kalite eşlemesi; `raw` dışa aktarma dönüşümü ters çevirir)  <sub>plan.md:522</sub>
+- [ ] Farklı firmware/format sürümlerinin uyumluluk tablosunu çıkar.  **AÇIK:** Desteklenen sürümler tablolandı (`docs/format/decoder-guide.md` §1, `inventory.md` §4); **firmware sürüm listesi gelmedi** (`E-08`, `K-06`).  <sub>plan.md:523</sub>
 
 ### 8.3.12 Doğrulama kuralları
 

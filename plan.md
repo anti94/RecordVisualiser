@@ -202,14 +202,14 @@ Recording_2026_09_08.bin
 
 Yapılacaklar:
 
-- [ ] Lazy-loading destekli model/view tabanlı ağaç oluştur.
-- [ ] Kanal adına, ID’ye, birime ve kaynağa göre arama ekle.
-- [ ] `Sensors`, `BIT`, `Transmission`, `Derived` hızlı filtreleri ekle.
-- [ ] Kanal türü, bağlantı durumu ve alarm seviyesi için ikon sistemi belirle.
-- [ ] Kanalı çift tıklama ve sürükle-bırak ile grafiğe ekle.
-- [ ] Çoklu seçim ve “seçilenleri aynı grafikte/yeni grafiklerde aç” komutu ekle. (`F3-016`: “aynı grafikte” kısmı yapıldı; “yeni/ayrı grafiklerde” çoklu-panel/tab altyapısı Bölüm 5.3'te kurulunca eklenecek.)
-- [ ] Favori kanal gruplarını kaydet.
-- [ ] Sağ tık menüsü: Plot, Inspect, Add to Existing Plot, Export, Copy Path.
+- [x] Lazy-loading destekli model/view tabanlı ağaç oluştur.  (`F3-009` ağaç modeli, `F3-010` lazy yükleme)
+- [x] Kanal adına, ID’ye, birime ve kaynağa göre arama ekle.  (`F3-011`; dört alan da testlerle kapsandı)
+- [x] `Sensors`, `BIT`, `Transmission`, `Derived` hızlı filtreleri ekle.  (`F3-012`)
+- [ ] Kanal türü, bağlantı durumu ve alarm seviyesi için ikon sistemi belirle.  **AÇIK:** severity ikonları `ui/status_icons.py` ile tanımlı ve olay tablosunda kullanılıyor; kanal türü ve bağlantı durumu için ikon ağaçta yok.
+- [x] Kanalı çift tıklama ve sürükle-bırak ile grafiğe ekle.  (`F3-013` çift tık, `F3-015` sürükle-bırak)
+- [ ] Çoklu seçim ve “seçilenleri aynı grafikte/yeni grafiklerde aç” komutu ekle. (`F3-016`: “aynı grafikte” kısmı yapıldı; “yeni/ayrı grafiklerde” çoklu-panel/tab altyapısı Bölüm 5.3'te kurulunca eklenecek.)  **AÇIK:** `F3-016` "aynı grafikte" kısmını verdi; "ayrı grafiklerde" çoklu-panel altyapısına bağlı.
+- [x] Favori kanal gruplarını kaydet.  (`F3-017`)
+- [ ] Sağ tık menüsü: Plot, Inspect, Add to Existing Plot, Export, Copy Path.  **AÇIK:** `F3-018` Plot · Inspect · Copy Path verdi; "Add to Existing Plot" ve "Export" menüde yok.
 
 ### 5.3 Workspace ve grafik kartı
 
@@ -229,14 +229,14 @@ Her grafik panelinde şu öğeler bulunmalı:
 
 Yapılacaklar:
 
-- [ ] `PlotPanel` temel bileşenini oluştur.
-- [ ] Birden fazla kanalı aynı panelde destekle.
-- [ ] Sol/sağ Y ekseni veya ayrı eksen grupları desteğini değerlendir.
-- [ ] Tüm açık grafiklerde isteğe bağlı X-axis synchronization ekle.
-- [ ] Legend üzerinde kanal gizleme ve solo mode ekle.
-- [ ] Grafiği tab, split view ve ayrı pencere olarak açmayı destekle.
-- [ ] Boş workspace için sürükle-bırak yönlendirmesi tasarla.
-- [ ] Grafik sayısı arttığında kaynak kullanımını sınırla.
+- [x] `PlotPanel` temel bileşenini oluştur.  (`F1-031`; çoklu seri `F3-019`)
+- [x] Birden fazla kanalı aynı panelde destekle.  (`F3-019`)
+- [x] Sol/sağ Y ekseni veya ayrı eksen grupları desteğini değerlendir.  (`F3-020`: ikinci Y ekseni farklı birimli seriler için eklendi)
+- [x] Tüm açık grafiklerde isteğe bağlı X-axis synchronization ekle.  (`F3-032`: araç çubuğundaki `Sync` anahtarı; durumu workspace ile saklanır)
+- [x] Legend üzerinde kanal gizleme ve solo mode ekle.  (`F3-030`; `test_plot_legend_solo.py`)
+- [ ] Grafiği tab, split view ve ayrı pencere olarak açmayı destekle.  **AÇIK:** Ayrı pencere (`F4-082`, `test_detached_plot.py`) var; grafiği sekme ya da split view olarak açmak yok.
+- [ ] Boş workspace için sürükle-bırak yönlendirmesi tasarla.  **AÇIK:** Boş kanal ağacı için yönlendirme metni var (`EMPTY_TREE_HINT`); boş grafik alanı için sürükle-bırak yönlendirmesi yok.
+- [x] Grafik sayısı arttığında kaynak kullanımını sınırla.  (`F4-055` nokta bütçesi görünür piksel genişliğine göre örnek sayısını sınırlar; merkez yerleşimi sabit sayıda grafik taşır)
 
 ### 5.4 Inspector
 
@@ -252,11 +252,11 @@ Sekmeler:
 
 Yapılacaklar:
 
-- [ ] Seçime göre içeriği dinamik güncelle.
-- [ ] Değişiklikleri undo/redo sistemine bağla.
-- [ ] İşlenmiş kanalın ham veriyi değiştirmediğini açıkça göster.
-- [ ] Filtre sırasını sürükle-bırak ile değiştirmeyi destekle.
-- [ ] Geçersiz parametreleri çalıştırmadan önce doğrula.
+- [x] Seçime göre içeriği dinamik güncelle.  (`F1-025`, `F3-035`, `F3-044`: seçilen kanal ve olay Inspector içeriğini günceller)
+- [x] Değişiklikleri undo/redo sistemine bağla.  (`F3-041` görünüm ayarları, `F4-079` işlem zinciri ve işaretler)
+- [x] İşlenmiş kanalın ham veriyi değiştirmediğini açıkça göster.  (`F4-005` ham dizi değişmez; `raw` dışa aktarma `variant=raw` ile ayrı yazılır)
+- [x] Filtre sırasını sürükle-bırak ile değiştirmeyi destekle.  (`F4-006`: Analysis Tools listesinde adım ekleme, silme ve sıralama)
+- [x] Geçersiz parametreleri çalıştırmadan önce doğrula.  (`F4-007`: geçersiz değer işlem başlamadan alanda açıklanır)
 
 ### 5.5 BIT, Events ve Transmission paneli
 
@@ -277,13 +277,13 @@ Ortak event tablosu sütunları:
 
 Yapılacaklar:
 
-- [ ] Zaman, kategori, severity, source ve metin filtreleri ekle.
-- [ ] Severity renklerini yalnızca renge bağlı bırakma; ikon ve metin de kullan.
-- [ ] Satıra çift tıklayınca tüm senkronize grafikleri ilgili zamana götür.
-- [ ] Event seçildiğinde Inspector’da detay ve ilişkili kanalları göster.
-- [ ] Aynı veya çok yakın zamandaki tekrarları gruplayabil.
-- [ ] PASS/FAIL/UNKNOWN için tutarlı durum bileşeni oluştur.
-- [ ] TX START/STOP aralıklarını grafik üzerinde gölgeli bölge olarak gösterebil.
+- [x] Zaman, kategori, severity, source ve metin filtreleri ekle.  (`F3-043` zaman/severity/kaynak/metin, `F2-035` kategori sorgusu)
+- [x] Severity renklerini yalnızca renge bağlı bırakma; ikon ve metin de kullan.  (`ui/status_icons.py`: severity hem ikon hem metin taşır, yalnız renge bağlı değil)
+- [x] Satıra çift tıklayınca tüm senkronize grafikleri ilgili zamana götür.  (`F3-046`)
+- [x] Event seçildiğinde Inspector’da detay ve ilişkili kanalları göster.  (`F3-044`)
+- [x] Aynı veya çok yakın zamandaki tekrarları gruplayabil.  (`F3-049`)
+- [x] PASS/FAIL/UNKNOWN için tutarlı durum bileşeni oluştur.  (`F1-014` PASS/FAIL/UNKNOWN modeli, `F3-051` BIT kartı ortak durum bileşeni)
+- [x] TX START/STOP aralıklarını grafik üzerinde gölgeli bölge olarak gösterebil.  (`F3-047`)
 
 ### 5.6 Timeline ve playback
 
@@ -296,10 +296,10 @@ Yapılacaklar:
 
 Yapılacaklar:
 
-- [ ] Playback durum makinesini UI’dan bağımsız geliştir.
-- [ ] Scrubbing sırasında ağır analizleri debounce et.
-- [ ] Viewport değişimini tüm senkronize panellere yayınla.
-- [ ] Dosya zamanı, UTC ve elapsed time gösterimlerini destekle.
+- [x] Playback durum makinesini UI’dan bağımsız geliştir.  (`F3-056`: durum makinesi GUI olmadan doğrulanır)
+- [x] Scrubbing sırasında ağır analizleri debounce et.  (`F3-060`)
+- [x] Viewport değişimini tüm senkronize panellere yayınla.  (`F3-055`, `F3-032`)
+- [x] Dosya zamanı, UTC ve elapsed time gösterimlerini destekle.  (`F3-061`: UTC, yerel ve geçen süre aynı kanonik anı gösterir)
 
 ## 6. Görsel tasarım sistemi
 
@@ -338,12 +338,12 @@ Yapılacaklar:
 
 ### 6.4 Erişilebilirlik ve kullanım
 
-- [ ] Minimum metin kontrastını kontrol et.
-- [ ] %100, %125, %150 ve %200 Windows ölçeklemede test et.
-- [ ] Sadece klavyeyle temel navigasyonu destekle.
-- [ ] Tooltip yerine kalıcı açıklama gereken kritik terimleri etiketle.
-- [ ] Kritik eylemlerde durum geri bildirimi ver.
-- [ ] Yanlışlıkla uzun işlem başlatılırsa iptal olanağı sun.
+- [x] Minimum metin kontrastını kontrol et.  (`F1-029` tema kontrastı, `F3-074` kontrast kontrolü; `tests/unit/test_theme.py`)
+- [x] %100, %125, %150 ve %200 Windows ölçeklemede test et.  (`F3-074`; `tests/gui/test_dpi_scaling.py` dört ölçeği kapsar)
+- [x] Sadece klavyeyle temel navigasyonu destekle.  (`F3-072` kısayollar, `F3-073` odak sırası: ana akış yalnız klavyeyle tamamlanır)
+- [x] Tooltip yerine kalıcı açıklama gereken kritik terimleri etiketle.  (`F3-073`: kritik terimler kalıcı etiketle açıklanır, yalnız tooltip'e bırakılmaz)
+- [x] Kritik eylemlerde durum geri bildirimi ver.  (`F1-028` durum çubuğu alanları; `F3-053` zaman damgalı log mesajları)
+- [x] Yanlışlıkla uzun işlem başlatılırsa iptal olanağı sun.  (`F3-003` yükleme, `F3-066` export, `F4-004` DSP: üçü de iptal edilebilir)
 
 ## 7. Teknik mimari
 
@@ -513,14 +513,14 @@ Parser her iki profili de `format detection` ile ayırt edecek biçimde tasarlan
 
 ### 8.1 Ön analiz
 
-- [ ] Format dokümanlarını ve örnek kayıtları topla.
-- [ ] Magic bytes, header, sürüm, endian, alignment ve paket yapılarını belgeleyin.
-- [ ] Timestamp kaynağını ve çözünürlüğünü belirle.
-- [ ] Sensör, BIT, TX ve event paket türlerini listele.
-- [ ] CRC/checksum algoritmasını netleştir.
-- [ ] Eksik/bozuk paket davranışını tanımla.
-- [ ] Ölçekleme, calibration, signed/unsigned ve unit dönüşümlerini doğrula.
-- [ ] Farklı firmware/format sürümlerinin uyumluluk tablosunu çıkar.
+- [ ] Format dokümanlarını ve örnek kayıtları topla.  **AÇIK:** Sentetik fixture'lar toplandı (`F0-009`, `F0-010`); **gerçek kayıt ve resmî doküman yok** (`E-01`, `E-02`, `K-01`, `K-02`).
+- [x] Magic bytes, header, sürüm, endian, alignment ve paket yapılarını belgeleyin.  (`F0-004`, `F0-005`; `docs/format/profile-a.md`, `profile-b.md`, `docs/format/decoder-guide.md`)
+- [x] Timestamp kaynağını ve çözünürlüğünü belirle.  (`F0-011`, `ADR-003`: kanonik `int64` UTC ns, 125 ms kayıt ızgarası)
+- [x] Sensör, BIT, TX ve event paket türlerini listele.  (`F0-005` sensör/BIT/TX alanları, `F0-007` kanal grupları; Profil B blok türleri `io/profile_b_format.py`)
+- [x] CRC/checksum algoritmasını netleştir.  (`F0-008`, `ADR-011`: CRC-32/ISO-HDLC, kendi alanı hariç kapsam)
+- [x] Eksik/bozuk paket davranışını tanımla.  (`F0-010` senaryolar, `F2-017` fixture'lar, `F2-015` bilinmeyen paket teşhisi)
+- [x] Ölçekleme, calibration, signed/unsigned ve unit dönüşümlerini doğrula.  (`F2-020` scale/offset, `F2-021` calibration ve kalite eşlemesi; `raw` dışa aktarma dönüşümü ters çevirir)
+- [ ] Farklı firmware/format sürümlerinin uyumluluk tablosunu çıkar.  **AÇIK:** Desteklenen sürümler tablolandı (`docs/format/decoder-guide.md` §1, `inventory.md` §4); **firmware sürüm listesi gelmedi** (`E-08`, `K-06`).
 
 ### 8.2 Örnek `.bin` dosya formatı — Profil A: sabit 64 baytlık kayıt
 
