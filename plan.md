@@ -934,9 +934,9 @@ Parser her kayıtta şunları kontrol eder; ihlalde kayıt işaretlenir ve okuma
 - [x] `block_size % DTYPE_SIZE[dtype] == 0`; yapısal bloklarda girdi boyutuna tam bölünüyor.  (`_decode_block`: `block_size % DTYPE_SIZE` bölünmüyorsa `ProfileBFormatError`)
 - [x] `channel_id` ChannelTable'da tanımlı; tanımsızsa kanal "unknown" olarak üretilir, blok atılmaz.  (`_decode_block`: bilinmeyen blok türü atlanır, payload çözülmez; kayıt reddedilmez)
 - [x] `crc32` doğru ve `end_marker == b"ENDR"`.  (`profile_b_indexed_query`: `marker == END_MARKER and expected == header_crc == actual`)
-- [ ] `record_index` monoton artıyor; atlama varsa `GAP_BEFORE`, geri gidiş varsa bozulma/yeniden başlatma olarak raporlanır.  **AÇIK:** `record_index` okunuyor ve `F4-012` zaman üretiminde kullanılıyor; monotonluk ve geri gidiş için ayrı bir teşhis kodu yok.
-- [ ] `device_ticks` farkı nominal 125 ms'ten yapılandırılabilir toleransın (örn. ±%1) dışındaysa jitter uyarısı üretilir.  **AÇIK:** `device_ticks` alanı okunuyor; ±%1 jitter uyarısı Profil B yolunda uygulanmadı (Profil A'da `JITTER` bayrağı var).
-- [x] `abs(t_start_offset_ns - record_index * 125_000_000)` tolerans dışındaysa zaman tutarsızlığı raporlanır.  (`F4-014`: örnek sayısı ve sample rate sınırları `rates_match` ile toleranslı denetlenir)
+- [x] `record_index` monoton artıyor; atlama varsa `GAP_BEFORE`, geri gidiş varsa bozulma/yeniden başlatma olarak raporlanır.  (`io/decoders/profile_b_sequence.py`: atlama `GAP_BEFORE`, geri gidiş `INDEX_BACKWARD` — ikisi ayrı teşhistir)
+- [x] `device_ticks` farkı nominal 125 ms'ten yapılandırılabilir toleransın (örn. ±%1) dışındaysa jitter uyarısı üretilir.  (`profile_b_sequence`: `TICK_JITTER`, tolerans ve kayıt başına tick sayısı yapılandırılabilir; tick frekansı verilmezse denetim **yapılmadı** olarak bildirilir (`E-07`))
+- [x] `abs(t_start_offset_ns - record_index * 125_000_000)` tolerans dışındaysa zaman tutarsızlığı raporlanır.  (`profile_b_sequence`: `TIME_INCONSISTENT`, tolerans yapılandırılabilir (öntanımlı 1 ms))
 
 Resync stratejisi: CRC hatası veya kırık zincir durumunda okuyucu, sonraki 8 bayt hizalı konumlardan itibaren `b"Data"` + geçerli `record_index`/`record_size` desenini arar; bulunan kayda `RESYNC` işaretlenir, aradaki alan indekse "bozuk bölge" olarak yazılır. `record_count == 0` veya header flag'inde "kayıt tamamlanmadı" biti varsa (canlı kayıt kesintisi) indeks tamamen bu tarama ile üretilir.
 

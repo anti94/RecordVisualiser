@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 499 madde · 473 tamamlandı · 26 kaldı**
+**Toplam 499 madde · 475 tamamlandı · 24 kaldı**
 
-`[#######################.]` %94.8
+`[#######################.]` %95.2
 
 ## Özet
 
@@ -41,8 +41,8 @@ Work in fully autonomous mode.
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 41 | 0 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 35 | 0 | 35 |
-| Bölüm içi kontrol listeleri | 119 | 26 | 145 |
-| **Toplam** | **473** | **26** | **499** |
+| Bölüm içi kontrol listeleri | 121 | 24 | 145 |
+| **Toplam** | **475** | **24** | **499** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -513,9 +513,9 @@ Work in fully autonomous mode.
 - [x] `block_size % DTYPE_SIZE[dtype] == 0`; yapısal bloklarda girdi boyutuna tam bölünüyor.  (`_decode_block`: `block_size % DTYPE_SIZE` bölünmüyorsa `ProfileBFormatError`)  <sub>plan.md:934</sub>
 - [x] `channel_id` ChannelTable'da tanımlı; tanımsızsa kanal "unknown" olarak üretilir, blok atılmaz.  (`_decode_block`: bilinmeyen blok türü atlanır, payload çözülmez; kayıt reddedilmez)  <sub>plan.md:935</sub>
 - [x] `crc32` doğru ve `end_marker == b"ENDR"`.  (`profile_b_indexed_query`: `marker == END_MARKER and expected == header_crc == actual`)  <sub>plan.md:936</sub>
-- [ ] `record_index` monoton artıyor; atlama varsa `GAP_BEFORE`, geri gidiş varsa bozulma/yeniden başlatma olarak raporlanır.  **AÇIK:** `record_index` okunuyor ve `F4-012` zaman üretiminde kullanılıyor; monotonluk ve geri gidiş için ayrı bir teşhis kodu yok.  <sub>plan.md:937</sub>
-- [ ] `device_ticks` farkı nominal 125 ms'ten yapılandırılabilir toleransın (örn. ±%1) dışındaysa jitter uyarısı üretilir.  **AÇIK:** `device_ticks` alanı okunuyor; ±%1 jitter uyarısı Profil B yolunda uygulanmadı (Profil A'da `JITTER` bayrağı var).  <sub>plan.md:938</sub>
-- [x] `abs(t_start_offset_ns - record_index * 125_000_000)` tolerans dışındaysa zaman tutarsızlığı raporlanır.  (`F4-014`: örnek sayısı ve sample rate sınırları `rates_match` ile toleranslı denetlenir)  <sub>plan.md:939</sub>
+- [x] `record_index` monoton artıyor; atlama varsa `GAP_BEFORE`, geri gidiş varsa bozulma/yeniden başlatma olarak raporlanır.  (`io/decoders/profile_b_sequence.py`: atlama `GAP_BEFORE`, geri gidiş `INDEX_BACKWARD` — ikisi ayrı teşhistir)  <sub>plan.md:937</sub>
+- [x] `device_ticks` farkı nominal 125 ms'ten yapılandırılabilir toleransın (örn. ±%1) dışındaysa jitter uyarısı üretilir.  (`profile_b_sequence`: `TICK_JITTER`, tolerans ve kayıt başına tick sayısı yapılandırılabilir; tick frekansı verilmezse denetim **yapılmadı** olarak bildirilir (`E-07`))  <sub>plan.md:938</sub>
+- [x] `abs(t_start_offset_ns - record_index * 125_000_000)` tolerans dışındaysa zaman tutarsızlığı raporlanır.  (`profile_b_sequence`: `TIME_INCONSISTENT`, tolerans yapılandırılabilir (öntanımlı 1 ms))  <sub>plan.md:939</sub>
 
 ### 8.3.13 Yapılacaklar
 

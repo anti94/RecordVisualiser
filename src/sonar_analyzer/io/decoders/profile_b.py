@@ -82,6 +82,10 @@ class DecodedRecord:
     t_start_offset_ns: int
     byte_offset: int
     blocks: tuple[DecodedBlock, ...]
+    #: `RecordHeader.device_ticks` — cihazın kendi sayacı. Kanonik zamanın
+    #: yanında **ham hâliyle** saklanır (`ADR-003`): dönüştürülmüş zaman
+    #: yanlışsa, ham sayaç olmadan bunu kimse gösteremez.
+    device_ticks: int = 0
 
     def sensor_block(self, channel_id: int) -> DecodedBlock | None:
         for block in self.blocks:
@@ -164,9 +168,16 @@ def iter_records(buffer: ReadableBuffer) -> Iterator[DecodedRecord]:
     total = len(buffer)
 
     while offset + RECORD_HEADER_SIZE + RECORD_TRAILER_SIZE <= total:
-        name_raw, record_index, record_size, block_count, _flags, t_start_offset_ns, *_rest = (
-            RECORD_HEADER.unpack_from(buffer, offset)
-        )
+        (
+            name_raw,
+            record_index,
+            record_size,
+            block_count,
+            _flags,
+            t_start_offset_ns,
+            device_ticks,
+            *_rest,
+        ) = RECORD_HEADER.unpack_from(buffer, offset)
         if record_size <= 0 or offset + record_size > total:
             raise ProfileBFormatError(
                 f"record_size ({record_size}) tampon disina cikiyor", byte_offset=offset
@@ -187,6 +198,7 @@ def iter_records(buffer: ReadableBuffer) -> Iterator[DecodedRecord]:
             t_start_offset_ns=t_start_offset_ns,
             byte_offset=offset,
             blocks=tuple(blocks),
+            device_ticks=device_ticks,
         )
         offset += record_size
 
