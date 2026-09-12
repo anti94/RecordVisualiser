@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 655 madde · 510 tamamlandı · 145 kaldı**
+**Toplam 655 madde · 514 tamamlandı · 141 kaldı**
 
-`[###################.....]` %77.9
+`[###################.....]` %78.5
 
 ## Özet
 
@@ -41,10 +41,10 @@ Work in fully autonomous mode.
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 41 | 0 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 35 | 0 | 35 |
-| Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema | 30 | 50 | 80 |
+| Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema | 34 | 46 | 80 |
 | Faz 8 — Tx/Rx ham veri analizi ve sensör sağlığı | 0 | 76 | 76 |
 | Bölüm içi kontrol listeleri | 126 | 19 | 145 |
-| **Toplam** | **510** | **145** | **655** |
+| **Toplam** | **514** | **141** | **655** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -437,7 +437,7 @@ Work in fully autonomous mode.
 | [x] | `F6-034` | `4.0.0` | 15 dk | Dağıtım milestone kabulünü kapat ve major sürümü hazırla |
 | [x] | `F6-035` | `3.35.0` | 20 dk | Kalite bayraklarını dışa aktarmaya ve paket denetimine taşı |
 
-### Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema (30/80)
+### Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema (34/80)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -471,10 +471,10 @@ Work in fully autonomous mode.
 | [x] | `F7-028` | `4.33.0` | 20 dk | Kayıt klasörü düzenini keşfet |
 | [x] | `F7-029` | `4.34.0` | 20 dk | Dosya sayacı sırasını doğrula ve boşlukları raporla |
 | [x] | `F7-030` | `4.35.0` | 20 dk | Klasör manifestini oku ve yoksa üret |
-| [ ] | `F7-031` | `4.36.0` | 20 dk | Klasör seviyesinde indeks yapısını kur |
-| [ ] | `F7-032` | `4.37.0` | 20 dk | İndeksi dosya adı, boyut ve değişiklik zamanıyla geçersizle |
-| [ ] | `F7-033` | `4.38.0` | 15 dk | İndeksi atomik yaz |
-| [ ] | `F7-034` | `4.39.0` | 20 dk | Salt okunur klasörde indeksi bellekte kur |
+| [x] | `F7-031` | `4.36.0` | 20 dk | Klasör seviyesinde indeks yapısını kur |
+| [x] | `F7-032` | `4.37.0` | 20 dk | İndeksi dosya adı, boyut ve değişiklik zamanıyla geçersizle |
+| [x] | `F7-033` | `4.38.0` | 15 dk | İndeksi atomik yaz |
+| [x] | `F7-034` | `4.39.0` | 20 dk | Salt okunur klasörde indeksi bellekte kur |
 | [ ] | `F7-035` | `4.40.0` | 20 dk | 1.200 dosyalık kayıtta indeks kurma süresini ölç |
 | [ ] | `F7-036` | `4.41.0` | 20 dk | `FolderRecordingRepository` iskeletini kur |
 | [ ] | `F7-037` | `4.42.0` | 20 dk | `metadata()` zaman aralığını klasörden üret |
