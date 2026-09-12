@@ -1,0 +1,71 @@
+{
+  "previous_installer": "sonar-analyzer-3.8.0-setup.exe",
+  "current_installer": "sonar-analyzer-3.32.0-setup.exe",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "step_count": 12,
+  "passed_count": 12,
+  "failed_count": 0,
+  "ok": true,
+  "steps": [
+    {
+      "name": "1. Yeni sürüm kurulur",
+      "ok": true,
+      "detail": "cikis 0, exe=var"
+    },
+    {
+      "name": "2. Yeni sürüm çalışıyor",
+      "ok": true,
+      "detail": "sonar-analyzer 3.32.0"
+    },
+    {
+      "name": "3. Ayarlar yazılır ve yedeklenir",
+      "ok": true,
+      "detail": "yedek: settings.json, 233 bayt"
+    },
+    {
+      "name": "4. Yeni sürümün uygulama dosyaları kaldırılır",
+      "ok": true,
+      "detail": "cikis 0, kalan: yok (senkron kaldirmada uninstall.exe beklenir)"
+    },
+    {
+      "name": "5. Ayarlar kaldırmadan sağ çıktı",
+      "ok": true,
+      "detail": "ayar dosyasi kurulum dizini disinda yasiyor"
+    },
+    {
+      "name": "6. Önceki sürüm kurulur (geri dönüş)",
+      "ok": true,
+      "detail": "cikis 0, hedef surum 3.8.0"
+    },
+    {
+      "name": "7. Geri dönülen sürüm doğru",
+      "ok": true,
+      "detail": "sonar-analyzer 3.8.0"
+    },
+    {
+      "name": "8. Önceki sürüm, yeni sürümün ayar dosyasıyla açılıyor",
+      "ok": true,
+      "detail": "cikis 0"
+    },
+    {
+      "name": "9. Yedekten geri yükleme çalışıyor",
+      "ok": true,
+      "detail": "recent_files=['D:/olcumler/gorev-42.bin']"
+    },
+    {
+      "name": "10. Geri yüklenen ayarlarla açılıyor",
+      "ok": true,
+      "detail": "cikis 0"
+    },
+    {
+      "name": "11. Geri dönülen sürüm normal kaldırmada iz bırakmıyor",
+      "ok": true,
+      "detail": "kalan: yok"
+    },
+    {
+      "name": "12. Ayarlar kaldırmadan sonra hâlâ duruyor",
+      "ok": true,
+      "detail": "settings.json"
+    }
+  ]
+}
