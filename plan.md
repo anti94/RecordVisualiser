@@ -207,7 +207,7 @@ Yapılacaklar:
 - [x] `Sensors`, `BIT`, `Transmission`, `Derived` hızlı filtreleri ekle.  (`F3-012`)
 - [x] Kanal türü, bağlantı durumu ve alarm seviyesi için ikon sistemi belirle.  (kanal türü ikonları `ui/status_icons.py` `CHANNEL_SOURCE_STYLES`; her ikon simge + metin taşır, ipucu kaynakta bulunma durumunu yazar)
 - [x] Kanalı çift tıklama ve sürükle-bırak ile grafiğe ekle.  (`F3-013` çift tık, `F3-015` sürükle-bırak)
-- [ ] Çoklu seçim ve “seçilenleri aynı grafikte/yeni grafiklerde aç” komutu ekle. (`F3-016`: “aynı grafikte” kısmı yapıldı; “yeni/ayrı grafiklerde” çoklu-panel/tab altyapısı Bölüm 5.3'te kurulunca eklenecek.)  **AÇIK:** `F3-016` "aynı grafikte" kısmını verdi; "ayrı grafiklerde" çoklu-panel altyapısına bağlı.
+- [ ] Çoklu seçim ve “seçilenleri aynı grafikte/yeni grafiklerde aç” komutu ekle.  **AÇIK:** `F3-016` "aynı grafikte" kısmını verdi. "Ayrı grafiklerde" kısmı, Bölüm 5.3'teki **çoklu-panel altyapısına** bağlıdır (bkz. aynı bölümdeki "tab, split view" maddesi); ikisi tek iştir ve birlikte yapılmalıdır. Bugün `F4-082` grafiği ayrı pencereye **taşır**, yeni panel **üretmez**.
 - [x] Favori kanal gruplarını kaydet.  (`F3-017`)
 - [x] Sağ tık menüsü: Plot, Inspect, Add to Existing Plot, Export, Copy Path.  (beş eylem de bağlı: Plot · Inspect · Add to Existing Plot · Export · Copy Path)
 
@@ -234,7 +234,7 @@ Yapılacaklar:
 - [x] Sol/sağ Y ekseni veya ayrı eksen grupları desteğini değerlendir.  (`F3-020`: ikinci Y ekseni farklı birimli seriler için eklendi)
 - [x] Tüm açık grafiklerde isteğe bağlı X-axis synchronization ekle.  (`F3-032`: araç çubuğundaki `Sync` anahtarı; durumu workspace ile saklanır)
 - [x] Legend üzerinde kanal gizleme ve solo mode ekle.  (`F3-030`; `test_plot_legend_solo.py`)
-- [ ] Grafiği tab, split view ve ayrı pencere olarak açmayı destekle.  **AÇIK:** Ayrı pencere (`F4-082`, `test_detached_plot.py`) var; grafiği sekme ya da split view olarak açmak yok.
+- [ ] Grafiği tab, split view ve ayrı pencere olarak açmayı destekle.  **AÇIK:** Ayrı pencere var (`F4-082`, `test_detached_plot.py`) ama var olan paneli taşır. Sekme ve split view için **yeni `PlotPanel` üretebilen** bir kapsayıcı, X senkron gruplarının panel başına yönetimi ve workspace'e kaydı gerekir. Merkez yerleşimi `F6-031` mockup kabulünde ölçülüyor; bu iş o kabulü bozmadan yapılmalıdır. Bölüm 5.2'deki "ayrı grafiklerde aç" maddesi de buna bağlıdır.
 - [x] Boş workspace için sürükle-bırak yönlendirmesi tasarla.  (`PlotPanel.EMPTY_PLOT_HINT`: boş grafikte sürükle-bırak yönlendirmesi görünür, seri eklenince kaybolur)
 - [x] Grafik sayısı arttığında kaynak kullanımını sınırla.  (`F4-055` nokta bütçesi görünür piksel genişliğine göre örnek sayısını sınırlar; merkez yerleşimi sabit sayıda grafik taşır)
 
