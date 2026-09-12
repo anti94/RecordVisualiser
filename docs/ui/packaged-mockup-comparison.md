@@ -16,8 +16,8 @@ Sonuç: `docs/ui/results/packaged-mockup-comparison.json`
 
 | | |
 | --- | --- |
-| Çalıştırılan | `dist/sonar-analyzer-3.32.0/sonar-analyzer.exe` |
-| Sürüm | `3.32.0` |
+| Çalıştırılan | `dist/sonar-analyzer-3.33.0/sonar-analyzer.exe` |
+| Sürüm | `3.33.0` |
 | Pencere | 1520 × 1201 mantıksal piksel |
 | Madde sayısı | **7** |
 | Geçen | **7** |

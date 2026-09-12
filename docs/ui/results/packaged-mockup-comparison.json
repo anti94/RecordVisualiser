@@ -1,6 +1,6 @@
 {
-  "executable": "D:\\Code\\SignalProcessing\\dist\\sonar-analyzer-3.32.0\\sonar-analyzer.exe",
-  "version": "3.32.0",
+  "executable": "D:\\Code\\SignalProcessing\\dist\\sonar-analyzer-3.33.0\\sonar-analyzer.exe",
+  "version": "3.33.0",
   "platform": "Windows-10-10.0.26200-SP0",
   "layout_exit_code": 0,
   "layout_report": "docs\\ui\\results\\packaged-layout.json",

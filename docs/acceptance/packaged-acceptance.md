@@ -14,8 +14,8 @@ Ham kanıt: `docs/acceptance/results/packaged-acceptance.json`
 
 | | |
 | --- | --- |
-| Çalıştırılan | `dist/sonar-analyzer-3.32.0/sonar-analyzer.exe` |
-| Sürüm | `3.32.0` |
+| Çalıştırılan | `dist/sonar-analyzer-3.33.0/sonar-analyzer.exe` |
+| Sürüm | `3.33.0` |
 | Platform | Windows 11 (10.0.26200), x64 |
 | Adım sayısı | **9** (4 operatör + 5 mühendis) |
 | Geçen | **8** |
@@ -41,7 +41,7 @@ Operatör uygulamayı açar, bir kaydı görüntüler, çıktı alır. Onun içi
 
 | Adım | Ne denendi | Sonuç | Kanıt |
 | --- | --- | --- | --- |
-| `O-01` | Doğru sürüm kuruldu mu | **TAMAM** | `sonar-analyzer 3.29.0` |
+| `O-01` | Doğru sürüm kuruldu mu | **TAMAM** | `sonar-analyzer 3.33.0` |
 | `O-02` | Ekransız temiz başlangıç ve kapanış | **TAMAM** | çıkış kodu 0; oturum log'u yazıldı |
 | `O-03` | Ana ekran, tema ve ikon | **TAMAM** | `platform plugin: windows`, `tema: 3216 karakterlik stil sayfasi`, `ana ekran: 1520x1201`, `ikon: sonar-analyzer.ico` |
 | `O-04` | Kayıt açma, CSV ve PNG çıktısı | **TAMAM** | 8 kanal / 8 kayıt; `export.csv` 8 satır geri okundu; `export.png` 1406 bayt, imza doğru |
