@@ -1948,13 +1948,13 @@ kaydın uyuşmadığı durumda **sessizce yanlış okumamaktır**.
 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `F7-045` | `4.50.0` | 20 dk | Klasör açma diyalogunu ekle | `Open Recording Folder` bir kayıt klasörü seçtirir; dosya seçimi de çalışmaya devam eder | `F7-044` | `feat(ui): F7-045 klasör açma diyalogunu ekle` |
-| [ ] | `F7-046` | `4.51.0` | 15 dk | Son kullanılanlara klasör yolunu ekle | Klasör yolu saklanır ve yeniden açılır; eski dosya kayıtları bozulmaz | `F7-045` | `feat(ui): F7-046 son kullanılanlara klasör yolunu ekle` |
+| [x] | `F7-045` | `4.50.0` | 20 dk | Klasör açma diyalogunu ekle | `Open Recording Folder` bir kayıt klasörü seçtirir; dosya seçimi de çalışmaya devam eder | `F7-044` | `feat(ui): F7-045 klasör açma diyalogunu ekle` |
+| [x] | `F7-046` | `4.51.0` | 15 dk | Son kullanılanlara klasör yolunu ekle | Klasör yolu saklanır ve yeniden açılır; eski dosya kayıtları bozulmaz | `F7-045` | `feat(ui): F7-046 son kullanılanlara klasör yolunu ekle` |
 | [ ] | `F7-047` | `4.52.0` | 20 dk | Data Explorer'da Tx/Rx ağacını kur | Ağaçta `Tx` ve `Rx` iki üst düğüm; altlarında 32 sensör görünür | `F7-046` | `feat(ui): F7-047 data Explorer'da Tx/Rx ağacını kur` |
-| [ ] | `F7-048` | `4.53.0` | 20 dk | Şema dosyası seçimini ayarlara ekle | Seçilen TOML yolu `settings.json`'a yazılır ve yeniden açılışta korunur | `F7-047` | `feat(settings): F7-048 şema dosyası seçimini ayarlara ekle` |
+| [x] | `F7-048` | `4.53.0` | 20 dk | Şema dosyası seçimini ayarlara ekle | Seçilen TOML yolu `settings.json`'a yazılır ve yeniden açılışta korunur | `F7-047` | `feat(settings): F7-048 şema dosyası seçimini ayarlara ekle` |
 | [ ] | `F7-049` | `4.54.0` | 20 dk | Şema değişince açık kaydı yeniden yükle | Yeni şema uygulanır; uyuşmazsa kayıt kapanmaz, hata gösterilir | `F7-048` | `feat(ui): F7-049 şema değişince açık kaydı yeniden yükle` |
 | [ ] | `F7-050` | `4.55.0` | 20 dk | Geçersiz şemayı arayüzde göster | Hangi alanın hangi offsette sorunlu olduğu diyalogda okunur | `F7-049` | `feat(ui): F7-050 geçersiz şemayı arayüzde göster` |
-| [ ] | `F7-051` | `4.56.0` | 15 dk | Sürükle bırakta klasör kabul et | Klasör bırakıldığında kayıt açılır; dosya bırakma davranışı korunur | `F7-050` | `feat(ui): F7-051 sürükle bırakta klasör kabul et` |
+| [x] | `F7-051` | `4.56.0` | 15 dk | Sürükle bırakta klasör kabul et | Klasör bırakıldığında kayıt açılır; dosya bırakma davranışı korunur | `F7-050` | `feat(ui): F7-051 sürükle bırakta klasör kabul et` |
 | [ ] | `F7-052` | `4.57.0` | 20 dk | Kayıt kartında klasör ve şema bilgisini göster | Kaynak klasör, şema kimliği, sensör sayısı ve süre kartta görünür | `F7-051` | `feat(ui): F7-052 kayıt kartında klasör ve şema bilgisini göster` |
 
 ##### Sentetik üreteç ve test senaryoları

@@ -711,3 +711,40 @@ def test_a_non_positive_payload_dimension_is_rejected(key: str) -> None:
 def test_an_unknown_sample_type_is_rejected() -> None:
     with pytest.raises(SchemaTypeError):
         load_text(MINIMAL.replace('sample_type = "std::complex<float>"', 'sample_type = "blob"'))
+
+
+# --------------------------------------------------------------------------- #
+# SOZDIZIMI HATASI SEMA HATASINA CEVRILIYOR
+# --------------------------------------------------------------------------- #
+
+
+def test_a_syntactically_broken_file_raises_a_schema_error() -> None:
+    """Asıl kabul: ayrıştırıcının kendi istisnası dışarı sızmamalı.
+
+    Sızsaydı çağıran taraf `SchemaError` bekleyip yakalayamaz ve arayüz
+    bir şema yazım hatası yüzünden çökerdi.
+    """
+    with pytest.raises(SchemaValueError, match="sozdizimi"):
+        load_text("bu gecerli toml degil [[")
+
+
+def test_the_syntax_error_carries_the_parser_message() -> None:
+    """Satır ve sütun bilgisi olmadan kullanıcı hatayı bulamaz."""
+    with pytest.raises(SchemaValueError) as caught:
+        load_text("a = = 1")
+
+    assert "line" in str(caught.value) or "satir" in str(caught.value).lower()
+
+
+def test_a_broken_schema_file_raises_a_schema_error(tmp_path: Path) -> None:
+    broken = tmp_path / "bozuk.toml"
+    broken.write_text("[[[", encoding="utf-8")
+
+    with pytest.raises(SchemaValueError, match="sozdizimi"):
+        load(broken)
+
+
+def test_an_unreadable_schema_file_raises_a_schema_error(tmp_path: Path) -> None:
+    """Var olmayan dosya da şema hatası olmalı, `OSError` değil."""
+    with pytest.raises(SchemaValueError, match="okunamadi"):
+        load(tmp_path / "hicyok.toml")

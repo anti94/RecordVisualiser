@@ -25,7 +25,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, cast
 
-from sonar_analyzer.io.schema._toml import load_path, loads
+from sonar_analyzer.io.schema._toml import loads
 from sonar_analyzer.io.schema.errors import SchemaLayoutError, SchemaValueError
 from sonar_analyzer.io.schema.model import (
     BitField,
@@ -382,11 +382,32 @@ def build(raw: Table) -> Schema:
     )
 
 
+def _parse(text: str, *, source: str) -> Table:
+    """TOML metnini ayrıştırır; sözdizimi hatasını şema hatasına çevirir.
+
+    Ayrıştırıcının kendi istisnası (`TOMLDecodeError`) dışarı sızarsa,
+    çağıran taraf `SchemaError` bekleyip yakalayamaz ve arayüz bir şema
+    yazım hatası yüzünden çöker. Kullanıcının gördüğü şey bir yığın izi
+    değil, satır ve sütun bilgisi olmalı.
+    """
+    try:
+        return loads(text)
+    except Exception as error:
+        raise SchemaValueError(
+            f"{source}: TOML sozdizimi hatali — {error}. "
+            f"Dosyayi bir TOML dogrulayicisiyla kontrol edin."
+        ) from error
+
+
 def load_text(text: str) -> Schema:
     """TOML metninden şema kurar."""
-    return build(loads(text))
+    return build(_parse(text, source="sema metni"))
 
 
 def load(path: Path) -> Schema:
     """TOML dosyasından şema kurar."""
-    return build(load_path(path))
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except OSError as error:
+        raise SchemaValueError(f"{path}: sema dosyasi okunamadi — {error}") from error
+    return build(_parse(raw, source=str(path)))

@@ -81,6 +81,16 @@ class AppSettings:
     #: bir sayıya gömmek, cevap geldiğinde kodun içinde aranmasını
     #: gerektirirdi.
     correlation_tolerance_ns: int = DEFAULT_TOLERANCE_NS
+    #: Profil C sema dosyasinin yolu (`F7-048`). Bos ise Profil C kaydi
+    #: acilamaz ve kullaniciya bunun NEDENI soylenir — sessizce bos bir
+    #: kayit gostermek, dosyalarin bozuk oldugu izlenimi verirdi.
+    #: Sema C++ struct tanimlarinin tarifidir (`D-29`); her kurulumda
+    #: farkli olabilir, bu yuzden koda gomulmez.
+    profile_c_schema_path: str = ""
+    #: Son acilan kayit KLASORLERI (`F7-046`). `recent_files` dosya
+    #: yollarini tasir ve bozulmadan kalir; klasorler ayri tutulur cunku
+    #: ikisi farkli acma yollarina gider.
+    recent_folders: list[str] = field(default_factory=_empty_str_list)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -138,6 +148,7 @@ def _coerce(raw: dict[str, Any], warnings: list[str]) -> AppSettings:
         tolerance = defaults.correlation_tolerance_ns
 
     recent = _string_list(raw.get("recent_files", []), warnings)
+    recent_folders = _string_list(raw.get("recent_folders", []), warnings)
     favorites = _favorite_groups(raw.get("favorite_groups", []), warnings)
 
     def _text(key: str, fallback: str) -> str:
@@ -157,6 +168,8 @@ def _coerce(raw: dict[str, Any], warnings: list[str]) -> AppSettings:
         favorite_groups=favorites,
         live_connection=_live_connection(raw.get("live_connection"), warnings),
         correlation_tolerance_ns=tolerance,
+        profile_c_schema_path=_text("profile_c_schema_path", defaults.profile_c_schema_path),
+        recent_folders=recent_folders,
     )
 
 
