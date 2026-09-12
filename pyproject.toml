@@ -18,6 +18,11 @@ dependencies = [
     # 3.9 ile 3.12 ayaklarinda farkli numpy secilirse pyright ayni kodda
     # farkli sonuc veriyor. 2.0.x hem 3.9 hem 3.12 destekliyor.
     "numpy>=1.26,<2.1",
+    # Profil C sema dosyalari TOML (F7-006+). `tomllib` Python 3.11'de
+    # standart kutuphaneye girdi; bu proje 3.9 uzerinde kostugu icin geri
+    # tasima gerekiyor (D-20). Kod once `tomllib`'i dener, yoksa `tomli`ye
+    # duser — 3.11+ ortamda bu paket hic kurulmaz.
+    "tomli>=2.0; python_version < '3.11'",
 ]
 
 [project.optional-dependencies]

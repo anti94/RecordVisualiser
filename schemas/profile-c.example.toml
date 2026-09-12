@@ -1,0 +1,291 @@
+#  Profil C sema ORNEGI
+#  =====================
+#
+#  DIKKAT: Bu dosya, sema bicimini gosteren CALISIR BIR ORNEKTIR.
+#  Gercek Profil C yerlesimi C++ tarafinin struct tanimlarindan gelir
+#  (karar D-29) ve o tanimlar henuz elde yoktur (dis girdi E-11).
+#
+#  Ornekteki offsetler ve alan adlari, sema bicimindeki her ozelligi
+#  (enum, bit alani, dizi, bildirilmis dolgu, opak blok) gostermek icin
+#  secilmistir. Gercek kayit geldiginde bu dosya onun tarifiyle
+#  degistirilecektir.
+#
+#  Bilinmeyen alanlar UYDURULMAMISTIR. CIT, transmisyon ve platform
+#  verilerinin ic yerlesimi bilinmiyor (D-30, D-31); bu yuzden opak
+#  bayt bloklari olarak tanimlanmislardir. Okuyucu onlari ham saklar ve
+#  yorumlamaz. Ic yapilari ogrenildiginde burada acilacaklardir.
+#
+#  Sozlesme: docs/format/toml-schema.md
+
+[schema]
+id = "sonar-profile-c"
+version = 1
+endianness = "little"   # "little" | "big"
+packing = "packed"      # "packed" | "natural"
+description = "Klasor tabanli Tx/Rx kayit — bicim ornegi"
+
+# --------------------------------------------------------------------------- #
+# ENUM'LAR
+#
+# Her enum temel tipini bildirir. C++ tarafinda `enum class X : uint8_t`
+# yazildiginda temel tip uint8_t'dir; bildirilmezse derleyici secer ve
+# boyut degisebilir.
+# --------------------------------------------------------------------------- #
+
+[enums.StreamKind]
+underlying = "uint8_t"
+description = "Dosyanin hangi akima ait oldugu"
+[enums.StreamKind.values]
+UNKNOWN = 0
+TX = 1
+RX = 2
+
+[enums.SampleFormat]
+underlying = "uint8_t"
+description = "Payload ornek tipi"
+[enums.SampleFormat.values]
+COMPLEX_FLOAT32 = 0
+COMPLEX_INT16 = 1
+
+[enums.ClockSource]
+underlying = "uint8_t"
+description = "Zaman damgasinin kaynagi"
+[enums.ClockSource.values]
+UNKNOWN = 0
+SYSTEM = 1
+GPS_PPS = 2
+EXTERNAL = 3
+
+# --------------------------------------------------------------------------- #
+# DOSYA BASLIGI
+#
+# Bir saniyelik dosyanin basinda bir kez bulunur.
+# --------------------------------------------------------------------------- #
+
+[structs.FileHeader]
+size = 64
+description = "1 saniyelik dosya basligi"
+
+[[structs.FileHeader.fields]]
+name = "magic"
+type = "char[N]"
+count = 8
+offset = 0
+description = "SNRPROFC — profil kimligi"
+
+[[structs.FileHeader.fields]]
+name = "schema_version"
+type = "uint16_t"
+offset = 8
+description = "Bu dosyayi yazan sema surumu; TOML ile karsilastirilir"
+
+[[structs.FileHeader.fields]]
+name = "header_size"
+type = "uint16_t"
+offset = 10
+description = "Bu basligin bayt sayisi"
+
+[[structs.FileHeader.fields]]
+name = "stream_kind"
+type = "uint8_t"
+offset = 12
+enum = "StreamKind"
+
+[[structs.FileHeader.fields]]
+name = "sample_format"
+type = "uint8_t"
+offset = 13
+enum = "SampleFormat"
+
+[[structs.FileHeader.fields]]
+name = "clock_source"
+type = "uint8_t"
+offset = 14
+enum = "ClockSource"
+
+[[structs.FileHeader.fields]]
+name = "_pad0"
+type = "uint8_t"
+offset = 15
+count = 1
+note = "hizalama dolgusu"
+
+[[structs.FileHeader.fields]]
+name = "sensor_count"
+type = "uint16_t"
+offset = 16
+description = "Bu dosyadaki sensor sayisi"
+
+[[structs.FileHeader.fields]]
+name = "frame_samples"
+type = "uint16_t"
+offset = 18
+description = "Frame basina complex ornek sayisi"
+
+[[structs.FileHeader.fields]]
+name = "frame_count"
+type = "uint32_t"
+offset = 20
+description = "Bu dosyadaki frame sayisi"
+
+[[structs.FileHeader.fields]]
+name = "sample_rate_hz"
+type = "uint32_t"
+offset = 24
+unit = "Hz"
+
+[[structs.FileHeader.fields]]
+name = "file_index"
+type = "uint32_t"
+offset = 28
+description = "Dosya adindaki sayacla ayni olmali"
+
+[[structs.FileHeader.fields]]
+name = "start_time_utc_ns"
+type = "int64_t"
+offset = 32
+unit = "ns"
+description = "Ilk frame'in zaman damgasi"
+
+[[structs.FileHeader.fields]]
+name = "_reserved"
+type = "uint8_t"
+offset = 40
+count = 20
+note = "ileride kullanilmak uzere ayrildi"
+
+[[structs.FileHeader.fields]]
+name = "header_crc32"
+type = "uint32_t"
+offset = 60
+description = "Kendi alani haric hesaplanir (ADR-011)"
+
+# --------------------------------------------------------------------------- #
+# FRAME BASLIGI
+#
+# Her frame'in basinda bulunur. CIT, transmisyon ve platform bloklari
+# OPAKTIR: ic yerlesimleri bilinmiyor (D-30, D-31).
+# --------------------------------------------------------------------------- #
+
+[structs.FrameHeader]
+size = 128
+description = "Her frame'in basligi"
+
+[[structs.FrameHeader.fields]]
+name = "magic"
+type = "char[N]"
+count = 4
+offset = 0
+description = "FRMC"
+
+[[structs.FrameHeader.fields]]
+name = "frame_index"
+type = "uint32_t"
+offset = 4
+description = "Kayit basindan itibaren artan sayac"
+
+[[structs.FrameHeader.fields]]
+name = "timestamp_utc_ns"
+type = "int64_t"
+offset = 8
+unit = "ns"
+description = "KANONIK zaman kaynagi (profile-c.md Bolum 6)"
+
+[[structs.FrameHeader.fields]]
+name = "status"
+type = "uint16_t"
+offset = 16
+description = "Bit alanlari asagida"
+
+[[structs.FrameHeader.fields.bits]]
+name = "tx_active"
+mask = 0x0001
+description = "Bu frame yayin suresine denk geliyor"
+
+[[structs.FrameHeader.fields.bits]]
+name = "clock_locked"
+mask = 0x0002
+description = "Zaman kaynagi kilitli"
+
+[[structs.FrameHeader.fields.bits]]
+name = "overflow"
+mask = 0x0004
+description = "Alim tamponu tasti"
+
+[[structs.FrameHeader.fields.bits]]
+name = "gain_index"
+mask = 0x00F0
+shift = 4
+description = "Uygulanan kazanc kademesi"
+
+[[structs.FrameHeader.fields]]
+name = "sensor_count"
+type = "uint16_t"
+offset = 18
+description = "Dosya basligiyla ayni olmali"
+
+[[structs.FrameHeader.fields]]
+name = "sample_count"
+type = "uint32_t"
+offset = 20
+description = "Bu frame'deki complex ornek sayisi"
+
+[[structs.FrameHeader.fields]]
+name = "_pad0"
+type = "uint8_t"
+offset = 24
+count = 8
+note = "hizalama dolgusu"
+
+[[structs.FrameHeader.fields]]
+name = "cit_raw"
+type = "uint8_t"
+offset = 32
+count = 16
+opaque = true
+note = "CIT verisi — ic yerlesimi BILINMIYOR (D-30). Ham saklanir, yorumlanmaz."
+
+[[structs.FrameHeader.fields]]
+name = "tx_raw"
+type = "uint8_t"
+offset = 48
+count = 24
+opaque = true
+note = "Transmisyon verisi — ic yerlesimi BILINMIYOR (D-31). Ham saklanir."
+
+[[structs.FrameHeader.fields]]
+name = "platform_raw"
+type = "uint8_t"
+offset = 72
+count = 48
+opaque = true
+note = "Platform verisi — ic yerlesimi BILINMIYOR. Ham saklanir."
+
+[[structs.FrameHeader.fields]]
+name = "payload_crc32"
+type = "uint32_t"
+offset = 120
+description = "Frame yukunun CRC-32/ISO-HDLC degeri"
+
+[[structs.FrameHeader.fields]]
+name = "header_crc32"
+type = "uint32_t"
+offset = 124
+description = "Kendi alani haric hesaplanir (ADR-011)"
+
+# --------------------------------------------------------------------------- #
+# PAYLOAD
+#
+# Frame basligindan hemen sonra gelir.
+#
+# `layout` alani kritiktir: 32 x 820 bir dizi iki farkli sirada
+# yazilabilir ve ikisi AYNI bayt sayisini tutar. Yanlis secim hicbir
+# boyut denetimini dusurmez, yalniz sensorleri birbirine karistirir.
+# --------------------------------------------------------------------------- #
+
+[payload]
+sensor_count = 32
+frame_samples = 820
+sample_type = "std::complex<float>"
+layout = "sensor_major"   # "sensor_major" | "sample_major"
+description = "sensor_major: once 0. sensorun 820 ornegi, sonra 1. sensorun"
