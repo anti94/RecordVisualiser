@@ -412,8 +412,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F7-008` | 20 dk | 14 dk 24 sn | `e6a2050` | …F7-013 TOML şema yükleyicisini ve doğrulamalarını kur |
 | `F7-014` | 20 dk | 12 dk 41 sn | `c146bee` | …F7-018 şemadan çalışma zamanı yapıları üret |
 | `F7-019` | 20 dk | 41 dk 13 sn | `b4ce54d` | …F7-026 Profil C çözücüsünü kur |
+| `F7-027` | 20 dk | 10 dk 16 sn | `37fd8d0` | sürüm dağıtımına Profil C'yi ekle |
 
-**394 commit · olculen toplam 5701 dk 48 sn · olculemeyen 1 (ilk commit)**
+**395 commit · olculen toplam 5712 dk 4 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

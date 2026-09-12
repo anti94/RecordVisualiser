@@ -1921,9 +1921,9 @@ kaydın uyuşmadığı durumda **sessizce yanlış okumamaktır**.
 
 | Durum | İş ID | Hedef sürüm | Süre | Somut çıktı | Kabul kontrolü | Bağımlılıklar | Commit mesajı |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `F7-028` | `4.33.0` | 20 dk | Kayıt klasörü düzenini keşfet | Tarih klasörü altında `Tx/` ve `Rx/` bulunur; eksikse hangisinin olmadığı söylenir | `F7-027` | `feat(io): F7-028 kayıt klasörü düzenini keşfet` |
-| [ ] | `F7-029` | `4.34.0` | 20 dk | Dosya sayacı sırasını doğrula ve boşlukları raporla | `RxData00042.bin` eksikse boşluk bildirilir, kayıt açılmaya devam eder | `F7-028` | `feat(io): F7-029 dosya sayacı sırasını doğrula ve boşlukları raporla` |
-| [ ] | `F7-030` | `4.35.0` | 20 dk | Klasör manifestini oku ve yoksa üret | Manifest sensör sayısı, örnekleme hızı, şema kimliği ve süreyi taşır | `F7-029` | `feat(io): F7-030 klasör manifestini oku ve yoksa üret` |
+| [x] | `F7-028` | `4.33.0` | 20 dk | Kayıt klasörü düzenini keşfet | Tarih klasörü altında `Tx/` ve `Rx/` bulunur; eksikse hangisinin olmadığı söylenir | `F7-027` | `feat(io): F7-028 kayıt klasörü düzenini keşfet` |
+| [x] | `F7-029` | `4.34.0` | 20 dk | Dosya sayacı sırasını doğrula ve boşlukları raporla | `RxData00042.bin` eksikse boşluk bildirilir, kayıt açılmaya devam eder | `F7-028` | `feat(io): F7-029 dosya sayacı sırasını doğrula ve boşlukları raporla` |
+| [x] | `F7-030` | `4.35.0` | 20 dk | Klasör manifestini oku ve yoksa üret | Manifest sensör sayısı, örnekleme hızı, şema kimliği ve süreyi taşır | `F7-029` | `feat(io): F7-030 klasör manifestini oku ve yoksa üret` |
 | [ ] | `F7-031` | `4.36.0` | 20 dk | Klasör seviyesinde indeks yapısını kur | Dosya → zaman aralığı, frame sayısı ve offset eşlemesi tek dosyada tutulur | `F7-030` | `feat(io): F7-031 klasör seviyesinde indeks yapısını kur` |
 | [ ] | `F7-032` | `4.37.0` | 20 dk | İndeksi dosya adı, boyut ve değişiklik zamanıyla geçersizle | Bir dosya eklenir ya da değişirse indeks yeniden kurulur; her dosyanın hash'i alınmaz | `F7-031` | `feat(io): F7-032 i̇ndeksi dosya adı, boyut ve değişiklik zamanıyla geçersizle` |
 | [ ] | `F7-033` | `4.38.0` | 15 dk | İndeksi atomik yaz | Yarıda kesilen yazım geçersiz indeks bırakmaz; geçici dosya üzerinden taşınır | `F7-032` | `feat(io): F7-033 i̇ndeksi atomik yaz` |
