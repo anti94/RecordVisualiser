@@ -387,8 +387,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F6-027` | 20 dk | 14 dk 51 sn | `e7b92eb` | format ve decoder kılavuzunu güncelle |
 | `F6-028` | 15 dk | 13 dk 34 sn | `f0060f4` | klavye, mouse ve ölçekleme kılavuzunu tamamla |
 | `F6-029` | 15 dk | 14 dk 31 sn | `8f8e50e` | bilinen sorunları ve veri sınırlamalarını yaz |
+| `F6-030` | 20 dk | 18 dk 3 sn | `b4855ce` | paketli uygulamada kullanıcı kabul turunu kaydet |
 
-**369 commit · olculen toplam 4516 dk 30 sn · olculemeyen 1 (ilk commit)**
+**370 commit · olculen toplam 4534 dk 33 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

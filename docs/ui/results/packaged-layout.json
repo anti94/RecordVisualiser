@@ -1,0 +1,155 @@
+{
+  "window": {
+    "width": 1520,
+    "height": 1201
+  },
+  "regions": [
+    {
+      "region": 1,
+      "label": "Dosya ve Veri Yönetimi",
+      "object_name": "dock_data_explorer",
+      "found": true,
+      "visible": true,
+      "expected_area": "left",
+      "actual_area": "left",
+      "width": 200,
+      "height": 802
+    },
+    {
+      "region": 2,
+      "label": "Hızlı Araçlar",
+      "object_name": "toolbar_quick_tools",
+      "found": true,
+      "visible": true,
+      "expected_area": "center",
+      "actual_area": "center",
+      "width": 1520,
+      "height": 22
+    },
+    {
+      "region": 3,
+      "label": "Görselleştirme Alanı",
+      "object_name": "center_stack",
+      "found": true,
+      "visible": true,
+      "expected_area": "center",
+      "actual_area": "center",
+      "width": 985,
+      "height": 723
+    },
+    {
+      "region": 4,
+      "label": "Donanım/BIT Durumu",
+      "object_name": "card_bit_status",
+      "found": true,
+      "visible": true,
+      "expected_area": "right",
+      "actual_area": "right",
+      "width": 305,
+      "height": 252
+    },
+    {
+      "region": 5,
+      "label": "Hesaplamalar ve Analiz",
+      "object_name": "card_analysis_tools",
+      "found": true,
+      "visible": true,
+      "expected_area": "right",
+      "actual_area": "right",
+      "width": 305,
+      "height": 251
+    },
+    {
+      "region": 6,
+      "label": "Çoklu Görünüm",
+      "object_name": "view_tab_bar",
+      "found": true,
+      "visible": true,
+      "expected_area": "center",
+      "actual_area": "center",
+      "width": 985,
+      "height": 27
+    },
+    {
+      "region": 7,
+      "label": "Zaman Kontrolü",
+      "object_name": "dock_playback",
+      "found": true,
+      "visible": true,
+      "expected_area": "bottom",
+      "actual_area": "bottom",
+      "width": 1520,
+      "height": 92
+    },
+    {
+      "region": 8,
+      "label": "Log / Mesajlar",
+      "object_name": "dock_bottom_panel",
+      "found": true,
+      "visible": true,
+      "expected_area": "bottom",
+      "actual_area": "bottom",
+      "width": 1520,
+      "height": 213
+    },
+    {
+      "region": 9,
+      "label": "Ayarlar ve Dışa Aktarma",
+      "object_name": "card_data_export",
+      "found": true,
+      "visible": true,
+      "expected_area": "right",
+      "actual_area": "right",
+      "width": 305,
+      "height": 216
+    }
+  ],
+  "columns": {
+    "dock_data_explorer": {
+      "width": 200,
+      "expected": 200,
+      "tolerance": 120
+    },
+    "dock_right_column": {
+      "width": 319,
+      "expected": 300,
+      "tolerance": 150
+    }
+  },
+  "tabs": {
+    "found": true,
+    "titles": [
+      "Time Series",
+      "Spectrum",
+      "Spectrogram",
+      "Cross Analysis",
+      "BIT / Status",
+      "Transmission",
+      "3D View",
+      "Report"
+    ],
+    "enabled": [
+      "Time Series",
+      "Spectrum",
+      "Spectrogram",
+      "BIT / Status",
+      "Transmission"
+    ],
+    "current": "Time Series"
+  },
+  "theme": {
+    "stylesheet_chars": 3216,
+    "background": "#0b1118",
+    "background_lightness": 18
+  },
+  "analysis": {
+    "attempted": true,
+    "opened": true,
+    "channels": 8,
+    "samples": 8,
+    "has_spectrum": true,
+    "spectrum_points": 5,
+    "frequency_axis": "<span style='color: #969696'>Frequency (Hz)</span>",
+    "amplitude_axis": "<span style='color: #969696'>Amplitude (bar)</span>"
+  }
+}

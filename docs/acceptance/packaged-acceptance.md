@@ -14,8 +14,8 @@ Ham kanıt: `docs/acceptance/results/packaged-acceptance.json`
 
 | | |
 | --- | --- |
-| Çalıştırılan | `dist/sonar-analyzer-3.30.0/sonar-analyzer.exe` |
-| Sürüm | `3.30.0` |
+| Çalıştırılan | `dist/sonar-analyzer-3.31.0/sonar-analyzer.exe` |
+| Sürüm | `3.31.0` |
 | Platform | Windows 11 (10.0.26200), x64 |
 | Adım sayısı | **9** (4 operatör + 5 mühendis) |
 | Geçen | **8** |

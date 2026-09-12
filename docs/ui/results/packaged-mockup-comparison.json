@@ -1,0 +1,59 @@
+{
+  "executable": "D:\\Code\\SignalProcessing\\dist\\sonar-analyzer-3.31.0\\sonar-analyzer.exe",
+  "version": "3.31.0",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "layout_exit_code": 0,
+  "layout_report": "docs\\ui\\results\\packaged-layout.json",
+  "check_count": 7,
+  "passed_count": 7,
+  "failed_count": 0,
+  "ok": true,
+  "checks": [
+    {
+      "item": "1.1",
+      "title": "Dokuz bölgenin tamamı görünür ve layout-map §2'deki alanda",
+      "passed": true,
+      "evidence": "9/9 dogru"
+    },
+    {
+      "item": "1.1h",
+      "title": "Hiyerarşi: 1 sol · 3 merkez · 3 sağ · 2 alt",
+      "passed": true,
+      "evidence": "olculen: {'left': 1, 'center': 3, 'right': 3, 'bottom': 2}"
+    },
+    {
+      "item": "1.2",
+      "title": "Sol sütun ~200 px, sağ sütun ~300 px, merkez kalan alan",
+      "passed": true,
+      "evidence": "dock_data_explorer=200px (~200); dock_right_column=319px (~300)"
+    },
+    {
+      "item": "1.3",
+      "title": "Sekme çubuğunda sekiz sekme, mockup sırasıyla; Time Series seçili açılır",
+      "passed": true,
+      "evidence": "8 sekme, secili: 'Time Series'"
+    },
+    {
+      "item": "1.3b",
+      "title": "Çalışmayan görünümler pasif ve açıklamalı (v2)",
+      "passed": true,
+      "evidence": "etkin: ['BIT / Status', 'Spectrogram', 'Spectrum', 'Time Series', 'Transmission']; pasif: ['3D View', 'Cross Analysis', 'Report']"
+    },
+    {
+      "item": "1.7",
+      "title": "Koyu tema uygulanmış (stil sayfası paketten geldi)",
+      "passed": true,
+      "evidence": "3216 karakter stil, arka plan #0b1118 (aydinlik 18)"
+    },
+    {
+      "item": "3.14",
+      "title": "Ana analiz çalışıyor: spektrum paneli gerçek kayıttan eğri üretiyor",
+      "passed": true,
+      "evidence": "8 ornek -> 5 nokta; eksen \"<span style='color: #969696'>Frequency (Hz)</span>\" / \"<span style='color: #969696'>Amplitude (bar)</span>\""
+    }
+  ],
+  "window": {
+    "width": 1520,
+    "height": 1201
+  }
+}

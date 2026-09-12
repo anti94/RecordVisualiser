@@ -10,8 +10,10 @@ gibi komutlar PySide6 kurulu olmasa da çalışır ve hata iletisi anlaşılır 
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import sys
+import traceback
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -21,6 +23,7 @@ from sonar_analyzer.application.error_handling import (
     install_exception_handler,
     qt_notifier,
 )
+from sonar_analyzer.application.layout_report import build_layout_report
 from sonar_analyzer.application.self_check import run_self_check
 from sonar_analyzer.logging.setup import setup_logging
 from sonar_analyzer.resources import app_icon_path
@@ -63,6 +66,20 @@ def build_parser() -> argparse.ArgumentParser:
         "--self-check",
         action="store_true",
         help="tema, ikon ve Qt platform plugin'inin yuklendigini dogrular",
+    )
+    parser.add_argument(
+        "--layout-report",
+        type=Path,
+        default=None,
+        metavar="JSON",
+        help="ana ekrani olcer ve raporu JSON olarak yazar (F6-031)",
+    )
+    parser.add_argument(
+        "--layout-source",
+        type=Path,
+        default=None,
+        metavar="BIN",
+        help="--layout-report icin analiz denetiminde kullanilacak kayit",
     )
     return parser
 
@@ -130,6 +147,35 @@ def main(argv: Sequence[str] | None = None) -> int:
         window.deleteLater()
         app.processEvents()
         return EXIT_OK if report.ok else EXIT_ERROR
+
+    if args.layout_report is not None:
+        # F6-031: rapor GOSTERILMIS pencereden olculur. Gosterilmeyen bir
+        # pencerede dock alanlari ve boyutlar henuz yerlesmemis olur;
+        # olculen sey kullanicinin gordugu ekran olmazdi.
+        window.show()
+        window.apply_default_layout()
+        app.processEvents()
+        try:
+            layout = build_layout_report(window, args.layout_source)
+        except Exception:
+            # Tanilama komutunun cokmesi sessiz kalmamali ama modal bir
+            # hata penceresi de acmamali: ekransiz/CI calismasinda o
+            # pencere kimseye gorunmez ve sureci sonsuza kadar bekletir.
+            traceback.print_exc()
+            window.close()
+            window.deleteLater()
+            app.processEvents()
+            return EXIT_ERROR
+        args.layout_report.parent.mkdir(parents=True, exist_ok=True)
+        args.layout_report.write_text(
+            json.dumps(layout.data, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        for line in layout.lines:
+            print(line)
+        window.close()
+        window.deleteLater()
+        app.processEvents()
+        return EXIT_OK if layout.ok else EXIT_ERROR
 
     if args.no_window:
         # Pencere hic gosterilmeden yasam dongusu tamamlanir: giris yolunun

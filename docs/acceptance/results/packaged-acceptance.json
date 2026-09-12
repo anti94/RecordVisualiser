@@ -1,6 +1,6 @@
 {
-  "executable": "D:\\Code\\SignalProcessing\\dist\\sonar-analyzer-3.30.0\\sonar-analyzer.exe",
-  "version": "3.30.0",
+  "executable": "D:\\Code\\SignalProcessing\\dist\\sonar-analyzer-3.31.0\\sonar-analyzer.exe",
+  "version": "3.31.0",
   "platform": "Windows-10-10.0.26200-SP0",
   "python": "3.9.13",
   "step_count": 9,
@@ -17,9 +17,9 @@
       "command": "sonar-analyzer.exe --version",
       "expected_exit": 0,
       "actual_exit": 0,
-      "duration_s": 2.484,
+      "duration_s": 0.36,
       "stdout_tail": [
-        "sonar-analyzer 3.30.0"
+        "sonar-analyzer 3.31.0"
       ],
       "artifacts": [],
       "problems": []
@@ -32,10 +32,10 @@
       "command": "sonar-analyzer.exe --no-window",
       "expected_exit": 0,
       "actual_exit": 0,
-      "duration_s": 1.156,
+      "duration_s": 1.0,
       "stdout_tail": [
-        "2026-09-12 02:55:39 INFO    [3.30.0 71a362c1] sonar_analyzer: Oturum basladi: surum 3.30.0, oturum 71a362c1",
-        "2026-09-12 02:55:40 INFO    [3.30.0 71a362c1] sonar_analyzer: Arayuz baslatiliyor (oturum 71a362c1)"
+        "2026-09-12 03:27:55 INFO    [3.31.0 ca4be719] sonar_analyzer: Oturum basladi: surum 3.31.0, oturum ca4be719",
+        "2026-09-12 03:27:55 INFO    [3.31.0 ca4be719] sonar_analyzer: Arayuz baslatiliyor (oturum ca4be719)"
       ],
       "artifacts": [],
       "problems": []
@@ -48,15 +48,15 @@
       "command": "sonar-analyzer.exe --self-check",
       "expected_exit": 0,
       "actual_exit": 0,
-      "duration_s": 1.266,
+      "duration_s": 1.265,
       "stdout_tail": [
         "platform plugin: windows",
         "tema: 3216 karakterlik stil sayfasi",
         "ana ekran: 1520x1201",
         "ikon: sonar-analyzer.ico",
         "sonuc: TAMAM",
-        "2026-09-12 02:55:40 INFO    [3.30.0 e4e5fd3a] sonar_analyzer: Oturum basladi: surum 3.30.0, oturum e4e5fd3a",
-        "2026-09-12 02:55:41 INFO    [3.30.0 e4e5fd3a] sonar_analyzer: Arayuz baslatiliyor (oturum e4e5fd3a)"
+        "2026-09-12 03:27:56 INFO    [3.31.0 cdbf54b6] sonar_analyzer: Oturum basladi: surum 3.31.0, oturum cdbf54b6",
+        "2026-09-12 03:27:56 INFO    [3.31.0 cdbf54b6] sonar_analyzer: Arayuz baslatiliyor (oturum cdbf54b6)"
       ],
       "artifacts": [],
       "problems": []
@@ -69,16 +69,16 @@
       "command": "sonar-analyzer.exe --bin-check D:\\Code\\SignalProcessing\\tests\\fixtures\\valid_8records_v2.bin --bin-check-out D:\\Code\\SignalProcessing\\docs\\acceptance\\results\\artifacts\\O-04",
       "expected_exit": 0,
       "actual_exit": 0,
-      "duration_s": 1.016,
+      "duration_s": 1.0,
       "stdout_tail": [
         "sorgu: ch0 -> 8 ornek",
         "csv: 8 satir geri okundu (export.csv)",
         "png: 1406 bayt, imza dogru (export.png)",
         "sonuc: TAMAM",
-        "2026-09-12 02:55:42 INFO    [3.30.0 db41b350] sonar_analyzer: Oturum basladi: surum 3.30.0, oturum db41b350",
-        "2026-09-12 02:55:42 INFO    [3.30.0 db41b350] sonar_analyzer: Arayuz baslatiliyor (oturum db41b350)",
-        "2026-09-12 02:55:42 INFO    [3.30.0 db41b350] sonar_analyzer.performance: performance {\"source_bytes\": 580, \"parser_version\": 1, \"operation\": \"index\", \"duration_ms\": 0.26479999999995396, \"status\": \"ok\"}",
-        "2026-09-12 02:55:42 INFO    [3.30.0 db41b350] sonar_analyzer.performance: performance {\"channel_id\": \"ch0\", \"kind\": \"analysis\", \"max_points\": null, \"start_ns\": 1788901200000000000, \"end_ns\": 1788901201000000000, \"operation\": \"query\", \"duration_ms\": 0.1126999999999656, \"status\": \"ok\"}"
+        "2026-09-12 03:27:57 INFO    [3.31.0 22b1157a] sonar_analyzer: Oturum basladi: surum 3.31.0, oturum 22b1157a",
+        "2026-09-12 03:27:58 INFO    [3.31.0 22b1157a] sonar_analyzer: Arayuz baslatiliyor (oturum 22b1157a)",
+        "2026-09-12 03:27:58 INFO    [3.31.0 22b1157a] sonar_analyzer.performance: performance {\"source_bytes\": 580, \"parser_version\": 1, \"operation\": \"index\", \"duration_ms\": 0.27440000000000797, \"status\": \"ok\"}",
+        "2026-09-12 03:27:58 INFO    [3.31.0 22b1157a] sonar_analyzer.performance: performance {\"channel_id\": \"ch0\", \"kind\": \"analysis\", \"max_points\": null, \"start_ns\": 1788901200000000000, \"end_ns\": 1788901201000000000, \"operation\": \"query\", \"duration_ms\": 0.11499999999997623, \"status\": \"ok\"}"
       ],
       "artifacts": [
         {
@@ -108,10 +108,10 @@
         "csv: 8 satir geri okundu (export.csv)",
         "png: 1406 bayt, imza dogru (export.png)",
         "sonuc: TAMAM",
-        "2026-09-12 02:55:43 INFO    [3.30.0 a83e86c5] sonar_analyzer: Oturum basladi: surum 3.30.0, oturum a83e86c5",
-        "2026-09-12 02:55:43 INFO    [3.30.0 a83e86c5] sonar_analyzer: Arayuz baslatiliyor (oturum a83e86c5)",
-        "2026-09-12 02:55:43 INFO    [3.30.0 a83e86c5] sonar_analyzer.performance: performance {\"source_bytes\": 544, \"parser_version\": 1, \"operation\": \"index\", \"duration_ms\": 0.28290000000008586, \"status\": \"ok\"}",
-        "2026-09-12 02:55:43 INFO    [3.30.0 a83e86c5] sonar_analyzer.performance: performance {\"channel_id\": \"ch0\", \"kind\": \"analysis\", \"max_points\": null, \"start_ns\": 1788901200000000000, \"end_ns\": 1788901201000000000, \"operation\": \"query\", \"duration_ms\": 0.08879999999999999, \"status\": \"ok\"}"
+        "2026-09-12 03:27:58 INFO    [3.31.0 2ead90c6] sonar_analyzer: Oturum basladi: surum 3.31.0, oturum 2ead90c6",
+        "2026-09-12 03:27:59 INFO    [3.31.0 2ead90c6] sonar_analyzer: Arayuz baslatiliyor (oturum 2ead90c6)",
+        "2026-09-12 03:27:59 INFO    [3.31.0 2ead90c6] sonar_analyzer.performance: performance {\"source_bytes\": 544, \"parser_version\": 1, \"operation\": \"index\", \"duration_ms\": 0.27399999999999647, \"status\": \"ok\"}",
+        "2026-09-12 03:27:59 INFO    [3.31.0 2ead90c6] sonar_analyzer.performance: performance {\"channel_id\": \"ch0\", \"kind\": \"analysis\", \"max_points\": null, \"start_ns\": 1788901200000000000, \"end_ns\": 1788901201000000000, \"operation\": \"query\", \"duration_ms\": 0.08700000000005925, \"status\": \"ok\"}"
       ],
       "artifacts": [
         {
@@ -130,16 +130,16 @@
       "command": "sonar-analyzer.exe --bin-check D:\\Code\\SignalProcessing\\tests\\fixtures\\gap_missing_record.bin --bin-check-out D:\\Code\\SignalProcessing\\docs\\acceptance\\results\\artifacts\\M-02",
       "expected_exit": 0,
       "actual_exit": 0,
-      "duration_s": 1.031,
+      "duration_s": 1.109,
       "stdout_tail": [
         "sorgu: ch0 -> 8 ornek",
         "csv: 8 satir geri okundu (export.csv)",
         "png: 1406 bayt, imza dogru (export.png)",
         "sonuc: TAMAM",
-        "2026-09-12 02:55:44 INFO    [3.30.0 c27b4e20] sonar_analyzer: Oturum basladi: surum 3.30.0, oturum c27b4e20",
-        "2026-09-12 02:55:44 INFO    [3.30.0 c27b4e20] sonar_analyzer: Arayuz baslatiliyor (oturum c27b4e20)",
-        "2026-09-12 02:55:44 INFO    [3.30.0 c27b4e20] sonar_analyzer.performance: performance {\"source_bytes\": 544, \"parser_version\": 1, \"operation\": \"index\", \"duration_ms\": 0.34849999999997383, \"status\": \"ok\"}",
-        "2026-09-12 02:55:44 INFO    [3.30.0 c27b4e20] sonar_analyzer.performance: performance {\"channel_id\": \"ch0\", \"kind\": \"analysis\", \"max_points\": null, \"start_ns\": 1788901200000000000, \"end_ns\": 1788901201125000000, \"operation\": \"query\", \"duration_ms\": 0.09510000000001462, \"status\": \"ok\"}"
+        "2026-09-12 03:27:59 INFO    [3.31.0 fbc80b11] sonar_analyzer: Oturum basladi: surum 3.31.0, oturum fbc80b11",
+        "2026-09-12 03:28:00 INFO    [3.31.0 fbc80b11] sonar_analyzer: Arayuz baslatiliyor (oturum fbc80b11)",
+        "2026-09-12 03:28:00 INFO    [3.31.0 fbc80b11] sonar_analyzer.performance: performance {\"source_bytes\": 544, \"parser_version\": 1, \"operation\": \"index\", \"duration_ms\": 0.27239999999995046, \"status\": \"ok\"}",
+        "2026-09-12 03:28:00 INFO    [3.31.0 fbc80b11] sonar_analyzer.performance: performance {\"channel_id\": \"ch0\", \"kind\": \"analysis\", \"max_points\": null, \"start_ns\": 1788901200000000000, \"end_ns\": 1788901201125000000, \"operation\": \"query\", \"duration_ms\": 0.08779999999997123, \"status\": \"ok\"}"
       ],
       "artifacts": [],
       "problems": []
@@ -152,12 +152,12 @@
       "command": "sonar-analyzer.exe --bin-check D:\\Code\\SignalProcessing\\tests\\fixtures\\unsupported_version.bin --bin-check-out D:\\Code\\SignalProcessing\\docs\\acceptance\\results\\artifacts\\M-03",
       "expected_exit": 1,
       "actual_exit": 1,
-      "duration_s": 0.984,
+      "duration_s": 0.969,
       "stdout_tail": [
         "kayit: ACILAMADI (desteklenmeyen surum: 99 (desteklenen: 1, 2) (offset 8))",
         "sonuc: EKSIK -> kayit",
-        "2026-09-12 02:55:45 INFO    [3.30.0 ecfcaba8] sonar_analyzer: Oturum basladi: surum 3.30.0, oturum ecfcaba8",
-        "2026-09-12 02:55:45 INFO    [3.30.0 ecfcaba8] sonar_analyzer: Arayuz baslatiliyor (oturum ecfcaba8)"
+        "2026-09-12 03:28:00 INFO    [3.31.0 b06cc2c2] sonar_analyzer: Oturum basladi: surum 3.31.0, oturum b06cc2c2",
+        "2026-09-12 03:28:01 INFO    [3.31.0 b06cc2c2] sonar_analyzer: Arayuz baslatiliyor (oturum b06cc2c2)"
       ],
       "artifacts": [],
       "problems": []
@@ -170,12 +170,12 @@
       "command": "sonar-analyzer.exe --bin-check D:\\Code\\SignalProcessing\\tests\\fixtures\\truncated_header.bin --bin-check-out D:\\Code\\SignalProcessing\\docs\\acceptance\\results\\artifacts\\M-04",
       "expected_exit": 1,
       "actual_exit": 1,
-      "duration_s": 0.985,
+      "duration_s": 0.922,
       "stdout_tail": [
         "kayit: ACILAMADI (kesik header: 32 bayt gerekli, 20 bayt bulundu (offset 0))",
         "sonuc: EKSIK -> kayit",
-        "2026-09-12 02:55:46 INFO    [3.30.0 73ffe597] sonar_analyzer: Oturum basladi: surum 3.30.0, oturum 73ffe597",
-        "2026-09-12 02:55:46 INFO    [3.30.0 73ffe597] sonar_analyzer: Arayuz baslatiliyor (oturum 73ffe597)"
+        "2026-09-12 03:28:01 INFO    [3.31.0 159ab19a] sonar_analyzer: Oturum basladi: surum 3.31.0, oturum 159ab19a",
+        "2026-09-12 03:28:02 INFO    [3.31.0 159ab19a] sonar_analyzer: Arayuz baslatiliyor (oturum 159ab19a)"
       ],
       "artifacts": [],
       "problems": []
@@ -188,16 +188,16 @@
       "command": "sonar-analyzer.exe --bin-check D:\\Code\\SignalProcessing\\tests\\fixtures\\crc_error.bin --bin-check-out D:\\Code\\SignalProcessing\\docs\\acceptance\\results\\artifacts\\M-05",
       "expected_exit": 0,
       "actual_exit": 0,
-      "duration_s": 1.0,
+      "duration_s": 0.968,
       "stdout_tail": [
         "sorgu: ch0 -> 8 ornek",
         "csv: 8 satir geri okundu (export.csv)",
         "png: 1406 bayt, imza dogru (export.png)",
         "sonuc: TAMAM",
-        "2026-09-12 02:55:47 INFO    [3.30.0 a8fcc235] sonar_analyzer: Oturum basladi: surum 3.30.0, oturum a8fcc235",
-        "2026-09-12 02:55:47 INFO    [3.30.0 a8fcc235] sonar_analyzer: Arayuz baslatiliyor (oturum a8fcc235)",
-        "2026-09-12 02:55:47 INFO    [3.30.0 a8fcc235] sonar_analyzer.performance: performance {\"source_bytes\": 580, \"parser_version\": 1, \"operation\": \"index\", \"duration_ms\": 0.2982000000000262, \"status\": \"ok\"}",
-        "2026-09-12 02:55:47 INFO    [3.30.0 a8fcc235] sonar_analyzer.performance: performance {\"channel_id\": \"ch0\", \"kind\": \"analysis\", \"max_points\": null, \"start_ns\": 1788901200000000000, \"end_ns\": 1788901201000000000, \"operation\": \"query\", \"duration_ms\": 0.12250000000002537, \"status\": \"ok\"}"
+        "2026-09-12 03:28:02 INFO    [3.31.0 fb2c0952] sonar_analyzer: Oturum basladi: surum 3.31.0, oturum fb2c0952",
+        "2026-09-12 03:28:02 INFO    [3.31.0 fb2c0952] sonar_analyzer: Arayuz baslatiliyor (oturum fb2c0952)",
+        "2026-09-12 03:28:03 INFO    [3.31.0 fb2c0952] sonar_analyzer.performance: performance {\"source_bytes\": 580, \"parser_version\": 1, \"operation\": \"index\", \"duration_ms\": 0.27050000000006236, \"status\": \"ok\"}",
+        "2026-09-12 03:28:03 INFO    [3.31.0 fb2c0952] sonar_analyzer.performance: performance {\"channel_id\": \"ch0\", \"kind\": \"analysis\", \"max_points\": null, \"start_ns\": 1788901200000000000, \"end_ns\": 1788901201000000000, \"operation\": \"query\", \"duration_ms\": 0.12330000000004837, \"status\": \"ok\"}"
       ],
       "artifacts": [],
       "problems": [

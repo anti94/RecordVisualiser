@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 499 madde · 367 tamamlandı · 132 kaldı**
+**Toplam 499 madde · 368 tamamlandı · 131 kaldı**
 
-`[##################......]` %73.5
+`[##################......]` %73.7
 
 ## Özet
 
@@ -40,9 +40,9 @@ Work in fully autonomous mode.
 | Faz 3 — MVP analiz arayüzü | 80 | 0 | 80 |
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 41 | 0 | 41 |
-| Faz 6 — Windows dağıtımı ve ürünleştirme | 30 | 5 | 35 |
+| Faz 6 — Windows dağıtımı ve ürünleştirme | 31 | 4 | 35 |
 | Bölüm içi kontrol listeleri | 18 | 127 | 145 |
-| **Toplam** | **367** | **132** | **499** |
+| **Toplam** | **368** | **131** | **499** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -395,7 +395,7 @@ Work in fully autonomous mode.
 | [x] | `F5-040` | `2.40.0` | 20 dk | Canlı modda mockup pano davranışını kontrol et |
 | [x] | `F5-041` | `3.0.0` | 15 dk | Canlı veri milestone kabulünü kapat ve major sürümü hazırla |
 
-### Faz 6 — Windows dağıtımı ve ürünleştirme (30/35)
+### Faz 6 — Windows dağıtımı ve ürünleştirme (31/35)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -429,7 +429,7 @@ Work in fully autonomous mode.
 | [x] | `F6-028` | `3.28.0` | 15 dk | Klavye, mouse ve ölçekleme kılavuzunu tamamla |
 | [x] | `F6-029` | `3.29.0` | 15 dk | Bilinen sorunları ve veri sınırlamalarını yaz |
 | [x] | `F6-030` | `3.30.0` | 20 dk | Paketli uygulamada kullanıcı kabul turunu kaydet |
-| [ ] | `F6-031` | `3.31.0` | 20 dk | Paketli ana ekranı referans mockup ile karşılaştır |
+| [x] | `F6-031` | `3.31.0` | 20 dk | Paketli ana ekranı referans mockup ile karşılaştır |
 | [ ] | `F6-032` | `3.32.0` | 20 dk | Release ve geri dönüş prosedürünü yaz |
 | [ ] | `F6-033` | `3.33.0` | 15 dk | Major sürüm notları ve milestone özetini hazırla |
 | [ ] | `F6-034` | `4.0.0` | 15 dk | Dağıtım milestone kabulünü kapat ve major sürümü hazırla |
