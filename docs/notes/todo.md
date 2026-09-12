@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 655 madde · 506 tamamlandı · 149 kaldı**
+**Toplam 655 madde · 507 tamamlandı · 148 kaldı**
 
-`[###################.....]` %77.3
+`[###################.....]` %77.4
 
 ## Özet
 
@@ -41,10 +41,10 @@ Work in fully autonomous mode.
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 41 | 0 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 35 | 0 | 35 |
-| Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema | 26 | 54 | 80 |
+| Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema | 27 | 53 | 80 |
 | Faz 8 — Tx/Rx ham veri analizi ve sensör sağlığı | 0 | 76 | 76 |
 | Bölüm içi kontrol listeleri | 126 | 19 | 145 |
-| **Toplam** | **506** | **149** | **655** |
+| **Toplam** | **507** | **148** | **655** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -437,7 +437,7 @@ Work in fully autonomous mode.
 | [x] | `F6-034` | `4.0.0` | 15 dk | Dağıtım milestone kabulünü kapat ve major sürümü hazırla |
 | [x] | `F6-035` | `3.35.0` | 20 dk | Kalite bayraklarını dışa aktarmaya ve paket denetimine taşı |
 
-### Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema (26/80)
+### Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema (27/80)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -467,7 +467,7 @@ Work in fully autonomous mode.
 | [x] | `F7-024` | `4.29.0` | 20 dk | Kesik dosyayı raporla, tam frame'leri kullan |
 | [x] | `F7-025` | `4.30.0` | 15 dk | Frame indeksi ile dosya adı uyuşmazlığını raporla |
 | [x] | `F7-026` | `4.31.0` | 20 dk | Timestamp ile frame sayacı arasındaki kaymayı ölç |
-| [ ] | `F7-027` | `4.32.0` | 20 dk | Sürüm dağıtımına Profil C'yi ekle |
+| [x] | `F7-027` | `4.32.0` | 20 dk | Sürüm dağıtımına Profil C'yi ekle |
 | [ ] | `F7-028` | `4.33.0` | 20 dk | Kayıt klasörü düzenini keşfet |
 | [ ] | `F7-029` | `4.34.0` | 20 dk | Dosya sayacı sırasını doğrula ve boşlukları raporla |
 | [ ] | `F7-030` | `4.35.0` | 20 dk | Klasör manifestini oku ve yoksa üret |

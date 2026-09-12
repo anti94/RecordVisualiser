@@ -1915,7 +1915,7 @@ kaydın uyuşmadığı durumda **sessizce yanlış okumamaktır**.
 | [x] | `F7-024` | `4.29.0` | 20 dk | Kesik dosyayı raporla, tam frame'leri kullan | Yarım frame atılır, kaç bayt atıldığı kullanıcıya bildirilir | `F7-023` | `feat(parser): F7-024 kesik dosyayı raporla, tam frame'leri kullan` |
 | [x] | `F7-025` | `4.30.0` | 15 dk | Frame indeksi ile dosya adı uyuşmazlığını raporla | `RxData00007.bin` içinde 70'ten farklı başlayan indeks uyarı üretir | `F7-024` | `feat(parser): F7-025 frame indeksi ile dosya adı uyuşmazlığını raporla` |
 | [x] | `F7-026` | `4.31.0` | 20 dk | Timestamp ile frame sayacı arasındaki kaymayı ölç | Kayma ppm olarak raporlanır; 820/8192 kaynaklı beklenen kayma ile karşılaştırılır | `F7-025` | `feat(parser): F7-026 timestamp ile frame sayacı arasındaki kaymayı ölç` |
-| [ ] | `F7-027` | `4.32.0` | 20 dk | Sürüm dağıtımına Profil C'yi ekle | Profil A, B ve C dosyaları doğru çözücüye gider; bilinmeyen sürüm açık hata verir | `F7-026` | `feat(parser): F7-027 sürüm dağıtımına Profil C'yi ekle` |
+| [x] | `F7-027` | `4.32.0` | 20 dk | Sürüm dağıtımına Profil C'yi ekle | Profil A, B ve C dosyaları doğru çözücüye gider; bilinmeyen sürüm açık hata verir | `F7-026` | `feat(parser): F7-027 sürüm dağıtımına Profil C'yi ekle` |
 
 ##### Klasör keşfi ve indeks
 
