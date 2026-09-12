@@ -176,6 +176,13 @@ def _build_bits(
                 f"{where}.{name}: 0x{mask:X} maskesi daha once tanimlanmis bir bitle "
                 f"ortusuyor; bir bit iki anlama gelemez"
             )
+        natural = (mask & -mask).bit_length() - 1
+        if shift and shift != natural:
+            raise SchemaValueError(
+                f"{where}.{name}: shift={shift} ama 0x{mask:X} maskesinin en dusuk seti "
+                f"{natural}. konumda; acikca yazilan kaydirma maskeyle uyusmuyor ve "
+                f"dusuk bitleri sessizce atardi"
+            )
         combined |= mask
         bits.append(
             BitField(name=name, mask=mask, shift=shift, description=_text(entry, "description"))

@@ -20,23 +20,41 @@ from dataclasses import field as dataclass_field
 from sonar_analyzer.io.schema.types import CppType
 
 
+def _trailing_zeros(mask: int) -> int:
+    """Maskenin en düşük set bitinin konumu."""
+    if mask == 0:
+        return 0
+    return (mask & -mask).bit_length() - 1
+
+
 @dataclass(frozen=True)
 class BitField:
-    """Bir tamsayı alanının içindeki maske."""
+    """Bir tamsayı alanının içindeki maske.
+
+    `shift` verilmezse maskenin en düşük set bitinden türetilir. Bu, tek
+    bitlik bir bayrağın 0/1 döndürmesini sağlar: `clock_locked` maskesi
+    0x0002 ise kaydırmasız `extract` 2 döndürürdü ve `== 1` karşılaştıran
+    her kod sessizce yanlış çalışırdı.
+    """
 
     name: str
     mask: int
     shift: int = 0
     description: str = ""
 
+    @property
+    def effective_shift(self) -> int:
+        """Uygulanan kaydırma: verilmişse o, yoksa maskeden türetilen."""
+        return self.shift if self.shift else _trailing_zeros(self.mask)
+
     def extract(self, value: int) -> int:
         """Ham tamsayıdan bu bit alanının değerini çıkarır."""
-        return (value & self.mask) >> self.shift
+        return (value & self.mask) >> self.effective_shift
 
     @property
     def width(self) -> int:
         """Maskenin kapsadığı bit sayısı."""
-        return bin(self.mask >> self.shift).count("1")
+        return bin(self.mask).count("1")
 
 
 @dataclass(frozen=True)

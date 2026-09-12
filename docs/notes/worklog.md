@@ -409,8 +409,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F7-005` | 20 dk | 35 sn | `16e4c92` | zaman ekseninin tek kaynağını sözleşmeye bağla |
 | `F7-006` | 20 dk | 12 dk 51 sn | `fbb8a97` | örnek TOML şema dosyasını yaz |
 | `F7-007` | 20 dk | 11 dk 9 sn | `1d90fe8` | cpp tip → struct kodu → NumPy dtype eşlemesini kur |
+| `F7-008` | 20 dk | 14 dk 24 sn | `e6a2050` | …F7-013 TOML şema yükleyicisini ve doğrulamalarını kur |
 
-**391 commit · olculen toplam 5633 dk 30 sn · olculemeyen 1 (ilk commit)**
+**392 commit · olculen toplam 5647 dk 54 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

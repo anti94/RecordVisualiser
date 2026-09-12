@@ -1897,11 +1897,11 @@ kaydın uyuşmadığı durumda **sessizce yanlış okumamaktır**.
 | [x] | `F7-011` | `4.16.0` | 20 dk | Offset çakışması ve boşluk denetimini ekle | Üst üste binen iki alan hata verir; bildirilmemiş boşluk uyarı olarak raporlanır | `F7-010` | `feat(schema): F7-011 offset çakışması ve boşluk denetimini ekle` |
 | [x] | `F7-012` | `4.17.0` | 15 dk | Bildirilen boyut ile hesaplanan boyut uyuşmazlığını reddet | `size = 256` diyen ama alanları 248 bayt tutan şema açık hata verir | `F7-011` | `feat(schema): F7-012 bildirilen boyut ile hesaplanan boyut uyuşmazlığını reddet` |
 | [x] | `F7-013` | `4.18.0` | 20 dk | Hizalama ihlali denetimini ekle | 4 baytlık alan 2'ye hizalı offsette ise, paketleme `packed` değilse hata verir | `F7-012` | `feat(schema): F7-013 hizalama ihlali denetimini ekle` |
-| [ ] | `F7-014` | `4.19.0` | 20 dk | Şemadan çalışma zamanında `struct.Struct` üret | Üretilen format dizgisinin `calcsize` sonucu bildirilen boyuta eşittir | `F7-013` | `feat(schema): F7-014 şemadan çalışma zamanında `struct.Struct` üret` |
-| [ ] | `F7-015` | `4.20.0` | 20 dk | Şemadan NumPy structured dtype üret | `dtype.itemsize` bildirilen boyuta eşit; alan offsetleri şemayla birebir | `F7-014` | `feat(schema): F7-015 şemadan NumPy structured dtype üret` |
-| [ ] | `F7-016` | `4.21.0` | 15 dk | Şema parmak izini hesapla ve kayda yaz | Aynı şema aynı parmak izini verir; tek alan değişince parmak izi değişir | `F7-015` | `feat(schema): F7-016 şema parmak izini hesapla ve kayda yaz` |
-| [ ] | `F7-017` | `4.22.0` | 20 dk | Şema ile kayıt uyuşmazlığını tespit eden kapıyı kur | Magic, şema kimliği ve akıl sağlığı kontrolü; yanlış şemayla açılan kayıt sessizce okunmaz, reddedilir | `F7-016` | `feat(schema): F7-017 şema ile kayıt uyuşmazlığını tespit eden kapıyı kur` |
-| [ ] | `F7-018` | `4.23.0` | 20 dk | Şema doğrulama hatalarını kullanıcıya taşıyan mesajları yaz | Her hata sınıfı için hangi alan, hangi offset ve ne beklendiği mesajda görünür | `F7-017` | `feat(schema): F7-018 şema doğrulama hatalarını kullanıcıya taşıyan mesajları yaz` |
+| [x] | `F7-014` | `4.19.0` | 20 dk | Şemadan çalışma zamanında `struct.Struct` üret | Üretilen format dizgisinin `calcsize` sonucu bildirilen boyuta eşittir | `F7-013` | `feat(schema): F7-014 şemadan çalışma zamanında `struct.Struct` üret` |
+| [x] | `F7-015` | `4.20.0` | 20 dk | Şemadan NumPy structured dtype üret | `dtype.itemsize` bildirilen boyuta eşit; alan offsetleri şemayla birebir | `F7-014` | `feat(schema): F7-015 şemadan NumPy structured dtype üret` |
+| [x] | `F7-016` | `4.21.0` | 15 dk | Şema parmak izini hesapla ve kayda yaz | Aynı şema aynı parmak izini verir; tek alan değişince parmak izi değişir | `F7-015` | `feat(schema): F7-016 şema parmak izini hesapla ve kayda yaz` |
+| [x] | `F7-017` | `4.22.0` | 20 dk | Şema ile kayıt uyuşmazlığını tespit eden kapıyı kur | Magic, şema kimliği ve akıl sağlığı kontrolü; yanlış şemayla açılan kayıt sessizce okunmaz, reddedilir | `F7-016` | `feat(schema): F7-017 şema ile kayıt uyuşmazlığını tespit eden kapıyı kur` |
+| [x] | `F7-018` | `4.23.0` | 20 dk | Şema doğrulama hatalarını kullanıcıya taşıyan mesajları yaz | Her hata sınıfı için hangi alan, hangi offset ve ne beklendiği mesajda görünür | `F7-017` | `feat(schema): F7-018 şema doğrulama hatalarını kullanıcıya taşıyan mesajları yaz` |
 
 ##### Profil C çözücüsü
 
