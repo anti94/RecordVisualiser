@@ -17,6 +17,7 @@ from sonar_analyzer.domain.time_range import TimeRange
 from sonar_analyzer.repository.mock_repository import MockRecordingRepository
 from sonar_analyzer.ui.docks.data_explorer import (
     EMPTY_VALUE,
+    MOCKUP_SUMMARY_FIELDS,
     SUMMARY_FIELDS,
     DataExplorerDock,
 )
@@ -51,7 +52,22 @@ def window(qtbot: QtBot) -> MainWindow:
 
 
 def test_summary_fields_are_in_mockup_order(dock: DataExplorerDock) -> None:
-    assert list(SUMMARY_FIELDS) == ["File", "Size", "Start", "Duration", "Platform"]
+    """Mockup'taki beş alan, aynı sırada ve **başta** olmalı.
+
+    Kart sonradan büyüyebilir (`F7-052` "Format" ekledi) ama mockup'ın
+    alanları kaydırılamaz: sıra ve konum `F6-031` kabulünün parçası.
+    Yeni bilgi sona eklenir.
+    """
+    assert list(MOCKUP_SUMMARY_FIELDS) == ["File", "Size", "Start", "Duration", "Platform"]
+    assert list(SUMMARY_FIELDS[: len(MOCKUP_SUMMARY_FIELDS)]) == list(MOCKUP_SUMMARY_FIELDS)
+
+
+def test_extra_fields_come_after_the_mockup_ones(dock: DataExplorerDock) -> None:
+    """Eklenen alanlar mockup alanlarını bölmemeli."""
+    extra = SUMMARY_FIELDS[len(MOCKUP_SUMMARY_FIELDS) :]
+
+    assert "Format" in extra
+    assert not set(extra) & set(MOCKUP_SUMMARY_FIELDS)
 
 
 def test_summary_is_a_card(dock: DataExplorerDock) -> None:

@@ -417,8 +417,9 @@ Tablo `python tools/worklog_stats.py --update` ile üretilir; **elle düzenlenme
 | `F7-031` | 20 dk | 12 dk 10 sn | `3631a32` | …F7-034 klasör seviyesinde indeksi kur |
 | `F7-035` | 20 dk | 75 dk 22 sn | `043843f` | klasör indeksi kurma süresini ölç |
 | `F7-036` | 20 dk | 14 dk 59 sn | `7efbbf8` | …F7-040, F7-042, F7-044 klasör repository'sini kur |
+| `F7-045` | 20 dk | 101 dk 31 sn | `6084d41` | , F7-046, F7-048, F7-051 klasör açma ve şema ayarı |
 
-**399 commit · olculen toplam 5825 dk 7 sn · olculemeyen 1 (ilk commit)**
+**400 commit · olculen toplam 5926 dk 38 sn · olculemeyen 1 (ilk commit)**
 
 <!-- SURELER:BITIS -->
 

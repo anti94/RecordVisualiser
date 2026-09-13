@@ -310,3 +310,23 @@ yükseltilir. Rapor: `docs/packaging/results/dependency-scan.json`.
   demektir.
 - Açık kararların tam kütüğü: `docs/notes/open-decisions.md`.
   Eksik dış girdiler: `docs/format/inventory.md` §2.
+
+## K-22 — `test_custom_tab_chain_still_applies_when_it_is_active` sıra bağımlı
+
+`tests/gui/test_filter_tab_low_pass.py` içindeki bu test, tam süit belirli
+bir `pytest-randomly` tohumuyla koşturulduğunda düşüyor; tek başına ve
+başka tohumlarda geçiyor.
+
+**Etki:** Testin kendisi ya da filtre sekmesi kodu, testler arasında
+taşınan bir durum tutuyor. Sıra bağımlı bir test iki yönde de zarar
+verir: rastgele düşen bir süit güveni aşındırır, ve gerçek bir sızıntıyı
+gizler — çünkü "bazen düşüyor" diye görmezden gelinir.
+
+Bu bulgu `F7-047` çalışması sırasında ortaya çıktı ve o değişiklikten
+kaynaklanmıyor: aynı süit hem önce hem sonra başka tohumlarla geçiyor.
+
+**İş kimliği:** Henüz açılmadı; Faz 7 kabulünde (`F7-080`) ele alınacak.
+
+**Hedef düzeltme:** Düşüren tohum yakalanıp (`-p randomly --randomly-seed=N`)
+hangi testin durumu bıraktığı bulunmalı. Muhtemel kaynak: modül seviyesinde
+paylaşılan bir `MainWindow` ya da işleme zinciri örneği.

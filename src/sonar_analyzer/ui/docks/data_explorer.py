@@ -56,14 +56,33 @@ EMPTY_TREE_HINT = "Kanal yok. Bir .bin dosyasi acin."
 _LAZY_PLACEHOLDER_TEXT = "Yukleniyor..."
 
 #: Dosya ozetinde gosterilen alanlar (mockup bolge 1).
-SUMMARY_FIELDS = ("File", "Size", "Start", "Duration", "Platform")
+#: Mockup'taki BES alan (`docs/ui/layout-map.md` Bolum 2), aynen o sirada.
+#: Sira mockup kabulunun (`F6-031`) parcasidir ve degistirilemez.
+MOCKUP_SUMMARY_FIELDS = ("File", "Size", "Start", "Duration", "Platform")
+
+#: Kayit karti alanlari. "Format" `F7-052` ile SONA eklendi: ayni klasor
+#: iki farkli semayla acildiginda IKI FARKLI SONUC verir ve hangisinin
+#: kullanildigi ekranda gorunmezse yanlis olan fark edilmez.
+#:
+#: Basa ya da araya konmadi: mockup'taki bes alanin sirasi ve konumu
+#: kabulle sabitlenmis durumda. Yeni bilgi EKLENIR, var olan yerlesim
+#: kaydirilmaz.
+SUMMARY_FIELDS = (*MOCKUP_SUMMARY_FIELDS, "Format")
 
 #: Yol parcasi -> agacta gosterilecek etiket.
 #:
 #: Kanal yolunda "/" ayractir, bu yuzden bir parca adi "/" ICEREMEZ. Mockup'ta
 #: grup "Vehicle / Transmission" yaziyor; yolda "Vehicle" tutulur ve gosterim
 #: etiketi burada eslenir.
-GROUP_LABELS = {"Vehicle": "Vehicle / Transmission"}
+#:
+#: Profil C'de iki ust dugum Tx ve Rx'tir (`F7-047`). Iki harf tek basina
+#: hangisinin yayin hangisinin dinleme oldugunu soylemiyor ve ikisi
+#: karistirilirsa okunan veri yanlis yorumlanir; etiket bunu aciyor.
+GROUP_LABELS = {
+    "Vehicle": "Vehicle / Transmission",
+    "Tx": "Tx (Transmit)",
+    "Rx": "Rx (Receive)",
+}
 
 #: `F3-012` kategori filtresi düğmeleri — mockup'taki beş grup (plan Bölüm 5.2).
 CATEGORIES: tuple[str, ...] = (
@@ -178,6 +197,20 @@ def _format_start(timestamp_ns: int) -> str:
         return EMPTY_VALUE
     moment = datetime.fromtimestamp(timestamp_ns / 1_000_000_000, tz=timezone.utc)
     return moment.strftime("%Y-%m-%d %H:%M:%S UTC")
+
+
+def _format_profile(metadata: RecordingMetadata) -> str:
+    """Kayıt kartındaki biçim satırı — `F7-052`.
+
+    Profil C'de sürüm, kaydı **hangi şemayla** okuduğumuzu söyler. Aynı
+    klasör iki farklı şemayla açıldığında iki farklı sonuç verir; hangisi
+    kullanıldı sorusunun cevabı ekranda olmazsa, yanlış olan fark
+    edilmez.
+    """
+    profile = metadata.format_profile or "?"
+    channels = metadata.channel_count
+    suffix = f" · {channels} kanal" if channels else ""
+    return f"Profil {profile} v{metadata.format_version}{suffix}"
 
 
 def _format_duration(seconds: float) -> str:
@@ -472,6 +505,7 @@ class DataExplorerDock(QDockWidget):
         self._summary_labels["Start"].setText(_format_start(metadata.start_ns))
         self._summary_labels["Duration"].setText(_format_duration(metadata.duration_seconds))
         self._summary_labels["Platform"].setText(metadata.device_id or EMPTY_VALUE)
+        self._summary_labels["Format"].setText(_format_profile(metadata))
 
         self._channels = tuple(channels)
         self._rebuild_tree()

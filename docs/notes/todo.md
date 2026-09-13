@@ -26,9 +26,9 @@ Work in fully autonomous mode.
 - Only stop if continuing is technically impossible without information that cannot be inferred from the project, codebase, todo.md, or Git history.
 - After completing a task, immediately continue with the next unfinished item in todo.md.
 
-**Toplam 655 madde · 526 tamamlandı · 129 kaldı**
+**Toplam 655 madde · 528 tamamlandı · 127 kaldı**
 
-`[###################.....]` %80.3
+`[###################.....]` %80.6
 
 ## Özet
 
@@ -41,10 +41,10 @@ Work in fully autonomous mode.
 | Faz 4 — Mockup analiz panosu ve büyük veri performansı | 96 | 0 | 96 |
 | Faz 5 — Canlı veri, bağlantı ve kayıt | 41 | 0 | 41 |
 | Faz 6 — Windows dağıtımı ve ürünleştirme | 35 | 0 | 35 |
-| Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema | 46 | 34 | 80 |
+| Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema | 48 | 32 | 80 |
 | Faz 8 — Tx/Rx ham veri analizi ve sensör sağlığı | 0 | 76 | 76 |
 | Bölüm içi kontrol listeleri | 126 | 19 | 145 |
-| **Toplam** | **526** | **129** | **655** |
+| **Toplam** | **528** | **127** | **655** |
 
 ## A. Bölüm 22 iş tabloları
 
@@ -437,7 +437,7 @@ Work in fully autonomous mode.
 | [x] | `F6-034` | `4.0.0` | 15 dk | Dağıtım milestone kabulünü kapat ve major sürümü hazırla |
 | [x] | `F6-035` | `3.35.0` | 20 dk | Kalite bayraklarını dışa aktarmaya ve paket denetimine taşı |
 
-### Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema (46/80)
+### Faz 7 — Klasör tabanlı Tx/Rx kayıt mimarisi ve TOML şema (48/80)
 
 | | İş | Sürüm | Süre | Çıktı |
 | --- | --- | --- | --- | --- |
@@ -487,12 +487,12 @@ Work in fully autonomous mode.
 | [x] | `F7-044` | `4.49.0` | 20 dk | Bozuk ve eksik dosyayı oynatmada göster |
 | [x] | `F7-045` | `4.50.0` | 20 dk | Klasör açma diyalogunu ekle |
 | [x] | `F7-046` | `4.51.0` | 15 dk | Son kullanılanlara klasör yolunu ekle |
-| [ ] | `F7-047` | `4.52.0` | 20 dk | Data Explorer'da Tx/Rx ağacını kur |
+| [x] | `F7-047` | `4.52.0` | 20 dk | Data Explorer'da Tx/Rx ağacını kur |
 | [x] | `F7-048` | `4.53.0` | 20 dk | Şema dosyası seçimini ayarlara ekle |
 | [ ] | `F7-049` | `4.54.0` | 20 dk | Şema değişince açık kaydı yeniden yükle |
 | [ ] | `F7-050` | `4.55.0` | 20 dk | Geçersiz şemayı arayüzde göster |
 | [x] | `F7-051` | `4.56.0` | 15 dk | Sürükle bırakta klasör kabul et |
-| [ ] | `F7-052` | `4.57.0` | 20 dk | Kayıt kartında klasör ve şema bilgisini göster |
+| [x] | `F7-052` | `4.57.0` | 20 dk | Kayıt kartında klasör ve şema bilgisini göster |
 | [ ] | `F7-053` | `4.58.0` | 20 dk | Profil C sentetik üreteç iskeletini kur |
 | [ ] | `F7-054` | `4.59.0` | 20 dk | CW dalga biçimi üretimini ekle |
 | [ ] | `F7-055` | `4.60.0` | 20 dk | LFM yukarı ve aşağı cıvıltı üretimini ekle |
